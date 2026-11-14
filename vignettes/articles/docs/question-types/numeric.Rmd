@@ -1,5 +1,5 @@
 ---
-title: "Ask for a number"
+title: "Add a number question"
 description: "Add a question, choose Numeric, and set the range the answer may take."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Numeric, and set the range the answer may t
 
 Add a question, choose Numeric, and set the range the answer may take.
 
-![The a number question selected in the editor, its settings outlined.](../../../docs/question-types/numeric-editor.png){width=100%}
+![The questionnaire editor with the number question selected and its settings panel outlined.](../../../docs/question-types/numeric-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/numeric-preview.png){width=90%}
+![The number question as the respondent sees it.](../../../docs/question-types/numeric-preview.png){width=90%}
 
 ## Settings
 

@@ -1,5 +1,5 @@
 ---
-title: "Ask for a rating on a slider"
+title: "Add a slider rating"
 description: "Add a question, choose Slider, and set its range and step."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Slider, and set its range and step."
 
 Add a question, choose Slider, and set its range and step.
 
-![The a rating on a slider question selected in the editor, its settings outlined.](../../../docs/question-types/slider-editor.png){width=100%}
+![The questionnaire editor with the slider rating selected and its settings panel outlined.](../../../docs/question-types/slider-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/slider-preview.png){width=90%}
+![The slider rating as the respondent sees it.](../../../docs/question-types/slider-preview.png){width=90%}
 
 ## Settings
 

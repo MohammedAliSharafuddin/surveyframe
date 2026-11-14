@@ -1,5 +1,5 @@
 ---
-title: "Ask a grid of rating questions"
+title: "Add a grid of rating questions"
 description: "Add a question, choose Matrix, list the rows, and pick the scale every row is rated on."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Matrix, list the rows, and pick the scale e
 
 Add a question, choose Matrix, list the rows, and pick the scale every row is rated on.
 
-![The grid of rating questions question selected in the editor, its settings outlined.](../../../docs/question-types/grid-editor.png){width=100%}
+![The questionnaire editor with the grid of rating questions selected and its settings panel outlined.](../../../docs/question-types/grid-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/grid-preview.png){width=90%}
+![The grid of rating questions as the respondent sees it.](../../../docs/question-types/grid-preview.png){width=90%}
 
 ## Settings
 

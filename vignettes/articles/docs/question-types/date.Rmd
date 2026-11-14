@@ -1,5 +1,5 @@
 ---
-title: "Ask for a date"
+title: "Add a date question"
 description: "Add a question and choose Date. The respondent picks it from a calendar."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question and choose Date. The respondent picks it from a cal
 
 Add a question and choose Date. The respondent picks it from a calendar.
 
-![The a date question selected in the editor, its settings outlined.](../../../docs/question-types/date-editor.png){width=100%}
+![The questionnaire editor with the date question selected and its settings panel outlined.](../../../docs/question-types/date-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/date-preview.png){width=90%}
+![The date question as the respondent sees it.](../../../docs/question-types/date-preview.png){width=90%}
 
 ## Settings
 

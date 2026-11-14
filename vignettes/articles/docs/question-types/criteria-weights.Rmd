@@ -1,5 +1,5 @@
 ---
-title: "Ask respondents to weight criteria"
+title: "Add a criteria weighting question"
 description: "Add a question, choose Criteria weight, and list the criteria to divide 100 points across."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Criteria weight, and list the criteria to d
 
 Add a question, choose Criteria weight, and list the criteria to divide 100 points across.
 
-![The respondents to weight criteria question selected in the editor, its settings outlined.](../../../docs/question-types/criteria-weights-editor.png){width=100%}
+![The questionnaire editor with the criteria weighting question selected and its settings panel outlined.](../../../docs/question-types/criteria-weights-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/criteria-weights-preview.png){width=90%}
+![The criteria weighting question as the respondent sees it.](../../../docs/question-types/criteria-weights-preview.png){width=90%}
 
 ## Settings
 

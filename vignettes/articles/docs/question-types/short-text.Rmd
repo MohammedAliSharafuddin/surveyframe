@@ -1,5 +1,5 @@
 ---
-title: "Ask for a short text answer"
+title: "Add a short text question"
 description: "Add a question and choose Short text for a word or a line."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question and choose Short text for a word or a line."
 
 Add a question and choose Short text for a word or a line.
 
-![The a short text answer question selected in the editor, its settings outlined.](../../../docs/question-types/short-text-editor.png){width=100%}
+![The questionnaire editor with the short text question selected and its settings panel outlined.](../../../docs/question-types/short-text-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/short-text-preview.png){width=90%}
+![The short text question as the respondent sees it.](../../../docs/question-types/short-text-preview.png){width=90%}
 
 ## Settings
 
@@ -19,7 +19,7 @@ Add a question and choose Short text for a word or a line.
 
 ## Best practices for research
 
-Ask for a short text only where the answer cannot be listed: open answers take longer and are skipped more.
+Use a short text where the possible answers are too varied to list. Where the answers can be listed, a choice question is quicker to answer and to analyse.
 
 Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
 
