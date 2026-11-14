@@ -4,7 +4,7 @@
 # into its JavaScript state, so the questions, scales and analysis plan show
 # at once, and returns its path. Used by launch_builder(demo =).
 sframe_builder_demo_html <- function(name) {
-  demo <- sframe_demo(name)
+  demo <- sframe_demo(name, preview = FALSE)
 
   # Build a plain-list serialisation payload (strips R S3 classes)
   payload <- sframe_serialization_payload(demo$instrument)

@@ -3039,7 +3039,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$load_sample_btn, {
     tryCatch({
-      demo <- sframe_demo("input_types")
+      demo <- sframe_demo("input_types", preview = FALSE)
       rv$builder <- builder_state_from_instrument(demo$instrument)
       rv$instrument <- demo$instrument
       rv$responses <- demo$responses

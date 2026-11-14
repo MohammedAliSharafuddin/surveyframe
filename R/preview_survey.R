@@ -38,7 +38,7 @@ preview_survey <- function(x, where = c("browser", "studio"),
   where <- match.arg(where)
   if (is.character(x) && length(x) == 1L) {
     name <- x
-    x <- sframe_demo(name, branded = TRUE)$instrument
+    x <- sframe_demo(name, branded = TRUE, preview = FALSE)$instrument
   } else if (inherits(x, "sframe")) {
     name <- x$meta$id %||% "survey"
   } else {
