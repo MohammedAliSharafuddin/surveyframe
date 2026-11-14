@@ -264,7 +264,7 @@ See `sframe_demo("multi_response")`.
 
 **A trap worth knowing.** When a matrix row label contains a space, the
 column does too, and `read.csv()` will quietly rewrite
-`session__Opening keynote` as `session__Opening.keynote`, which no longer
+`session__Reading materials` as `session__Reading.materials`, which no longer
 matches the contract the instrument declares. Read with
 `check.names = FALSE`.
 
