@@ -21,3 +21,10 @@ div.sourceCode > pre.sourceCode > code {
   padding-left: 2ch;
   text-indent: -2ch;
 }
+
+// Web-only pages (vignettes/articles/) are site pages, not package files, so
+// their "Source: vignettes/articles/..." line, a developer cue, is hidden
+// (owner UI check 2026-11-14). The package vignettes keep theirs.
+small.dont-index:has(a[href*="vignettes/articles/"]) {
+  display: none;
+}
