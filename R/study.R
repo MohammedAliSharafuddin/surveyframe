@@ -8,7 +8,10 @@
 # the respondent's page, and a change to it after collection is a design
 # amendment.
 
-sframe_study_fields <- c("problem", "objectives", "sampling")
+sframe_study_fields <- c("problem", "objectives", "sampling", "preregistration")
+# The preregistration fields (owner 2026-11-14), each an optional text.
+sframe_preregistration_fields <- c("exclusion_rules", "stopping_rule", "primary_outcomes",
+                                   "secondary_outcomes", "multiplicity", "contingency")
 sframe_sampling_fields <- c("population", "method", "method_other", "planned_n")
 
 #' Sampling methods a study can declare
@@ -46,7 +49,12 @@ sframe_sampling_methods <- function(type = c("all", "probability", "non_probabil
 #' Returns the instrument's `study`: the problem statement, the objectives
 #' (each with an `id` such as `"O1"` and its `text`), and the sampling plan
 #' (`population`, `method` from [sframe_sampling_methods()], `method_other`
-#' describing an `"other"` method, and `planned_n`).
+#' describing an `"other"` method, and `planned_n`), and the preregistration
+#' fields a plan states beyond its blocks (`preregistration`, with
+#' `exclusion_rules`, `stopping_rule`, `primary_outcomes`,
+#' `secondary_outcomes`, `multiplicity` and `contingency`, each 1 optional
+#' text). The study is inside the hash, so on a published instrument a change
+#' to any of these is a design amendment, recorded with [amend_sframe()].
 #' Set it with `sframe_instrument(study = )` or by assigning
 #' `instrument$study`. Each plan block may name the objective it serves in its
 #' `objective` field. The study is never shown to respondents, since telling
@@ -59,8 +67,8 @@ sframe_sampling_methods <- function(type = c("all", "probability", "non_probabil
 #'
 #' @param x An `sframe` object.
 #' @param ... Ignored.
-#' @return A list with `problem`, `objectives` and `sampling`, each `NULL`
-#'   when not declared.
+#' @return A list with `problem`, `objectives`, `sampling` and
+#'   `preregistration`, each `NULL` when not declared.
 #' @export
 #' @family Design functions
 #' @examples
@@ -71,7 +79,8 @@ sframe_sampling_methods <- function(type = c("all", "probability", "non_probabil
 sframe_get_study <- function(x, ...) {
   sframe_check_instrument(x)
   s <- x$study %||% list()
-  list(problem = s$problem, objectives = s$objectives, sampling = s$sampling)
+  list(problem = s$problem, objectives = s$objectives, sampling = s$sampling,
+       preregistration = s$preregistration)
 }
 
 # The study as read from JSON, with the shapes R code expects.
@@ -88,6 +97,9 @@ sframe_restore_study <- function(study) {
   if (!is.null(study$sampling$planned_n) && is.numeric(study$sampling$planned_n) &&
       length(study$sampling$planned_n) == 1 && study$sampling$planned_n == round(study$sampling$planned_n)) {
     study$sampling$planned_n <- as.integer(study$sampling$planned_n)
+  }
+  if (is.list(study$preregistration)) {
+    study$preregistration <- lapply(study$preregistration, sframe_as_vector, "character")
   }
   study
 }
@@ -106,6 +118,10 @@ sframe_study_plain <- function(study) {
     if (length(study$sampling) == 0) study$sampling <- NULL
   }
   if (!is.null(study$objectives)) study$objectives <- unname(study$objectives)
+  if (!is.null(study$preregistration)) {
+    study$preregistration <- Filter(function(v) length(v) > 0, study$preregistration)
+    if (length(study$preregistration) == 0) study$preregistration <- NULL
+  }
   if (length(study) == 0) NULL else study
 }
 
@@ -158,12 +174,12 @@ sframe_study_problems <- function(instrument) {
     return(list(problems = c(problems, trace(character(0))), notes = notes))
   }
   if (!is.list(s) || is.null(names(s))) {
-    return(list(problems = c(problems, "`study` must be a named list with problem, objectives and sampling."),
+    return(list(problems = c(problems, "`study` must be a named list with problem, objectives, sampling and preregistration."),
                 notes = notes))
   }
   extra <- setdiff(names(s), sframe_study_fields)
   if (length(extra)) {
-    problems <- c(problems, sprintf("`study` has unknown %s: %s. It holds problem, objectives and sampling.",
+    problems <- c(problems, sprintf("`study` has unknown %s: %s. It holds problem, objectives, sampling and preregistration.",
                                     sframe_plural(length(extra), "field"), paste(extra, collapse = ", ")))
   }
   if (!is.null(s$problem)) {
@@ -232,6 +248,28 @@ sframe_study_problems <- function(instrument) {
       n <- sp$planned_n
       if (!is.null(n) && (!is.numeric(n) || length(n) != 1 || is.na(n) || n < 1 || n != round(n))) {
         problems <- c(problems, "`study$sampling$planned_n` must be a whole number of 1 or more.")
+      }
+    }
+  }
+  if (!is.null(s$preregistration)) {
+    pr <- s$preregistration
+    if (!is.list(pr) || (length(pr) && is.null(names(pr)))) {
+      problems <- c(problems, paste0("`study$preregistration` must be a list of texts named ",
+                                     paste(sframe_preregistration_fields, collapse = ", "), "."))
+    } else if (length(pr) == 0) {
+      problems <- c(problems, "`study$preregistration` is present and empty. Drop it, or write at least 1 of its fields.")
+    } else {
+      extra <- setdiff(names(pr), sframe_preregistration_fields)
+      if (length(extra)) {
+        problems <- c(problems, sprintf("`study$preregistration` has unknown %s: %s. It holds %s.",
+                                        sframe_plural(length(extra), "field"), paste(extra, collapse = ", "),
+                                        paste(sframe_preregistration_fields, collapse = ", ")))
+      }
+      for (f in intersect(names(pr), sframe_preregistration_fields)) {
+        v <- pr[[f]]
+        if (!one_string(v) || !grepl("\\S", v)) {
+          problems <- c(problems, sprintf("`study$preregistration$%s` must be 1 text, not blank.", f))
+        }
       }
     }
   }

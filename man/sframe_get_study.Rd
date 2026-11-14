@@ -12,14 +12,19 @@ sframe_get_study(x, ...)
 \item{...}{Ignored.}
 }
 \value{
-A list with \code{problem}, \code{objectives} and \code{sampling}, each \code{NULL}
-when not declared.
+A list with \code{problem}, \code{objectives}, \code{sampling} and
+\code{preregistration}, each \code{NULL} when not declared.
 }
 \description{
 Returns the instrument's \code{study}: the problem statement, the objectives
 (each with an \code{id} such as \code{"O1"} and its \code{text}), and the sampling plan
 (\code{population}, \code{method} from \code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}}, \code{method_other}
-describing an \code{"other"} method, and \code{planned_n}).
+describing an \code{"other"} method, and \code{planned_n}), and the preregistration
+fields a plan states beyond its blocks (\code{preregistration}, with
+\code{exclusion_rules}, \code{stopping_rule}, \code{primary_outcomes},
+\code{secondary_outcomes}, \code{multiplicity} and \code{contingency}, each 1 optional
+text). The study is inside the hash, so on a published instrument a change
+to any of these is a design amendment, recorded with \code{\link[=amend_sframe]{amend_sframe()}}.
 Set it with \code{sframe_instrument(study = )} or by assigning
 \code{instrument$study}. Each plan block may name the objective it serves in its
 \code{objective} field. The study is never shown to respondents, since telling

@@ -49,8 +49,10 @@ or imported from a \code{.sframe} file.}
 \item{study}{List or \code{NULL}. The study the instrument serves: \code{problem} (1
 short paragraph), \code{objectives} (a list, each with an \code{id} such as \code{"O1"}
 and its \code{text}) and \code{sampling} (\code{population}, \code{method} from
-\code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}} and \code{planned_n}). Never shown to
-respondents. See \code{\link[=sframe_get_study]{sframe_get_study()}}.}
+\code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}} and \code{planned_n}) and \code{preregistration}
+(\code{exclusion_rules}, \code{stopping_rule}, \code{primary_outcomes},
+\code{secondary_outcomes}, \code{multiplicity} and \code{contingency}, each optional
+text). Never shown to respondents. See \code{\link[=sframe_get_study]{sframe_get_study()}}.}
 }
 \value{
 An object of class \code{sframe} with slots \code{meta}, \code{items}, \code{choices},
