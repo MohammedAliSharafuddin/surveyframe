@@ -1,13 +1,13 @@
 ---
 title: "Measurement model questionnaire (CFA and SEM)"
-description: "A study of whether content quality builds satisfaction, and satisfaction the intention to return, with the measurement model and the structural paths declared in advance. surveyframe gives you the questionnaire, the model syntax for lavaan and seminr, and the report."
+description: "A study exploring a proposed relationship between content quality, satisfaction and the intention to return. Specify the measurement and structural model, then generate syntax for lavaan or seminr. surveyframe gives you the questionnaire, the model syntax and the report."
 ---
 
 ```{=html}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Measurement model questionnaire (CFA and SEM)","description":"A study of whether content quality builds satisfaction, and satisfaction the intention to return, with the measurement model and the structural paths declared in advance. surveyframe gives you the questionnaire, the model syntax for lavaan and seminr, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/measurement-model-questionnaire.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Measurement model questionnaire (CFA and SEM)","description":"A study exploring a proposed relationship between content quality, satisfaction and the intention to return. Specify the measurement and structural model, then generate syntax for lavaan or seminr. surveyframe gives you the questionnaire, the model syntax and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/measurement-model-questionnaire.html"}</script>
 ```
 
-A study of whether content quality builds satisfaction, and satisfaction the intention to return, with the measurement model and the structural paths declared in advance. surveyframe gives you the questionnaire, the model syntax for lavaan and seminr, and the report.
+A study exploring a proposed relationship between content quality, satisfaction and the intention to return. Specify the measurement and structural model, then generate syntax for lavaan or seminr. surveyframe gives you the questionnaire, the model syntax and the report.
 
 ## Preview the questionnaire
 
@@ -36,7 +36,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ## Open this instrument in SurveyStudio
 
 1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
-2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `sem_pls`.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `sem_pls`, which opens this template's study.
 3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
 4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
@@ -54,7 +54,7 @@ Yes. Constructs, paths and the indirect effect are declared in the instrument an
 
 Yes. The model layer opens in SurveyStudio from RStudio's Addins menu.
 
-## For R users
+## Optional R code
 
 ```{=html}
 <details><summary>Open this study in R</summary>

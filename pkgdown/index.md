@@ -60,7 +60,7 @@ run the planned analyses and prepare APA 7 tables, figures and references for
 supported methods.
 [See the report stage](articles/run-a-study-in-surveystudio.html#report).
 
-**Keep a record of your research design.** Preserve the instrument version,
+**Keep a record of your research design.** Preserve the questionnaire version,
 sources and disclosed amendments with the design file.
 [Verify a `.sframe` file](https://surveyframe.org/verify/) to check that it
 matches the hash recorded when it was saved.

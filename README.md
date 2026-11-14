@@ -69,7 +69,7 @@ The development version, with the newest features before they reach CRAN:
 remotes::install_github("MohammedAliSharafuddin/surveyframe")
 ```
 
-## For R users
+## Optional R code
 
 ```r
 library(surveyframe)
@@ -78,7 +78,7 @@ results <- run_analysis_plan(demo$responses, demo$instrument)
 render_report(demo$instrument, data = demo$responses)
 ```
 
-Already have data from Google Forms, Qualtrics or REDCap? Describe the questions, then load the CSV with `read_responses()`. The [method guides](https://surveyframe.org/articles/guides.html) show each analysis step by step.
+Already have data from Google Forms, Qualtrics or REDCap? Describe the questions, then load the CSV with `read_responses()`. The [how-to guides](https://surveyframe.org/articles/guides.html) show each analysis step by step.
 
 ## Is it the right tool?
 
@@ -112,7 +112,7 @@ citation("surveyframe")
 ## Learn more
 
 - [Quantitative Analysis with Small Samples](https://doi.org/10.5281/zenodo.20221929), a companion textbook on the small-sample methods in surveyframe.
-- [Website](https://surveyframe.org/), [questionnaire templates](https://surveyframe.org/articles/templates.html), [method guides](https://surveyframe.org/articles/guides.html) and [changelog](https://surveyframe.org/news/index.html).
+- [Website](https://surveyframe.org/), [questionnaire templates](https://surveyframe.org/articles/templates.html), [how-to guides](https://surveyframe.org/articles/guides.html) and [changelog](https://surveyframe.org/news/index.html).
 
 ## Contributing
 

@@ -1,13 +1,13 @@
 ---
 title: "Training evaluation before and after"
-description: "A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report."
+description: "Compare the same participants' confidence, and their willingness to recommend a workshop, before and after the training. Plan the paired comparisons before collecting responses. surveyframe gives you the questionnaire, the plan and the report."
 ---
 
 ```{=html}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Training evaluation before and after","description":"A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/training-evaluation-before-and-after.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Training evaluation before and after","description":"Compare the same participants' confidence, and their willingness to recommend a workshop, before and after the training. Plan the paired comparisons before collecting responses. surveyframe gives you the questionnaire, the plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/training-evaluation-before-and-after.html"}</script>
 ```
 
-A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report.
+Compare the same participants' confidence, and their willingness to recommend a workshop, before and after the training. Plan the paired comparisons before collecting responses. surveyframe gives you the questionnaire, the plan and the report.
 
 ## Preview the questionnaire
 
@@ -36,7 +36,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ## Open this instrument in SurveyStudio
 
 1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
-2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `paired`.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `paired`, which opens this template's study.
 3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
 4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
@@ -54,7 +54,7 @@ Yes. With 3 or more measurements the plan uses a repeated measures ANOVA or the 
 
 Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.
 
-## For R users
+## Optional R code
 
 ```{=html}
 <details><summary>Open this study in R</summary>
