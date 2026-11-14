@@ -189,6 +189,8 @@ sframe_item_config_problems <- function(item) {
 #'
 #' sec <- sframe_item("sec_1", "Demographic Information", type = "section_break",
 #'                section_intro = "Please answer the following questions.")
+#' item
+#' sec
 #' @family Design functions
 sframe_item <- function(
     id,

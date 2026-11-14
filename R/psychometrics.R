@@ -172,7 +172,7 @@ print.sframe_reliability_report <- function(x, ...) {
 #'
 #' @examples
 #' \donttest{
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("likert_scale")
 #' ir <- sframe_item_results(demo$responses, demo$instrument)
 #' print(ir)
 #' # one scale's diagnostics

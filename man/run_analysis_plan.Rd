@@ -106,11 +106,11 @@ both. A multinomial model's reference is the first category.
 
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 responses <- read_responses(
-  system.file("extdata", "tourism_services_responses.csv",
+  system.file("extdata", "demos", "two_group_responses.csv",
               package = "surveyframe"),
   instr,
   respondent_id = "respondent_id",

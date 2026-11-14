@@ -1368,6 +1368,14 @@ arithmetic.
 
 ## Documentation
 
+* **Every example ends with something to look at, in 40 console lines or
+  fewer.** The examples of `sframe_item()`, `sframe_scale()`,
+  `sframe_branch()`, `sframe_choice_set()` and `sframe_attention_check()`
+  print what they made, where they printed nothing. `sframe_plan()`'s
+  example printed 1,647 lines, `run_analysis_plan()`'s 138 and
+  `sframe_item_results()`'s 83. They now use the `two_group` and
+  `likert_scale` demos, at 15, 10 and 33 lines. The 1 page over 40 is
+  `sframe_syntax_pls()`, whose 42 lines are the script it generates.
 * The visual-workflow vignette shows the tools it describes: SurveyBuilder's
   Analyse mode with a plan open, SurveyStudio's Upload Responses screen and
   a result on its Run preview tab, the dashboard, and the RStudio Addins

@@ -19,7 +19,10 @@ a codebook.
 Returns the ordered analysis blocks attached to an instrument or codebook.
 }
 \examples{
-sframe_plan(sframe_demo("tourism_services")$instrument)
+plan <- sframe_plan(sframe_demo("two_group")$instrument)
+length(plan)
+# 1 block, its fields
+str(plan[[1]], max.level = 1)
 }
 \seealso{
 \link{sframe_accessors}, \link{sframe_plan<-}

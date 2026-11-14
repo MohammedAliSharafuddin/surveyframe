@@ -46,6 +46,7 @@ rule <- sframe_branch(
   value      = "other",
   action     = "show"
 )
+rule
 }
 \seealso{
 \code{\link[=sframe_instrument]{sframe_instrument()}}, \code{\link[=validate_sframe]{validate_sframe()}}
