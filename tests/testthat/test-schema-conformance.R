@@ -133,3 +133,13 @@ test_that("the bundled schema describes the RFC 8785 hash and its canonical fiel
   # What the writer puts in the hash object is what the schema declares.
   expect_setequal(names(sframe_hash_object(strrep("0", 64))), names(hash$properties))
 })
+
+test_that("the bundled schema declares study$preregistration and its 6 fields", {
+  path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
+  skip_if(!nzchar(path), "bundled schema not found")
+  pre <- jsonlite::fromJSON(path, simplifyVector = FALSE)$properties$study$properties$preregistration
+  expect_identical(pre$type, "object")
+  expect_false(pre$additionalProperties)
+  expect_setequal(names(pre$properties), c("exclusion_rules", "stopping_rule", "primary_outcomes",
+                                            "secondary_outcomes", "multiplicity", "contingency"))
+})
