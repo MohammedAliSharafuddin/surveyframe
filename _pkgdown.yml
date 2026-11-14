@@ -87,6 +87,8 @@ navbar:
           href: articles/two-ways-to-run-a-study.html
         - text: "Method guides"
           href: articles/guides.html
+        - text: "Docs"
+          href: articles/docs.html
         - text: "Question types"
           href: articles/learn/question-types.html
         - text: "The analysis plan"
@@ -136,6 +138,13 @@ articles:
     contents:
       - articles/guides
       - starts_with("articles/guides/")
+  - title: "Docs"
+    desc: >
+      How to set up each question type, with annotated screenshots. Web only.
+    navbar: ~
+    contents:
+      - articles/docs
+      - starts_with("articles/docs/")
   - title: "Get started and learn"
     desc: >
       Install and open a study with no code, the frequently asked questions,
