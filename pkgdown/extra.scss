@@ -45,3 +45,29 @@ select:focus-visible, textarea:focus-visible {
   outline-offset: 2px;
   box-shadow: none;
 }
+
+// Heading permalinks a keyboard reader can reach (Codex WR82, WCAG 2.1.1):
+// pkgdown hides them with display:none until hover, which also takes them out
+// of the tab order. They stay in the tab order, invisible until hovered or
+// focused. pkgdown/extra.js names each one after its heading.
+a.anchor {
+  display: inline-block;
+  opacity: 0;
+}
+h2, h3, h4, h5, h6, dt {
+  &:hover .anchor,
+  &:target .anchor {
+    opacity: 1;
+  }
+}
+a.anchor:focus-visible {
+  opacity: 1;
+}
+
+// Navbar dropdown text (Codex WR196, WCAG 1.4.3): Flatly's #7b8a8b was 4.3:1
+// on the dark dropdown surface #212529. #dee2e6 is 11.8:1 there and 8.5:1 on
+// the navbar #0B3A78, where the collapsed mobile menu shows it.
+.navbar .dropdown-menu {
+  --bs-dropdown-link-color: #dee2e6;
+  --bs-dropdown-header-color: #dee2e6;
+}
