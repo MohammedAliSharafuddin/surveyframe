@@ -33,6 +33,7 @@ data-raw/*
 !data-raw/sync_sframe_schema.R
 !data-raw/build_demo_library.R
 !data-raw/demo_stories.R
+!data-raw/reference_demo_stories.R
 roadmap.md
 todo.md
 revision_todo_0.3.md
