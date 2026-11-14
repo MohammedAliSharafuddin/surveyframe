@@ -1,0 +1,23 @@
+---
+title: "Docs: how to set up surveyframe"
+description: "How to set up each question type and analysis in surveyframe, step by step, with annotated SurveyStudio screenshots."
+---
+
+Docs answer how to set something up. The [method guides](guides.html) answer how to answer your research question.
+
+## Question types (13 pages) {#question-types}
+
+- [Ask a Likert question](docs/question-types/likert.html)
+- [Ask a single-choice question](docs/question-types/single-choice.html)
+- [Ask a choose-any question](docs/question-types/multiple-choice.html)
+- [Ask for a number](docs/question-types/numeric.html)
+- [Ask for a short text answer](docs/question-types/short-text.html)
+- [Ask an open-ended question](docs/question-types/long-text.html)
+- [Ask for a date](docs/question-types/date.html)
+- [Ask a grid of rating questions](docs/question-types/grid.html)
+- [Ask for a rating on a slider](docs/question-types/slider.html)
+- [Ask respondents to rank options](docs/question-types/ranking.html)
+- [Ask for a star rating](docs/question-types/star-rating.html)
+- [Ask for pairwise comparisons](docs/question-types/pairwise-comparison.html)
+- [Ask respondents to weight criteria](docs/question-types/criteria-weights.html)
+
