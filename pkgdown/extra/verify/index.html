@@ -488,7 +488,7 @@ async function verify(text){
   }
 
   resultEl.innerHTML=html;
-  resultEl.focus();
+  if (typeof resultEl.focus === "function") resultEl.focus();
 }
 
 // -- Wiring ------------------------------------------------------------------
