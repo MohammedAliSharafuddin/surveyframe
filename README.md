@@ -17,12 +17,12 @@ Same study, same verifiable file.
 </p>
 
 <p align="center">
-  <a href="https://surveyframe.org/">Website</a> ·
-  <a href="https://surveyframe.org/articles/start.html">Get started</a> ·
-  <a href="https://surveyframe.org/articles/templates.html">Templates</a> ·
-  <a href="https://surveyframe.org/articles/docs.html">Docs</a> ·
-  <a href="https://surveyframe.org/verify/">Verify a file</a> ·
-  <a href="https://surveyframe.org/articles/cite.html">Cite</a>
+  Visit the <a href="https://surveyframe.org/">website</a> to
+  <a href="https://surveyframe.org/articles/start.html">get started</a>, browse the
+  <a href="https://surveyframe.org/articles/templates.html">templates</a> and the
+  <a href="https://surveyframe.org/articles/docs.html">documentation</a>,
+  <a href="https://surveyframe.org/verify/">verify a file</a> or
+  <a href="https://surveyframe.org/articles/cite.html">cite surveyframe</a>.
 </p>
 
 <p align="center">

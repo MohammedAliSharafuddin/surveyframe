@@ -1,5 +1,3 @@
-<img src="man/figures/readme-logo.png" align="right" width="200" alt="surveyframe" />
-
 # Plan, run and report survey research
 
 Design your questionnaire, plan your analysis and prepare an APA 7 report.

@@ -56,10 +56,6 @@ home:
       href: articles/start.html
     - text: Cite surveyframe
       href: articles/cite.html
-    - text: GitHub repository
-      href: https://github.com/MohammedAliSharafuddin/surveyframe
-    - text: Report a bug
-      href: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 
 navbar:
   title: "surveyframe"
