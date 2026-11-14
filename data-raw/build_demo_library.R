@@ -64,10 +64,14 @@ indicators <- function(factor_scores, loadings, k = 5) {
 #' Respondent ids and the 2 timestamp columns every collector writes.
 frame_of <- function(n, seed_offset = 0) {
   start <- as.POSIXct("2026-06-01 09:00:00", tz = "UTC") + seed_offset * 60
+  # Demonstration data cannot pass as collected data (owner 2026-11-05):
+  # DEMO- ids and a data_status column that names it, which surveyframe
+  # reads to stamp every output made from it.
   data.frame(
-    respondent_id = sprintf("R%03d", seq_len(n)),
+    respondent_id = sprintf("DEMO-%03d", seq_len(n)),
     started_at    = format(start + (seq_len(n) - 1) * 37, "%Y-%m-%dT%H:%M:%SZ"),
     submitted_at  = format(start + (seq_len(n) - 1) * 37 + 240, "%Y-%m-%dT%H:%M:%SZ"),
+    data_status   = sframe_demo_data_status,
     stringsAsFactors = FALSE
   )
 }
@@ -180,7 +184,7 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE,
   if (isTRUE(run_plan)) {
     r <- read_responses(responses, instrument, respondent_id = "respondent_id",
                         meta_cols = c("started_at", "submitted_at",
-                                      intersect("survey_weight", names(responses))))
+                                      intersect(c("data_status", "survey_weight"), names(responses))))
     res <- run_analysis_plan(r, instrument)
     errs <- Filter(function(b) !is.null(b$error), res)
     # A block whose method needs an optional package that is absent here is a

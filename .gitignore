@@ -35,6 +35,7 @@ data-raw/*
 !data-raw/demo_stories.R
 !data-raw/reference_demo_stories.R
 !data-raw/input_types_comparison_items.R
+!data-raw/reference_demo_status.R
 roadmap.md
 todo.md
 revision_todo_0.3.md
