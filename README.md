@@ -10,7 +10,7 @@
 
 > **Just here to verify a `.sframe` file's integrity hash or read its
 > amendment log?**
-> **[Verify a file now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
+> **[Verify a file now](https://surveyframe.org/verify/)**.
 > No R, no install. It runs entirely in your browser and nothing is
 > uploaded.
 
