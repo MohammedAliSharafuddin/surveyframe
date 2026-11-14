@@ -94,7 +94,7 @@ your own study.
 
 **Research methods.**
 [Pilot survey with a small sample](articles/templates/pilot-survey-small-sample.html),
-[Pre-registered survey sealed and amended](articles/templates/pre-registered-survey-sealed-and-amended.html).
+[Preparing a survey study for preregistration](articles/templates/pre-registered-survey-sealed-and-amended.html).
 
 [All questionnaire templates](articles/templates.html)
 

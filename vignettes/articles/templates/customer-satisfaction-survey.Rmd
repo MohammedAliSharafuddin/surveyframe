@@ -11,15 +11,15 @@ A customer study of whether using a service more predicts that customers return,
 
 ## Preview the questionnaire
 
-This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../templates/logistic/preview.html).
+This is the questionnaire as respondents see it. It is a preview to try, and it stores no answers. [Open the Customer satisfaction survey preview in a new tab](../../templates/logistic/preview.html){target="_blank" rel="noopener"}.
 
 ```{=html}
 <iframe src="../../templates/logistic/preview.html" title="Preview of the Customer satisfaction survey questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
 ```
 
-## The analysis plan, ready to preregister
+## The example analysis plan
 
-Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../templates/logistic/plan.html), or [download the instrument (.sframe)](../../templates/logistic/logistic.sframe) and open it in SurveyStudio.
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and the fields a preregistration still asks you to complete. [Read the Customer satisfaction survey plan](../../templates/logistic/plan.html), or [download the Customer satisfaction survey instrument (.sframe)](../../templates/logistic/logistic.sframe) to adapt it.
 
 Methods it declares: Binary logistic regression, Ordinal logistic regression, Multinomial logistic regression.
 
@@ -27,16 +27,18 @@ Methods it declares: Binary logistic regression, Ordinal logistic regression, Mu
 
 The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
 
-![Design screen with the questionnaire.](../../templates/logistic/design.png){width=100%}
-![Collect screen.](../../templates/logistic/collect.png){width=100%}
-![Quality screen.](../../templates/logistic/check.png){width=100%}
-![Analyse screen with the declared plan.](../../templates/logistic/analyse.png){width=100%}
-![Report screen.](../../templates/logistic/report.png){width=100%}
+![The Customer satisfaction survey study on the Design screen, with its questions listed.](../../templates/logistic/design.png){width=100%}
+![The Customer satisfaction survey study on the Collect screen, which exports the survey web page.](../../templates/logistic/collect.png){width=100%}
+![The Customer satisfaction survey study on the Quality screen, which checks the responses.](../../templates/logistic/check.png){width=100%}
+![The Customer satisfaction survey study on the Analyse screen, with the declared plan.](../../templates/logistic/analyse.png){width=100%}
+![The Customer satisfaction survey study on the Report screen, which exports the report.](../../templates/logistic/report.png){width=100%}
 
-## Start in 2 steps in SurveyStudio
+## Open this instrument in SurveyStudio
 
-1. Install surveyframe in R: `install.packages("surveyframe")`
-2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `logistic`. The study opens in SurveyStudio.
+1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `logistic`.
+3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
+4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
 ## Questions
 
@@ -46,11 +48,11 @@ A binary logistic regression, with the odds ratio of each predictor and its conf
 
 ### Can I predict a rating instead?
 
-Yes. An ordinal logistic regression predicts an ordered rating, and a multinomial model a choice among several options.
+Yes. An ordinal logistic regression predicts an ordered rating, and a multinomial model a choice among 3 or more options.
 
-### Can my team use it without R?
+### Can my team use it without writing code?
 
-Yes. SurveyStudio runs the whole study in a browser window, started from RStudio's Addins menu.
+Yes. SurveyStudio runs the whole study in a window started from RStudio's Addins menu. R and RStudio need to be installed, as Get started shows.
 
 ## For R users
 
