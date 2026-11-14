@@ -46,7 +46,9 @@ test_that("Save settings with nothing edited changes none of the content", {
   settings_save(ctx)
   back <- read_sframe(builder_save(ctx))
   expect_identical(sframe_content_hash(back), sframe_content_hash(ins))
-  expect_null(back$meta$authors)
+  # The demo declares "Demo author" since Session 10. Save settings with
+  # nothing edited keeps the author list as it was.
+  expect_identical(back$meta$authors, ins$meta$authors)
   # An amended instrument the builder left alone takes a further write.
   expect_no_error(write_sframe(back, tempfile(fileext = ".sframe")))
   expect_match(builder_toasts(ctx)$msg, "No settings changed", fixed = TRUE,
