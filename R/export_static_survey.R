@@ -104,8 +104,8 @@ sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
 #' # Write to a temp file without opening the browser
 #' out <- export_survey(instr,
 #'                              output_path = file.path(tempdir(), "sat.html"),
-#'                              open = FALSE)
-#' file.exists(out)
+#'                              open = FALSE, overwrite = TRUE)
+#' sframe_show(out)
 #'
 #' \donttest{
 #' # Write to a temp file and open in the default browser
@@ -121,6 +121,7 @@ sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
 #'   open         = FALSE,
 #'   overwrite    = TRUE
 #' )
+#' sframe_show(file.path(tempdir(), "sat_endpoint.html"))
 #' }
 #' @family Collect functions
 export_survey <- function(

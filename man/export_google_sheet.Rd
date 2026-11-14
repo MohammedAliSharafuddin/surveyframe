@@ -75,7 +75,7 @@ script <- export_google_sheet(
   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
   output_dir = tempdir()
 )
-file.exists(script)
+sframe_show(script)
 }
 \seealso{
 \code{\link[=read_sheet_responses]{read_sheet_responses()}}, \code{\link[=read_responses]{read_responses()}}, \code{\link[=write_sframe]{write_sframe()}}

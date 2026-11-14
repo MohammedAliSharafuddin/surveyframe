@@ -2383,7 +2383,7 @@ sframe_md_em <- function(x) {
 #' results <- run_analysis_plan(responses, instr)
 #' out <- render_results(results, instr,
 #'                       output_file = tempfile(fileext = ".html"))
-#' file.exists(out)
+#' sframe_show(out)
 #' }
 #' @family Report functions
 render_results <- function(

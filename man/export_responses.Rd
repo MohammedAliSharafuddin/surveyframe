@@ -58,6 +58,7 @@ demo <- sframe_demo("two_group")
 out <- file.path(tempdir(), "two_group.sav")
 if (requireNamespace("haven", quietly = TRUE)) {
   export_responses(demo$responses, demo$instrument, out)
+  sframe_show(out)
 }
 }
 }

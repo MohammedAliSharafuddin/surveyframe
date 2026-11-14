@@ -405,6 +405,7 @@ print.sframe_branding <- function(x, ...) {
 #' out <- file.path(tempdir(), "two_group.sav")
 #' if (requireNamespace("haven", quietly = TRUE)) {
 #'   export_responses(demo$responses, demo$instrument, out)
+#'   sframe_show(out)
 #' }
 #' }
 #' @family Responses functions
@@ -602,8 +603,8 @@ sframe_labelled_message <- function(changes, ext) {
 #' @export
 #' @seealso [sframe_demo()], [sframe_list_demos()]
 #' @examples
-#' out <- sframe_demo_qmd("two_group", dir = tempdir())
-#' basename(out)
+#' out <- sframe_demo_qmd("two_group", dir = tempfile("demo-qmd-"))
+#' sframe_show(out)
 #' @family Demo functions
 sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
   idx <- sframe_demo_index()
@@ -674,8 +675,8 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #' item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 #' instr <- sframe_instrument("Demo", components = list(item))
 #' resp  <- data.frame(q1 = c("Great", "Fine"))
-#' out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
-#' basename(out$qmd)
+#' out <- sframe_analysis_qmd(instr, resp, dir = tempfile("analysis-qmd-"))
+#' sframe_show(out$qmd)
 #' @family Report functions
 sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
                                  overwrite = FALSE) {

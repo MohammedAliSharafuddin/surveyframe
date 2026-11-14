@@ -9,18 +9,22 @@
 # function generates, and cutting it would hide the result.
 example_line_exceptions <- c(sframe_syntax_pls = 42L)
 
-example_console_lines <- function(rd) {
+example_output <- function(rd) {
   ex <- tempfile(fileext = ".R")
   tools::Rd2ex(rd, ex, commentDontrun = TRUE, commentDonttest = FALSE)
-  if (!file.exists(ex)) return(NA_integer_)
+  if (!file.exists(ex)) return(NULL)
   wd <- tempfile("ex-wd-")
   dir.create(wd)
   old <- setwd(wd)
   on.exit(setwd(old), add = TRUE)
-  out <- utils::capture.output(suppressMessages(suppressWarnings(
+  utils::capture.output(suppressMessages(suppressWarnings(
     source(ex, echo = FALSE, print.eval = TRUE, local = new.env(parent = globalenv()))
   )))
-  length(out)
+}
+
+example_console_lines <- function(rd) {
+  out <- example_output(rd)
+  if (is.null(out)) NA_integer_ else length(out)
 }
 
 test_that("every example prints at most 40 console lines", {
@@ -51,4 +55,25 @@ test_that("the design constructors' examples show what they made", {
                  "sframe_choice_set", "sframe_attention_check", "sframe_plan")) {
     expect_gt(example_console_lines(file.path(man, paste0(page, ".Rd"))), 0)
   }
+})
+
+test_that("the examples that write a file end with sframe_show(), and open nothing here", {
+  skip_if_not_slow()
+  man <- test_path("..", "..", "man")
+  skip_if(!dir.exists(man), "no source tree")
+  opened <- 0
+  old <- options(viewer = function(...) opened <<- opened + 1,
+                 browser = function(...) opened <<- opened + 1)
+  on.exit(options(old), add = TRUE)
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  pages <- c("sframe_show", "render_report", "render_results", "export_survey",
+             "preview_survey", "launch_builder", "sframe_analysis_qmd",
+             "sframe_demo_qmd", "sframe_save_figures", "write_sframe",
+             "export_responses", "export_google_sheet")
+  for (page in pages) {
+    out <- example_output(file.path(man, paste0(page, ".Rd")))
+    expect_true(any(grepl("^Written: ", out)), info = page)
+  }
+  expect_equal(opened, 0)
 })

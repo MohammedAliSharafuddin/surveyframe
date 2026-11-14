@@ -50,11 +50,11 @@ origins. Saved \code{.sframe} files can be loaded and validated with
 \examples{
 # Retrieve the builder path for inspection without opening the browser
 path <- launch_builder(open = FALSE)
-file.exists(path)
+sframe_show(path)
 
 # The same builder with a demo preloaded
 path <- launch_builder(demo = "two_group", open = FALSE)
-file.exists(path)
+sframe_show(path)
 }
 \seealso{
 \code{\link[=launch_studio]{launch_studio()}}, \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}

@@ -43,11 +43,11 @@
 #' @examples
 #' # Retrieve the builder path for inspection without opening the browser
 #' path <- launch_builder(open = FALSE)
-#' file.exists(path)
+#' sframe_show(path)
 #'
 #' # The same builder with a demo preloaded
 #' path <- launch_builder(demo = "two_group", open = FALSE)
-#' file.exists(path)
+#' sframe_show(path)
 #' @family Design functions
 launch_builder <- function(open = TRUE, demo = NULL) {
   builder_path <- if (is.null(demo)) {

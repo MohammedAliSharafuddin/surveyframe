@@ -1368,6 +1368,19 @@ arithmetic.
 
 ## Documentation
 
+* **`sframe_show()` opens a file surveyframe wrote** (new export). In an
+  interactive session an HTML page goes to the viewer of RStudio, Positron
+  or VS Code, else the browser, and any other file to the program the
+  system opens it with. In a script, a knitr or Quarto render, or under
+  `R CMD check` it opens nothing and prints 1 line, `Written: <path>`, so a
+  file in the temporary folder is never left unseen. The 11 examples that
+  write a file end with it: `render_report()`, `render_results()`,
+  `export_survey()`, `preview_survey()`, `launch_builder()`,
+  `sframe_analysis_qmd()`, `sframe_demo_qmd()`, `sframe_save_figures()`,
+  `write_sframe()`, `export_responses()` and `export_google_sheet()`. The
+  examples of `export_survey()`, `sframe_analysis_qmd()` and
+  `sframe_demo_qmd()` run a second time in the same session, where they
+  stopped on the file they had written the first time.
 * **Every example ends with something to look at, in 40 console lines or
   fewer.** The examples of `sframe_item()`, `sframe_scale()`,
   `sframe_branch()`, `sframe_choice_set()` and `sframe_attention_check()`

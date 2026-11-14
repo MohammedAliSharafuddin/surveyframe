@@ -44,6 +44,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   paths <- sframe_save_figures(res, file.path(tempdir(), "figures"),
                                width = 6, height = 4, dpi = 300)
   basename(paths)
+  sframe_show(paths[1])
 }
 }
 }
@@ -57,6 +58,7 @@ Other Report functions:
 \code{\link[=sframe_codebook]{sframe_codebook()}},
 \code{\link[=sframe_format_result]{sframe_format_result()}},
 \code{\link[=sframe_report_source]{sframe_report_source()}},
-\code{\link{sframe_reports}}
+\code{\link{sframe_reports}},
+\code{\link[=sframe_show]{sframe_show()}}
 }
 \concept{Report functions}

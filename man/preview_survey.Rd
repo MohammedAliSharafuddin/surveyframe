@@ -30,12 +30,12 @@ its collector removed, so trying it is safe: no answer is sent anywhere.
 \examples{
 # A demo by name
 path <- preview_survey("two_group", open = FALSE)
-file.exists(path)
+sframe_show(path)
 
 # Your own instrument
 ins <- sframe_demo("first_survey")$instrument
 path <- preview_survey(ins, open = FALSE)
-file.exists(path)
+sframe_show(path)
 }
 \seealso{
 \code{\link[=export_survey]{export_survey()}} for the page you send to respondents,

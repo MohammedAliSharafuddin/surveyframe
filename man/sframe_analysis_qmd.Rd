@@ -41,8 +41,8 @@ files written alongside it, so all 3 files must stay together.
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 instr <- sframe_instrument("Demo", components = list(item))
 resp  <- data.frame(q1 = c("Great", "Fine"))
-out <- sframe_analysis_qmd(instr, resp, dir = tempdir())
-basename(out$qmd)
+out <- sframe_analysis_qmd(instr, resp, dir = tempfile("analysis-qmd-"))
+sframe_show(out$qmd)
 }
 \seealso{
 \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}, \code{\link[=write_sframe]{write_sframe()}}, \code{\link[=read_responses]{read_responses()}}
@@ -54,6 +54,7 @@ Other Report functions:
 \code{\link[=sframe_format_result]{sframe_format_result()}},
 \code{\link[=sframe_report_source]{sframe_report_source()}},
 \code{\link{sframe_reports}},
-\code{\link[=sframe_save_figures]{sframe_save_figures()}}
+\code{\link[=sframe_save_figures]{sframe_save_figures()}},
+\code{\link[=sframe_show]{sframe_show()}}
 }
 \concept{Report functions}

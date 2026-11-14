@@ -65,7 +65,7 @@ responses <- read_responses(
 results <- run_analysis_plan(responses, instr)
 out <- render_results(results, instr,
                       output_file = tempfile(fileext = ".html"))
-file.exists(out)
+sframe_show(out)
 }
 }
 \seealso{
@@ -78,6 +78,7 @@ Other Report functions:
 \code{\link[=sframe_format_result]{sframe_format_result()}},
 \code{\link[=sframe_report_source]{sframe_report_source()}},
 \code{\link{sframe_reports}},
-\code{\link[=sframe_save_figures]{sframe_save_figures()}}
+\code{\link[=sframe_save_figures]{sframe_save_figures()}},
+\code{\link[=sframe_show]{sframe_show()}}
 }
 \concept{Report functions}

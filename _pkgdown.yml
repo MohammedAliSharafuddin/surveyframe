@@ -208,7 +208,8 @@ reference:
     desc: >
       Write up what was run: an HTML, PDF, Word or OpenDocument report or its
       Quarto source, a codebook, the figures,
-      and the R code behind each result. In SurveyStudio: the Report screen.
+      and the R code behind each result, and `sframe_show()` to open a
+      written file. In SurveyStudio: the Report screen.
       In code: `render_report()`.
     contents:
       - render_report
@@ -219,6 +220,7 @@ reference:
       - sframe_codebook
       - sframe_save_figures
       - sframe_analysis_qmd
+      - sframe_show
 
   - title: "References"
     desc: >
