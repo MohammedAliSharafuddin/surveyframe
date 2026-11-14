@@ -40,7 +40,8 @@ You write your analysis plan with your questions. When the answers arrive, surve
 - **Small samples and decisions.** Exact tests, Firth regression and 10 multi-criteria decision methods.
 - **Files anyone can verify.** Every questionnaire carries a sealed hash and an amendment log.
 
-Free and open source under MIT. No account. Your data stays on your computer.
+Free and open source under MIT, with no account. The analysis runs on your
+computer, and you choose where responses are collected and stored.
 
 ## How it works
 
