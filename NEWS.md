@@ -1394,12 +1394,12 @@ arithmetic.
   field names it first, with the GitHub repository second, and the
   start-up message, the README, the verifier page's canonical link and the
   sitemap point to it. The old address redirects.
-* **New vignette, "Two ways to run a study"**, with SurveyStudio
-  screenshots: the 5 stages (design, collect, check, analyse, report), each
-  in SurveyStudio and in R, on the `paired` demo, and the pre-analysis plan
-  before collecting. The standalone SurveyBuilder is named once, as the
-  offline designer. It leads the "Start here" articles. "Deploying and
-  collecting" describes SurveyStudio's Collect screen where it said "from
+* **2 new vignettes for the 5 stages** (design, collect, check, analyse,
+  report) on the `paired` demo, each with the pre-analysis plan before
+  collecting. "Run a study in SurveyStudio" has screenshots and no code at
+  all, for researchers who do not write R. "Run a study in R" gives the same
+  stages as R code. Each links the other once, and both lead the "Start here"
+  articles. "Deploying and collecting" describes SurveyStudio's Collect screen where it said "from
   the SurveyBuilder" (UX-22).
 * **`sframe_show()` opens a file surveyframe wrote** (new export). In an
   interactive session an HTML page goes to the viewer of RStudio, Positron

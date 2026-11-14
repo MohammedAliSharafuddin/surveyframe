@@ -85,8 +85,10 @@ navbar:
     learn:
       text: "Learn"
       menu:
-        - text: "Two ways to run a study"
-          href: articles/two-ways-to-run-a-study.html
+        - text: "Run a study in SurveyStudio"
+          href: articles/run-a-study-in-surveystudio.html
+        - text: "Run a study in R"
+          href: articles/run-a-study-in-r.html
         - text: "How-to guides"
           href: articles/guides.html
         - text: "Documentation"
@@ -165,7 +167,8 @@ articles:
       name of a test.
     navbar: ~
     contents:
-      - two-ways-to-run-a-study
+      - run-a-study-in-surveystudio
+      - run-a-study-in-r
       - learn-by-example
   - title: "Survey research workflow"
     desc: >

@@ -30,6 +30,7 @@ the same menu and go to Design.
 ## What next
 
 - [Questionnaire templates](templates.html), by field.
-- [Two ways to run a study](two-ways-to-run-a-study.html): the 5 stages in
-  SurveyStudio and in R.
+- [Run a study in SurveyStudio](run-a-study-in-surveystudio.html): the 5
+  stages with no code.
+- [Run a study in R](run-a-study-in-r.html): the same stages in R.
 - [Frequently asked questions](learn/faq.html).
