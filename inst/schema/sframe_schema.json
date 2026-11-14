@@ -161,7 +161,7 @@
     },
     "study": {
       "type": "object",
-      "description": "Optional (surveyframe 0.4.3). The study the instrument serves: the problem statement, the objectives and the sampling plan. Never shown to respondents, since telling them the aims can bias their answers. Inside the content hash and the amendment content hash, so a change to it after collection is a design amendment. Present only when something is declared, so an instrument without a study hashes as it did before this field existed. Objective ids are unique within the study, a check this schema cannot express and surveyframe's validate_sframe() makes.",
+      "description": "Optional (surveyframe 0.4.3). The study the instrument serves: the problem statement, the objectives, the sampling plan and the preregistration fields. Never shown to respondents, since telling them the aims can bias their answers. Inside the content hash and the amendment content hash, so a change to it after collection is a design amendment. Present only when something is declared, so an instrument without a study hashes as it did before this field existed. Objective ids are unique within the study, a check this schema cannot express and surveyframe's validate_sframe() makes.",
       "minProperties": 1,
       "additionalProperties": false,
       "properties": {
@@ -176,6 +176,20 @@
               "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$", "description": "Such as O1. A plan block names it in its objective field." },
               "text": { "type": "string", "pattern": "\\S", "description": "The objective, not blank." }
             }
+          }
+        },
+        "preregistration": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "description": "Optional (surveyframe 0.4.3). What a preregistration asks for beyond the plan blocks, each a non-blank text, any of them absent. Inside the hash like the rest of the study, so a change after collection is a design amendment.",
+          "properties": {
+            "exclusion_rules": { "type": "string", "pattern": "\\S", "description": "Which responses will be excluded, and why." },
+            "stopping_rule": { "type": "string", "pattern": "\\S", "description": "When data collection ends: a date, a sample size or another rule." },
+            "primary_outcomes": { "type": "string", "pattern": "\\S", "description": "The outcomes that answer the main question." },
+            "secondary_outcomes": { "type": "string", "pattern": "\\S", "description": "The secondary outcomes." },
+            "multiplicity": { "type": "string", "pattern": "\\S", "description": "How the tests are corrected for being run together, if at all." },
+            "contingency": { "type": "string", "pattern": "\\S", "description": "What will be done if an assumption fails or the planned sample is not reached." }
           }
         },
         "sampling": {
