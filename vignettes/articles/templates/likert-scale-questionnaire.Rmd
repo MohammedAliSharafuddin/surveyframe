@@ -36,7 +36,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ## Open this instrument in SurveyStudio
 
 1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
-2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `likert_scale`.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `likert_scale`, which opens this template's study.
 3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
 4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
@@ -44,7 +44,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 
 ### Can I use this for my thesis?
 
-Yes. Replace the items with your own, keep the plan, and submit the pre-analysis plan to your supervisor or ethics committee before you collect data.
+Yes. Adapt the questions and review the analysis plan with your supervisor before collecting answers. If you change the items, update the scale and the plan to match.
 
 ### How do I check that my scale is reliable?
 
@@ -54,7 +54,7 @@ The plan declares Cronbach's alpha and McDonald's omega with a decision rule, .7
 
 Yes. Install surveyframe, then choose Try a demo from RStudio's Addins menu, and the whole study opens in SurveyStudio.
 
-## For R users
+## Optional R code
 
 ```{=html}
 <details><summary>Open this study in R</summary>

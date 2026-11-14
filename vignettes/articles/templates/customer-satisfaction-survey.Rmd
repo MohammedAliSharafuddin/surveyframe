@@ -36,7 +36,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ## Open this instrument in SurveyStudio
 
 1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
-2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `logistic`.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `logistic`, which opens this template's study.
 3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
 4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
@@ -54,7 +54,7 @@ Yes. An ordinal logistic regression predicts an ordered rating, and a multinomia
 
 Yes. SurveyStudio runs the whole study in a window started from RStudio's Addins menu. R and RStudio need to be installed, as Get started shows.
 
-## For R users
+## Optional R code
 
 ```{=html}
 <details><summary>Open this study in R</summary>

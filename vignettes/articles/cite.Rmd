@@ -25,8 +25,12 @@ https://doi.org/10.32614/CRAN.package.surveyframe
 }
 ```
 
-## Cite the instrument too
+## Cite the software and identify the questionnaire
 
-A study's `.sframe` file carries a SHA-256 hash. Name it beside the citation,
-so a reader can check at [surveyframe.org/verify](https://surveyframe.org/verify/)
-that the questionnaire analysed is the one planned.
+Cite surveyframe itself as described above.
+
+Identify the study's questionnaire by its title, its version, where it is
+preserved (such as OSF) and its SHA-256 hash from the `.sframe` file. The hash
+identifies the file and the citation credits the software, so a reader can check
+at [surveyframe.org/verify](https://surveyframe.org/verify/) that the
+questionnaire analysed is the one planned.

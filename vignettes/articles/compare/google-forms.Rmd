@@ -7,7 +7,7 @@ Google Forms is Google's form builder. Its responses can be viewed in the form o
 
 surveyframe is a free R package (MIT, on CRAN) for the whole research workflow around a survey: the questionnaire and its analysis plan, the collection, the checks, the planned analyses and the APA 7 report.
 
-## What surveyframe adds for research
+## What the surveyframe workflow provides
 
 - An analysis plan written before the data, with hypotheses and decision
   rules, saved in the questionnaire file.

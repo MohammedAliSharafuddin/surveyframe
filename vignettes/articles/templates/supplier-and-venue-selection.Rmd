@@ -1,13 +1,13 @@
 ---
 title: "Supplier and venue selection (decision making)"
-description: "A decision study that weights the criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report."
+description: "Compare candidate suppliers or venues using the criteria your committee values. Record the criteria and the judgements, then review the rankings your selected methods produce. surveyframe gives you the questionnaire, the analysis plan and the report."
 ---
 
 ```{=html}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Supplier and venue selection (decision making)","description":"A decision study that weights the criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/supplier-and-venue-selection.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Supplier and venue selection (decision making)","description":"Compare candidate suppliers or venues using the criteria your committee values. Record the criteria and the judgements, then review the rankings your selected methods produce. surveyframe gives you the questionnaire, the analysis plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/supplier-and-venue-selection.html"}</script>
 ```
 
-A decision study that weights the criteria from a committee's judgements and ranks the options by 10 methods, to show whether they agree. surveyframe gives you the questionnaire, the analysis plan and the report.
+Compare candidate suppliers or venues using the criteria your committee values. Record the criteria and the judgements, then review the rankings your selected methods produce. surveyframe gives you the questionnaire, the analysis plan and the report.
 
 ## Preview the questionnaire
 
@@ -36,7 +36,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ## Open this instrument in SurveyStudio
 
 1. Set up R, RStudio and surveyframe as [Get started](../start.html) shows.
-2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `mcdm_choice`.
+2. To explore the example with its demonstration responses, open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick `mcdm_choice`, which opens this template's study.
 3. To make it your own study, download the instrument above, choose **surveyframe: Open analysis workspace** from the **Addins** menu, then **Open Instrument** in SurveyStudio's left menu, and select the file.
 4. Adapt the questions on the **Design** screen and the research questions under **Plan**, press **Save to Studio**, then press **Download copy** on the **Report** screen to save your study.
 
@@ -54,7 +54,7 @@ The plan accepts pairwise judgements when the consistency ratio is below .10.
 
 Yes. Each member answers the same questionnaire, and the judgements are combined.
 
-## For R users
+## Optional R code
 
 ```{=html}
 <details><summary>Open this study in R</summary>
