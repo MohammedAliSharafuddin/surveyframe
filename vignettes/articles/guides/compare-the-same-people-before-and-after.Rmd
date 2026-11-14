@@ -1,0 +1,36 @@
+---
+title: "How to compare the same people before and after"
+description: "A pre and post training evaluation: participants rate their confidence, and say whether they would recommend the training, before and after it. surveyframe declares the analysis in advance (Paired samples t-test, Wilcoxon signed-rank test, McNemar test) and reports it in APA 7."
+---
+
+A pre and post training evaluation: participants rate their confidence, and say whether they would recommend the training, before and after it. surveyframe declares the analysis in advance (Paired samples t-test, Wilcoxon signed-rank test, McNemar test) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `paired`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the paired study.](../../studies/paired/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("paired")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Did confidence change from before to after the training? | Paired samples t-test | The APA 7 sentence, its table and chart |
+| Did confidence change, without assuming normality? | Wilcoxon signed-rank test | The APA 7 sentence, its table and chart |
+| Did willingness to recommend change? | McNemar test | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

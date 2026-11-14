@@ -1,0 +1,33 @@
+---
+title: "How to ask questions only of those they apply to"
+description: "A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics) and reports it in APA 7."
+---
+
+A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `branching`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("branching")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence, its table and chart |
+| Among those asked, how many sessions did they attend? | Descriptive statistics | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

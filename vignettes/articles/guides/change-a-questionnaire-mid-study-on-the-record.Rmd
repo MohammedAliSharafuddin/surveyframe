@@ -1,0 +1,35 @@
+---
+title: "How to change a questionnaire mid-study, on the record"
+description: "A short feedback survey for a one-day professional event, run to describe who attended and to check the quality of the answers before the programme is planned again. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics, Missing-data summary, Response quality checks) and reports it in APA 7."
+---
+
+A short feedback survey for a one-day professional event, run to describe who attended and to check the quality of the answers before the programme is planned again. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics, Missing-data summary, Response quality checks) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `instrument_revision`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("instrument_revision")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Who came to the event? | Frequencies and percentages | The APA 7 sentence, its table and chart |
+| How old are attendees? | Descriptive statistics | The APA 7 sentence, its table and chart |
+| How complete is the data? | Missing-data summary | The APA 7 sentence, its table and chart |
+| Are there inattentive responses? | Response quality checks | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

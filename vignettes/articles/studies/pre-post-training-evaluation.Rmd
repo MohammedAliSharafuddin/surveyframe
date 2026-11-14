@@ -72,5 +72,5 @@ results <- run_analysis_plan(d$responses, d$instrument)
 
 - [All university and teaching evaluation studies](../studies.html#teaching)
 - [Course evaluation survey](course-evaluation-survey.html)
-- [Method guides](../learn-by-example.html)
+- [Method guides](../guides.html)
 

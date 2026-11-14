@@ -1,0 +1,39 @@
+---
+title: "How to test a measurement and structural model"
+description: "A measurement and structural model study: whether the quality of a programme's content builds satisfaction, and satisfaction the intention to return. surveyframe declares the analysis in advance (Structural equation model (lavaan syntax), PLS structural equation model (seminr syntax), Mediation analysis, Confirmatory factor analysis (lavaan syntax), PLS structural equation model, Moderation analysis) and reports it in APA 7."
+---
+
+A measurement and structural model study: whether the quality of a programme's content builds satisfaction, and satisfaction the intention to return. surveyframe declares the analysis in advance (Structural equation model (lavaan syntax), PLS structural equation model (seminr syntax), Mediation analysis, Confirmatory factor analysis (lavaan syntax), PLS structural equation model, Moderation analysis) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `sem_pls`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the sem_pls study.](../../studies/sem_pls/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("sem_pls")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| What lavaan syntax does this model generate? | Structural equation model (lavaan syntax) | The APA 7 sentence, its table and chart |
+| And the seminr syntax for a PLS estimate? | PLS structural equation model (seminr syntax) | The APA 7 sentence, its table and chart |
+| Does satisfaction carry content quality through to intention? | Mediation analysis | The APA 7 sentence, its table and chart |
+| What CFA syntax does the measurement model generate? | Confirmatory factor analysis (lavaan syntax) | The APA 7 sentence, its table and chart |
+| And what does a PLS estimate give? | PLS structural equation model | The APA 7 sentence, its table and chart |
+| Does content quality matter more to some attendees than others? | Moderation analysis | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

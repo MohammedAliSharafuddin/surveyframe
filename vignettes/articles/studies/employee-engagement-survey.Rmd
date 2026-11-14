@@ -73,5 +73,5 @@ results <- run_analysis_plan(d$responses, d$instrument)
 - [All organisations: customer and employee research studies](../studies.html#organisations)
 - [Customer satisfaction and return intention](customer-satisfaction-return-intention.html)
 - [Choosing between options: a supplier or a venue](choosing-between-options.html)
-- [Method guides](../learn-by-example.html)
+- [Method guides](../guides.html)
 

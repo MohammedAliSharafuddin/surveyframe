@@ -1,0 +1,34 @@
+---
+title: "How to analyse choose-any and ranking questions"
+description: "A study of which sessions attendees chose and why they came, from a choose-any item and a ranking. surveyframe declares the analysis in advance (Descriptive statistics, Cochran's Q test) and reports it in APA 7."
+---
+
+A study of which sessions attendees chose and why they came, from a choose-any item and a ranking. surveyframe declares the analysis in advance (Descriptive statistics, Cochran's Q test) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `multi_response`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+## In R
+
+```r
+d <- sframe_demo("multi_response")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Which sessions were best attended? | Descriptive statistics | The APA 7 sentence, its table and chart |
+| Do the sessions differ in how often they were chosen? | Cochran's Q test | The APA 7 sentence, its table and chart |
+| What did attendees come for? | Descriptive statistics | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+

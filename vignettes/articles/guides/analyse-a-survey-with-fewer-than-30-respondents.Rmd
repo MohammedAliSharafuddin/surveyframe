@@ -1,0 +1,36 @@
+---
+title: "How to analyse a survey with fewer than 30 respondents"
+description: "A pilot study with 18 participants, answering the main study's questions with methods suited to a small sample. surveyframe declares the analysis in advance (Mann-Whitney U test, Fisher's exact test, Firth logistic regression) and reports it in APA 7."
+---
+
+A pilot study with 18 participants, answering the main study's questions with methods suited to a small sample. surveyframe declares the analysis in advance (Mann-Whitney U test, Fisher's exact test, Firth logistic regression) and reports it in APA 7.
+
+## In SurveyStudio
+
+In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `small_sample`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+
+![The Design screen with the small_sample study.](../../studies/small_sample/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("small_sample")
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses)
+```
+
+## What the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| Do the 2 formats differ, without assuming normality? | Mann-Whitney U test | The APA 7 sentence, its table and chart |
+| Is format associated with returning, on an exact test? | Fisher's exact test | The APA 7 sentence, its table and chart |
+| Does attending more sessions predict returning, with a small-sample correction? | Firth logistic regression | The APA 7 sentence, its table and chart |
+
+The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Survey studies to start from](../studies.html)
+- [All method guides](../guides.html)
+
