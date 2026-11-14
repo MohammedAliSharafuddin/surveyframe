@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "c5085cf2f7cd5341557b1f0fb8c5ac03bd3f8f4229d0be974583c900233d02bf",
+    "value": "a734607031472c4c69ef59d847796ce3bc89cf9f06bd73acbff447ff6ab16f77",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -23,7 +23,7 @@
       "required": true,
       "choice_set": "rate5",
       "reverse": false,
-      "matrix_items": ["Opening keynote", "Workshop A", "Workshop B", "Closing panel"]
+      "matrix_items": ["Lectures", "Seminars", "Assessment", "Reading materials"]
     },
     {
       "id": "format",
@@ -56,15 +56,15 @@
   "analysis_plan": [
     {
       "id": "RQ1",
-      "research_question": "How was each session rated?",
+      "research_question": "How was each part of the course rated?",
       "family": "descriptive",
       "method": "descriptives",
       "roles": {
         "variables": [
-          "session__Opening keynote",
-          "session__Workshop A",
-          "session__Workshop B",
-          "session__Closing panel"
+          "session__Lectures",
+          "session__Seminars",
+          "session__Assessment",
+          "session__Reading materials"
         ]
       },
       "objective": "O1",
@@ -79,11 +79,11 @@
     },
     {
       "id": "RQ2",
-      "research_question": "How were keynote ratings distributed?",
+      "research_question": "How were ratings of the lectures distributed?",
       "family": "descriptive",
       "method": "frequency",
       "roles": {
-        "variable": "session__Opening keynote"
+        "variable": "session__Lectures"
       },
       "objective": "O1",
       "options": [],
@@ -97,17 +97,17 @@
     },
     {
       "id": "RQ3",
-      "research_question": "Did in-person and online attendees rate the keynote differently?",
+      "research_question": "Did in-person and online students rate the lectures differently?",
       "family": "categorical",
       "method": "crosstab",
       "roles": {
         "row": "format",
-        "column": "session__Opening keynote"
+        "column": "session__Lectures"
       },
       "objective": "O2",
       "hypotheses": {
-        "null": "The rating of the opening session does not depend on how the course was taken.",
-        "alternative": "The rating of the opening session depends on how the course was taken."
+        "null": "The rating of the lectures does not depend on how the course was taken.",
+        "alternative": "The rating of the lectures depends on how the course was taken."
       },
       "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],

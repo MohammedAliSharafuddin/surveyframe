@@ -251,8 +251,8 @@ sframe_demo <- function(name, branded = FALSE, preview = interactive()) {
     instrument$render <- unclass(sframe_demo_branding())
   }
   # check.names = FALSE matters. A matrix item whose rows carry spaces expands
-  # into columns like `session__Opening keynote`, and read.csv()'s default
-  # turns that into `session__Opening.keynote`, which no longer matches the
+  # into columns like `session__Reading materials`, and read.csv()'s default
+  # turns that into `session__Reading.materials`, which no longer matches the
   # column contract the instrument declares. Anyone reading a surveyframe CSV
   # by hand needs the same argument.
   raw <- utils::read.csv(responses_path, stringsAsFactors = FALSE,
@@ -461,7 +461,7 @@ print.sframe_branding <- function(x, ...) {
 #' SPSS and Stata refuse column names with spaces or punctuation, names that
 #' do not start with a letter, and names over the format's length limit (64
 #' bytes for SPSS, 32 characters for Stata). Matrix row columns such as
-#' `session__Opening keynote` are renamed to valid names, with illegal
+#' `session__Reading materials` are renamed to valid names, with illegal
 #' characters turned into `_`, a leading `v` where the first character is not
 #' a letter, and a number added where two names would otherwise match. Variable
 #' labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value

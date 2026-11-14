@@ -363,7 +363,9 @@ n <- 50
 # Readable row labels, since these become the matrix rows a respondent sees
 # and the expansion column names a reader meets. Spaces are handled, as the
 # bundled input-types fixture already shows with "Staff helpfulness".
-sessions <- c("Opening keynote", "Workshop A", "Workshop B", "Closing panel")
+# The parts of a course since Session 10, for the course-evaluation study
+# page. The values are drawn by position, so only the names changed.
+sessions <- c("Lectures", "Seminars", "Assessment", "Reading materials")
 matrix_likert <- sf_instrument(
   title = "Rate each session", version = "1.0.0",
   description = "One matrix item, and the columns it expands into.",
@@ -388,7 +390,7 @@ matrix_likert <- sf_instrument(
   )
 )
 ml <- frame_of(n, 3)
-# true means: keynote high at about 4.2, workshop_b low at about 2.6
+# true means: lectures high at about 4.2, assessment low at about 2.6
 for (j in seq_along(sessions)) {
   mu <- c(4.2, 3.4, 2.6, 3.6)[j]
   ml[[paste0("session__", sessions[j])]] <-

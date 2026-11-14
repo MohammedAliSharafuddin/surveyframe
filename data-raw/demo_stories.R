@@ -54,8 +54,11 @@ demo_stories <- list(
                        O2 = "Compare ratings between in-person and online students."),
       sampling = list(population = "Students enrolled on the course this term", method = "census", planned_n = 60L)),
     serves = c(RQ1 = "O1", RQ2 = "O1", RQ3 = "O2"),
-    hyp = list(RQ3 = hyp("The rating of the opening session does not depend on how the course was taken.",
-                         "The rating of the opening session depends on how the course was taken.")),
+    rq = c(RQ1 = "How was each part of the course rated?",
+           RQ2 = "How were ratings of the lectures distributed?",
+           RQ3 = "Did in-person and online students rate the lectures differently?"),
+    hyp = list(RQ3 = hyp("The rating of the lectures does not depend on how the course was taken.",
+                         "The rating of the lectures depends on how the course was taken.")),
     rules = c(RQ3 = rule_p)),
 
   two_group = list(

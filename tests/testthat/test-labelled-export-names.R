@@ -1,6 +1,6 @@
 # tests/testthat/test-labelled-export-names.R
 #
-# D10 / CX-18. Matrix row columns such as `session__Opening keynote` and long
+# D10 / CX-18. Matrix row columns such as `session__Reading materials` and long
 # MCDA pair names broke or were silently cut in SPSS and Stata files.
 
 valid_name <- function(nm, limit) {
