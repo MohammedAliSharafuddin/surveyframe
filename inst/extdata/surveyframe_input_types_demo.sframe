@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "3d0080bf9457c651446e33f40f9eab426b34e6a2f9214feaab3fd067d68dc1f3",
+    "value": "e2130477ce1fc98f10c25b71d5867726c7a33d6427ec971f9e44d1a02d949631",
     "canonical": "rfc8785"
   },
   "version": "0.3.0",
@@ -166,6 +166,32 @@
       "choice_set": "feature_rank",
       "reverse": false,
       "page": 2
+    },
+    {
+      "id": "feature_pairs",
+      "label": "Which of each pair matters more to you when choosing where to stay, and by how much?",
+      "type": "pairwise_comparison",
+      "required": false,
+      "reverse": false,
+      "comparison_items": ["price", "location", "service"],
+      "comparison_scale": "saaty"
+    },
+    {
+      "id": "feature_points",
+      "label": "Divide 100 points across price, location and service by how much each matters to you.",
+      "type": "criteria_weight",
+      "required": false,
+      "reverse": false,
+      "comparison_items": ["price", "location", "service"]
+    },
+    {
+      "id": "feature_influence",
+      "label": "How strongly does each of these influence the others for you?",
+      "type": "pairwise_comparison",
+      "required": false,
+      "reverse": false,
+      "comparison_items": ["price", "location", "service"],
+      "comparison_scale": "influence"
     },
     {
       "id": "overall_rating",
