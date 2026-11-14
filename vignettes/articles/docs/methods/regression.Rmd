@@ -9,7 +9,7 @@ How much predictors explain a numeric outcome, or change the odds of a yes, an o
 
 **Assumptions.** Independent respondents, predictors not too closely related to each other, and for linear regression a straight-line relation with roughly normal residuals. Firth's correction suits small samples and rare outcomes.
 
-In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set the outcome and 1 or more predictors. The outcome picks the model: a number for linear regression, a yes or no for binary logistic, an ordered rating for ordinal logistic, and a choice of 3 or more categories for multinomial logistic. Declare the hypotheses and the decision rule before collecting responses.
 
 ## Linear regression
 
@@ -22,7 +22,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use and staff time explain some of the variance in value.
 > **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE.
 
@@ -37,7 +37,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use changes the odds of returning.
 > **Planned decision rule:** Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
 
@@ -52,7 +52,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use changes the odds of a higher satisfaction rating.
 > **Planned decision rule:** Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
 
@@ -67,7 +67,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use changes which offer is preferred.
 > **Planned decision rule:** Reject H0 if the likelihood-ratio test of use has p < .05.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley.
 
@@ -82,7 +82,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Sessions attended change the odds of returning.
 > **Planned decision rule:** Reject H0 if the penalised likelihood p < .05, and report the odds ratio with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied logistic regression* (3rd ed.). Wiley. Firth, D. (1993). Bias reduction of maximum likelihood estimates. *Biometrika*, *80*(1), 27-38. Heinze, G., & Schemper, M. (2002). A solution to the problem of separation in logistic regression. *Statistics in Medicine*, *21*(16), 2409-2419.
 

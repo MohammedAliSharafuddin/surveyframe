@@ -9,7 +9,7 @@ How strongly 2 numeric or ordered answers move together, and whether that holds 
 
 **Assumptions.** Pearson's r assumes a straight-line relation, the rank correlations a steady direction. Correlation is not causation.
 
-In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set 2 numeric or ordered answers. Partial correlation takes a third answer to hold constant. Declare the hypotheses and the decision rule before collecting responses.
 
 ## Pearson correlation
 
@@ -22,7 +22,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use and perceived value are correlated.
 > **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE. Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
 
@@ -37,7 +37,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use and perceived value are rank-correlated.
 > **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Spearman, C. (1904). The proof and measurement of association between two things. *The American Journal of Psychology*, *15*(1), 72-101.
 
@@ -52,7 +52,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Use and perceived value are associated by Kendall's tau.
 > **Planned decision rule:** Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum. Kendall, M. G. (1938). A new measure of rank correlation. *Biometrika*, *30*(1/2), 81-93.
 
@@ -67,7 +67,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Holding age constant, use and value are correlated.
 > **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
 
