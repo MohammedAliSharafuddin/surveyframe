@@ -79,16 +79,17 @@ test_that("NULL interpretations prints the decision rules and no interpretation"
   expect_no_match(html, "Interpretation (written", fixed = TRUE)
 })
 
-test_that("codebook-only report also renders the override", {
+test_that("a report with no data is the plan: decision rules, and no interpretation", {
+  # With no data render_report() writes the pre-analysis plan (Session 10).
+  # An interpretation is written after the results, so the plan prints each
+  # block's decision rule and leaves interpretations to the results report.
   fx <- interp_fixture()
   html <- render_fallback(fx$instr,
     interpretations = list(rq_fast = "Speed was pre-drafted before data collection."))
-  fast <- rq_chunk(html, "RQ 1: How fast")
+  fast <- rq_chunk(html, "rq_fast: How fast")
   expect_match(fast, "Planned decision rule:")
-  expect_match(fast, "Interpretation (written after the results):", fixed = TRUE)
-  expect_match(fast, "pre-drafted before data collection")
-  friendly <- rq_chunk(html, "RQ 2: How friendly")
-  expect_no_match(friendly, "Interpretation")
+  expect_no_match(fast, "Interpretation")
+  expect_no_match(html, "pre-drafted before data collection", fixed = TRUE)
 })
 
 test_that("block-id keying survives a plan reorder", {
