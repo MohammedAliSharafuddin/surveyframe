@@ -131,6 +131,8 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
     "Apps Script written to: ", out_path, "\n",
     "Follow the setup instructions inside the file to deploy it."
   )
+  sframe_next_stage("Once deployed, answers arrive in the sheet.",
+                    "read them with read_sheet_responses().")
   invisible(out_path)
 }
 

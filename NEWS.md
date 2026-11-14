@@ -1808,6 +1808,15 @@ arithmetic.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **Each stage names the next.** At the console, `write_sframe()`,
+  `export_survey()`, `export_google_sheet()`, `read_responses()`,
+  `run_analysis_plan()` and `render_report()` end with 1 message saying
+  what was done and the call that comes next, for example "Ran 2 planned
+  analyses. Next: write the report with render_report(instrument,
+  responses)." The messages appear only in an interactive session and for
+  a call typed at the top level, so a script, a render, a test, a server
+  and the package's own calls stay as quiet as before. Their class is
+  `sframe_next_stage`, and `suppressMessages()` silences them.
 * **The RStudio Addins menu has "Try a demo".** It lists the 24 bundled
   demos with what each teaches, and opens the chosen one in SurveyStudio on
   the Design screen with its responses loaded, so each of the 5 stages has

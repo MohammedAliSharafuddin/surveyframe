@@ -963,7 +963,8 @@ sframe_report_seed <- function(data, instrument, include_analysis = TRUE) {
   formals(run_analysis_plan)$seed %||% "unseeded"
 }
 
-sframe_report_result <- function(dest, engine, open = FALSE) {
+sframe_report_result <- function(dest, engine, open = FALSE,
+                                 caller = parent.frame(2)) {
   # The full path: a relative output_file named only its basename, and a
   # reader could not tell where the report had gone.
   rlang::inform(
@@ -973,6 +974,10 @@ sframe_report_result <- function(dest, engine, open = FALSE) {
     class = "sframe_report_engine"
   )
   if (isTRUE(open)) sframe_show(dest, quiet = TRUE)
+  sframe_next_stage(
+    "The report is written.",
+    "share it with the .sframe file, whose hash lets a reader check the instrument.",
+    caller = caller)
   attr(dest, "engine") <- engine
   invisible(dest)
 }

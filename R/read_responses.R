@@ -287,7 +287,15 @@ read_responses <- function(
   )
 
   out <- sframe_as_data_frame(data[, ordered_cols, drop = FALSE])
-  sframe_convert_declared_columns(out, instrument, response_items, dec)
+  out <- sframe_convert_declared_columns(out, instrument, response_items, dec)
+  sframe_next_stage(
+    paste0("Read ", nrow(out), " responses to ", sframe_stage_title(instrument), "."),
+    if (length(instrument$analysis_plan)) {
+      "run the planned analyses with run_analysis_plan(responses, instrument)."
+    } else {
+      "declare an analysis plan, or describe the answers with sframe_item_results()."
+    })
+  out
 }
 
 # TRUE when a choice set's codes are numbers: numeric, or text that survives
