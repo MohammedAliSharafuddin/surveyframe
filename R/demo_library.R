@@ -215,6 +215,18 @@ sframe_demo_dir <- function() {
 #'   this demo, which is the reference to compare against when you run the
 #'   same data through another package. The 2 reference datasets have no
 #'   codebook or results table, so those 2 paths are `NA`.
+#' @section How the demos may be used:
+#' The demos' responses are simulated, not collected from participants. Each
+#' respondent id starts with `DEMO-`, and a `data_status` column says
+#' "Demonstration data, not collected from participants". Every output made
+#' from data that carries it says so too: each APA sentence from
+#' [run_analysis_plan()] ends with "(demonstration data)", and a report's
+#' title, its opening line and each table and figure title carry the same,
+#' also after the data is copied into another project. Use the demos to
+#' learn, teach and test a method or an instrument. Presenting their results
+#' as findings, or editing the data to hide where it came from, is
+#' fabrication, which no check can stop: the stamp makes a copy visible.
+#'
 #' @export
 #' @seealso [sframe_list_demos()], [export_responses()]
 #' @examples
@@ -290,6 +302,28 @@ sframe_demo_preview <- function(demo, preview) {
 # from data that carries it are stamped (owner 2026-11-05), also after the
 # data is copied into another project.
 sframe_demo_data_status <- "Demonstration data, not collected from participants"
+
+# Whether responses are surveyframe's demonstration data: their data_status
+# column says so (coordinator ruling 2026-11-14, the column only).
+sframe_is_demo_data <- function(data) {
+  is.data.frame(data) && "data_status" %in% names(data) &&
+    any(as.character(data$data_status) == sframe_demo_data_status, na.rm = TRUE)
+}
+
+# The stamp every output made from demonstration data carries: each APA
+# sentence, the report title, and each table and figure title. On while
+# render_report() works on demo data, so the captions both engines build
+# carry it.
+sframe_demo_stamp_text <- " (demonstration data)"
+.sframe_demo_env <- new.env(parent = emptyenv())
+
+sframe_demo_stamp <- function(x, on = isTRUE(.sframe_demo_env$on)) {
+  if (!on || is.null(x)) return(x)
+  x <- as.character(x)
+  todo <- !is.na(x) & nzchar(x) & !endsWith(x, sframe_demo_stamp_text)
+  x[todo] <- paste0(x[todo], sframe_demo_stamp_text)
+  x
+}
 
 # A demo is the plain list sframe_demo() has always returned, with the class
 # sframe_demo and its name as an attribute, so printing it shows a short card

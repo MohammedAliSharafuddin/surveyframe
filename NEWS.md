@@ -2013,6 +2013,16 @@ arithmetic.
 
 ## Demos
 
+* **Demonstration data says so wherever it goes.** Every demo's responses
+  have respondent ids `DEMO-001` and on, and a `data_status` column,
+  "Demonstration data, not collected from participants", kept by
+  `sframe_demo()` and `read_responses(meta_cols = )`. Data that carries it
+  is stamped: each APA sentence from `run_analysis_plan()` ends with
+  "(demonstration data)", in the console as in a report, and a report's
+  title, its opening line and each table and figure title say the same,
+  with both engines and in every format, also after the data is copied
+  into another project. The 25 stored results files carry the stamp.
+  `?sframe_demo` says how the demos may be used.
 * **3 new teaching demos**, 25 in all. `weighted_survey`: a resident
   satisfaction survey whose sample over-represents 1 region, with frequency,
   descriptives and a chi-square test weighted by a design weight carried in

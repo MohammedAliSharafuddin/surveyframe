@@ -258,14 +258,14 @@ sframe_apa_headings <- function(names, conf_level = 0.95) {
 # order as APA 7 does: the number in bold, the title in italics on the line
 # below, tables and figures counted apart.
 sframe_apa_caption <- function(title) {
-  sprintf("<caption class=\"sf-apa-caption\">%s</caption>", htmltools_escape(title))
+  sprintf("<caption class=\"sf-apa-caption\">%s</caption>", htmltools_escape(sframe_demo_stamp(title)))
 }
 
 sframe_apa_figure <- function(img, title) {
   if (is.null(img) || !nzchar(img)) return(img)
   sprintf(
     "<figure class=\"sf-figure\"><figcaption class=\"sf-apa-caption\">%s</figcaption>%s</figure>",
-    htmltools_escape(title), img)
+    htmltools_escape(sframe_demo_stamp(title)), img)
 }
 
 # The opening of a figure in the Quarto report. knitr writes the image
@@ -274,7 +274,7 @@ sframe_apa_figure <- function(img, title) {
 sframe_apa_figure_open <- function(title, alt) {
   sprintf(
     "<figure class=\"sf-figure\" data-alt=\"%s\"><figcaption class=\"sf-apa-caption\">%s</figcaption>",
-    htmltools_escape(alt), htmltools_escape(title))
+    htmltools_escape(alt), htmltools_escape(sframe_demo_stamp(title)))
 }
 
 # A result's table and figure title: its block id and research question.

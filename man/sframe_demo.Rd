@@ -39,6 +39,20 @@ datasets: \code{"tourism_services"}, a realistic multi-scale instrument, and
 \code{"input_types"}, which uses every input type SurveyBuilder and
 SurveyStudio support in a single instrument.
 }
+\section{How the demos may be used}{
+
+The demos' responses are simulated, not collected from participants. Each
+respondent id starts with \verb{DEMO-}, and a \code{data_status} column says
+"Demonstration data, not collected from participants". Every output made
+from data that carries it says so too: each APA sentence from
+\code{\link[=run_analysis_plan]{run_analysis_plan()}} ends with "(demonstration data)", and a report's
+title, its opening line and each table and figure title carry the same,
+also after the data is copied into another project. Use the demos to
+learn, teach and test a method or an instrument. Presenting their results
+as findings, or editing the data to hide where it came from, is
+fabrication, which no check can stop: the stamp makes a copy visible.
+}
+
 \examples{
 demo <- sframe_demo("two_group")
 demo

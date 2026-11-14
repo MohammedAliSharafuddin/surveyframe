@@ -159,6 +159,11 @@ html_esc <- function(v) {
   gsub(">", "&gt;", v, fixed = TRUE)
 }
 apa_kable <- function(x, ..., caption = NULL, cap = NULL) {
+  # Demonstration data stamps each table title (owner 2026-11-05).
+  if (isTRUE(content$demo_data)) {
+    if (!is.null(caption)) caption <- paste0(caption, " (demonstration data)")
+    if (!is.null(cap)) cap <- paste0(cap, " (demonstration data)")
+  }
   args <- list(...)
   if (is.null(args$row.names)) args$row.names <- FALSE
   if (is.data.frame(x) && is.null(args$col.names)) {
@@ -214,6 +219,9 @@ apa_note <- function(text) {
   else cat(sprintf("\n*Note.* %s\n\n", text))
 }
 figure_start <- function(html, title) {
+  # The HTML opening is built in R, stamped there. The other formats stamp
+  # the title here.
+  if (isTRUE(content$demo_data)) title <- paste0(title, " (demonstration data)")
   if (out_html) cat("\n", html, "\n\n", sep = "")
   else {
     fig_n <<- fig_n + 1L
@@ -380,6 +388,13 @@ cat(sprintf("**Validation status:** %s\n\n",
 ```
 
 ---
+
+```{r demo-data-lead}
+#| output: asis
+if (isTRUE(content$demo_data)) {
+  cat("**Demonstration data, not collected from participants.** Every number, table and figure here was computed from it.\n\n")
+}
+```
 
 ## Provenance {#sec-provenance .unnumbered}
 
