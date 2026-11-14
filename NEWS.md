@@ -1838,12 +1838,12 @@ arithmetic.
   with their reverse keys, scoring and missing-answer rule, each research
   question with its hypotheses, the method in plain words with its
   reference, the variables, the significance level and the decision rule,
-  the models, the amendments or "None", the references, and "To complete
-  before submission", a prompt and a blank line for each field a
-  preregistration asks for that the instrument does not hold (exclusion
-  rules, stopping rule, primary and secondary outcomes, multiplicity,
-  contingency decisions and the significance level, printed as declared
-  where a plan block sets alpha). Quarto writes it as HTML, PDF, Word or
+  the preregistration fields the study declares, with the significance
+  level where a plan block sets alpha, the models, the amendments or
+  "None", the references, and "To complete before submission", a prompt
+  and a blank line for each of those fields the study leaves empty
+  (exclusion rules, stopping rule, primary outcomes, secondary outcomes,
+  multiplicity, contingency decisions and the significance level). Quarto writes it as HTML, PDF, Word or
   OpenDocument from its own template, `plan.qmd`, and the built-in engine
   writes the same content as plain HTML. Results rows (the results record,
   the responses hash and the analysis seed) are no longer printed with no
