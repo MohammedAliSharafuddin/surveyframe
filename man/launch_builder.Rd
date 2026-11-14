@@ -4,7 +4,7 @@
 \alias{launch_builder}
 \title{Launch the surveyframe visual survey builder}
 \usage{
-launch_builder(open = TRUE, demo = NULL)
+launch_builder(open = TRUE, demo = NULL, instrument = NULL)
 }
 \arguments{
 \item{open}{Logical. When \code{TRUE} (the default), the builder HTML file is
@@ -16,10 +16,16 @@ useful for automated testing.}
 then opens from a temporary copy with that demo's questions, scales and
 analysis plan already loaded. \code{"input_types"} shows every input type
 the builder supports.}
+
+\item{instrument}{Optional. An \code{sframe} instrument. The builder then opens
+from a temporary copy with this instrument loaded, as if it had been
+opened with the builder's Open button, so its study, designs,
+amendments and references are kept on the next save. Supply \code{demo} or
+\code{instrument}, not both.}
 }
 \value{
 The path to the builder HTML file, invisibly: the bundled file, or
-the temporary copy when \code{demo} is given.
+the temporary copy when \code{demo} or \code{instrument} is given.
 }
 \description{
 Opens the SurveyBuilder, a self-contained HTML application for visual survey
@@ -54,6 +60,11 @@ sframe_show(path)
 
 # The same builder with a demo preloaded
 path <- launch_builder(demo = "two_group", open = FALSE)
+sframe_show(path)
+
+# Or with an instrument of your own
+ins <- sframe_demo("likert_scale", preview = FALSE)$instrument
+path <- launch_builder(instrument = ins, open = FALSE)
 sframe_show(path)
 }
 \seealso{
