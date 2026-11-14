@@ -289,7 +289,9 @@ p1_expect_apa_floats <- function(to) {
     }
   }
   tab1 <- grep("^Table 1$", p$text)
-  expect_identical(p$text[tab1 + 1], "Provenance")
+  # The two_group demo is demonstration data, so every table title carries
+  # the stamp (owner 2026-11-14, 2fc5fb5).
+  expect_identical(p$text[tab1 + 1], "Provenance (demonstration data)")
   # The not-applicable dash and its note print, and no raw column name does.
   all_text <- paste(p$text, collapse = " ")
   expect_true(grepl("—", all_text, fixed = TRUE))
@@ -375,7 +377,9 @@ p1_expect_no_overlap <- function(to) {
   # margin's width leaves off.
   # A glyph's side bearing can reach 1 or 2 points past it.
   right <- w$width - min(w$x0) + 4
-  expect_identical(w$word[w$x1 > right], character(0))
+  past <- w$x1 > right
+  expect_identical(w$word[past], character(0),
+    info = paste(sprintf("page %d x1 %.1f right %.1f %s", w$page[past], w$x1[past], right, w$word[past]), collapse = "; "))
   # Words on 1 line share a baseline, and none may cover another. The dot
   # leaders of the contents page are left out, and so are the rotated labels
   # of a chart, which LaTeX embeds as text: a box taller than any line.

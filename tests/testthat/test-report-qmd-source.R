@@ -98,7 +98,9 @@ test_that("a title holding a quote, a colon, a hash and a newline then --- leave
   title <- "A \"quoted\": study # one\n---\nbibliography: evil.json"
   s <- write_source(title = title)
   qmd <- file.path(s$dir, "report.qmd")
-  expect_identical(front_value(qmd, "title"), title)
+  # The source is built from demonstration data, so the title carries the
+  # stamp (owner 2026-11-14, 2fc5fb5). The front matter stays whole.
+  expect_identical(front_value(qmd, "title"), paste0(title, " (demonstration data)"))
   expect_identical(front_value(qmd, "bibliography"), "references.json")
   expect_identical(sum(grepl("^title: ", front_lines(qmd))), 1L)
   lines <- readLines(file.path(s$dir, "report.qmd"))

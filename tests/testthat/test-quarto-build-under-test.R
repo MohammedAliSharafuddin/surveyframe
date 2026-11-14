@@ -16,7 +16,9 @@ test_that("the Quarto report was rendered by the build under test", {
   ins <- sframe_instrument(title = "Build check", components = list(
     sframe_item("q1", "Comment", type = "text")))
   out <- tempfile(fileext = ".html")
-  render_report(ins, output_file = out, open = FALSE)
+  # With responses, so this is the results report: with no data
+  # render_report() writes the pre-analysis plan (48b585e).
+  render_report(ins, data = data.frame(q1 = c("a", "b")), output_file = out, open = FALSE)
   html <- paste(readLines(out, warn = FALSE), collapse = "\n")
   line <- regmatches(html, regexpr("surveyframe:</strong> .*?</p>", html, perl = TRUE))
   expect_length(line, 1)

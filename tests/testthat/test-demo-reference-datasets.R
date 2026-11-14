@@ -46,7 +46,9 @@ test_that("sframe_list_demos() lists the reference datasets apart", {
   expect_setequal(ref$name, c("tourism_services", "input_types"))
   # listed after the teaching demos
   expect_identical(utils::tail(idx$name, 2), ref$name)
-  expect_identical(sum(idx$focus != "reference"), 22L)
+  # 25 since Session 10 added weighted_survey, citing_sources and
+  # mediation_moderation (7fcf1e1).
+  expect_identical(sum(idx$focus != "reference"), 25L)
 })
 
 test_that("the old loaders forward to sframe_demo()", {
