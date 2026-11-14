@@ -7,7 +7,7 @@ description: "Add a question, choose Slider, and set its range and step."
 
 Add a question, choose Slider, and set its range and step.
 
-![The questionnaire editor with the slider rating selected and its settings panel outlined.](../../../docs/question-types/slider-editor.png){width=100%}
+![SurveyStudio's Design screen with the slider rating selected and its settings panel outlined.](../../../docs/question-types/slider-editor.png){width=100%}
 
 ## What the respondent sees
 

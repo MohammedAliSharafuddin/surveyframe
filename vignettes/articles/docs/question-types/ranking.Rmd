@@ -7,7 +7,7 @@ description: "Add a question, choose Ranking, and give the options to put in ord
 
 Add a question, choose Ranking, and give the options to put in order.
 
-![The questionnaire editor with the ranking question selected and its settings panel outlined.](../../../docs/question-types/ranking-editor.png){width=100%}
+![SurveyStudio's Design screen with the ranking question selected and its settings panel outlined.](../../../docs/question-types/ranking-editor.png){width=100%}
 
 ## What the respondent sees
 

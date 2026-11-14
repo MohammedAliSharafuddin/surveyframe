@@ -7,7 +7,7 @@ description: "Add a question, choose Criteria weight, and list the criteria to d
 
 Add a question, choose Criteria weight, and list the criteria to divide 100 points across.
 
-![The questionnaire editor with the criteria weighting question selected and its settings panel outlined.](../../../docs/question-types/criteria-weights-editor.png){width=100%}
+![SurveyStudio's Design screen with the criteria weighting question selected and its settings panel outlined.](../../../docs/question-types/criteria-weights-editor.png){width=100%}
 
 ## What the respondent sees
 

@@ -7,7 +7,7 @@ description: "Add a question and choose Short text for a word or a line."
 
 Add a question and choose Short text for a word or a line.
 
-![The questionnaire editor with the short text question selected and its settings panel outlined.](../../../docs/question-types/short-text-editor.png){width=100%}
+![SurveyStudio's Design screen with the short text question selected and its settings panel outlined.](../../../docs/question-types/short-text-editor.png){width=100%}
 
 ## What the respondent sees
 

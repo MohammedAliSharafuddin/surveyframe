@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Analytic hierarchy process (AHP)
 
-![The Plan card for a Analytic hierarchy process (AHP) block, from the `mcdm_choice` demo.](../../../docs/methods/ahp.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Analytic hierarchy process (AHP) research question, from the `mcdm_choice` demo.](../../../docs/methods/ahp.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -26,7 +26,7 @@ References: Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.
 
 ## Analytic network process (ANP)
 
-![The Plan card for a Analytic network process (ANP) block, from the `mcdm_choice` demo.](../../../docs/methods/anp.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Analytic network process (ANP) research question, from the `mcdm_choice` demo.](../../../docs/methods/anp.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -38,7 +38,7 @@ References: Saaty, T. L. (1996). *Decision making with dependence and feedback: 
 
 ## DEMATEL
 
-![The Plan card for a DEMATEL block, from the `mcdm_choice` demo.](../../../docs/methods/dematel.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a DEMATEL research question, from the `mcdm_choice` demo.](../../../docs/methods/dematel.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -50,7 +50,7 @@ References: Gabus, A., & Fontela, E. (1972). *World problems, an invitation to f
 
 ## TOPSIS
 
-![The Plan card for a TOPSIS block, from the `mcdm_choice` demo.](../../../docs/methods/topsis.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a TOPSIS research question, from the `mcdm_choice` demo.](../../../docs/methods/topsis.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -62,7 +62,7 @@ References: Hwang, C.-L., & Yoon, K. (1981). *Multiple attribute decision making
 
 ## VIKOR
 
-![The Plan card for a VIKOR block, from the `mcdm_choice` demo.](../../../docs/methods/vikor.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a VIKOR research question, from the `mcdm_choice` demo.](../../../docs/methods/vikor.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -74,7 +74,7 @@ References: Opricovic, S., & Tzeng, G.-H. (2004). Compromise solution by MCDM me
 
 ## MOORA
 
-![The Plan card for a MOORA block, from the `mcdm_choice` demo.](../../../docs/methods/moora.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a MOORA research question, from the `mcdm_choice` demo.](../../../docs/methods/moora.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -86,7 +86,7 @@ References: Brauers, W. K. M., & Zavadskas, E. K. (2006). The MOORA method and i
 
 ## SMART
 
-![The Plan card for a SMART block, from the `mcdm_choice` demo.](../../../docs/methods/smart.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a SMART research question, from the `mcdm_choice` demo.](../../../docs/methods/smart.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -98,7 +98,7 @@ References: Edwards, W. (1977). How to use multiattribute utility measurement fo
 
 ## WASPAS
 
-![The Plan card for a WASPAS block, from the `mcdm_choice` demo.](../../../docs/methods/waspas.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a WASPAS research question, from the `mcdm_choice` demo.](../../../docs/methods/waspas.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -110,7 +110,7 @@ References: Zavadskas, E. K., Turskis, Z., Antucheviciene, J., & Zakarevicius, A
 
 ## PROMETHEE
 
-![The Plan card for a PROMETHEE block, from the `mcdm_choice` demo.](../../../docs/methods/promethee.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a PROMETHEE research question, from the `mcdm_choice` demo.](../../../docs/methods/promethee.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -122,7 +122,7 @@ References: Brans, J. P., & Vincke, P. (1985). A preference ranking organisation
 
 ## ELECTRE
 
-![The Plan card for a ELECTRE block, from the `mcdm_choice` demo.](../../../docs/methods/electre.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a ELECTRE research question, from the `mcdm_choice` demo.](../../../docs/methods/electre.png){width=90%}
 
 In the pre-analysis plan:
 

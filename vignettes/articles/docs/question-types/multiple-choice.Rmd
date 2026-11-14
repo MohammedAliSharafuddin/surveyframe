@@ -7,7 +7,7 @@ description: "Add a question, choose Multiple choice, and give the options the r
 
 Add a question, choose Multiple choice, and give the options the respondent may tick.
 
-![The questionnaire editor with the choose-any question selected and its settings panel outlined.](../../../docs/question-types/multiple-choice-editor.png){width=100%}
+![SurveyStudio's Design screen with the choose-any question selected and its settings panel outlined.](../../../docs/question-types/multiple-choice-editor.png){width=100%}
 
 ## What the respondent sees
 

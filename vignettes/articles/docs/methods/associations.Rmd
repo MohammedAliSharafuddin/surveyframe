@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Cross-tabulation
 
-![The Plan card for a Cross-tabulation block, from the `matrix_likert` demo.](../../../docs/methods/crosstab.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Cross-tabulation research question, from the `matrix_likert` demo.](../../../docs/methods/crosstab.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -26,7 +26,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Chi-square test of association
 
-![The Plan card for a Chi-square test of association block, from the `categorical` demo.](../../../docs/methods/chi_square.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Chi-square test of association research question, from the `categorical` demo.](../../../docs/methods/chi_square.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -41,7 +41,7 @@ References: Field, A. (2018). *Discovering statistics using IBM SPSS statistics*
 
 ## Fisher's exact test
 
-![The Plan card for a Fisher's exact test block, from the `categorical` demo.](../../../docs/methods/fisher_exact.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Fisher's exact test research question, from the `categorical` demo.](../../../docs/methods/fisher_exact.png){width=90%}
 
 In the pre-analysis plan:
 

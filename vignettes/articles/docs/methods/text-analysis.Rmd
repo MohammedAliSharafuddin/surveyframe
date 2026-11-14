@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Word frequencies
 
-![The Plan card for a Word frequencies block, from the `open_text` demo.](../../../docs/methods/term_freq.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Word frequencies research question, from the `open_text` demo.](../../../docs/methods/term_freq.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -23,7 +23,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Phrase frequencies
 
-![The Plan card for a Phrase frequencies block, from the `open_text` demo.](../../../docs/methods/ngram_freq.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Phrase frequencies research question, from the `open_text` demo.](../../../docs/methods/ngram_freq.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -33,7 +33,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Words in context
 
-![The Plan card for a Words in context block, from the `open_text` demo.](../../../docs/methods/term_context.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Words in context research question, from the `open_text` demo.](../../../docs/methods/term_context.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -43,7 +43,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Word co-occurrence
 
-![The Plan card for a Word co-occurrence block, from the `open_text` demo.](../../../docs/methods/co_occurrence.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Word co-occurrence research question, from the `open_text` demo.](../../../docs/methods/co_occurrence.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -53,7 +53,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Word co-occurrence network
 
-![The Plan card for a Word co-occurrence network block, from the `open_text` demo.](../../../docs/methods/co_occurrence_network.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Word co-occurrence network research question, from the `open_text` demo.](../../../docs/methods/co_occurrence_network.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -65,7 +65,7 @@ References: Blondel, V. D., Guillaume, J.-L., Lambiotte, R., & Lefebvre, E. (200
 
 ## Sentiment analysis
 
-![The Plan card for a Sentiment analysis block, from the `open_text` demo.](../../../docs/methods/tidy_sentiment.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Sentiment analysis research question, from the `open_text` demo.](../../../docs/methods/tidy_sentiment.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -75,7 +75,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Document-feature matrix
 
-![The Plan card for a Document-feature matrix block, from the `open_text` demo.](../../../docs/methods/quanteda_dfm.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Document-feature matrix research question, from the `open_text` demo.](../../../docs/methods/quanteda_dfm.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -85,7 +85,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Topic model (LDA)
 
-![The Plan card for a Topic model (LDA) block, from the `open_text` demo.](../../../docs/methods/topic_model_lda.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Topic model (LDA) research question, from the `open_text` demo.](../../../docs/methods/topic_model_lda.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -95,7 +95,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Structural topic model
 
-![The Plan card for a Structural topic model block, from the `open_text` demo.](../../../docs/methods/stm_topics.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Structural topic model research question, from the `open_text` demo.](../../../docs/methods/stm_topics.png){width=90%}
 
 In the pre-analysis plan:
 

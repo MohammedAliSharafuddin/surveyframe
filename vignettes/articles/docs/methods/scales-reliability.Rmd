@@ -13,7 +13,7 @@ In SurveyStudio, open **Plan** on the Design screen, add a research question and
 
 ## Scale score descriptive statistics
 
-![The Plan card for a Scale score descriptive statistics block, from the `likert_scale` demo.](../../../docs/methods/scale_descriptives.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Scale score descriptive statistics research question, from the `likert_scale` demo.](../../../docs/methods/scale_descriptives.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -23,7 +23,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 ## Cronbach's alpha (internal consistency)
 
-![The Plan card for a Cronbach's alpha (internal consistency) block, from the `likert_scale` demo.](../../../docs/methods/reliability_alpha.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Cronbach's alpha (internal consistency) research question, from the `likert_scale` demo.](../../../docs/methods/reliability_alpha.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -36,7 +36,7 @@ References: Cronbach, L. J. (1951). Coefficient alpha and the internal structure
 
 ## McDonald's omega (internal consistency)
 
-![The Plan card for a McDonald's omega (internal consistency) block, from the `likert_scale` demo.](../../../docs/methods/reliability_omega.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a McDonald's omega (internal consistency) research question, from the `likert_scale` demo.](../../../docs/methods/reliability_omega.png){width=90%}
 
 In the pre-analysis plan:
 
@@ -49,7 +49,7 @@ References: Cronbach, L. J. (1951). Coefficient alpha and the internal structure
 
 ## Item diagnostics
 
-![The Plan card for a Item diagnostics block, from the `likert_scale` demo.](../../../docs/methods/item_diagnostics.png){width=90%}
+![SurveyStudio's Plan screen with the Edit Analysis Plan dialog for a Item diagnostics research question, from the `likert_scale` demo.](../../../docs/methods/item_diagnostics.png){width=90%}
 
 In the pre-analysis plan:
 

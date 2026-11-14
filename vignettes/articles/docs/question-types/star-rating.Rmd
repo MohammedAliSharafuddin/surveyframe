@@ -7,7 +7,7 @@ description: "Add a question and choose Rating for a row of stars."
 
 Add a question and choose Rating for a row of stars.
 
-![The questionnaire editor with the star rating selected and its settings panel outlined.](../../../docs/question-types/star-rating-editor.png){width=100%}
+![SurveyStudio's Design screen with the star rating selected and its settings panel outlined.](../../../docs/question-types/star-rating-editor.png){width=100%}
 
 ## What the respondent sees
 

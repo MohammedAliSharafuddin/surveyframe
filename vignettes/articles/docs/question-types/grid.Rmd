@@ -7,7 +7,7 @@ description: "Add a question, choose Matrix, list the rows, and pick the scale e
 
 Add a question, choose Matrix, list the rows, and pick the scale every row is rated on.
 
-![The questionnaire editor with the grid of rating questions selected and its settings panel outlined.](../../../docs/question-types/grid-editor.png){width=100%}
+![SurveyStudio's Design screen with the grid of rating questions selected and its settings panel outlined.](../../../docs/question-types/grid-editor.png){width=100%}
 
 ## What the respondent sees
 
