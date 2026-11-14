@@ -93,7 +93,7 @@ sframe_sample_size_plan(type = "t_test", groups = 2)
 ```
 
 A worked instrument in this vignette targets n = 20 complete responses, well
-below that planning estimate. The instrument below has a two-level grouping
+below that planning estimate. The instrument below has a 2-level grouping
 question, a numeric outcome, and a binary outcome for the logistic example
 later in this vignette.
 

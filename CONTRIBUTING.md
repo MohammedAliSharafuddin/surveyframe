@@ -1,6 +1,6 @@
 # Contributing to surveyframe
 
-## Three rules that form the package contract
+## 3 rules that form the package contract
 
 These apply to every exported function, without exception.
 
@@ -49,14 +49,14 @@ recorded path, but it is opt-in: nothing stops a contributor from
 reconstructing an instrument and writing it fresh instead of calling
 `amend_sframe()` first. Do not describe the hash, the amendment log, or
 `link_git_commit()` in documentation as detecting or preventing
-undisclosed change beyond what they actually do -- the hash detects that
-a file changed; the amendment log records a change the researcher chose
+undisclosed change beyond what they actually do. The hash detects that
+a file changed, and the amendment log records a change the researcher chose
 to disclose. Neither compels disclosure.
 
 ## Stability policy
 
 Exported functions are not removed or renamed without a deprecation cycle:
-mark the old name `.Deprecated()`, keep it working for at least one minor
+mark the old name `.Deprecated()`, keep it working for at least 1 minor
 release, and record the change in `NEWS.md` under a "Deprecated" heading.
 Breaking changes to an exported function's arguments or return type are
 also recorded in `NEWS.md`, explicitly labelled "Breaking," whether or not

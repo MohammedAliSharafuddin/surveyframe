@@ -40,7 +40,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
 
-`surveyframe` has three graphical entry points, kept separate on purpose, each
+`surveyframe` has 3 graphical entry points, kept separate on purpose, each
 mapping onto a part of the research-design workflow.
 
 * `launch_builder()` opens SurveyBuilder, a standalone questionnaire builder. It
@@ -57,7 +57,7 @@ mapping onto a part of the research-design workflow.
 ## Input-types demo
 
 The input-types demo covers the main controls available in SurveyBuilder and
-SurveyStudio. The two decision item types, `pairwise_comparison` and
+SurveyStudio. The 2 decision item types, `pairwise_comparison` and
 `criteria_weight`, sit outside this demo. They get their own worked
 example in the MCDM vignette, because they only make sense alongside a
 declared decision method and a set of alternatives.
@@ -74,7 +74,7 @@ dim(responses)
 ## SurveyBuilder: the Plan mode
 
 SurveyBuilder runs entirely in the browser, so it is an authoring tool. Its
-Plan mode has three tabs, Plan, Declared analyses and Expected outputs, with a three-panel layout
+Plan mode has 3 tabs, Plan, Declared analyses and Expected outputs, with a 3-panel layout
 underneath: a list of variables and constructs on the left, the analysis plans
 in the middle, and an output preview with the model builder on the right.
 
@@ -235,7 +235,7 @@ Design an instrument -> save .sframe -> Analyse an existing instrument ->
 upload responses -> run the plan -> export the report
 ```
 
-The starter instrument holds a 5-point choice set, 3 items, one scale, and a
+The starter instrument holds a 5-point choice set, 3 items, 1 scale, and a
 reliability plan, and it validates as inserted. It ends with a commented
 `write_sframe()` line for saving it. When a command has to stop, because
 RStudio is closed, the console has focus, or a file fails to load, it prints

@@ -138,11 +138,11 @@ kable(as.data.frame(validity), digits = 2,
 The average variance extracted exceeds 0.5 for every construct, and the
 composite reliability exceeds 0.7, so each construct explains more than half the
 variance in its items. The sustainability construct sits lowest, in line with
-the two weaker items the paper flagged (DSUQ4 and DSUQ5).
+the 2 weaker items the paper flagged (DSUQ4 and DSUQ5).
 
 ## Discriminant validity
 
-The study assessed discriminant validity in two ways. The Fornell-Larcker
+The study assessed discriminant validity in 2 ways. The Fornell-Larcker
 criterion compares the square root of a construct's AVE with its correlations
 with the others. The square roots, 0.810 for digital marketing effectiveness,
 0.910 for service quality, 0.726 for sustainability quality, 0.911 for

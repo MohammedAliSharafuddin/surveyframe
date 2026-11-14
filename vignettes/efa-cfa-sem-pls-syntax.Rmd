@@ -36,14 +36,14 @@ library(surveyframe)
 
 The model is the third part of the research design. surveyframe stores the
 measurement and structural specification and writes the syntax for the modelling
-stage, and you fit the models with lavaan or seminr. This vignette builds the three models from
+stage, and you fit the models with lavaan or seminr. This vignette builds the 3 models from
 the published Thailand study (Sharafuddin, Madhavan, and Wangtueai 2024). The
 syntax steps need no raw data, so every chunk below runs as written.
 
-There are five constructs. Digital marketing effectiveness (DME) is built from
+There are 5 constructs. Digital marketing effectiveness (DME) is built from
 relevance and engagement (DMRE), accessibility and usefulness (DMAU), ease of use
 (DMEU), and perceived value (DMPV). Destination service quality (DSQ) is built
-from accommodation (DSQA) and local transport (DSQT). The remaining three are
+from accommodation (DSQA) and local transport (DSQT). The remaining 3 are
 destination sustainability quality (DSUQ), tourist satisfaction (TS), and
 behavioural intention (BI).
 
@@ -67,7 +67,7 @@ cat(sframe_syntax_efa(items = c(dmre, dmau, dmeu, dmpv), nfactors = 4,
 
 ## CFA syntax: the lower-order measurement model
 
-The confirmatory measurement model has the nine lower-order constructs as
+The confirmatory measurement model has the 9 lower-order constructs as
 reflective factors. `sframe_syntax_cfa()` writes lavaan syntax from a model
 object, with no need for lavaan at this stage.
 
@@ -90,9 +90,9 @@ cat(sframe_syntax_cfa(model = cfa_model))
 
 ## CB-SEM syntax: the structural model
 
-The covariance-based reading treats the five constructs as first-order
-reflective factors over their full item sets, with the nine direct paths and the
-four indirect effects from the hypotheses. `sframe_syntax_sem()` writes the
+The covariance-based reading treats the 5 constructs as first-order
+reflective factors over their full item sets, with the 9 direct paths and the
+4 indirect effects from the hypotheses. `sframe_syntax_sem()` writes the
 measurement, structural, and indirect-effect lines.
 
 ```{r cbsem}
@@ -129,7 +129,7 @@ cat(sframe_syntax_sem(sem_model))
 
 ## PLS-SEM syntax: the two-stage higher-order model
 
-The published study used PLS-SEM with a two-stage treatment of the higher-order
+The published study used PLS-SEM with a 2-stage treatment of the higher-order
 constructs. The second stage models digital marketing effectiveness and service
 quality as composites of their lower-order construct scores, then estimates the
 structural paths. `sframe_syntax_pls()` writes the seminr code, including the
@@ -184,4 +184,4 @@ The generated lavaan syntax is copied into `lavaan::cfa()` or `lavaan::sem()`
 after choosing the estimator, ordered-item handling, and missing-data treatment.
 The generated seminr syntax is copied into a script where seminr is installed and
 the bootstrap settings and construct modes are set. The published study fitted
-the two-stage PLS model in seminr with 1000 bootstrap resamples.
+the 2-stage PLS model in seminr with 1000 bootstrap resamples.

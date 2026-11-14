@@ -38,14 +38,14 @@ This guide takes a finished instrument to a live, public survey that writes
 responses into a Google Sheet. Every step is free, and the survey itself is a
 single HTML file that runs in any browser with no server.
 
-The deployment has three parts.
+The deployment has 3 parts.
 
 1. A Google Apps Script collector turns a Google Sheet into a response endpoint.
 2. The survey HTML carries that endpoint URL and posts each submission to it.
 3. A free static host serves the HTML file to respondents.
 
 You can do all of this on SurveyStudio's Collect screen without writing R, or
-from R with two function calls. Both routes produce the same files.
+from R with 2 function calls. Both routes produce the same files.
 
 ## What you need
 
