@@ -2,8 +2,11 @@
 
 # Column names response data already carries, which an item or scale id must
 # never take, since score_scales() writes each score under its scale's id.
+# data_status marks surveyframe's demonstration data (Session 10), so
+# read_responses() keeps it without being told, and the stamp it causes
+# survives every read of a demo file.
 sframe_reserved_response_columns <- c("respondent_id", "response_id",
-                                      "started_at", "submitted_at")
+                                      "started_at", "submitted_at", "data_status")
 
 # The ids of items reversed within `scale`. Reversal belongs to the scale that
 # declares it: the scale's own reverse_items, and items whose scale_id names
