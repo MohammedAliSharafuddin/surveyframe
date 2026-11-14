@@ -343,6 +343,16 @@ style.
 
 ## The study an instrument serves
 
+* **The study holds what a preregistration asks for beyond the plan
+  blocks.** `study$preregistration` takes `exclusion_rules`,
+  `stopping_rule`, `primary_outcomes`, `secondary_outcomes`, `multiplicity`
+  and `contingency`, each 1 optional text. Set it with
+  `sframe_instrument(study = )` or `instrument$study`, and read it with
+  `sframe_get_study()`. It is inside the hash, so on a published
+  instrument a change to it is a design amendment. `validate_sframe()`
+  refuses an empty block, a blank or non-text field and an unknown field,
+  and the published instrument profile declares it. An instrument with no
+  preregistration hashes as before.
 * **Text fields may hold Markdown and equations.** A research question,
   H0, H1, decision rule, interpretation, study problem or deviation report
   may use bold, italic, lists, links, `[@key]` citations, `~sub~`, `^sup^`,

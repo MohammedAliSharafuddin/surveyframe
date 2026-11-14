@@ -29,8 +29,10 @@
 #' @param study List or `NULL`. The study the instrument serves: `problem` (1
 #'   short paragraph), `objectives` (a list, each with an `id` such as `"O1"`
 #'   and its `text`) and `sampling` (`population`, `method` from
-#'   [sframe_sampling_methods()] and `planned_n`). Never shown to
-#'   respondents. See [sframe_get_study()].
+#'   [sframe_sampling_methods()] and `planned_n`) and `preregistration`
+#'   (`exclusion_rules`, `stopping_rule`, `primary_outcomes`,
+#'   `secondary_outcomes`, `multiplicity` and `contingency`, each optional
+#'   text). Never shown to respondents. See [sframe_get_study()].
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
 #'   `scales`, `branching`, `checks`, `analysis_plan`, `models`, and `render`.
