@@ -335,7 +335,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
   display:flex;flex-direction:column;overflow:hidden}
 .sb-top{padding:10px;border-bottom:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .sb-title{padding:4px 8px 6px;color:var(--st);font-size:12px;font-weight:600;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  overflow-wrap:anywhere}
 /* The 1 settings entry point (owner decision 2026-07-11). Owner 2026-11-05:
    until settings are saved once it is the panel's filled primary and
    + Add question an outline, then the 2 swap (updPanelLead()). As a
@@ -531,6 +531,9 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .fl{font-size:11px;font-weight:600;color:var(--t2);
   display:flex;align-items:center;gap:3px}
 .fr{color:var(--cd);font-size:10px}
+/* A hint beside a label, such as optional: muted, never the red of an error
+   (owner 2026-11-15). --t2 keeps 4.5:1 on the dialog's white. */
+.fopt{color:var(--t2);font-size:10px;font-weight:400}
 .fc input,.fc textarea,.fc select{width:100%;border:1.5px solid var(--cb);
   border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--t1);
   background:var(--cf);transition:border-color var(--d1),box-shadow var(--d1)}
@@ -677,7 +680,7 @@ body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav
 .vbadge.con{background:var(--cp-l);color:var(--cp-t)}.vbadge.id{background:var(--vb-id-bg);color:var(--vb-id-fg)}
 .vbadge.lik{background:var(--cs-l);color:var(--cs-t)}.vbadge.scl{background:var(--vb-scl-bg);color:var(--vb-scl-fg)}
 .vbadge.txt{background:var(--vb-txt-bg);color:var(--vb-txt-fg)}
-.role-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.role-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
 .role-card{border:1px solid var(--cb);border-radius:8px;background:var(--cg);padding:9px;min-width:0}
 .role-card select{width:100%;max-width:100%;min-width:0}
 .role-card .fl{margin-bottom:5px}
@@ -997,7 +1000,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <button type="button" class="an-tab active" data-an-tab="plan" onclick="setAnalyseTab('plan')">Plan</button>
       <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Declared analyses</button>
       <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Expected outputs</button>
-      <button type="button" class="btn sf-tertiary" id="anPrereg" onclick="openSettings('study')">Preregistration fields</button>
+      <button type="button" class="an-tab" id="anPrereg" onclick="openSettings('study')">Preregistration fields</button>
     </div>
     <!-- Two-pane split (owner feedback 2026-07-16): the former right-hand
          "Output preview and model builder" column is removed so the plans
@@ -1266,8 +1269,8 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
       <div class="field" id="rq-alpha-field"><label class="fl" for="rq-alpha">Significance level</label><div class="fc"><select id="rq-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div></div>
       <div id="rq-hyp-field" style="display:none">
-        <div class="field"><label class="fl" for="rq-h0">Null hypothesis (H0) <span class="fr">optional</span></label><div class="fc"><textarea id="rq-h0" rows="2" placeholder="State what you expect if there is no effect."></textarea></div></div>
-        <div class="field"><label class="fl" for="rq-h1">Alternative hypothesis (H1) <span class="fr">optional</span></label><div class="fc"><textarea id="rq-h1" rows="2" placeholder="State what you expect if there is an effect."></textarea></div></div>
+        <div class="field"><label class="fl" for="rq-h0">Null hypothesis (H0) <span class="fopt">optional</span></label><div class="fc"><textarea id="rq-h0" rows="2" placeholder="State what you expect if there is no effect."></textarea></div></div>
+        <div class="field"><label class="fl" for="rq-h1">Alternative hypothesis (H1) <span class="fopt">optional</span></label><div class="fc"><textarea id="rq-h1" rows="2" placeholder="State what you expect if there is an effect."></textarea></div></div>
       </div>
       <div class="field" id="rq-term-field" style="display:none"><label class="fl" for="rq-term">Keyword <span class="fr">*</span></label><div class="fc"><input type="text" id="rq-term" placeholder="Enter the keyword to search for"></div></div>
       <div class="field" id="rq-wordcloud-field" style="display:none"><label class="fl" for="rq-wordcloud">Word cloud</label><div class="fc"><label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="rq-wordcloud"> Render as a word cloud instead of a bar chart</label></div></div>
@@ -5692,7 +5695,10 @@ function varLevel(id){
 // PLS-SEM generator (or the reverse), which emits a runnable script that
 // estimates a different model from the one declared. R refuses the same
 // pairing in sframe_check_model_type().
-function roleOptions(role,selected){var useModels=role.levels&&role.levels.includes('model');var opts=useModels?(S.models||[]).filter(function(m){return !role.modelTypes||role.modelTypes.indexOf(m.type||'')>=0;}).map(function(m){return{id:m.id,label:m.id+' ('+(m.type||'model')+')'};}):getAllVars().filter(function(v){return role.levels.includes('any')||role.levels.includes(v.level)||role.levels.includes(v.kind);});var multi=role.max>1;var html='';if(!multi){html+='<option value=""'+(selected.length?'':' selected')+'>'+(role.min?(useModels?'Choose a saved model':'Choose a variable'):'(none)')+'</option>';}html+=opts.map(function(v){return'<option value="'+esc(v.id)+'"'+(selected.includes(v.id)?' selected':'')+'>'+esc(v.label)+'</option>';}).join('');return html;}
+function roleOptions(role,selected){var useModels=role.levels&&role.levels.includes('model');var opts=useModels?(S.models||[]).filter(function(m){return !role.modelTypes||role.modelTypes.indexOf(m.type||'')>=0;}).map(function(m){return{id:m.id,label:m.id+' ('+(m.type||'model')+')'};}):getAllVars().filter(function(v){return role.levels.includes('any')||role.levels.includes(v.level)||role.levels.includes(v.kind);});var multi=role.max>1;var html='';if(!multi){html+='<option value=""'+(selected.length?'':' selected')+'>'+(role.min?(useModels?'Choose a saved model':'Choose a variable'):'(none)')+'</option>';}html+=opts.map(function(v){return'<option value="'+esc(v.id)+'"'+(selected.includes(v.id)?' selected':'')+(v.full?' title="'+esc(v.full)+'"':'')+'>'+esc(v.label)+'</option>';}).join('');return html;}
+// A label cut at a word boundary, with an ellipsis, so a role dropdown never
+// stops mid-word (owner 2026-11-15). The full text goes in the option's title.
+function shortLbl(s,n){s=String(s||'');if(s.length<=n)return s;var c=s.slice(0,n);var k=c.lastIndexOf(' ');return(k>n*0.5?c.slice(0,k):c).replace(/[\s,;:.]+$/,'')+'\u2026';}
 function getAllVars(){
   // Matrix, ranking, and multiple-choice items expand to one variable per
   // sub-item or option, mirroring the response columns read_responses()
@@ -5705,13 +5711,13 @@ function getAllVars(){
     if(i.type==='matrix'&&(i.matrix_items||[]).length){
       i.matrix_items.forEach(function(row){
         var sid=i.id+'__'+row;var m=varLevel(sid);
-        items.push({id:sid,label:sid+' - '+String(row).slice(0,42),level:m.level,kind:'item',meta:m,item:i});
+        items.push({id:sid,label:sid+' - '+shortLbl(String(row),48),full:String(row),level:m.level,kind:'item',meta:m,item:i});
       });
     }else if(i.type==='multiple_choice'&&i.choice_set){
       var vals=choiceValuesFor(i.choice_set),labs=choiceLabelsFor(i.choice_set);
       vals.forEach(function(v,vi){
         var sid=i.id+'__'+v;var m=varLevel(sid);
-        items.push({id:sid,label:sid+' - '+(labs[vi]||v).slice(0,42),level:m.level,kind:'item',meta:m,item:i});
+        items.push({id:sid,label:sid+' - '+shortLbl(String(labs[vi]||v),48),full:String(labs[vi]||v),level:m.level,kind:'item',meta:m,item:i});
       });
     }else if(i.type==='ranking'&&i.choice_set){
       var rvals=choiceValuesFor(i.choice_set),rlabs=choiceLabelsFor(i.choice_set);
@@ -5721,7 +5727,7 @@ function getAllVars(){
       });
     }else{
       var m0=varLevel(i.id);
-      items.push({id:i.id,label:i.id+' - '+(i.label||'').slice(0,42),level:m0.level,kind:'item',meta:m0,item:i});
+      items.push({id:i.id,label:i.id+' - '+shortLbl(i.label||'',48),full:(i.label||''),level:m0.level,kind:'item',meta:m0,item:i});
     }
   });
   var scales=S.scales.map(function(s){var m=varLevel(s.id);return{id:s.id,label:s.id+' - '+(s.label||'scale score'),level:m.level,kind:'scale',meta:m,scale:s};});
@@ -5772,7 +5778,7 @@ function openRQModal(id){
 }
 function popRQVars(roleValues){
   var vars=getAllVars();
-  document.getElementById('rqVarCBs').innerHTML=vars.length?'<span style="font-size:11px;color:var(--t3)">Assign variables below by methodological role. Variable checkboxes are no longer used for v0.3 plans.</span>':'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
+  document.getElementById('rqVarCBs').innerHTML=vars.length?'<span style="font-size:11px;color:var(--t3)">Assign each variable its role in the analysis.</span>':'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
   renderRoleFields(roleValues||{});
 }
 // R reads some roles under more than one name (a mediation's x is its predictor),
@@ -5989,16 +5995,25 @@ function currentModel(){
   var id=sel&&sel.value?sel.value:models[models.length-1].id;
   return models.find(function(m){return m.id===id;})||models[models.length-1];
 }
+// A model's readable name, such as Model 1 (CB-SEM), in place of its id.
+// What a syntax-only block gives, in place of a decision rule it has no use for.
+var SYNTAX_GIVES={cfa_lavaan_syntax:'Writes lavaan syntax for the declared measurement model, to fit in lavaan.',sem_lavaan_syntax:'Writes lavaan syntax for the declared model, to fit in lavaan.',seminr_syntax:'Writes seminr syntax for the declared model, to fit in seminr.',pls_sem:'Writes seminr syntax for the declared model, to fit in seminr.'};
+var MODEL_TYPES={efa:'EFA',cfa:'CFA',cb_sem:'CB-SEM',pls_sem:'PLS-SEM'};
+function modelLabel(m){var ms=S.models||[];var k=ms.indexOf(m);return(m.label||('Model '+(k+1)))+' ('+(MODEL_TYPES[m.type]||m.type||'model')+')';}
+function modelLabelById(id){var m=(S.models||[]).find(function(x){return x.id===id;});return m?modelLabel(m):id;}
+function alphaText(a){return '\u03b1 = '+String(a).replace(/^0\./,'.');}
 function renderModelBuilder(){
   var models=S.models||[],sel=document.getElementById('mb-model'),from=document.getElementById('mb-from'),to=document.getElementById('mb-to'),list=document.getElementById('modelList');
   if(!sel||!from||!to||!list)return;
   var previous=sel.value;
-  sel.innerHTML=models.length?models.map(function(m){return'<option value="'+esc(m.id)+'">'+esc(m.id+' ('+(m.type||'model')+')')+'</option>';}).join(''):'<option value="">No saved models</option>';
+  sel.innerHTML=models.length?models.map(function(m){return'<option value="'+esc(m.id)+'">'+esc(modelLabel(m))+'</option>';}).join(''):'<option value="">No saved models</option>';
   if(previous&&models.some(function(m){return m.id===previous;}))sel.value=previous;
   var model=currentModel(),constructs=model&&model.measurement?model.measurement.constructs||[]:[];
   var opts=constructs.map(function(c){return'<option value="'+esc(c.id)+'">'+esc(c.id)+'</option>';}).join('');
   from.innerHTML=opts;to.innerHTML=opts;
-  list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(m.id)+'</strong> <span class="vbadge">'+esc(m.type||'model')+'</span><div>'+countNoun((m.measurement&&m.measurement.constructs||[]).length,'construct')+', '+countNoun(paths.length,'path')+'</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
+  // Path to starts on a different construct from Path from (owner 2026-11-15).
+  if(constructs.length>1){from.selectedIndex=0;to.selectedIndex=1;}
+  list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(modelLabel(m))+'</strong><div>'+countNoun((m.measurement&&m.measurement.constructs||[]).length,'construct')+', '+countNoun(paths.length,'path')+'</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
 // Inline interpretation editing in Expected outputs. The decision rule is
 // declared in the RQ modal and shown here read-only. This writes the
@@ -6065,7 +6080,7 @@ function renderAnalyse(){
   // execution queue: the same cards, minus syntax-only methods, reorderable
   // in place (drag order writes back to S.analysis_plan by id).
   var draggable=anTab==='plan'||anTab==='run';
-  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">significance='+esc(alpha||0.05)+'</span>':'')+(rq.status?'<span class="ac">'+esc(rq.status)+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(v)+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(ruleOf(rq)?'<div class="rq-interp">'+esc(ruleOf(rq))+'</div>':'<div class="rq-no-int">Decision rule pending.</div>')+'</div></div></div>';}).join('');};
+  var cardHtml=function(plans){return plans.map(function(rq,i){var method=rq.method||rq.test,reg=ANALYSIS_REGISTRY[method]||{},alpha=(rq.options&&rq.options.alpha)||rq.alpha,vars=asArr(rq.variables);if(!vars.length)vars=flattenRoles(rq.roles||{});var refs=asArr(rq.reporting_references);if(!refs.length)refs=asArr(rq.citations);var drg=draggable?' draggable="true" ondragstart="pStart(event,\''+rq.id+'\')" ondragover="pOver(event,\''+rq.id+'\')" ondrop="pDrop(event,\''+rq.id+'\')" ondragend="pEnd(event)" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"':'';return'<div class="rq-card'+(draggable?' rq-drag':'')+'"'+drg+' onclick="openRQModal(\''+rq.id+'\')"><div style="display:flex;align-items:flex-start;gap:8px"><span class="rq-num"'+(draggable?' title="Drag to reorder"':'')+'>'+(i+1)+'</span><div style="flex:1"><div class="rq-q">'+esc(rq.research_question)+'</div><div class="rq-meta"><span class="tc">'+esc(TLBLS[method]||method)+'</span>'+(reg.showAlpha?'<span class="ac">'+esc(alphaText(alpha||0.05))+'</span>':'')+(rq.status?'<span class="ac">'+esc(String(rq.status).charAt(0).toUpperCase()+String(rq.status).slice(1))+'</span>':'')+refs.map(function(k){return'<span class="cc">'+esc(CSHORT[k]||k)+'</span>';}).join('')+'</div>'+(vars.length?'<div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">'+vars.map(function(v){return'<span class="vchip">'+esc(modelLabelById(v))+'</span>';}).join('')+'</div>':'')+(hypLines(rq)?'<div class="rq-interp">'+hypLines(rq)+'</div>':'')+(ruleOf(rq)?'<div class="rq-interp">'+esc(ruleOf(rq))+'</div>':(SYNTAX_GIVES[method]?'<div class="rq-interp">'+SYNTAX_GIVES[method]+'</div>':'<div class="rq-no-int">Decision rule pending.</div>'))+'</div></div></div>';}).join('');};
   if(anTab==='run'){
     rb.innerHTML=cardHtml(runPlans);
     if(syntaxOnly.length)rb.innerHTML+='<div style="padding:8px 12px;font-size:11px;color:var(--t3);border-top:1px solid var(--bdr);margin-top:4px">'+countNoun(syntaxOnly.length,'syntax-only method')+' excluded. These generate lavaan or seminr strings without requiring response data.</div>';
