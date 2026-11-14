@@ -76,6 +76,15 @@ navbar:
       aria-label: GitHub
 
 articles:
+  - title: "Studies"
+    desc: >
+      10 complete survey studies to start from, each with its questionnaire,
+      a pre-analysis plan ready to preregister, and SurveyStudio screenshots.
+      Web only.
+    navbar: ~
+    contents:
+      - articles/studies
+      - starts_with("articles/studies/")
   - title: "Start here"
     desc: >
       The 5 stages of a study, in SurveyStudio or in R, then 25 small surveys,
