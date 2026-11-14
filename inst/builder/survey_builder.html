@@ -995,6 +995,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <button type="button" class="an-tab active" data-an-tab="plan" onclick="setAnalyseTab('plan')">Plan</button>
       <button type="button" class="an-tab" data-an-tab="run" onclick="setAnalyseTab('run')">Declared analyses</button>
       <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Expected outputs</button>
+      <button type="button" class="btn sf-tertiary" id="anPrereg" onclick="openSettings('study')">Preregistration fields</button>
     </div>
     <!-- Two-pane split (owner feedback 2026-07-16): the former right-hand
          "Output preview and model builder" column is removed so the plans
@@ -1069,7 +1070,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       </div>
     </div>
     <div class="stp" id="sp-study" role="tabpanel" aria-labelledby="st-study">
-      <div class="alert-i">The study this instrument serves: the problem, the objectives and the sampling plan. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
+      <div class="alert-i">The study this instrument serves: the problem, the objectives, the sampling plan and the preregistration fields. It is saved in the .sframe file and printed in the report, and never shown to respondents, since telling them the aims can bias their answers. A change to it after data collection is a design amendment.</div>
       <div class="field"><label class="fl" for="s-problem">Problem statement</label><div class="fc"><textarea id="s-problem" rows="4" placeholder="1 short paragraph: what is not yet known, and why it matters."></textarea></div></div>
       <div class="field"><span class="fl" id="s-objs-l">Objectives</span><div id="s-objs" role="group" aria-labelledby="s-objs-l"></div><button type="button" class="btn sf-secondary" onclick="studyAddObjective()">+ Add objective</button><span class="fhint">Each has an id such as O1, and a research question names the objective it serves.</span></div>
       <div class="field"><label class="fl" for="s-pop">Population</label><div class="fc"><input type="text" id="s-pop" placeholder="Delegates registered for the 2026 conference"></div></div>
@@ -1078,6 +1079,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="field"><label class="fl" for="s-n">Planned sample size</label><div class="fc"><input type="number" id="s-n" min="1" step="1"></div></div>
       </div>
       <div class="field" id="s-other-f" hidden><label class="fl" for="s-other">Describe the method <span class="fr">*</span></label><div class="fc"><input type="text" id="s-other"></div></div>
+      <h3 class="fl" id="s-prereg-h" style="margin:14px 0 4px">Preregistration</h3>
+      <p class="fhint" style="margin:0 0 6px">What a preregistration asks for beyond the analysis plan. Each is optional, saved in the .sframe file and printed in the pre-analysis plan.</p>
+      <div class="field"><label class="fl" for="s-pr-exclusion_rules">Exclusion rules</label><div class="fc"><textarea id="s-pr-exclusion_rules" rows="2" placeholder="Which responses will be excluded, and why."></textarea></div></div>
+      <div class="field"><label class="fl" for="s-pr-stopping_rule">Stopping rule</label><div class="fc"><textarea id="s-pr-stopping_rule" rows="2" placeholder="When data collection ends: a date, a sample size or another rule."></textarea></div></div>
+      <div class="field"><label class="fl" for="s-pr-primary_outcomes">Primary outcomes</label><div class="fc"><textarea id="s-pr-primary_outcomes" rows="2" placeholder="The outcomes that answer the main question."></textarea></div></div>
+      <div class="field"><label class="fl" for="s-pr-secondary_outcomes">Secondary outcomes</label><div class="fc"><textarea id="s-pr-secondary_outcomes" rows="2" placeholder="The secondary outcomes."></textarea></div></div>
+      <div class="field"><label class="fl" for="s-pr-multiplicity">Multiplicity</label><div class="fc"><textarea id="s-pr-multiplicity" rows="2" placeholder="How the tests are corrected for being run together, if at all."></textarea></div></div>
+      <div class="field"><label class="fl" for="s-pr-contingency">Contingency decisions</label><div class="fc"><textarea id="s-pr-contingency" rows="2" placeholder="What you will do if an assumption fails or the planned sample is not reached."></textarea></div></div>
     </div>
     <div class="stp" id="sp-header" role="tabpanel" aria-labelledby="st-header">
       <div class="field"><label class="fl" for="s-inst">Institution or study name</label><div class="fc"><input type="text" id="s-inst" placeholder="University: Department"></div></div>
@@ -4178,6 +4187,8 @@ function studyFill(s){
   sv('s-method',typeof sp.method==='string'?sp.method:'');
   sv('s-other',typeof sp.method_other==='string'?sp.method_other:'');
   sv('s-n',sp.planned_n!=null?String(sp.planned_n):'');
+  var pr=(s.preregistration&&typeof s.preregistration==='object'&&!Array.isArray(s.preregistration))?s.preregistration:{};
+  PREREG_FIELDS.forEach(function(f){sv('s-pr-'+f,typeof pr[f]==='string'?pr[f]:'');});
   renderStudyObjs();studyMethodSync();
   studyShown=JSON.stringify(studyRead());
 }
@@ -4207,8 +4218,14 @@ function studyRead(){
   if(m==='other'&&gv('s-other').trim())sp.method_other=gv('s-other').trim();
   if(n)sp.planned_n=Number(n);
   if(Object.keys(sp).length)s.sampling=sp;
+  // A blank field is left out, and an empty block too, as R writes them.
+  var pr={};PREREG_FIELDS.forEach(function(f){var v=gv('s-pr-'+f).trim();if(v)pr[f]=v;});
+  if(Object.keys(pr).length)s.preregistration=pr;
   return Object.keys(s).length?s:null;
 }
+// The preregistration fields of the study (owner 2026-11-14), each an
+// optional text, as sframe_preregistration_fields lists them in R.
+var PREREG_FIELDS=['exclusion_rules','stopping_rule','primary_outcomes','secondary_outcomes','multiplicity','contingency'];
 // The study as write_sframe() writes it: an empty sampling or objectives
 // left out, and nothing when the study is then empty.
 function studyPlain(s){
@@ -4216,6 +4233,7 @@ function studyPlain(s){
   var o={};Object.keys(s).forEach(function(k){o[k]=s[k];});
   if(Array.isArray(o.objectives)&&!o.objectives.length)delete o.objectives;
   if(o.sampling&&typeof o.sampling==='object'&&!Array.isArray(o.sampling)&&!Object.keys(o.sampling).length)delete o.sampling;
+  if(o.preregistration&&typeof o.preregistration==='object'&&!Array.isArray(o.preregistration)&&!Object.keys(o.preregistration).length)delete o.preregistration;
   return Object.keys(o).length?o:null;
 }
 // What validate_sframe() would refuse, said before the study is saved.
