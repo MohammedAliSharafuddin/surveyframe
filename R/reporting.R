@@ -1479,6 +1479,12 @@ sframe_clean_interpretations <- function(interpretations) {
         }, character(1))
         plot_html <- paste(c(plot_html, diag_imgs[diag_imgs != ""]), collapse = "\n")
       }
+      # A second chart beside the first (first contact section 4a).
+      for (ep in result$extra_plots %||% list()) {
+        ep_title <- paste0(rq_label, ": ", ep$title)
+        img <- tryCatch(.render_report_ggplot_png(ep$plot, alt = ep_title), error = function(e) NULL)
+        if (!is.null(img)) plot_html <- paste(c(plot_html, sframe_apa_figure(img, ep_title)), collapse = "\n")
+      }
       declared <- declaration_html(result)
       extra <- interp_html(result)
       # A CFA/SEM/PLS-SEM syntax block has no table or chart to show: its
@@ -1715,6 +1721,11 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       r$exploratory <- sframe_result_exploratory(r)
       r$exploratory_label <- sframe_exploratory_label
       r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))
+      for (k in seq_along(r$extra_plots)) {
+        ep_title <- paste0(title, ": ", r$extra_plots[[k]]$title)
+        r$extra_plots[[k]]$caption_text <- ep_title
+        r$extra_plots[[k]]$figure_open <- sframe_apa_figure_open(ep_title, ep_title)
+      }
       r
     }, results, seq_along(results))
   }

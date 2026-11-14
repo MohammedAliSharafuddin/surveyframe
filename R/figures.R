@@ -100,7 +100,9 @@ sframe_check_svg <- function() {
 #'   `"svg"`.
 #'
 #' @return The paths written, named by block id, invisibly. Only blocks
-#'   that drew a chart write a file.
+#'   that drew a chart write a file. A block with a second chart, a linear
+#'   regression's standardised coefficients or a mediation's path diagram,
+#'   writes it as `<id>_2`.
 #' @export
 #' @seealso [render_report()], which takes the same settings as `figures`.
 #' @examples
@@ -131,6 +133,15 @@ sframe_save_figures <- function(results, dir, width = 7, height = 4.5, dpi = 300
     ggplot2::ggsave(file, r$plot, width = width, height = height, dpi = dpi,
                     device = format, bg = "white")
     paths[id] <- file
+    # A second chart beside the first, as id_2 and on.
+    for (k in seq_along(r$extra_plots)) {
+      if (!inherits(r$extra_plots[[k]]$plot, "ggplot")) next
+      id_k <- paste0(id, "_", k + 1L)
+      file_k <- file.path(dir, paste0(gsub("[^A-Za-z0-9_.-]", "_", id_k), ".", format))
+      ggplot2::ggsave(file_k, r$extra_plots[[k]]$plot, width = width, height = height,
+                      dpi = dpi, device = format, bg = "white")
+      paths[id_k] <- file_k
+    }
   }
   invisible(paths)
 }

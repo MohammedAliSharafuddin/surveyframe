@@ -756,6 +756,13 @@ if (!has_data) {
           print(r$plot)
           figure_end()
         }
+        # A second chart beside the first: a regression's standardised
+        # coefficients, a mediation's path diagram.
+        for (ep in r$extra_plots) {
+          figure_start(ep$figure_open, ep$caption_text)
+          print(ep$plot)
+          figure_end()
+        }
         interp_md(r)
         # Cited in text. The references themselves are listed once, in the
         # References section at the end.

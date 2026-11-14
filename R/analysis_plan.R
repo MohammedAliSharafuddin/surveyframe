@@ -2102,6 +2102,27 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (isTRUE(plots) && is.null(result$plot)) {
     result$plot <- .sframe_with_plot_labels(plot_labels,
       sframe_plot_for_result(result, data, palette = plot_palette), instrument)
+    if (identical(result$test, "regression_logistic_multinomial")) {
+      result$plot <- sframe_relabel_terms(result$plot, plot_labels)
+    }
+  }
+  # A second chart beside the first (first contact section 4a): the
+  # standardised coefficients of a regression with 2 predictors or more, and
+  # a mediation's path diagram. Each is titled, and both engines draw it
+  # after the result's own chart.
+  if (isTRUE(plots) && is.null(result$extra_plots)) {
+    extra <- switch(result$test %||% "",
+      regression_linear = list(list(title = "Standardised coefficients",
+        plot = sframe_plot_coefficients(result, data, palette = plot_palette))),
+      mediation = list(list(title = "Path diagram",
+        plot = sframe_plot_mediation_path(result, palette = plot_palette))),
+      NULL)
+    extra <- Filter(function(x) inherits(x$plot, "ggplot"), extra %||% list())
+    for (k in seq_along(extra)) {
+      extra[[k]]$plot <- sframe_relabel_terms(
+        .sframe_with_plot_labels(plot_labels, extra[[k]]$plot, instrument), plot_labels)
+    }
+    if (length(extra)) result$extra_plots <- extra
   }
   if (isTRUE(plots) && identical(result$test, "regression_linear") &&
       is.data.frame(result$diagnostics) && is.null(result$diagnostic_plots)) {

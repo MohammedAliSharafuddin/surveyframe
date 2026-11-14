@@ -1169,6 +1169,7 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
     regression_logistic_binary  = ,
     firth_logistic              = ,
     regression_logistic_ordinal = function() sframe_plot_logistic_coefficients(result, palette),
+    regression_logistic_multinomial = function() sframe_plot_multinomial(result, palette),
     topsis              = ,
     ahp                 = ,
     anp                 = ,
@@ -2958,4 +2959,129 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette)
   if (grouped) p <- p + ggplot2::facet_wrap(~ group, scales = "free_y")
   p
+}
+
+
+# --- Regression charts (Session 10, first contact section 4a) ----------------
+
+# Standardised estimates with their confidence intervals, 1 row per
+# predictor, beside the observed-against-fitted chart of a linear regression
+# with 2 predictors or more. Every variable is put on z scores and the model
+# fitted again, so the estimates share 1 scale.
+sframe_plot_coefficients <- function(result, data, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot regression coefficients.")
+  palette <- match.arg(palette)
+  vars <- result$vars
+  if (length(vars) < 3 || !all(vars %in% colnames(data))) return(NULL)
+  outcome <- vars[length(vars)]
+  predictors <- vars[-length(vars)]
+  num <- as.data.frame(lapply(data[vars], function(v) suppressWarnings(as.numeric(v))))
+  num <- num[stats::complete.cases(num), , drop = FALSE]
+  if (nrow(num) < length(vars) + 2) return(NULL)
+  z <- as.data.frame(lapply(num, function(v) {
+    s <- stats::sd(v)
+    if (!is.finite(s) || s == 0) return(rep(NA_real_, length(v)))
+    (v - mean(v)) / s
+  }))
+  if (anyNA(z)) return(NULL)
+  fit <- stats::lm(stats::reformulate(sprintf("`%s`", predictors), sprintf("`%s`", outcome)), data = z)
+  est <- stats::coef(fit)[-1]
+  ci <- stats::confint(fit)[-1, , drop = FALSE]
+  df <- data.frame(term = factor(predictors, levels = rev(predictors)),
+                   estimate = unname(est), lo = ci[, 1], hi = ci[, 2])
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$estimate, y = .data$term)) +
+    ggplot2::geom_vline(xintercept = 0, colour = brand$grid, linewidth = 0.6) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$lo, xmax = .data$hi),
+                            width = 0.2, orientation = "y", colour = brand$ink, linewidth = 0.6) +
+    ggplot2::geom_point(colour = brand$teal, size = 3) +
+    ggplot2::labs(x = "Standardised estimate (95% CI)", y = NULL) +
+    theme_surveyframe()
+}
+
+# Puts the instrument's labels on a chart's variable ids: the term axis of a
+# coefficient chart and the nodes of a path diagram. Long labels wrap.
+sframe_relabel_terms <- function(p, labels) {
+  if (!inherits(p, "ggplot") || !length(labels)) return(p)
+  map <- function(x) {
+    x <- as.character(x)
+    hit <- x %in% names(labels)
+    x[hit] <- sframe_wrap_text(unname(labels[x[hit]]), 30)
+    x
+  }
+  if (is.data.frame(p$data) && "term" %in% names(p$data)) {
+    lv <- levels(factor(p$data$term))
+    p$data$term <- factor(map(p$data$term), levels = unique(map(lv)))
+  }
+  for (k in seq_along(p$layers)) {
+    d <- p$layers[[k]]$data
+    if (is.data.frame(d) && "label" %in% names(d)) p$layers[[k]]$data$label <- map(d$label)
+  }
+  p
+}
+
+# A multinomial logistic regression: 1 panel per outcome category, the odds
+# ratio of each predictor against the reference category, with its interval
+# on a log scale.
+sframe_plot_multinomial <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to plot a multinomial model.")
+  palette <- match.arg(palette)
+  co <- result$coefficients
+  se <- result$std_errors
+  if (!is.matrix(co) || !is.matrix(se) || !identical(dim(co), dim(se))) return(NULL)
+  keep <- colnames(co) != "(Intercept)"
+  if (!any(keep)) return(NULL)
+  level <- result$conf_level %||% 0.95
+  q <- stats::qnorm(1 - (1 - level) / 2)
+  rows <- lapply(rownames(co), function(k) {
+    b <- co[k, keep]
+    s <- se[k, keep]
+    data.frame(category = k, term = colnames(co)[keep], or = exp(b),
+               lo = exp(b - q * s), hi = exp(b + q * s), stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind, rows)
+  df$category <- factor(df$category, levels = rownames(co))
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$or, y = .data$term)) +
+    ggplot2::geom_vline(xintercept = 1, colour = brand$grid, linewidth = 0.6) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$lo, xmax = .data$hi),
+                            width = 0.2, orientation = "y", colour = brand$ink, linewidth = 0.6) +
+    ggplot2::geom_point(colour = brand$teal, size = 3) +
+    ggplot2::scale_x_log10() +
+    ggplot2::facet_wrap(~ category, ncol = 1) +
+    ggplot2::labs(x = sprintf("Odds ratio against %s, with its %d%% confidence interval (log scale)",
+                              result$reference %||% "the reference category", round(level * 100)),
+                  y = NULL) +
+    theme_surveyframe()
+}
+
+# A mediation's path diagram: the predictor, the mediator and the outcome
+# with a, b, the direct effect c-prime and, in brackets, the total effect c.
+sframe_plot_mediation_path <- function(result, palette = c("web", "print")) {
+  rlang::check_installed("ggplot2", reason = "to draw a path diagram.")
+  palette <- match.arg(palette)
+  ro <- result$roles %||% list()
+  pick <- function(keys) as.character(unlist(ro[intersect(keys, names(ro))]))[1]
+  v <- c(pick(c("predictor", "x")), pick("mediator"), pick(c("outcome", "y")))
+  if (anyNA(v) || is.null(result$a_path) || is.null(result$b_path)) return(NULL)
+  fmt <- function(x) formatC(as.numeric(x), format = "f", digits = 2)
+  nodes <- data.frame(x = c(0, 1, 2), y = c(0, 1, 0), label = v[1:3])
+  edges <- data.frame(x = c(0.12, 1.12, 0.25), y = c(0.12, 0.88, 0),
+                      xend = c(0.88, 1.88, 1.75), yend = c(0.88, 0.12, 0))
+  labs_df <- data.frame(
+    x = c(0.38, 1.62, 1), y = c(0.58, 0.58, -0.24),
+    label = c(paste0("a = ", fmt(result$a_path)), paste0("b = ", fmt(result$b_path)),
+              paste0("c\u2032 = ", fmt(result$direct), "  (c = ", fmt(result$total), ")")))
+  brand <- sframe_brand(palette)
+  ggplot2::ggplot() +
+    ggplot2::geom_segment(data = edges, ggplot2::aes(x = .data$x, y = .data$y,
+                                                     xend = .data$xend, yend = .data$yend),
+                          arrow = grid::arrow(length = grid::unit(0.18, "inches"), type = "closed"),
+                          colour = brand$ink, linewidth = 0.6) +
+    ggplot2::geom_label(data = nodes, ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+                        fill = "white", colour = brand$ink, label.padding = grid::unit(0.4, "lines")) +
+    ggplot2::geom_text(data = labs_df, ggplot2::aes(x = .data$x, y = .data$y, label = .data$label),
+                       colour = brand$teal, size = 3.6) +
+    ggplot2::coord_cartesian(xlim = c(-0.9, 2.9), ylim = c(-0.3, 1.25)) +
+    ggplot2::theme_void()
 }
