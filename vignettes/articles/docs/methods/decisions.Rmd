@@ -9,7 +9,7 @@ How much each criterion weighs, and which option ranks best.
 
 **Assumptions.** Consistent pairwise judgements (a consistency ratio below .10) and a performance score for each option on each criterion.
 
-In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set the criteria weight or pairwise comparison question for the weights, and each option's score on each criterion for the ranking. Declare the hypotheses and the decision rule before collecting responses.
 
 ## Analytic hierarchy process (AHP)
 
@@ -20,7 +20,7 @@ In the pre-analysis plan:
 > **RQ1.** What weight does each criterion carry?
 > **Planned decision rule:** Accept the pairwise judgements when the consistency ratio is below .10.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.
 
@@ -32,7 +32,7 @@ In the pre-analysis plan:
 
 > **RQ2.** The same weights with network dependence allowed.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Saaty, T. L. (1996). *Decision making with dependence and feedback: The analytic network process*. RWS Publications.
 
@@ -44,7 +44,7 @@ In the pre-analysis plan:
 
 > **RQ3.** Which criteria drive the others?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Gabus, A., & Fontela, E. (1972). *World problems, an invitation to further thought within the framework of DEMATEL*. Battelle Geneva Research Centre. Si, S.-L., You, X.-Y., Liu, H.-C., & Zhang, P. (2018). DEMATEL technique: A systematic review of the state-of-the-art literature on methodologies and applications. *Mathematical Problems in Engineering*, *2018*, 3696457. https://doi.org/10.1155/2018/3696457
 
@@ -56,7 +56,7 @@ In the pre-analysis plan:
 
 > **RQ4.** Which venue ranks best overall?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Hwang, C.-L., & Yoon, K. (1981). *Multiple attribute decision making: Methods and applications*. Springer.
 
@@ -68,7 +68,7 @@ In the pre-analysis plan:
 
 > **RQ5.** And by compromise ranking?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Opricovic, S., & Tzeng, G.-H. (2004). Compromise solution by MCDM methods: A comparative analysis of VIKOR and TOPSIS. *European Journal of Operational Research*, *156*(2), 445-455. https://doi.org/10.1016/S0377-2217(03)00020-1
 
@@ -80,7 +80,7 @@ In the pre-analysis plan:
 
 > **RQ6.** And by ratio analysis?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Brauers, W. K. M., & Zavadskas, E. K. (2006). The MOORA method and its application to privatization in a transition economy. *Control and Cybernetics*, *35*(2), 445-469.
 
@@ -92,7 +92,7 @@ In the pre-analysis plan:
 
 > **RQ7.** And by simple multi-attribute rating?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Edwards, W. (1977). How to use multiattribute utility measurement for social decisionmaking. *IEEE Transactions on Systems, Man, and Cybernetics*, *7*(5), 326-340. https://doi.org/10.1109/TSMC.1977.4309720
 
@@ -104,7 +104,7 @@ In the pre-analysis plan:
 
 > **RQ8.** And by weighted aggregated sum product?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Zavadskas, E. K., Turskis, Z., Antucheviciene, J., & Zakarevicius, A. (2012). Optimization of weighted aggregated sum product assessment. *Elektronika ir Elektrotechnika*, *122*(6), 3-6. https://doi.org/10.5755/j01.eee.122.6.1810
 
@@ -116,7 +116,7 @@ In the pre-analysis plan:
 
 > **RQ9.** And by outranking flows?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Brans, J. P., & Vincke, P. (1985). A preference ranking organisation method: The PROMETHEE method for multiple criteria decision-making. *Management Science*, *31*(6), 647-656. https://doi.org/10.1287/mnsc.31.6.647
 
@@ -128,7 +128,7 @@ In the pre-analysis plan:
 
 > **RQ10.** And by outranking with thresholds?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Roy, B. (1968). Classement et choix en presence de points de vue multiples (la methode ELECTRE). *Revue Francaise d'Informatique et de Recherche Operationnelle*, *2*(1), 57-75.
 

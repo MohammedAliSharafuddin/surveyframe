@@ -1,15 +1,15 @@
 ---
-title: "Check structure and test models"
-description: "Whether items measure the factors assumed, and how constructs relate in a declared model."
+title: "Check structure and write model syntax"
+description: "Whether items measure the factors assumed, the lavaan or seminr syntax for a declared model, and estimates of mediation and moderation."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-Whether items measure the factors assumed, and how constructs relate in a declared model.
+Whether items measure the factors assumed, the lavaan or seminr syntax for a declared model, and estimates of mediation and moderation.
 
-**Assumptions.** Enough respondents for the number of items, and items that correlate. Model syntax runs in lavaan or seminr.
+**Assumptions.** Enough respondents for the number of items, and items that correlate. surveyframe writes the CFA, SEM and PLS-SEM syntax, and you fit it in lavaan or seminr. It estimates factor analysis, mediation and moderation itself.
 
-In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. For factor analysis, set the items. For model syntax, choose the saved model. For mediation and moderation, set the predictor, the mediator or moderator, and the outcome. Declare the hypotheses and the decision rule before collecting responses.
 
 ## Factorability checks (KMO and Bartlett's test)
 
@@ -20,7 +20,7 @@ In the pre-analysis plan:
 > **RQ1.** Is this data suitable for factor analysis?
 > **Planned decision rule:** Proceed when KMO is .60 or above and Bartlett's test has p < .05.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 ## Exploratory factor analysis
 
@@ -31,7 +31,7 @@ In the pre-analysis plan:
 > **RQ2.** How many factors, and which items load where?
 > **Planned decision rule:** Retain the factors parallel analysis supports, and read loadings of .40 or above.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 ## Confirmatory factor analysis (lavaan syntax)
 
@@ -41,7 +41,7 @@ In the pre-analysis plan:
 
 > **RQ4.** What CFA syntax does the measurement model generate?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## Structural equation model (lavaan syntax)
 
@@ -54,7 +54,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** The declared model does not reproduce the observed covariances.
 > **Planned decision rule:** Judge the model's fit as acceptable when CFI is .95 or above and RMSEA is .06 or below.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## PLS structural equation model (seminr syntax)
 
@@ -64,18 +64,18 @@ In the pre-analysis plan:
 
 > **RQ2.** And the seminr syntax for a PLS estimate?
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
-## PLS structural equation model
+## PLS structural equation model syntax
 
-![The Plan card for a PLS structural equation model block, from the `sem_pls` demo.](../../../docs/methods/pls_sem.png){width=90%}
+![The Plan card for a PLS structural equation model syntax block, from the `sem_pls` demo.](../../../docs/methods/pls_sem.png){width=90%}
 
 In the pre-analysis plan:
 
 > **RQ5.** And what does a PLS estimate give?
 > **Planned decision rule:** Report a path as supported when its bootstrap confidence interval excludes 0.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 ## Mediation analysis
 
@@ -88,7 +88,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** Satisfaction carries part of the effect of content quality to intention.
 > **Planned decision rule:** Treat the indirect effect as present when its 95% bootstrap confidence interval excludes 0.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: MacKinnon, D. P. (2008). *Introduction to statistical mediation analysis*. Lawrence Erlbaum.
 
@@ -103,7 +103,7 @@ In the pre-analysis plan:
 > **Alternative hypothesis (H1):** The effect of content quality on intention depends on the moderator.
 > **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
 
-In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
 References: Aiken, L. S., & West, S. G. (1991). *Multiple regression: Testing and interpreting interactions*. SAGE.
 

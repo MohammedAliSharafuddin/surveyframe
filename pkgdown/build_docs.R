@@ -180,7 +180,7 @@ for (tp in names(types)) {
 landing <- c("---", "title: \"Documentation: how to set up surveyframe\"",
   "description: \"How to set up each question type and analysis in surveyframe, step by step, with annotated SurveyStudio screenshots.\"",
   "---", "",
-  "Documentation answers how to set something up. The [how-to guides](guides.html) answer how to answer your research question.", "",
+  "Set up each question type and each analysis method, step by step, with annotated SurveyStudio screenshots. To follow a complete task from start to finish, use a [how-to guide](guides.html).", "",
   sprintf("## Question types (%d pages) {#question-types}", length(types)), "",
   vapply(types, function(t) sprintf("- [%s](docs/question-types/%s.html)", t$h1, t$slug), character(1)), "")
 writeLines(landing, file.path("vignettes", "articles", "docs.Rmd"))
