@@ -37,12 +37,37 @@ ui3_levels <- function(b, root) {
   jsonlite::fromJSON(ui2_js(b, sprintf(ui3_levels_js, root)))
 }
 
+# The screens with secondary buttons once drawn, on the factor_structure demo
+# (probed 2026-11-15 with an 8 s wait per screen).
+ui3_secondary_screens <- c("collect", "responses", "quality", "analysis", "export")
+
+# Polls a screen's buttons until its primary, and if asked a secondary, has
+# drawn and the reading holds still across 2 polls 0.5 s apart, so a colour
+# or width transition has finished, for up to `timeout` seconds. Returns the
+# last reading.
+ui3_await_levels <- function(b, screen, secondary = FALSE, timeout = 20) {
+  root <- sprintf("document.getElementById('screen-%s')", screen)
+  lv <- NULL
+  last <- ""
+  for (i in seq_len(timeout * 2)) {
+    raw <- ui2_js(b, sprintf(ui3_levels_js, root))
+    lv <- jsonlite::fromJSON(raw)
+    ok <- is.data.frame(lv) && nrow(lv) && any(lv$level == "primary") &&
+      (!secondary || any(lv$level == "secondary"))
+    if (isTRUE(ok) && identical(raw, last)) return(lv)
+    last <- if (isTRUE(ok)) raw else ""
+    Sys.sleep(0.5)
+  }
+  lv
+}
+
 test_that("every Studio screen has exactly 1 filled primary, 40 px high and sized to its label (UI-3 item 2)", {
   b <- ui1_studio("factor_structure", width = 1280, height = 900)
   for (screen in setdiff(sframe_studio_screens(), "design")) {
     expect_true(ui1_screen(b, screen), info = screen)
-    Sys.sleep(1.5)
-    lv <- ui3_levels(b, sprintf("document.getElementById('screen-%s')", screen))
+    # Wait for the state the test checks, not a fixed sleep: the screen's
+    # primary, and on the screens that have them, its secondary buttons.
+    lv <- ui3_await_levels(b, screen, secondary = screen %in% ui3_secondary_screens)
     expect_identical(sum(lv$level == "primary"), 1L, info = screen)
     # Nothing else on the screen is filled with the primary colour.
     expect_identical(sum(lv$filled & lv$level != "primary"), 0L, info = screen)
@@ -51,9 +76,12 @@ test_that("every Studio screen has exactly 1 filled primary, 40 px high and size
     expect_true(all(p$height >= 40), info = screen)
     expect_true(all(p$slack <= 2), info = paste(screen, paste(p$slack, collapse = ",")))
     s <- lv[lv$level == "secondary", ]
-    # Unconditional, so the count of expectations does not depend on whether
-    # a screen's secondary buttons have drawn yet (all() of none is TRUE).
-    expect_true(all(s$height >= 36), info = paste(screen, paste(s$text[s$height < 36], collapse = "|")))
+    if (screen %in% ui3_secondary_screens) {
+      expect_gt(nrow(s), 0)
+      expect_true(all(s$height >= 36), info = paste(screen, paste(s$text[s$height < 36], collapse = "|")))
+    } else {
+      expect_identical(nrow(s), 0L, info = screen)
+    }
   }
 })
 
