@@ -28,3 +28,20 @@ div.sourceCode > pre.sourceCode > code {
 small.dont-index:has(a[href*="vignettes/articles/"]) {
   display: none;
 }
+
+// A visible keyboard focus ring on every control (Codex WR81, WCAG 2.4.7):
+// the theme's ring matched the navbar colour, so it could not be seen.
+// Dark blue #0B3A78 is 11.1:1 on the white page, yellow #f2b705 is 6.1:1 on
+// the dark blue navbar.
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+  outline: 3px solid #0B3A78;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+.navbar a:focus-visible, .navbar .nav-link:focus-visible,
+.navbar button:focus-visible {
+  outline: 3px solid #f2b705;
+  outline-offset: 2px;
+  box-shadow: none;
+}
