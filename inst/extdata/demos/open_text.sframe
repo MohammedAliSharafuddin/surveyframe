@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "0138438b70aca82687d035767c8e09871907d5642216c02be34f872750b4fcc7",
+    "value": "8b7793fd1757b614c2d6fdc9706e0766fd6feb9dc9692cf5c3c1da8e8605bb70",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "What worked, and what to change",
     "version": "1.0.0",
-    "description": "Two open questions, and the 9 things surveyframe can do with them.",
-    "authors": null,
+    "description": "An open-ended feedback study: what attendees say worked and what to change, analysed as text.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:51Z"
@@ -60,6 +60,7 @@
       "roles": {
         "item": "what_worked"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -77,6 +78,7 @@
       "roles": {
         "item": "what_worked"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -97,6 +99,7 @@
       "options": {
         "term": "sessions"
       },
+      "objective": "O1",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -113,6 +116,7 @@
       "roles": {
         "item": "what_worked"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -131,6 +135,7 @@
         "item": "what_to_improve",
         "group": "format"
       },
+      "objective": "O2",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -148,6 +153,7 @@
       "roles": {
         "item": "what_worked"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -165,6 +171,7 @@
       "roles": {
         "item": "what_to_improve"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -182,6 +189,7 @@
       "roles": {
         "item": "what_worked"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -202,6 +210,7 @@
       "options": {
         "k": 2
       },
+      "objective": "O1",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -221,6 +230,7 @@
       "options": {
         "k": 2
       },
+      "objective": "O1",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -241,6 +251,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Rating questions tell organisers how much attendees liked the event, not why. The open answers hold the reasons.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe the words and topics in what worked and what to change."
+      },
+      {
+        "id": "O2",
+        "text": "Compare what in-person and online attendees write."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a hybrid conference",
+      "method": "convenience",
+      "planned_n": 80
     }
   }
 }

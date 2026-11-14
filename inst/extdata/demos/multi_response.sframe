@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "b5fd4a52dd01eaeb4483d23fb07daee1c1046ae5ba2dfb98364dca95c423e327",
+    "value": "d8582159112b53dd728e70190036a7844795371871277cb5f51aa91a8be8a86c",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Which sessions, and why come at all?",
     "version": "1.0.0",
-    "description": "Two items that expand into one column per option.",
-    "authors": null,
+    "description": "A study of which sessions attendees chose and why they came, from a choose-any item and a ranking.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:54Z"
@@ -67,6 +67,7 @@
           "sessions_chosen__social"
         ]
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -90,8 +91,13 @@
           "sessions_chosen__social"
         ]
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Every session is chosen equally often.",
+        "alternative": "At least 1 session is chosen more or less often."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -111,6 +117,7 @@
           "rank_priorities__location"
         ]
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -132,6 +139,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Organisers need to know which sessions drew people and which reasons for coming matter most.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe which sessions were chosen and the reasons ranked first."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether the sessions differ in how often they were chosen."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a one-day event",
+      "method": "convenience",
+      "planned_n": 60
     }
   }
 }

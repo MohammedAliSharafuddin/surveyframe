@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "f393034ee0f9b879859261c0578e2ad130daa2c3e9ff9b8741510324118af627",
+    "value": "eba433d9f51f994355a2ce09516270cb152bd4e848de02386c465ccb0d12c9e4",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Will they come back?",
     "version": "1.0.0",
-    "description": "Binary, ordinal and 3-category outcomes from one predictor.",
-    "authors": null,
+    "description": "A customer return-intention study: whether more use of a service predicts that customers return, how satisfied they are and which offer they prefer.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:48Z"
@@ -18,14 +18,14 @@
   "items": [
     {
       "id": "sessions_attended",
-      "label": "How many sessions did you attend?",
+      "label": "How many times did you use the service this year?",
       "type": "numeric",
       "required": true,
       "reverse": false
     },
     {
       "id": "will_return",
-      "label": "Will you attend next year?",
+      "label": "Will you use the service again next year?",
       "type": "single_choice",
       "required": true,
       "choice_set": "yn",
@@ -33,7 +33,7 @@
     },
     {
       "id": "satisfaction",
-      "label": "I was satisfied with the event.",
+      "label": "I was satisfied with the service.",
       "type": "likert",
       "required": true,
       "choice_set": "agree5",
@@ -41,7 +41,7 @@
     },
     {
       "id": "preferred_session_type",
-      "label": "Which session type do you value most?",
+      "label": "Which of our offers do you value most?",
       "type": "single_choice",
       "required": true,
       "choice_set": "pref",
@@ -77,15 +77,20 @@
   "analysis_plan": [
     {
       "id": "RQ1",
-      "research_question": "Does attending more sessions predict returning?",
+      "research_question": "Does using the service more predict returning?",
       "family": "regression",
       "method": "regression_logistic_binary",
       "roles": {
         "predictors": "sessions_attended",
         "dependent": "will_return"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Use does not change the odds of returning.",
+        "alternative": "Use changes the odds of returning."
+      },
+      "decision_rule": "Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -102,8 +107,13 @@
         "predictors": "sessions_attended",
         "dependent": "satisfaction"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Use does not change the odds of a higher satisfaction rating.",
+        "alternative": "Use changes the odds of a higher satisfaction rating."
+      },
+      "decision_rule": "Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -120,8 +130,13 @@
         "predictors": "sessions_attended",
         "dependent": "preferred_session_type"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Use does not change which offer is preferred.",
+        "alternative": "Use changes which offer is preferred."
+      },
+      "decision_rule": "Reject H0 if the likelihood-ratio test of use has p < .05.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -141,6 +156,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A provider wants to know whether customers who use a service more are the ones who come back.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Test whether use predicts returning."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether use predicts satisfaction and the offer preferred."
+      }
+    ],
+    "sampling": {
+      "population": "Customers who used the service in the last year",
+      "method": "simple_random",
+      "planned_n": 150
     }
   }
 }

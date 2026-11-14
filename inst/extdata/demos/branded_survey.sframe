@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "9a5eac4fe2dfa9b226adac61d706d53988506dcb1def78f318a8a0a6066a749f",
+    "value": "92d5a5a19692874a2a145d8d28092d3d492622a3d8f690b23c5011e7e2611177",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Event feedback, branded",
     "version": "1.0.0",
-    "description": "The same 4 questions with a welcome page, a logo, a colour and a thank you page.",
-    "authors": null,
+    "description": "The event feedback survey with the organiser's welcome page, logo, colour and thank-you page.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:56Z"
@@ -84,6 +84,7 @@
       "roles": {
         "variable": "attendee_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -115,6 +116,20 @@
       "institution": "Riverside Conference Centre",
       "logo_base64": "",
       "show_progress": true
+    }
+  },
+  "study": {
+    "problem": "Respondents trust and finish a survey that shows who is asking, so the event's feedback form carries its brand.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended."
+      }
+    ],
+    "sampling": {
+      "population": "Registered attendees of the 2025 event",
+      "method": "census",
+      "planned_n": 50
     }
   }
 }

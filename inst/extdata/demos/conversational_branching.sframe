@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "32e8a2c8dc3f00d71e568ec077a63dc60b722ff91c235e12b13e416f7ba604f8",
+    "value": "de073a6a07717f6b133b2e1b453fe939a01132dd54c0b5ba394187acbd03b900",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "One question at a time, with skip logic",
     "version": "1.0.0",
-    "description": "Conversational mode and a multi-value skip rule together.",
-    "authors": null,
+    "description": "The skip-logic survey shown one question at a time, so each respondent sees only the questions that apply to them.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:56Z"
@@ -75,6 +75,7 @@
       "roles": {
         "variable": "attendee_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -106,6 +107,20 @@
       "institution": "Riverside Conference Centre",
       "logo_base64": "",
       "show_progress": true
+    }
+  },
+  "study": {
+    "problem": "Shown one at a time, skipped questions must not appear at all, or respondents meet questions that do not apply.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended."
+      }
+    ],
+    "sampling": {
+      "population": "Everyone admitted to the event",
+      "method": "census",
+      "planned_n": 60
     }
   }
 }

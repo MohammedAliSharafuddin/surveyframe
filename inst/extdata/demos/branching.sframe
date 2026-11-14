@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "7b2575c5a28911a82f67716fa8b165c64cc16e90b320d347ffeaf5fabb65d196",
+    "value": "242e5f4f304b448346053a622382303ea374b68dc06bc1a4bed29073a384f354",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Questions that depend on who you are",
     "version": "1.0.0",
-    "description": "Skip logic, and why a skipped question differs from a missing answer.",
-    "authors": null,
+    "description": "A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:51Z"
@@ -75,6 +75,7 @@
       "roles": {
         "variable": "attendee_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -92,6 +93,7 @@
       "roles": {
         "variables": "sessions_attended"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -113,6 +115,20 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Exhibitors and day visitors do not attend sessions, so asking them about sessions gives answers that mean nothing.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended, and the sessions of those who were asked."
+      }
+    ],
+    "sampling": {
+      "population": "Everyone admitted to the event",
+      "method": "census",
+      "planned_n": 60
     }
   }
 }

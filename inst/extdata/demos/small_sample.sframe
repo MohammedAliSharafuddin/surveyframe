@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "1c138723088f057fb7346b5487d6483405218de65409ca301cc88ae37ab34586",
+    "value": "06390f6257a5349ea9dc7808f4411ab9b2f53af746ac0901f227abe428db26f6",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "A pilot with 18 attendees",
     "version": "1.0.0",
-    "description": "What a defensible answer looks like when n is below 30.",
-    "authors": null,
+    "description": "A pilot study with 18 participants, answering the main study's questions with methods suited to a small sample.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:55Z"
@@ -69,8 +69,13 @@
         "group": "format",
         "outcome": "sessions_attended"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Sessions attended have the same distribution in both formats.",
+        "alternative": "Sessions attended tend to be higher in one format."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -87,8 +92,13 @@
         "row": "format",
         "column": "will_return"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Format and returning are independent.",
+        "alternative": "Format and returning are associated."
+      },
+      "decision_rule": "Reject H0 if the exact p < .05.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -105,8 +115,13 @@
         "predictors": "sessions_attended",
         "dependent": "will_return"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Sessions attended do not change the odds of returning.",
+        "alternative": "Sessions attended change the odds of returning."
+      },
+      "decision_rule": "Reject H0 if the penalised likelihood p < .05, and report the odds ratio with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -126,6 +141,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Before a full study, a pilot must show whether the main comparisons are worth testing, with too few people for large-sample methods.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Compare the 2 formats on sessions attended."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether format and sessions attended relate to returning."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a pilot event",
+      "method": "convenience",
+      "planned_n": 18
     }
   }
 }

@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "1d3995afbed68c4dd487204430f214cb98f9a792822064a5f2833fc2bde54d42",
+    "value": "3db2149ca3c347d2f503c525ee9704fcb302fcf5887585e6cd211c9a0b8c9a12",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Event feedback",
     "version": "1.0.0",
-    "description": "The shortest complete surveyframe study: 4 questions, 1 plan.",
-    "authors": null,
+    "description": "A short feedback survey for a one-day professional event, run to describe who attended and to check the quality of the answers before the programme is planned again.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:39Z"
@@ -84,6 +84,7 @@
       "roles": {
         "variables": "attendee_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -101,6 +102,7 @@
       "roles": {
         "variables": "age"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -121,8 +123,9 @@
           "suggestion"
         ]
       },
+      "objective": "O2",
+      "decision_rule": "Treat a question with more than 10% missing answers as a problem to report.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -136,8 +139,9 @@
       "family": "data_quality",
       "method": "quality",
       "roles": [],
+      "objective": "O2",
+      "decision_rule": "Flag a response as inattentive when it fails the quality checks, and report the count.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -157,6 +161,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "The organisers plan next year's programme without knowing who attends or whether feedback forms are completed with care.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended and how old they are."
+      },
+      {
+        "id": "O2",
+        "text": "Check how complete and attentive the responses are."
+      }
+    ],
+    "sampling": {
+      "population": "Registered attendees of the 2025 event",
+      "method": "census",
+      "planned_n": 50
     }
   }
 }

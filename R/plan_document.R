@@ -220,7 +220,7 @@ sframe_plan_blocks <- function(instrument, title = NULL, authors = NULL,
     vars <- sframe_analysis_vars(b)
     if (length(vars)) add("kv", label = "Variables", text = paste(vars, collapse = ", "))
     alpha <- b$options$alpha
-    if (m %in% sframe_inferential_methods) {
+    if (sframe_method_uses_alpha(m)) {
       add("kv", label = "Significance level", text = if (is.numeric(alpha) && length(alpha) == 1) {
         paste0("alpha = ", alpha)
       } else "alpha = .05, the package default")
@@ -285,16 +285,6 @@ sframe_plan_blocks <- function(instrument, title = NULL, authors = NULL,
   }
   out
 }
-
-# The methods that test a hypothesis against a significance level.
-sframe_inferential_methods <- c(
-  "crosstab", "t_test_ind", "mann_whitney", "t_test_pair", "wilcoxon_pair",
-  "mcnemar", "anova_one", "kruskal_wallis", "anova_two", "ancova",
-  "repeated_anova", "friedman", "chi_square", "fisher_exact",
-  "correlation_pearson", "correlation_spearman", "correlation_kendall",
-  "partial_correlation", "regression_linear", "regression_logistic_binary",
-  "regression_logistic_ordinal", "regression_logistic_multinomial",
-  "firth_logistic", "cochran_q", "mediation", "moderation")
 
 # The built-in reference keys a method cites, and every planned method's.
 sframe_method_citation_keys <- function(method) {

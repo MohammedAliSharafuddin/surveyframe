@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "94458440eef2aa5150b0b49c496485cf7f86bf425259c8d39384fdfcbc2715c2",
+    "value": "ce13e678eee59675743fa6a3fe6678366176dd2e21b805d04bcc9a47cd86057c",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "What do attendees prefer?",
     "version": "1.0.0",
-    "description": "Two categorical items, a crosstab, and 2 tests of association.",
-    "authors": null,
+    "description": "A study of whether attendance format is associated with the session type attendees value most.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:46Z"
@@ -62,6 +62,7 @@
         "row": "format",
         "column": "preferred_session_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -80,8 +81,13 @@
         "row": "format",
         "column": "preferred_session_type"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Format and preferred session type are independent.",
+        "alternative": "Format and preferred session type are associated."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -91,15 +97,20 @@
     },
     {
       "id": "RQ3",
-      "research_question": "The same question with an exact test, for the small cell.",
+      "research_question": "Are format and preference associated, on an exact test for the small cell?",
       "family": "categorical",
       "method": "fisher_exact",
       "roles": {
         "row": "format",
         "column": "preferred_session_type"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Format and preferred session type are independent.",
+        "alternative": "Format and preferred session type are associated."
+      },
+      "decision_rule": "Reject H0 if the exact p < .05, and report Cramer's V.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -119,6 +130,20 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Online and in-person attendees may value different kinds of session, which matters for how the programme is split between formats.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Test whether format and preferred session type are associated."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a hybrid conference",
+      "method": "convenience",
+      "planned_n": 60
     }
   }
 }

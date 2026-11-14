@@ -4,8 +4,8 @@
 
 prereg_file_instrument <- function() {
   ins <- sframe_demo("two_group", preview = FALSE)$instrument
-  ins$study <- list(preregistration = list(stopping_rule = "At 120 responses.",
-                                           multiplicity = "Holm correction across RQ1 and RQ2."))
+  ins$study$preregistration <- list(stopping_rule = "At 120 responses.",
+                                    multiplicity = "Holm correction across RQ1 and RQ2.")
   ins$meta$version <- "2.0.0"
   ins
 }
@@ -15,8 +15,8 @@ test_that("a preregistration opened in the builder fills the Study tab and saves
   ctx$eval("openSettings('study')")
   expect_identical(ctx$eval("gv('s-pr-stopping_rule')"), "At 120 responses.")
   expect_identical(ctx$eval("gv('s-pr-exclusion_rules')"), "")
-  expect_identical(ctx$eval("JSON.stringify(studyRead())"),
-                   '{"preregistration":{"stopping_rule":"At 120 responses.","multiplicity":"Holm correction across RQ1 and RQ2."}}')
+  expect_identical(ctx$eval("JSON.stringify(studyRead().preregistration)"),
+                   '{"stopping_rule":"At 120 responses.","multiplicity":"Holm correction across RQ1 and RQ2."}')
   back <- read_sframe(builder_save(ctx))
   expect_identical(back$study$preregistration$multiplicity, "Holm correction across RQ1 and RQ2.")
 })
