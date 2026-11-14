@@ -2026,8 +2026,9 @@ arithmetic.
 
 * **Demonstration data says so wherever it goes.** Every demo's responses
   have respondent ids `DEMO-001` and on, and a `data_status` column,
-  "Demonstration data, not collected from participants", kept by
-  `sframe_demo()` and `read_responses(meta_cols = )`. Data that carries it
+  "Demonstration data, not collected from participants". `read_responses()`
+  keeps it without being told, in strict mode as well, as it keeps the
+  collectors' own columns, so an item or a scale cannot take that name. Data that carries it
   is stamped: each APA sentence from `run_analysis_plan()` ends with
   "(demonstration data)", in the console as in a report, and a report's
   title, its opening line and each table and figure title say the same,
