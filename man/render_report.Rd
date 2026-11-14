@@ -32,8 +32,17 @@ render_report(
 \arguments{
 \item{instrument}{An \code{sframe} object.}
 
-\item{data}{A \code{tibble} or \code{data.frame} of responses, or NULL to generate a
-codebook-only report.}
+\item{data}{A \code{tibble} or \code{data.frame} of responses, or \code{NULL} for the
+pre-analysis plan: a document to submit to OSF, Zenodo or an ethics
+committee before collecting data. It holds a title page with the
+instrument's hash and how to verify it, the study, the participant
+information, the questionnaire in order with its branching in words,
+the scales and their scoring, each research question with its
+hypotheses, method in words, reference, variables, significance level
+and decision rule, the models and amendments, the references, and a
+section, "To complete before submission", that prompts for what a
+preregistration asks and the instrument does not hold. Quarto writes it
+in every format, and the built-in engine writes a plain HTML version.}
 
 \item{output_file}{Character or NULL. The output file path. When NULL, a
 temporary file is written and its path returned.}

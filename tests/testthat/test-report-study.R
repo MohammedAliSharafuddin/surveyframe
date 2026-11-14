@@ -46,9 +46,17 @@ test_that("the built-in report prints the study in its plan section", {
   surveyframe:::.render_report_html(study_instrument(), d$responses, output_path = f,
                                     show_code = FALSE)
   study_checks(paste(readLines(f, warn = FALSE), collapse = "\n"))
+  # With no data the page is the pre-analysis plan (Session 10): the study
+  # opens it, with the objectives table, before the first research question.
   f2 <- tempfile(fileext = ".html")
   surveyframe:::.render_report_html(study_instrument(), NULL, output_path = f2)
-  study_checks(paste(readLines(f2, warn = FALSE), collapse = "\n"))
+  plan <- paste(readLines(f2, warn = FALSE), collapse = "\n")
+  expect_match(plan, "Event organisers do not know", fixed = TRUE)
+  expect_match(plan, "Describe how organised the event felt.", fixed = TRUE)
+  expect_match(plan, "Objectives and the research questions that serve them", fixed = TRUE)
+  expect_match(plan, "none yet", fixed = TRUE)
+  expect_lt(regexpr("Event organisers do not know", plan, fixed = TRUE),
+            regexpr("<h3>RQ1:", plan, fixed = TRUE))
 })
 
 test_that("the Quarto report prints the study in its plan section", {
