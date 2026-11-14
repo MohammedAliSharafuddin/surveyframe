@@ -407,16 +407,16 @@ input,textarea,select{font-family:inherit;font-size:13px}
   cursor:pointer;margin-bottom:2px;transition:background var(--d1);
   position:relative;border-left:2px solid transparent}
 .ic:hover{background:var(--sh)}
-.ic.sel{background:color-mix(in srgb,var(--sf-primary) 18%,transparent);border-left-color:var(--sa)}
-.ic.sel .ic-lbl{color:var(--cf)}
+.ic.sel{background:color-mix(in srgb,var(--sf-primary) 38%,transparent);border-left:3px solid var(--sa);box-shadow:inset 0 0 0 1px var(--sa)}
+.ic.sel .ic-lbl{color:var(--cf);font-weight:600}
 .ic.drag-t{border-top:2px solid var(--cp)}.ic.drag-b{border-bottom:2px solid var(--cp)}
 .ic.dragging{opacity:.4}
 .ic-h{color:color-mix(in srgb,var(--sf-white) 18%,transparent);cursor:grab;font-size:11px;padding-top:2px;
   flex-shrink:0;transition:color var(--d1)}
 .ic:hover .ic-h{color:color-mix(in srgb,var(--sf-white) 45%,transparent)}
 .ic-body{flex:1;min-width:0}
-.ic-lbl{font-size:12px;color:var(--st);white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis;line-height:1.4}
+.ic-lbl{font-size:12px;color:var(--st);overflow:hidden;line-height:1.4;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow-wrap:anywhere}
 .ic-lbl.sec{color:var(--b-lbl);font-style:italic}
 .ic-lbl.blk{color:color-mix(in srgb,var(--sf-white) 55%,transparent);font-style:italic}
 .ic-meta{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
@@ -501,8 +501,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .insp-id{font-size:11px;font-weight:600;color:var(--t2);
   background:var(--cg);padding:2px 7px;border-radius:3px;
   font-family:monospace;flex-shrink:0}
-.insp-type-lbl{flex:1;font-size:11px;color:var(--t3);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.insp-type-lbl{flex:1;font-size:11px;color:var(--t3);overflow-wrap:anywhere}
 .insp-x{padding:3px;border-radius:4px;color:var(--t3);font-size:15px;
   transition:all var(--d1);flex-shrink:0}
 .insp-x:hover{background:var(--cg);color:var(--t1)}
@@ -511,6 +510,9 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .insp-body::-webkit-scrollbar-thumb{background:var(--cb);border-radius:4px}
 .insp-foot{padding:10px 14px;border-top:1px solid var(--cb);
   display:flex;align-items:center;flex-shrink:0}
+/* A welcome or thank-you page has no Duplicate or Delete: the hidden attribute
+   wins over the footer's display (owner 2026-11-15). */
+.insp-foot[hidden]{display:none}
 
 /* -- Field groups --------------------------------------------------------- */
 .fgs{border-bottom:1px solid var(--cb)}
@@ -4880,7 +4882,7 @@ function isSampleList(item){
   if(have.length!==want.length)return false;
   return have.every(function(v,i){return String(v)===want[i];});
 }
-var TL={likert:'Likert',single_choice:'Single',multiple_choice:'Multi',numeric:'Number',text:'Text',textarea:'Long text',date:'Date',matrix:'Matrix',slider:'Slider',ranking:'Ranking',rating:'Rating',section_break:'Section',text_block:'Block',pairwise_comparison:'Pairwise',criteria_weight:'Weights'};
+var TL={likert:'Likert',single_choice:'Single choice',multiple_choice:'Multiple choice',numeric:'Number',text:'Short text',textarea:'Long text',date:'Date',matrix:'Matrix',slider:'Slider',ranking:'Ranking',rating:'Rating',section_break:'Section break',text_block:'Text block',pairwise_comparison:'Pairwise comparison',criteria_weight:'Criteria weights'};
 var TB={likert:'b-li',single_choice:'b-si',multiple_choice:'b-mu',numeric:'b-nu',text:'b-te',textarea:'b-te',date:'b-nu',matrix:'b-ma',slider:'b-sl',ranking:'b-ra',rating:'b-ra',section_break:'b-se',text_block:'b-se'};
 function renderItemList(){
   var el=document.getElementById('itemList'),q=(gv('itemSearch')||'').toLowerCase();
@@ -4904,15 +4906,15 @@ function renderItemList(){
     var lc='ic-lbl'+(isSec?' sec':isTxt?' blk':'');
     var bgs=[];
     if(!isSec&&!isTxt)bgs.push('<span class="badge '+(TB[item.type]||'b-nu')+'">'+esc(TL[item.type]||item.type)+'</span>');
-    if(item.required)bgs.push('<span class="badge b-req">req</span>');
+    if(item.required)bgs.push('<span class="badge b-req">Required</span>');
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
-    if(item.reverse)bgs.push('<span class="badge b-rv">rev</span>');
-    if(ck)bgs.push('<span class="badge b-ck">attn</span>');
+    if(item.reverse)bgs.push('<span class="badge b-rv">Reverse-scored</span>');
+    if(ck)bgs.push('<span class="badge b-ck">Attention check</span>');
     // The row is focusable and answers Enter, Space and the arrow keys, where
     // it used to be a plain div with a click handler and no keyboard route to
     // selecting a question for editing. Ordering gains explicit named buttons,
     // since drag handlers alone leave a keyboard user with no way to reorder.
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" tabindex="0"'+(selId===item.id?' aria-current="true"':'')+' draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" tabindex="0"'+(selId===item.id?' aria-current="true"':'')+' draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'" title="'+esc(item.label||'')+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('')+screenRow('__thankyou');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
@@ -4971,7 +4973,7 @@ function openInsp(id){
   if(SCREENS[id]){openScreenInsp(id);return;}
   var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=false;
   var item=S.items.find(function(i){return i.id===id;});if(!item)return;
-  document.getElementById('inspId').textContent=item.id;
+  document.getElementById('inspId').hidden=false;document.getElementById('inspId').textContent=item.id;
   document.getElementById('inspTypeLbl').textContent=TL[item.type]||item.type;
   renderInspBody(item);
   document.getElementById('inspector').classList.add('open');
@@ -5008,7 +5010,9 @@ function screenVal(fid){
 }
 function openScreenInsp(id){
   var welcome=id==='__welcome';
-  document.getElementById('inspId').textContent=welcome?'welcome':'thankyou';
+  // The panel header names the page in full: a welcome or thank-you page has
+  // no item id to show (owner 2026-11-15).
+  document.getElementById('inspId').textContent='';document.getElementById('inspId').hidden=true;
   document.getElementById('inspTypeLbl').textContent=SCREENS[id].label;
   var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=true;
   function txt(fid,lbl,ph,type){return '<div class="field"><label class="fl" for="'+fid+'">'+lbl+'</label><div class="fc"><input type="'+(type||'text')+'" id="'+fid+'" value="'+esc(screenVal(fid))+'" placeholder="'+esc(ph||'')+'" onblur="updScreen(\''+fid+'\')"></div></div>';}
@@ -5023,6 +5027,8 @@ function openScreenInsp(id){
       +area('s-tym','Thank-you message',4)+txt('s-tyu','Redirect URL (optional)','https://example.com/thank-you','url')
       +'<span class="fhint">After submission, respondents are redirected to this URL.</span>'
       +box('s-tydl','Show "Download my response" button');
+  // The same inner padding as a question's field groups (owner 2026-11-15).
+  var ib=document.getElementById('inspBody');ib.innerHTML='<div class="fgs-body">'+ib.innerHTML+'</div>';
   screenShown={};Object.keys(SCREEN_FIELDS).forEach(function(fid){
     if(SCREEN_FIELDS[fid][0]!==SCREENS[id].key)return;
     var v=screenVal(fid),e=document.getElementById(fid);screenShown[fid]=v;

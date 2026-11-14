@@ -1552,7 +1552,7 @@ ui <- fluidPage(
     tags$div(class = "studio-sidebar", id = "studio_sidebar",
       tags$div(class = "studio-logo",
         tags$img(src = "sfstudio/surveyframe-shiny-square-icon.png", alt = "surveyframe"),
-        "Survey", tags$span("Studio")
+        "Survey", tags$span("Studio", .noWS = "before")
       ),
       # The study's order, in groups under headings that cannot be clicked.
       # Plan is an entry, not a screen: it opens Design with the builder in
