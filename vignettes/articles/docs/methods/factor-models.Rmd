@@ -72,7 +72,7 @@ In the report: the model syntax, ready for you to fit in lavaan or seminr.
 
 In the pre-analysis plan:
 
-> **RQ5.** And what does a PLS estimate give?
+> **RQ5.** And what seminr code would estimate the PLS model?
 > **Planned decision rule:** Report a path as supported when its bootstrap confidence interval excludes 0.
 
 In the report: the model syntax, ready for you to fit in lavaan or seminr.

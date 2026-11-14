@@ -801,7 +801,7 @@ sem_pls <- sf_instrument(
     list(id = "RQ4", research_question = "What CFA syntax does the measurement model generate?",
          family = "measurement", method = "cfa_lavaan_syntax",
          roles = list(model = "m3")),
-    list(id = "RQ5", research_question = "And what does a PLS estimate give?",
+    list(id = "RQ5", research_question = "And what seminr code would estimate the PLS model?",
          family = "measurement", method = "pls_sem",
          roles = list(model = "m2")),
     list(id = "RQ6", research_question = "Does content quality matter more to some attendees than others?",

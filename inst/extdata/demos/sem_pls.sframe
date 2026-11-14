@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "8300c52d07c83bed271f7689c6861dc2a782290763fbd004b7c0606d703803e4",
+    "value": "ec4386b8987f9c39910072de752b76955478aa16f9da2ae71121d537dba9925c",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -217,7 +217,7 @@
     },
     {
       "id": "RQ5",
-      "research_question": "And what does a PLS estimate give?",
+      "research_question": "And what seminr code would estimate the PLS model?",
       "family": "measurement",
       "method": "pls_sem",
       "roles": {
