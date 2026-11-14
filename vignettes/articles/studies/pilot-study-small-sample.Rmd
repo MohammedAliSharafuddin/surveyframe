@@ -1,0 +1,76 @@
+---
+title: "Pilot study with a small sample"
+description: "A pilot with 18 participants that answers the main study's questions with methods suited to a small sample: a rank-based comparison, an exact test and a penalised logistic regression. surveyframe gives you the questionnaire, the pre-analysis plan and the report."
+---
+
+```{=html}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Pilot study with a small sample","description":"A pilot with 18 participants that answers the main study's questions with methods suited to a small sample: a rank-based comparison, an exact test and a penalised logistic regression. surveyframe gives you the questionnaire, the pre-analysis plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/studies/pilot-study-small-sample.html"}</script>
+```
+
+A pilot with 18 participants that answers the main study's questions with methods suited to a small sample: a rank-based comparison, an exact test and a penalised logistic regression. surveyframe gives you the questionnaire, the pre-analysis plan and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../studies/small_sample/preview.html).
+
+```{=html}
+<iframe src="../../studies/small_sample/preview.html" title="Preview of the Pilot study with a small sample questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+```
+
+## The analysis plan, ready to preregister
+
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../studies/small_sample/plan.html), or [download the instrument (.sframe)](../../studies/small_sample/small_sample.sframe) and open it in SurveyStudio.
+
+Methods it declares: Mann-Whitney U test, Fisher's exact test, Firth logistic regression.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
+
+![Design screen with the questionnaire.](../../studies/small_sample/design.png){width=100%}
+![Collect screen.](../../studies/small_sample/collect.png){width=100%}
+![Quality screen.](../../studies/small_sample/check.png){width=100%}
+![Analyse screen with the declared plan.](../../studies/small_sample/analyse.png){width=100%}
+![Report screen.](../../studies/small_sample/report.png){width=100%}
+
+## Start in 2 steps (no coding)
+
+1. Install surveyframe in R: `install.packages("surveyframe")`
+2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `small_sample`. The study opens in SurveyStudio.
+
+## Questions
+
+### Which tests work with fewer than 30 participants?
+
+The plan uses the Mann-Whitney U test, Fisher's exact test and Firth logistic regression, which stay valid where large-sample tests do not.
+
+### Should a pilot test hypotheses?
+
+A pilot mainly checks the questionnaire and the procedure. Declaring the tests in advance still shows which comparisons the main study should power.
+
+### Can I run the pilot without coding?
+
+Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.
+
+## For R users
+
+```{=html}
+<details><summary>Open this study in R</summary>
+```
+
+```r
+d <- sframe_demo("small_sample")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+```{=html}
+</details>
+```
+
+## Related
+
+- [All students and thesis supervisors studies](../studies.html#students)
+- [Thesis questionnaire with a Likert scale](thesis-questionnaire-likert-scale.html)
+- [Method guides](../learn-by-example.html)
+

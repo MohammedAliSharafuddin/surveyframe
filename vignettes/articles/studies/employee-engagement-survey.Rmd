@@ -1,0 +1,77 @@
+---
+title: "Employee engagement survey"
+description: "An engagement survey of 8 items written to measure 2 dimensions, how work is organised and the content of the work, with a check that employees' answers support 2 scores. surveyframe gives you the questionnaire, the analysis plan and the report."
+---
+
+```{=html}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Employee engagement survey","description":"An engagement survey of 8 items written to measure 2 dimensions, how work is organised and the content of the work, with a check that employees' answers support 2 scores. surveyframe gives you the questionnaire, the analysis plan and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/studies/employee-engagement-survey.html"}</script>
+```
+
+An engagement survey of 8 items written to measure 2 dimensions, how work is organised and the content of the work, with a check that employees' answers support 2 scores. surveyframe gives you the questionnaire, the analysis plan and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview, so answers go nowhere. [Open it in a new tab](../../studies/factor_structure/preview.html).
+
+```{=html}
+<iframe src="../../studies/factor_structure/preview.html" title="Preview of the Employee engagement survey questionnaire" style="width:100%;height:560px;border:1px solid #d9e2ec;border-radius:6px"></iframe>
+```
+
+## The analysis plan, ready to preregister
+
+Before any data is collected, surveyframe writes the pre-analysis plan: the study, the questionnaire, each research question with its hypotheses, method and decision rule, and what a preregistration still asks for. [Read the plan](../../studies/factor_structure/plan.html), or [download the instrument (.sframe)](../../studies/factor_structure/factor_structure.sframe) and open it in SurveyStudio.
+
+Methods it declares: Factorability checks (KMO and Bartlett's test), Exploratory factor analysis.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check, analyse and report.
+
+![Design screen with the questionnaire.](../../studies/factor_structure/design.png){width=100%}
+![Collect screen.](../../studies/factor_structure/collect.png){width=100%}
+![Quality screen.](../../studies/factor_structure/check.png){width=100%}
+![Analyse screen with the declared plan.](../../studies/factor_structure/analyse.png){width=100%}
+![Report screen.](../../studies/factor_structure/report.png){width=100%}
+
+## Start in 2 steps (no coding)
+
+1. Install surveyframe in R: `install.packages("surveyframe")`
+2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `factor_structure`. The study opens in SurveyStudio.
+
+## Questions
+
+### How do I know the survey measures 2 things?
+
+The plan checks that the data suit factor analysis, then runs an exploratory factor analysis that shows which items load on which factor.
+
+### Can I report 2 scores?
+
+Yes, once the factor analysis supports them. Each scale's score and reliability are reported.
+
+### Can answers stay anonymous?
+
+Yes. The questionnaire asks for no name, and results are reported for the group.
+
+## For R users
+
+```{=html}
+<details><summary>Open this study in R</summary>
+```
+
+```r
+d <- sframe_demo("factor_structure")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+```{=html}
+</details>
+```
+
+## Related
+
+- [All organisations: customer and employee research studies](../studies.html#organisations)
+- [Customer satisfaction and return intention](customer-satisfaction-return-intention.html)
+- [Choosing between options: a supplier or a venue](choosing-between-options.html)
+- [Method guides](../learn-by-example.html)
+
