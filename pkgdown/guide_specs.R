@@ -153,7 +153,7 @@ guide_specs <- list(
     r = c("d <- sframe_demo(\"multi_response\")",
       "results <- run_analysis_plan(d$responses, d$instrument)")),
   weighted_survey = list(
-    outcome = "Apply survey weights so your summaries describe the population rather than the sample.",
+    outcome = "Apply survey weights so your summaries describe the population the sample was drawn from.",
     studio = c(open_demo("weighted_survey"),
       "On **Responses**, see the weight column, `survey_weight`, beside the answers.",
       "On **Design**, choose **Plan** and open RQ3. The weight column is set in its weights role. RQ1 shows the sample before weighting and RQ2 the population after.",

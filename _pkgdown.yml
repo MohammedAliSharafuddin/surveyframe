@@ -50,7 +50,7 @@ home:
     report. Work visually in SurveyStudio or use R. For people conducting,
     supervising, reviewing or planning survey research.
   links:
-    - text: Verify a .sframe file
+    - text: Verify a file
       href: verify/
     - text: Get started
       href: articles/start.html
@@ -101,7 +101,7 @@ navbar:
           href: articles/guides.html
         - text: "Documentation"
           href: articles/docs.html
-        - text: "Question types"
+        - text: "Choosing questions for your survey"
           href: articles/learn/question-types.html
         - text: "The analysis plan"
           href: articles/learn/analysis-plan.html

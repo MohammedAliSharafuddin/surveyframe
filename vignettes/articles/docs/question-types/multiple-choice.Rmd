@@ -15,7 +15,7 @@ Add a question, choose Multiple choice, and give the options the respondent may 
 
 ## Settings
 
-- **Answer set.** The options. Each becomes its own column in the data, ticked or not.
+- **Answer set.** The options. Each becomes its own column in the data, ticked or left blank.
 - **Required.** Asks for at least 1 tick.
 
 ## Best practices for research

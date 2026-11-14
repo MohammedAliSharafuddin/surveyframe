@@ -92,18 +92,21 @@
 <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation">
   <div class="container">
     <a class="navbar-brand me-2" href="../index.html">surveyframe</a>
-    <small class="nav-text text-muted me-auto">0.4.2</small>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div id="navbar" class="collapse navbar-collapse ms-3">
+      <!-- The site navbar's destinations (Codex WR85). No version number, so it never goes stale. -->
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
-        <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-        <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+        <li class="nav-item"><a class="nav-link" href="../articles/templates.html">Templates</a></li>
+        <li class="nav-item"><a class="nav-link" href="../articles/start.html">Get started</a></li>
+        <li class="nav-item"><a class="nav-link" href="../articles/guides.html">How-to guides</a></li>
+        <li class="nav-item"><a class="nav-link" href="../articles/docs.html">Documentation</a></li>
+        <li class="nav-item"><a class="nav-link" href="../reference/index.html">R reference</a></li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link active" aria-current="page" href="./">Verify a file</a></li>
+        <li class="nav-item"><a class="nav-link" href="../articles/cite.html">Cite</a></li>
         <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
     </div>
@@ -119,10 +122,10 @@
 
   <div class="privacy">
     <span><i class="fa-solid fa-lock" aria-hidden="true"></i></span>
-    <span><strong>Nothing is uploaded.</strong> This page has no server component.
-    Your file is read and hashed by your browser's own SubtleCrypto API and never
-    leaves your device. You can verify this yourself: view this page's source.
-    It's a single, self-contained HTML file with no network requests.</span>
+    <span><strong>Your file stays on your device.</strong> Your browser reads and
+    hashes it with its own SubtleCrypto API, and the page sends it nowhere. The
+    page loads its fonts, styles and scripts from surveyframe.org, as any page
+    does. View this page's source to see the check for yourself.</span>
   </div>
 
   <div class="card">
@@ -146,13 +149,12 @@
   <div id="result" role="status" aria-live="polite" tabindex="-1"></div>
 
   <p class="scope-note">
-    <strong>What this proves, and what it does not.</strong> A matching hash
-    confirms that the instrument content matches the SHA-256 digest stored by
-    <code>write_sframe()</code>. That detects later content changes. It does not
-    authenticate the author, and it says nothing about question
-    wording, sampling, or measurement quality, and an amendment log only
-    records changes a researcher chose to disclose through
-    <code>amend_sframe()</code>, which cannot compel disclosure. See the
+    <strong>What a matching hash shows.</strong> The instrument's content
+    matches the SHA-256 digest <code>write_sframe()</code> stored when the file
+    was saved, so its content is as it was then. The amendment log lists the
+    changes the researcher disclosed through <code>amend_sframe()</code>.
+    Authorship, question wording, sampling and measurement quality each need
+    their own evidence. See the
     <a href="../articles/surveyframe.html#validate-and-serialise">package
     vignette</a> for the full explanation and the package's separate,
     complementary defence against HARKing and p-hacking.

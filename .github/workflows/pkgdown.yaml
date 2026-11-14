@@ -51,6 +51,9 @@ jobs:
           mkdir -p docs/verify
           cp pkgdown/extra/verify/index.html docs/verify/index.html
 
+      - name: Finish llms.txt, the sitemap and canonical links
+        run: Rscript pkgdown/postbuild.R
+
       - name: Add the custom domain
         run: echo "surveyframe.org" > docs/CNAME
 

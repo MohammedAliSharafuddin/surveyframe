@@ -7,7 +7,7 @@ description: "How strongly 2 numeric or ordered answers move together, and wheth
 
 How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant.
 
-**Assumptions.** Pearson's r assumes a straight-line relation, the rank correlations a steady direction. Correlation is not causation.
+**Assumptions.** Pearson's r assumes a straight-line relation, the rank correlations a steady direction. A correlation shows association, and a claim of cause needs a design that tests it.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set 2 numeric or ordered answers. Partial correlation takes a third answer to hold constant. Declare the hypotheses and the decision rule before collecting responses.
 

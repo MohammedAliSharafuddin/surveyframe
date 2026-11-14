@@ -1398,8 +1398,8 @@ arithmetic.
   sitemap point to it. The old address redirects.
 * **2 new vignettes for the 5 stages** (design, collect, check, analyse,
   report) on the `paired` demo, each with the pre-analysis plan before
-  collecting. "Run a study in SurveyStudio" has screenshots and no code at
-  all, for researchers who do not write R. "Run a study in R" gives the same
+  collecting. "Run a study in SurveyStudio" has screenshots and takes each
+  stage by point and click, for researchers who work in SurveyStudio. "Run a study in R" gives the same
   stages as R code. Each links the other once, and both lead the "Start here"
   articles. "Deploying and collecting" describes SurveyStudio's Collect screen where it said "from
   the SurveyBuilder" (UX-22).

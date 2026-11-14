@@ -49,8 +49,8 @@ its integrity hash.
 write_sframe(d$instrument, "paired.sframe")
 ```
 
-Before collecting, write the plan down. `render_report()` with no data writes
-the pre-analysis plan, a document to submit to OSF, Zenodo or an ethics
+Before collecting, write the plan down. `render_report()` given the instrument
+alone writes the pre-analysis plan, a document to submit to OSF, Zenodo or an ethics
 committee.
 
 ```{r}

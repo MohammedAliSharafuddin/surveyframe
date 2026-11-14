@@ -36,7 +36,7 @@ library(surveyframe)
 
 The model is the third part of the research design. surveyframe stores the
 measurement and structural specification and writes the syntax for the modelling
-stage. It does not fit the models. This vignette builds the three models from
+stage, and you fit the models with lavaan or seminr. This vignette builds the three models from
 the published Thailand study (Sharafuddin, Madhavan, and Wangtueai 2024). The
 syntax steps need no raw data, so every chunk below runs as written.
 
