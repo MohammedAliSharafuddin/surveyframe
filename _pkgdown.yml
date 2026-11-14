@@ -135,32 +135,33 @@ navbar:
 articles:
   - title: "Questionnaire templates"
     desc: >
-      10 questionnaire templates, each a complete survey project with its
-      analysis plan ready to preregister and SurveyStudio screenshots,
-      grouped by field. Web only.
+      10 example questionnaires, each with an analysis plan to adapt and
+      screenshots of the study in SurveyStudio, grouped by field.
     navbar: ~
     contents:
       - articles/templates
       - starts_with("articles/templates/")
   - title: "How-to guides"
     desc: >
-      How to answer a research question with a survey, 1 guide per question,
-      in SurveyStudio and in R. Web only.
+      Complete tasks, from setting up a questionnaire to analysing responses
+      and recording the study, each in SurveyStudio and in R.
     navbar: ~
     contents:
       - articles/guides
       - starts_with("articles/guides/")
   - title: "Documentation"
     desc: >
-      How to set up each question type, with annotated screenshots. Web only.
+      How to set up each question type and each analysis method, with
+      screenshots of SurveyStudio.
     navbar: ~
     contents:
       - articles/docs
       - starts_with("articles/docs/")
   - title: "Get started and learn"
     desc: >
-      Install and open a study in SurveyStudio, the frequently asked questions,
-      and how to cite surveyframe. Web only.
+      Install surveyframe and open a study in SurveyStudio, guidance for
+      each audience, the frequently asked questions, comparisons with other
+      tools, and how to cite surveyframe.
     navbar: ~
     contents:
       - articles/start
@@ -170,9 +171,8 @@ articles:
   - title: "Start here"
     desc: >
       The 5 stages of a study, in SurveyStudio or in R, then 25 small surveys,
-      each doing one job, with the whole path from the questionnaire to the
-      report. Choose the demo that matches the data you have rather than the
-      name of a test.
+      each doing 1 job, with the whole path from the questionnaire to the
+      report. Choose the demo that matches the data you have.
     navbar: ~
     contents:
       - run-a-study-in-surveystudio

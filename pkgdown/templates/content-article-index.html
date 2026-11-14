@@ -1,0 +1,29 @@
+{{! surveyframe override of pkgdown 2.2.1 BS5/templates/content-article-index.html (Codex WR450): the section titles are h2 under the page h1, where pkgdown wrote h3 and skipped a level. Re-copy it when pkgdown changes this template. }}
+<div class="row">
+  <main id="main" class="col-md-9">
+    <div class="page-header">
+      {{#logo}}<img src="{{logo.src}}" class="logo" alt="" >{{/logo}}
+      <h1>{{{pagetitle}}}</h1>
+    </div>
+
+    {{#sections}}
+    <div class="section {{class}}">
+      <h2>{{{title}}}</h2>
+      <div class="section-desc">{{{desc}}}</div>
+
+      <dl>
+        {{#contents}}
+        <dt><a href="{{href}}">{{title}}</a></dt>
+        <dd>{{{description}}}</dt>
+        {{/contents}}
+      </dl>
+    </div>
+    {{/sections}}
+  </main>
+
+  <aside class="col-md-3">
+    <nav id="toc" aria-label="{{#translate}}{{toc}}{{/translate}}">
+      <h2>{{#translate}}{{on_this_page}}{{/translate}}</h2>
+    </nav>
+  </aside>
+</div>
