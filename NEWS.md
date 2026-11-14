@@ -1537,6 +1537,18 @@ arithmetic.
 
 ## SurveyBuilder
 
+* **The Plan screen reads in words** (owner check of the Docs screenshots,
+  2026-11-15). A plan card shows α = .05, Draft, and a model by its
+  name, such as Content quality to intention (CB-SEM), where it showed
+  significance=0.05, draft and m1. A syntax-only block says what it gives,
+  such as "Writes lavaan syntax for the declared model, to fit in lavaan".
+  In the Edit Analysis Plan dialog each role has a full-width row, its
+  options end at a whole word with the full question as their title, and
+  "optional" beside H0 and H1 is a muted hint. The Model Builder lists each
+  saved model by its name and type, and Path to starts on a different
+  construct from Path from. The study title in the item list wraps, and
+  Preregistration fields sits among the Plan screen's tabs.
+
 * **The question list and its panel read in full** (owner check of the Docs
   screenshots, 2026-11-15). The selected question stands out by a stronger
   ground, an accent bar and a bold label, beside its `aria-current`. A
