@@ -1848,6 +1848,12 @@ arithmetic.
   references are kept on the next save. `demo =` and `instrument =` cannot
   be used together. With `launch_studio(instrument, screen = "design")`,
   this gives both routes a way to open an instrument held in R.
+* **SurveyStudio points to the pre-analysis plan.** The Design screen says
+  "Plan complete? Save to Studio, then export it as a pre-analysis plan for
+  OSF, Zenodo or your ethics committee", linking the Report screen. There,
+  with no responses loaded, the button reads "Export pre-analysis plan",
+  says what it writes, and names the file `<title>_pre_analysis_plan.<format>`.
+
 * **`render_report(instrument)` with no data writes a pre-analysis plan**,
   not a results page, for a student or a lab to submit to OSF, Zenodo or
   an ethics committee before collecting data. It is titled "Pre-analysis
