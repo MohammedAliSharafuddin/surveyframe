@@ -48,8 +48,9 @@ with a hash anyone can [verify](https://surveyframe.org/verify/)
    amendment.
 5. **Report** in APA 7, as HTML, Word, PDF or OpenDocument.
 
-[Two ways to run a study](articles/two-ways-to-run-a-study.html) shows each
-stage in SurveyStudio and in R.
+[Run a study in SurveyStudio](articles/run-a-study-in-surveystudio.html) shows
+each stage with no code, and [Run a study in R](articles/run-a-study-in-r.html)
+shows the same stages in R.
 
 ## Start in 2 steps
 
