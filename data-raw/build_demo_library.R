@@ -12,12 +12,17 @@
 # for byte: a demo already in inst/extdata/demos keeps its created_at, the
 # thank-you text the demos shipped with is kept (the package default became
 # "Thank you for participating." after they were sealed, and changing it
-# would move every hash), and the results table is the package's own
-# sframe_demo_results_table(), which the parity tests read.
+# would move every hash), an amendment recorded again keeps the time it was
+# first recorded, and the results table is the package's own
+# sframe_demo_results_table(), which the parity tests read. Each demo's
+# study, author, wording, hypotheses and decision rules come from
+# data-raw/demo_stories.R (Session 10).
 #
 # Run from the repository root:  Rscript data-raw/build_demo_library.R
 
 devtools::load_all(quiet = TRUE)
+# Each demo's study, author, wording, hypotheses and decision rules.
+source(file.path("data-raw", "demo_stories.R"))
 
 out_dir <- file.path("inst", "extdata", "demos")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
@@ -118,11 +123,11 @@ shipped_created_at <- function(path, fallback) {
   jsonlite::fromJSON(path, simplifyVector = FALSE)$meta$created_at %||% fallback
 }
 
-# An amendment recorded again on a rerun keeps the entry the shipped file
-# holds, when it discloses the same change (the same reason, tier, author and
-# deviation report). A recorded entry stays as it was written: the shipped
-# instrument_revision log holds the time it was first recorded and content
-# hashes in the form before 0.4.3, which read_sframe() still accepts.
+# An amendment recorded again on a rerun keeps the time it was first
+# recorded, when it discloses the same change (the same reason, tier, author
+# and deviation report), so a rerun reproduces the file. Its content hashes
+# are those of this run. The log's chain runs on the content hashes, which
+# the time is not part of.
 shipped_amendments <- function(path, amendments) {
   if (!file.exists(path) || !length(amendments)) return(amendments)
   old <- jsonlite::fromJSON(path, simplifyVector = FALSE)$amendments
@@ -131,7 +136,9 @@ shipped_amendments <- function(path, amendments) {
     identical(lapply(a[keys], as.character), lapply(b[keys], as.character))
   }
   for (k in seq_len(min(length(old), length(amendments)))) {
-    if (same(old[[k]], amendments[[k]])) amendments[[k]] <- old[[k]]
+    if (same(old[[k]], amendments[[k]]) && !is.null(old[[k]]$timestamp)) {
+      amendments[[k]]$timestamp <- old[[k]]$timestamp
+    }
   }
   amendments
 }
@@ -140,6 +147,7 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE,
                        reuse_responses = NULL) {
   sframe_path <- file.path(out_dir, paste0(name, ".sframe"))
   csv_path    <- file.path(out_dir, paste0(name, "_responses.csv"))
+  instrument <- apply_story(instrument, demo_stories[[name]])
 
   # Every unbranded demo ships with welcome, consent and thank-you screens
   # (0.4.3, Ethos request 3).
@@ -1151,6 +1159,7 @@ if (length(first_survey$render) == 0) {
 }
 first_survey$meta$created_at <- shipped_created_at(
   file.path(out_dir, "first_survey.sframe"), first_survey$meta$created_at)
+first_survey <- apply_story(first_survey, demo_stories$first_survey)
 revised <- first_survey
 revised$items <- lapply(revised$items, function(it) {
   if (identical(it$id, "suggestion")) {

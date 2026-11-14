@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "0b95571d0000c6dc7b013104a3d914c058b23488fdd375614182224177ebfc10",
+    "value": "6790bf18453af62d4a1b724e1d2400472d6472107ccd3fed1c520f088e65ad9f",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Who attends the most?",
     "version": "1.0.0",
-    "description": "Three groups, a second factor, and a covariate.",
-    "authors": null,
+    "description": "A comparison of engagement across 3 attendee roles, with attendance format as a second factor and age as a covariate.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:44Z"
@@ -76,8 +76,13 @@
         "group": "attendee_role",
         "outcome": "sessions_attended"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Mean sessions attended are equal across the 3 roles.",
+        "alternative": "Mean sessions attended differ for at least 1 role."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -94,8 +99,13 @@
         "group": "attendee_role",
         "outcome": "sessions_attended"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Sessions attended have the same distribution across roles.",
+        "alternative": "Sessions attended differ in distribution for at least 1 role."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -113,8 +123,13 @@
         "factor2": "format",
         "outcome": "sessions_attended"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Neither role, format nor their interaction affects sessions attended.",
+        "alternative": "Role, format or their interaction affects sessions attended."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -132,8 +147,13 @@
         "covariates": "age",
         "outcome": "sessions_attended"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Adjusted for age, mean sessions attended are equal across roles.",
+        "alternative": "Adjusted for age, mean sessions attended differ for at least 1 role."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -153,6 +173,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Organisers suspect delegates, speakers and exhibitors engage differently, and need to know whether that holds once format and age are taken into account.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Compare sessions attended across the 3 roles."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether format and age change that comparison."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of an industry conference",
+      "method": "stratified",
+      "planned_n": 90
     }
   }
 }

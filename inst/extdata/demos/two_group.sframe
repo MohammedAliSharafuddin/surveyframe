@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "7d53e872d328c5f87dd48af86c26c4d88713539f8abdcd02c6b2e7b0612a2540",
+    "value": "3907d53280ea533c15c7d8194881fd5e9dd893bc030535439534229868cadc13",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "In person or online?",
     "version": "1.0.0",
-    "description": "One numeric outcome and one 2-level group: the commonest comparison there is.",
-    "authors": null,
+    "description": "A comparison of engagement between people who attended an event in person and those who attended online, measured by the number of sessions each attended.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:42Z"
@@ -54,8 +54,13 @@
         "group": "format",
         "outcome": "sessions_attended"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Mean sessions attended do not differ between in-person and online attendees.",
+        "alternative": "Mean sessions attended differ between in-person and online attendees."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -65,15 +70,20 @@
     },
     {
       "id": "RQ2",
-      "research_question": "The same question without assuming normality.",
+      "research_question": "Do in-person and online attendees differ in sessions attended, without assuming normality?",
       "family": "group_comparison",
       "method": "mann_whitney",
       "roles": {
         "group": "format",
         "outcome": "sessions_attended"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "The distribution of sessions attended is the same for both formats.",
+        "alternative": "Sessions attended tend to be higher in one format."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -93,6 +103,20 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Organisers are deciding whether to keep an online option, and do not know whether online attendees engage as much as those in the room.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Compare the number of sessions attended in person and online."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a hybrid conference",
+      "method": "convenience",
+      "planned_n": 60
     }
   }
 }

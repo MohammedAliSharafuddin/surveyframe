@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "d299da187c34dfacd7cb50994ab70d071fea3fe56e8f38ea6d0a6be4feb956bf",
+    "value": "63f938716b5c90334888600c2cda71215681a040fd35e1c8bd45e1d248d2c60c",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Event feedback, one question at a time",
     "version": "1.0.0",
-    "description": "The same instrument in conversational mode, for comparison with 18.",
-    "authors": null,
+    "description": "The event feedback survey shown one question at a time, for respondents on a phone.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:56Z"
@@ -84,6 +84,7 @@
       "roles": {
         "variable": "attendee_type"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -115,6 +116,20 @@
       "institution": "Riverside Conference Centre",
       "logo_base64": "",
       "show_progress": true
+    }
+  },
+  "study": {
+    "problem": "Many attendees answer on a phone, where a long page of questions is easy to abandon.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended."
+      }
+    ],
+    "sampling": {
+      "population": "Registered attendees of the 2025 event",
+      "method": "census",
+      "planned_n": 50
     }
   }
 }

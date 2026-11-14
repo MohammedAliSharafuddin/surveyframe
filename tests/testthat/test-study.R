@@ -13,9 +13,9 @@ study_instr <- function(study = NULL, plan_objective = "O1") {
   ins <- sframe_demo("likert_scale")$instrument
   # A new instrument built in R from the demo, not an edit of its file.
   attr(ins, "sframe_origin") <- NULL
-  if (!is.null(plan_objective)) {
-    for (k in seq_along(ins$analysis_plan)) ins$analysis_plan[[k]]$objective <- plan_objective
-  }
+  # Every block is set, NULL clearing it: the demo's own blocks name the
+  # objectives of its own study (Session 10).
+  for (k in seq_along(ins$analysis_plan)) ins$analysis_plan[[k]]["objective"] <- list(plan_objective)
   ins$study <- study %||% list(
     problem = "Students rate course organisation poorly, and no one knows which parts.",
     objectives = list(list(id = "O1", text = "Measure perceived organisation.")),
@@ -43,7 +43,11 @@ test_that("D13: sframe_instrument(study = ) stores it, and it survives a write a
 })
 
 test_that("D13: an instrument without a study hashes as before, and the study is inside the hash", {
+  # The demos declare a study since Session 10, so the plain instrument has
+  # it and the plan's objectives removed.
   plain <- sframe_demo("likert_scale")$instrument
+  plain$study <- NULL
+  for (k in seq_along(plain$analysis_plan)) plain$analysis_plan[[k]]$objective <- NULL
   expect_false("study" %in% names(sframe_serialization_payload(plain)))
   with <- study_instr()
   expect_false(identical(sframe_content_hash(with), sframe_content_hash(study_instr(

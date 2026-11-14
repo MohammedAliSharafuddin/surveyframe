@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "1e2a8325f7a79e176a64cc5979cf14eb0a3fee7cbdbb452e66574111ffb03aa4",
+    "value": "200f6f4f4fc9ab15d302490782f3027a46277b2d495b7258b08a478dc686e2dc",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Two things attendees judge",
     "version": "1.0.0",
-    "description": "Eight items, 2 factors, and whether the data supports that.",
-    "authors": null,
+    "description": "An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:48Z"
@@ -18,7 +18,7 @@
   "items": [
     {
       "id": "org_1",
-      "label": "The event ran to time.",
+      "label": "My work is planned well in advance.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -27,7 +27,7 @@
     },
     {
       "id": "org_2",
-      "label": "It was easy to find my way around.",
+      "label": "I know where to find what I need to do my job.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -36,7 +36,7 @@
     },
     {
       "id": "org_3",
-      "label": "Staff were helpful.",
+      "label": "My manager helps when I have a question.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -45,7 +45,7 @@
     },
     {
       "id": "org_4",
-      "label": "The venue suited the event.",
+      "label": "My workplace suits the work I do.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -54,7 +54,7 @@
     },
     {
       "id": "con_1",
-      "label": "The sessions were relevant to my work.",
+      "label": "My work is relevant to my goals.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -63,7 +63,7 @@
     },
     {
       "id": "con_2",
-      "label": "The material went deep enough.",
+      "label": "My work challenges me enough.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -72,7 +72,7 @@
     },
     {
       "id": "con_3",
-      "label": "The speakers knew their subject.",
+      "label": "The people I work with know their subject.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -81,7 +81,7 @@
     },
     {
       "id": "con_4",
-      "label": "The handouts were useful.",
+      "label": "The tools I am given are useful.",
       "type": "likert",
       "required": false,
       "choice_set": "agree5",
@@ -134,8 +134,9 @@
           "con_4"
         ]
       },
+      "objective": "O1",
+      "decision_rule": "Proceed when KMO is .60 or above and Bartlett's test has p < .05.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -160,8 +161,9 @@
           "con_4"
         ]
       },
+      "objective": "O2",
+      "decision_rule": "Retain the factors parallel analysis supports, and read loadings of .40 or above.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -181,6 +183,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "An organisation's engagement survey assumes 2 dimensions, and it needs to check that its employees' answers support that before reporting 2 scores.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Check that the data are suitable for factor analysis."
+      },
+      {
+        "id": "O2",
+        "text": "Find how many factors the items form, and which items load where."
+      }
+    ],
+    "sampling": {
+      "population": "Employees of one organisation",
+      "method": "census",
+      "planned_n": 200
     }
   }
 }

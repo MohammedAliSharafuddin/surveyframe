@@ -12,6 +12,9 @@ study_instrument <- function() {
                       list(id = "O2", text = "Check that the organisation scale is reliable."),
                       list(id = "O3", text = "Compare first-time and returning attendees.")))
   ids <- vapply(ins$analysis_plan, function(b) b$id, character(1))
+  # The demo's blocks name its own study's objectives (Session 10), cleared
+  # here so only the 3 below are linked.
+  for (k in seq_along(ins$analysis_plan)) ins$analysis_plan[[k]]$objective <- NULL
   ins$analysis_plan[[match("RQ1", ids)]]$objective <- "O1"
   ins$analysis_plan[[match("RQ2", ids)]]$objective <- "O2"
   ins$analysis_plan[[match("RQ3", ids)]]$objective <- "O2"
@@ -26,7 +29,10 @@ test_that("the trace table maps each objective to the questions that serve it", 
   expect_match(s$trace$`Research questions`[2], "RQ2.*RQ3")
   expect_identical(s$trace$`Research questions`[3], "none yet")
   expect_match(s$unlinked, "RQ4", fixed = TRUE)
-  expect_null(surveyframe:::sframe_report_study(sframe_demo("likert_scale")$instrument))
+  # The demos declare a study since Session 10, so 1 without it is made here.
+  plain <- sframe_demo("likert_scale")$instrument
+  plain$study <- NULL
+  expect_null(surveyframe:::sframe_report_study(plain))
 })
 
 study_checks <- function(doc) {

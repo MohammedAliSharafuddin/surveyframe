@@ -4,7 +4,8 @@
 prereg_instrument <- function(pre = list(stopping_rule = "At 120 responses or on 30 June.",
                                          exclusion_rules = "Responses failing the attention check.")) {
   ins <- sframe_demo("two_group", preview = FALSE)$instrument
-  ins$study <- list(preregistration = pre)
+  # The demo's own study, with the preregistration added.
+  ins$study$preregistration <- pre
   ins$meta$version <- "2.0.0"
   ins
 }

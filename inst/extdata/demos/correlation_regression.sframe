@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "773eca25fd5e3dc4dd83f85738001f736a6c3571b664cd1e8d3fbc6ea01bac2e",
+    "value": "1aa72dd4712f79b6365f63b86ed4de051e5198d80aedb142340040e64077cbd3",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "What goes with getting value from the event?",
     "version": "1.0.0",
-    "description": "Correlation, a partial correlation, and a regression on the same data.",
-    "authors": null,
+    "description": "A customer satisfaction study of what goes with the value customers get from a service, by correlation and regression.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:47Z"
@@ -18,14 +18,14 @@
   "items": [
     {
       "id": "sessions_attended",
-      "label": "How many sessions did you attend?",
+      "label": "How many times did you use the service this year?",
       "type": "numeric",
       "required": true,
       "reverse": false
     },
     {
       "id": "networking_minutes",
-      "label": "Roughly how many minutes did you spend networking?",
+      "label": "Roughly how many minutes did you spend with our staff?",
       "type": "slider",
       "required": false,
       "reverse": false,
@@ -35,7 +35,7 @@
     },
     {
       "id": "overall_value",
-      "label": "Overall, how much value did you get? (0 to 100)",
+      "label": "Overall, how much value did you get from the service? (0 to 100)",
       "type": "slider",
       "required": false,
       "reverse": false,
@@ -58,15 +58,20 @@
   "analysis_plan": [
     {
       "id": "RQ1",
-      "research_question": "Do sessions attended and perceived value go together?",
+      "research_question": "Do use of the service and perceived value go together?",
       "family": "correlation",
       "method": "correlation_pearson",
       "roles": {
         "x": "sessions_attended",
         "y": "overall_value"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Use and perceived value are not correlated.",
+        "alternative": "Use and perceived value are correlated."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -76,15 +81,20 @@
     },
     {
       "id": "RQ2",
-      "research_question": "The same question on ranks.",
+      "research_question": "Do use and perceived value go together on ranks?",
       "family": "correlation",
       "method": "correlation_spearman",
       "roles": {
         "x": "sessions_attended",
         "y": "overall_value"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Use and perceived value are not rank-correlated.",
+        "alternative": "Use and perceived value are rank-correlated."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -94,15 +104,20 @@
     },
     {
       "id": "RQ3",
-      "research_question": "And with Kendall's tau.",
+      "research_question": "Do use and perceived value go together, by Kendall's tau?",
       "family": "correlation",
       "method": "correlation_kendall",
       "roles": {
         "x": "sessions_attended",
         "y": "overall_value"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Use and perceived value are not associated by Kendall's tau.",
+        "alternative": "Use and perceived value are associated by Kendall's tau."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -120,8 +135,13 @@
         "y": "overall_value",
         "controls": "age"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Holding age constant, use and value are not correlated.",
+        "alternative": "Holding age constant, use and value are correlated."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -141,8 +161,13 @@
         ],
         "dependent": "overall_value"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Use and staff time explain none of the variance in value.",
+        "alternative": "Use and staff time explain some of the variance in value."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -162,6 +187,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A service provider wants to know which parts of a customer's experience go with the value they report, to decide where to invest.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Measure how use of the service relates to perceived value."
+      },
+      {
+        "id": "O2",
+        "text": "Estimate how much use and staff time together explain value."
+      }
+    ],
+    "sampling": {
+      "population": "Customers who used the service in the last year",
+      "method": "simple_random",
+      "planned_n": 120
     }
   }
 }

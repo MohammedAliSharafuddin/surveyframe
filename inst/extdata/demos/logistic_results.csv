@@ -1,6 +1,6 @@
 "block","method","quantity","value"
-"RQ1","regression_logistic_binary","apa","χ²(1) = 40.18, p < .001, McFadden R² = .362. The odds are of ""Will you attend next year?"" being Yes, against No."
-"RQ2","regression_logistic_ordinal","apa","Ordinal logistic regression of ""I was satisfied with the event."", ordered Strongly disagree < Disagree < Neither agree nor disagree < Agree < Strongly agree, was estimated with 80 complete cases."
+"RQ1","regression_logistic_binary","apa","χ²(1) = 40.18, p < .001, McFadden R² = .362. The odds are of ""Will you use the service again next year?"" being Yes, against No."
+"RQ2","regression_logistic_ordinal","apa","Ordinal logistic regression of ""I was satisfied with the service."", ordered Strongly disagree < Disagree < Neither agree nor disagree < Agree < Strongly agree, was estimated with 80 complete cases."
 "RQ3","regression_logistic_multinomial","apa","Multinomial logistic regression was estimated with 80 complete cases, against the reference category Workshops."
 "RQ3","regression_logistic_multinomial","p [1]","0.000154603"
 "RQ3","regression_logistic_multinomial","p [2]","0.000181109"

@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "d515e4b6bc39f9e8192f0f6162d2c484fdb87ecadd10fa99e45df249434682ed",
+    "value": "9afe289123c27eab5734788cec817fe31065e170113cec09d18b5ab355ae93dd",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Choosing next year's venue",
     "version": "1.0.0",
-    "description": "One decision, 10 methods, and whether they agree.",
-    "authors": null,
+    "description": "A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:54Z"
@@ -59,7 +59,8 @@
       "options": {
         "cr_filter": false
       },
-      "decision_rule": "",
+      "objective": "O1",
+      "decision_rule": "Accept the pairwise judgements when the consistency ratio is below .10.",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -78,6 +79,7 @@
       "options": {
         "cr_filter": false
       },
+      "objective": "O1",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -94,6 +96,7 @@
       "roles": {
         "pairwise": "crit_influence"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -164,6 +167,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -233,6 +237,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -302,6 +307,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -371,6 +377,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -440,6 +447,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -509,6 +517,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -578,6 +587,7 @@
           "cost"
         ]
       },
+      "objective": "O2",
       "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
@@ -598,6 +608,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "The organising committee must choose a venue on several criteria at once, and needs a defensible ranking rather than a vote.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Weight the decision criteria."
+      },
+      {
+        "id": "O2",
+        "text": "Rank the venues, and check whether the methods agree."
+      }
+    ],
+    "sampling": {
+      "population": "Members of the organising committee",
+      "method": "purposive",
+      "planned_n": 10
     }
   }
 }

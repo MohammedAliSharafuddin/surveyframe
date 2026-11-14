@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "25ded3bee6442d61a99ffacd5cdd0197d2c8a79adf050982f68c64abb2e1169e",
+    "value": "8300c52d07c83bed271f7689c6861dc2a782290763fbd004b7c0606d703803e4",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
     "title": "Does content quality bring people back?",
     "version": "1.0.0",
-    "description": "Three constructs, a declared path model, and the syntax it generates.",
-    "authors": null,
+    "description": "A measurement and structural model study: whether the quality of a programme's content builds satisfaction, and satisfaction the intention to return.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-08-28T10:20:49Z"
@@ -141,8 +141,13 @@
       "roles": {
         "model": "m1"
       },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "The declared model reproduces the observed covariances.",
+        "alternative": "The declared model does not reproduce the observed covariances."
+      },
+      "decision_rule": "Judge the model's fit as acceptable when CFI is .95 or above and RMSEA is .06 or below.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -158,6 +163,7 @@
       "roles": {
         "model": "m2"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -177,8 +183,13 @@
         "mediator": "satisfaction",
         "outcome": "intention"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Satisfaction does not carry the effect of content quality to intention.",
+        "alternative": "Satisfaction carries part of the effect of content quality to intention."
+      },
+      "decision_rule": "Treat the indirect effect as present when its 95% bootstrap confidence interval excludes 0.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -194,6 +205,7 @@
       "roles": {
         "model": "m3"
       },
+      "objective": "O1",
       "options": [],
       "decision_rule": "",
       "reporting_references": [],
@@ -211,8 +223,9 @@
       "roles": {
         "model": "m2"
       },
+      "objective": "O2",
+      "decision_rule": "Report a path as supported when its bootstrap confidence interval excludes 0.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -230,8 +243,13 @@
         "moderator": "satisfaction",
         "outcome": "intention"
       },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "The effect of content quality on intention does not depend on the moderator.",
+        "alternative": "The effect of content quality on intention depends on the moderator."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
       "options": [],
-      "decision_rule": "",
       "reporting_references": [],
       "status": "draft",
       "requires_data": true,
@@ -402,6 +420,24 @@
     },
     "thankyou": {
       "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A provider believes content quality drives return intention through satisfaction, and needs the measurement and the structural paths tested together.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Specify the measurement model for the 3 constructs."
+      },
+      {
+        "id": "O2",
+        "text": "Estimate the paths from content quality through satisfaction to intention."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a professional programme",
+      "method": "convenience",
+      "planned_n": 150
     }
   }
 }
