@@ -700,6 +700,9 @@ write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE,
   json_out <- sframe_payload_json(payload, pretty = pretty)
   writeLines(json_out, con = path, useBytes = FALSE)
 
+  sframe_next_stage(
+    paste0("Saved ", sframe_stage_title(instrument), " to ", path, "."),
+    "collect responses with export_survey() or launch_studio().")
   invisible(path)
 }
 

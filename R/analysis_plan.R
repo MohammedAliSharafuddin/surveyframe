@@ -2203,6 +2203,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
                               plot_palette = c("web", "print"), seed = 20260828L,
                               strict = FALSE) {
+  stage_caller <- parent.frame()
   plot_palette <- match.arg(plot_palette)
   sframe_check_instrument(instrument)
   stopifnot(is.data.frame(data))
@@ -2222,6 +2223,10 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
     # Recorded so render_report() can print it next to the instrument hash: a
     # report should state what reproducing it would take.
     attr(out, "seed") <- seed
+    sframe_next_stage(
+      paste0("Ran ", length(out), " planned analyses."),
+      "write the report with render_report(instrument, responses).",
+      caller = stage_caller)
     return(out)
   }
   if (isTRUE(plots)) {
@@ -2300,6 +2305,10 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
       class = "sframe_error"
     )
   }
+  sframe_next_stage(
+    paste0("Ran ", length(results), " planned analyses."),
+    "write the report with render_report(instrument, responses).",
+    caller = stage_caller)
   structure(results, class = "sframe_analysis_results", status = status)
 }
 

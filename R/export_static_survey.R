@@ -253,6 +253,9 @@ export_survey <- function(
   if (isTRUE(open)) {
     utils::browseURL(paste0("file://", normalizePath(output_path)))
   }
+  sframe_next_stage(
+    "The survey is ready to share with respondents.",
+    "read their answers with read_responses().")
 
   invisible(output_path)
 }
