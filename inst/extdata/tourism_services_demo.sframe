@@ -2,15 +2,15 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "ba6ab6936979d339de200166b6f347205fa67c2f76c31f8b13e53658c2e8f78a",
+    "value": "36942fb1db8b378022819bb18a344893897bca0b814de2b648417a81fd8a40f8",
     "canonical": "rfc8785"
   },
   "version": "0.3.0",
   "meta": {
     "title": "Tourism Services Experience Demo",
     "version": "0.3.0",
-    "description": "Simulated demo questionnaire inspired by tourism-services research on digital marketing, service quality, sustainability, satisfaction, and behavioural intention.",
-    "authors": "Mohammed Ali Sharafuddin",
+    "description": "A tourism services study of how digital marketing, service quality and sustainability communication relate to visitor satisfaction and the intention to return or recommend.",
+    "authors": "Demo author",
     "languages": "en",
     "validated": true,
     "created_at": "2026-05-13T18:16:19Z"
@@ -236,7 +236,12 @@
       "decision_rule": "Use the direction and size of the correlation to describe the relationship.",
       "reporting_references": [],
       "status": "draft",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Perceived digital marketing and satisfaction are not associated.",
+        "alternative": "Perceived digital marketing and satisfaction are associated."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_predict_sat",
@@ -253,7 +258,12 @@
       "decision_rule": "Compare the regression coefficients to identify the strongest predictor.",
       "reporting_references": [],
       "status": "draft",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Digital marketing, service quality and sustainability perceptions do not predict satisfaction.",
+        "alternative": "Digital marketing, service quality and sustainability perceptions predict satisfaction."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_visit_bi",
@@ -270,7 +280,12 @@
       "decision_rule": "Report whether behavioural intention differs by visitor type.",
       "reporting_references": [],
       "status": "draft",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Behavioural intention does not differ between first-time and repeat visitors.",
+        "alternative": "Behavioural intention differs between first-time and repeat visitors."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_freq",
@@ -287,7 +302,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_desc",
@@ -304,7 +320,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_missing",
@@ -321,7 +338,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_quality",
@@ -337,7 +355,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_scale_desc",
@@ -353,7 +372,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_alpha",
@@ -369,7 +389,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_omega",
@@ -385,7 +406,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_item_diag",
@@ -401,7 +423,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_efa_ready",
@@ -418,7 +441,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_efa_sol",
@@ -437,7 +461,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_cfa_syntax",
@@ -457,7 +482,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": false
+      "requires_data": false,
+      "objective": "O1"
     },
     {
       "id": "rq_sem_syntax",
@@ -477,7 +503,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": false
+      "requires_data": false,
+      "hypotheses": {
+        "null": "The declared model reproduces the observed covariances.",
+        "alternative": "The declared model does not reproduce the observed covariances."
+      },
+      "objective": "O1"
     },
     {
       "id": "rq_pls_syntax",
@@ -497,7 +528,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": false
+      "requires_data": false,
+      "objective": "O1"
     },
     {
       "id": "rq_chisq",
@@ -514,7 +546,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Visitor type and the attention check response are not associated.",
+        "alternative": "Visitor type and the attention check response are associated."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_crosstab",
@@ -531,7 +568,8 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "objective": "O1"
     },
     {
       "id": "rq_fisher",
@@ -548,7 +586,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Visitor type and the behavioural intention rating are not associated.",
+        "alternative": "Visitor type and the behavioural intention rating are associated."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_ttest_ind",
@@ -565,7 +608,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Mean satisfaction does not differ between first-time and repeat visitors.",
+        "alternative": "Mean satisfaction differs between first-time and repeat visitors."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_ttest_pair",
@@ -582,7 +630,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Respondents rate the 2 satisfaction items the same.",
+        "alternative": "Respondents rate the 2 satisfaction items differently."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_wilcoxon",
@@ -599,7 +652,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Respondents rate the first 2 service quality items the same.",
+        "alternative": "Respondents rate the first 2 service quality items differently."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_kruskal",
@@ -616,7 +674,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Satisfaction is the same across the visitor types.",
+        "alternative": "Satisfaction differs for at least 1 of the visitor types."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_anova1",
@@ -633,7 +696,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Mean behavioural intention is the same across the visitor types.",
+        "alternative": "Mean behavioural intention differs for at least 1 of the visitor types."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_ancova",
@@ -659,7 +727,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Satisfaction, adjusted for service quality, is the same across the visitor types.",
+        "alternative": "Satisfaction, adjusted for service quality, differs for at least 1 of the visitor types."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_rep_anova",
@@ -676,7 +749,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Respondents rate the 3 digital marketing items the same.",
+        "alternative": "Respondents rate the 3 digital marketing items differently."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_friedman",
@@ -693,7 +771,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Respondents rate the 3 service quality items the same.",
+        "alternative": "Respondents rate the 3 service quality items differently."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_spearman",
@@ -710,7 +793,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Service quality and sustainability perceptions are not associated.",
+        "alternative": "Service quality and sustainability perceptions are associated."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_kendall",
@@ -727,7 +815,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Sustainability perception and behavioural intention are not associated.",
+        "alternative": "Sustainability perception and behavioural intention are associated."
+      },
+      "objective": "O3"
     },
     {
       "id": "rq_partial",
@@ -753,7 +846,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Digital marketing, with satisfaction held constant, and behavioural intention are not associated.",
+        "alternative": "Digital marketing, with satisfaction held constant, and behavioural intention are associated."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_logit_bin",
@@ -770,7 +868,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Digital marketing and service quality perceptions do not predict visitor type.",
+        "alternative": "Digital marketing and service quality perceptions predict visitor type."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_logit_ord",
@@ -795,7 +898,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Digital marketing and sustainability perceptions do not predict the ordered satisfaction rating.",
+        "alternative": "Digital marketing and sustainability perceptions predict the ordered satisfaction rating."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_moderation",
@@ -821,7 +929,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "The effect of digital marketing on satisfaction does not depend on service quality.",
+        "alternative": "The effect of digital marketing on satisfaction depends on service quality."
+      },
+      "objective": "O2"
     },
     {
       "id": "rq_mediation",
@@ -847,7 +960,12 @@
       "citations": [],
       "reporting_references": [],
       "status": "valid_plan",
-      "requires_data": true
+      "requires_data": true,
+      "hypotheses": {
+        "null": "Satisfaction does not carry the effect of digital marketing to behavioural intention.",
+        "alternative": "Satisfaction carries part of the effect of digital marketing to behavioural intention."
+      },
+      "objective": "O2"
     }
   ],
   "models": [
@@ -1029,6 +1147,28 @@
       "institution": "surveyframe demo",
       "logo_base64": "",
       "show_progress": true
+    }
+  },
+  "study": {
+    "problem": "Tourism providers invest in digital marketing and sustainability messages without knowing how far these, beside service quality, shape satisfaction and return intention.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Check that the 5 scales are reliable and hold their structure."
+      },
+      {
+        "id": "O2",
+        "text": "Relate digital marketing, service quality and sustainability to satisfaction."
+      },
+      {
+        "id": "O3",
+        "text": "Relate satisfaction to behavioural intention, and compare first-time and repeat visitors."
+      }
+    ],
+    "sampling": {
+      "population": "Visitors to tourism services at one destination",
+      "method": "convenience",
+      "planned_n": 120
     }
   }
 }

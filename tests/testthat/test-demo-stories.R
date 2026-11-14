@@ -46,3 +46,20 @@ test_that("the two_group plan shows the author, the purpose and the hypotheses",
   expect_match(md, "**Null hypothesis (H0):**", fixed = TRUE)
   expect_false(grepl("commonest comparison", md, fixed = TRUE))
 })
+
+test_that("the 2 reference datasets have the placeholder author, a study and hypotheses", {
+  for (name in c("tourism_services", "input_types")) {
+    ins <- sframe_demo(name, preview = FALSE)$instrument
+    expect_identical(ins$meta$authors, "Demo author", info = name)
+    s <- sframe_get_study(ins)
+    expect_true(nzchar(s$problem %||% ""), info = name)
+    ids <- vapply(s$objectives, function(o) o$id, character(1))
+    for (b in ins$analysis_plan) {
+      who <- paste(name, b$id)
+      expect_true(isTRUE(b$objective %in% ids), info = who)
+      if (!surveyframe:::sframe_method_uses_alpha(surveyframe:::sframe_analysis_method(b))) next
+      expect_true(nzchar(b$hypotheses$null %||% ""), info = who)
+      expect_true(nzchar(b$decision_rule %||% ""), info = who)
+    }
+  }
+})
