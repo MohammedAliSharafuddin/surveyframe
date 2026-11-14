@@ -32,6 +32,9 @@ test_that("input-types demo covers all declared item types", {
     "slider",
     "ranking",
     "rating",
+    # Session 10: both pairwise scales and criteria weights (owner 2026-11-05).
+    "pairwise_comparison",
+    "criteria_weight",
     "section_break",
     "text_block"
   ))
@@ -53,7 +56,11 @@ test_that("input-types demo has responses for response-producing items", {
     character(1)
   )
 
-  expect_true(all(response_item_ids %in% names(demo$responses)))
+  # A comparison item answers in 1 column per pair or criterion, id__...
+  answered <- vapply(response_item_ids, function(id) {
+    id %in% names(demo$responses) || any(startsWith(names(demo$responses), paste0(id, "__")))
+  }, logical(1))
+  expect_true(all(answered))
 })
 
 test_that("display-only items are not required response columns", {

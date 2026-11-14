@@ -60,3 +60,16 @@ test_that("the old loaders forward to sframe_demo()", {
   expect_warning(sframe_demo_data(), "sframe_demo\\(\"tourism_services\"\\)",
                  class = "sframe_superseded_warning")
 })
+
+test_that("the all-types demo holds every answerable type, with both pairwise scales", {
+  d <- sframe_demo("input_types", preview = FALSE)
+  types <- vapply(d$instrument$items, function(it) it$type, character(1))
+  answerable <- setdiff(surveyframe:::sframe_item_types, c("section_break", "text_block"))
+  expect_setequal(intersect(types, answerable), answerable)
+  scales <- vapply(Filter(function(it) identical(it$type, "pairwise_comparison"), d$instrument$items),
+                   function(it) it$comparison_scale, character(1))
+  expect_setequal(scales, c("saaty", "influence"))
+  pts <- d$responses[, paste0("feature_points__", c("price", "location", "service"))]
+  expect_true(all(rowSums(pts) == 100))
+  expect_true(all(unlist(d$responses[, grep("^feature_influence__", names(d$responses))]) %in% 0:4))
+})

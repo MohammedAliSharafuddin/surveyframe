@@ -2004,6 +2004,11 @@ arithmetic.
 
 ## Demos
 
+* **The all-types demo holds all 13 answerable types.** `input_types`
+  gains a pairwise comparison on the Saaty scale, 1 on the influence scale
+  and a criteria weight, over price, location and service, with seeded
+  answers in 12 columns appended to its responses file. Its other columns
+  are unchanged. Added by `data-raw/input_types_comparison_items.R`.
 * **Each teaching demo tells a study.** The 22 teaching demos declare a
   research-style purpose, a study (problem, objectives and a sampling plan
   with population, method and planned n), "Demo author" as a placeholder
@@ -2034,7 +2039,7 @@ arithmetic.
   | File | Old hash | New hash |
   |---|---|---|
   | `tourism_services_demo` | `ba6ab6936979` | `36942fb1db8b` |
-  | `surveyframe_input_types_demo` | `b1fe65aa8754` | `3d0080bf9457` |
+  | `surveyframe_input_types_demo` | `b1fe65aa8754` | `e2130477ce1f` |
   | `branching` | `7b2575c5a289` | `242e5f4f304b` |
   | `branded_survey` | `9a5eac4fe2df` | `92d5a5a19692` |
   | `categorical` | `94458440eef2` | `ce13e678eee5` |
