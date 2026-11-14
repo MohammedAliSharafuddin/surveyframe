@@ -71,3 +71,12 @@ a.anchor:focus-visible {
   --bs-dropdown-link-color: #dee2e6;
   --bs-dropdown-header-color: #dee2e6;
 }
+
+// The "Source:" line under a page title is a developer cue (Codex WR241 to
+// WR244, WR257): hidden on the code of conduct, contributing, licence,
+// security and authors pages too. The package vignettes keep theirs (owner
+// UI check 2026-11-14), so only a link into /vignettes/ outside
+// vignettes/articles/ stays.
+small.dont-index:not(:has(a[href*="/vignettes/"])) {
+  display: none;
+}
