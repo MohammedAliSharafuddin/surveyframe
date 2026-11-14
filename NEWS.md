@@ -2030,6 +2030,16 @@ arithmetic.
   with both engines and in every format, also after the data is copied
   into another project. The 25 stored results files carry the stamp.
   `?sframe_demo` says how the demos may be used.
+* **3 regression charts** (first contact section 4a). A linear regression
+  with 2 predictors or more draws, beside its observed-against-fitted
+  chart, the standardised coefficients with their 95% confidence
+  intervals. A multinomial logistic regression draws 1 panel per outcome
+  category with each predictor's odds ratio against the reference, where
+  it drew nothing. A mediation draws its path diagram, with a, b, the
+  direct effect and the total effect, beside its effects chart. Both report
+  engines show the second chart after the first, titled with the result,
+  and `sframe_save_figures()` writes it as `<id>_2`. Variables are named by
+  their questions' labels.
 * **3 new teaching demos**, 25 in all. `weighted_survey`: a resident
   satisfaction survey whose sample over-represents 1 region, with frequency,
   descriptives and a chi-square test weighted by a design weight carried in

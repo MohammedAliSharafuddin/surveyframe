@@ -28,7 +28,9 @@ sframe_save_figures(
 }
 \value{
 The paths written, named by block id, invisibly. Only blocks
-that drew a chart write a file.
+that drew a chart write a file. A block with a second chart, a linear
+regression's standardised coefficients or a mediation's path diagram,
+writes it as \verb{<id>_2}.
 }
 \description{
 Writes each chart \code{\link[=run_analysis_plan]{run_analysis_plan()}} drew with \code{plots = TRUE} to its own
