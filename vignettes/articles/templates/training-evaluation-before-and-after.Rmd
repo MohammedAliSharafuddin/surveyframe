@@ -33,7 +33,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ![Analyse screen with the declared plan.](../../templates/paired/analyse.png){width=100%}
 ![Report screen.](../../templates/paired/report.png){width=100%}
 
-## Start in 2 steps (no coding)
+## Start in 2 steps in SurveyStudio
 
 1. Install surveyframe in R: `install.packages("surveyframe")`
 2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `paired`. The study opens in SurveyStudio.
@@ -48,7 +48,7 @@ The same people answer before and after, so their answers are compared with them
 
 Yes. With 3 or more measurements the plan uses a repeated measures ANOVA or the Friedman test.
 
-### Does it work without coding?
+### Can I run the whole study in SurveyStudio?
 
 Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.
 

@@ -5,7 +5,7 @@
 <h3 align="center">Plan, run and report survey research in R.</h3>
 
 <p align="center">
-Design, collect and analyse in the no-code SurveyStudio, or script every step in R.<br/>
+Design, collect and analyse in SurveyStudio, where you point and click through every step, or script every step in R.<br/>
 Same study, same verifiable file.
 </p>
 
@@ -33,7 +33,7 @@ Same study, same verifiable file.
 
 You write your analysis plan with your questions. When the answers arrive, surveyframe runs that plan and writes the report.
 
-- **A no-code studio.** Build, preview and run a whole study in SurveyStudio, from 1 line of R or the RStudio Addins menu.
+- **A point-and-click studio.** Build, preview and run a whole study in SurveyStudio, from 1 line of R or the RStudio Addins menu.
 - **The plan before the data.** Each research question is tied to its test and its variables at design time, ready to preregister.
 - **APA 7 reports.** Tables, figures, effect sizes and references, in HTML, Word, PDF or Quarto.
 - **Psychometrics and models.** Reliability, item analysis, and EFA, CFA, SEM and PLS-SEM syntax from 1 model.

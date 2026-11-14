@@ -159,7 +159,7 @@ articles:
       - starts_with("articles/docs/")
   - title: "Get started and learn"
     desc: >
-      Install and open a study with no code, the frequently asked questions,
+      Install and open a study in SurveyStudio, the frequently asked questions,
       and how to cite surveyframe. Web only.
     navbar: ~
     contents:
@@ -208,7 +208,7 @@ reference:
   - title: "Start here"
     desc: >
       SurveyStudio opens an instrument and takes it through every stage
-      below, with no code. ?surveyframe is the map of the package, and
+      below, by point and click. ?surveyframe is the map of the package, and
       sframe_demo("first_survey") is a whole survey to start from.
     contents:
       - surveyframe-package

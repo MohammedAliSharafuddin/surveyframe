@@ -15,7 +15,7 @@ in a journal's style. These are the questions worth asking of any tool.
 | Is a change after collection recorded? | Yes, as an amendment with its reason, printed in the report. |
 | Does it write the report? | Yes, in APA 7, as HTML, Word, PDF or OpenDocument. |
 | Who holds the data? | You. Answers go to a Google Sheet you own, or stay on your computer. |
-| Can I run it without code? | Yes, in SurveyStudio. Everything is also open to R code. |
+| Can I run it by point and click? | Yes, in SurveyStudio. Everything is also open to R code. |
 | What does it cost? | Nothing. It is free and open source (MIT), on CRAN. |
 
 surveyframe does not host surveys for you. It writes 1 HTML file that you put

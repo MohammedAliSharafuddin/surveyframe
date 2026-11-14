@@ -33,7 +33,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ![Analyse screen with the declared plan.](../../templates/likert_scale/analyse.png){width=100%}
 ![Report screen.](../../templates/likert_scale/report.png){width=100%}
 
-## Start in 2 steps (no coding)
+## Start in 2 steps in SurveyStudio
 
 1. Install surveyframe in R: `install.packages("surveyframe")`
 2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `likert_scale`. The study opens in SurveyStudio.
@@ -48,7 +48,7 @@ Yes. Replace the items with your own, keep the plan, and submit the pre-analysis
 
 The plan declares Cronbach's alpha and McDonald's omega with a decision rule, .70 or above, and item diagnostics that flag an item that sits poorly with the rest.
 
-### Does it work without coding?
+### Can I run the whole study in SurveyStudio?
 
 Yes. Install surveyframe, then choose Try a demo from RStudio's Addins menu, and the whole study opens in SurveyStudio.
 

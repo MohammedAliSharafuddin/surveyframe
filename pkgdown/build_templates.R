@@ -23,13 +23,13 @@ studies <- list(
        lead = "A short questionnaire that measures 1 idea with a 4-item Likert scale, including a reverse-worded item, and checks that the scale holds together before its score is used. surveyframe gives you the questionnaire, a pre-analysis plan to submit with your proposal, and an APA 7 report.",
        faq = c("Can I use this for my thesis?" = "Yes. Replace the items with your own, keep the plan, and submit the pre-analysis plan to your supervisor or ethics committee before you collect data.",
                "How do I check that my scale is reliable?" = "The plan declares Cronbach's alpha and McDonald's omega with a decision rule, .70 or above, and item diagnostics that flag an item that sits poorly with the rest.",
-               "Does it work without coding?" = "Yes. Install surveyframe, then choose Try a demo from RStudio's Addins menu, and the whole study opens in SurveyStudio.")),
+               "Can I run the whole study in SurveyStudio?" = "Yes. Install surveyframe, then choose Try a demo from RStudio's Addins menu, and the whole study opens in SurveyStudio.")),
   list(slug = "pilot-survey-small-sample", demo = "small_sample", audience = "research-methods",
        title = "Pilot survey with a small sample",
        lead = "A pilot with 18 participants that answers the main study's questions with methods suited to a small sample: a rank-based comparison, an exact test and a penalised logistic regression. surveyframe gives you the questionnaire, the pre-analysis plan and the report.",
        faq = c("Which tests work with fewer than 30 participants?" = "The plan uses the Mann-Whitney U test, Fisher's exact test and Firth logistic regression, which stay valid where large-sample tests do not.",
                "Should a pilot test hypotheses?" = "A pilot mainly checks the questionnaire and the procedure. Declaring the tests in advance still shows which comparisons the main study should power.",
-               "Can I run the pilot without coding?" = "Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.")),
+               "Can I run the whole study in SurveyStudio?" = "Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.")),
   list(slug = "course-evaluation-survey", demo = "matrix_likert", audience = "education",
        title = "Course evaluation survey",
        lead = "A course evaluation in which students rate each part of a course on 1 grid, compared between students who took it in person and online. surveyframe gives you the questionnaire, the analysis plan and a report for the teaching team.",
@@ -41,7 +41,7 @@ studies <- list(
        lead = "A training evaluation that measures confidence, and willingness to recommend, before and after a workshop in the same participants. surveyframe gives you the questionnaire, a plan with paired tests declared in advance, and the report.",
        faq = c("Why paired tests?" = "The same people answer before and after, so their answers are compared with themselves: the paired t-test, the Wilcoxon signed-rank test and McNemar's test.",
                "Can I add a third time point?" = "Yes. With 3 or more measurements the plan uses a repeated measures ANOVA or the Friedman test.",
-               "Does it work without coding?" = "Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.")),
+               "Can I run the whole study in SurveyStudio?" = "Yes. The whole study opens in SurveyStudio from RStudio's Addins menu.")),
   list(slug = "customer-satisfaction-survey", demo = "logistic", audience = "business",
        title = "Customer satisfaction survey",
        lead = "A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.",
@@ -77,7 +77,7 @@ studies <- list(
        lead = "A study of whether content quality builds satisfaction, and satisfaction the intention to return, with the measurement model and the structural paths declared in advance. surveyframe gives you the questionnaire, the model syntax for lavaan and seminr, and the report.",
        faq = c("Which software estimates the model?" = "surveyframe writes the syntax for lavaan (covariance-based SEM and CFA) and seminr (PLS-SEM), and runs the mediation and moderation.",
                "Can I declare the model before collecting data?" = "Yes. Constructs, paths and the indirect effect are declared in the instrument and sealed with it.",
-               "Does it work without coding?" = "Yes. The model layer opens in SurveyStudio from RStudio's Addins menu."))
+               "Can I run the whole study in SurveyStudio?" = "Yes. The model layer opens in SurveyStudio from RStudio's Addins menu."))
 )
 
 # The fields the templates are grouped by (owner 2026-11-14).
@@ -150,7 +150,7 @@ for (st in studies) {
     "",
     shots,
     "",
-    "## Start in 2 steps (no coding)",
+    "## Start in 2 steps in SurveyStudio",
     "",
     "1. Install surveyframe in R: `install.packages(\"surveyframe\")`",
     sprintf("2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `%s`. The study opens in SurveyStudio.", st$demo),
@@ -184,7 +184,7 @@ for (st in studies) {
 idx <- c("---", "title: \"Questionnaire templates\"",
          "description: \"10 questionnaire templates, each with its analysis plan ready to preregister and the report, in psychology, education, business, events and tourism, and research methods.\"",
          "---", "",
-         "Each template is a complete survey project you can open in SurveyStudio with no code: the questionnaire, a pre-analysis plan ready to preregister, and the report.", "")
+         "Each template is a complete survey project you can open and run in SurveyStudio: the questionnaire, a pre-analysis plan ready to preregister, and the report.", "")
 for (h in names(hubs)) {
   idx <- c(idx, sprintf("## %s {#%s}", hubs[[h]], h), "")
   for (st in Filter(function(o) identical(o$audience, h), studies)) {

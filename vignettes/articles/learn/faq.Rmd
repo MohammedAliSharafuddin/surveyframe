@@ -1,6 +1,6 @@
 ---
 title: "Frequently asked questions"
-description: "Answers about surveyframe: using it for a thesis, preregistering on OSF, working without code, collecting answers, and checking a questionnaire file."
+description: "Answers about surveyframe: using it for a thesis, preregistering on OSF, working by point and click in SurveyStudio, collecting answers, and checking a questionnaire file."
 ---
 
 ## Can I use surveyframe for my thesis?
@@ -9,7 +9,7 @@ Yes. Start from one of the [questionnaire templates](../templates.html), replace
 with yours, and submit the pre-analysis plan to your supervisor or ethics
 committee before you collect data. The report follows APA 7.
 
-## Does it work without coding?
+## Can I run the whole study in SurveyStudio?
 
 Yes. After `install.packages("surveyframe")`, everything runs in SurveyStudio,
 opened from RStudio's Addins menu. See [Get started](../start.html).

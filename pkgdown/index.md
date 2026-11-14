@@ -111,7 +111,7 @@ your own study.
 5. **Report** in APA 7, as HTML, Word, PDF or OpenDocument.
 
 [Run a study in SurveyStudio](articles/run-a-study-in-surveystudio.html) shows
-each stage with no code, and [Run a study in R](articles/run-a-study-in-r.html)
+each stage by point and click, and [Run a study in R](articles/run-a-study-in-r.html)
 shows the same stages in R.
 
 <details>

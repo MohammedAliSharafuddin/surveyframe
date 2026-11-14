@@ -1,6 +1,6 @@
 ---
 title: "Get started with surveyframe"
-description: "Install R, RStudio and surveyframe, open an example study in SurveyStudio, then turn a downloaded template into your own study. No coding needed."
+description: "Install R, RStudio and surveyframe, open an example study in SurveyStudio, then turn a downloaded template into your own study, by point and click in SurveyStudio."
 ---
 
 SurveyStudio is surveyframe's visual workspace. It opens from RStudio, so the
@@ -73,6 +73,6 @@ collect them, as
 
 - [Questionnaire templates](templates.html), grouped by field.
 - [Run a study in SurveyStudio](run-a-study-in-surveystudio.html): the 5
-  stages with screenshots and no code.
+  stages with screenshots, by point and click.
 - [Run a study in R](run-a-study-in-r.html): the same stages in R code.
 - [Frequently asked questions](learn/faq.html).

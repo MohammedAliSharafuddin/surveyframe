@@ -92,7 +92,7 @@ render_report(d$instrument, d$responses, output_file = "paired-report.docx",
 The report names the instrument's hash, so a reader can check that the
 questionnaire analysed is the one planned.
 
-## Prefer no code?
+## Prefer to point and click?
 
-The same 5 stages run in SurveyStudio, with no code. See
+The same 5 stages run in SurveyStudio. See
 [Run a study in SurveyStudio](run-a-study-in-surveystudio.html).

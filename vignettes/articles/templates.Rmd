@@ -3,7 +3,7 @@ title: "Questionnaire templates"
 description: "10 questionnaire templates, each with its analysis plan ready to preregister and the report, in psychology, education, business, events and tourism, and research methods."
 ---
 
-Each template is a complete survey project you can open in SurveyStudio with no code: the questionnaire, a pre-analysis plan ready to preregister, and the report.
+Each template is a complete survey project you can open and run in SurveyStudio: the questionnaire, a pre-analysis plan ready to preregister, and the report.
 
 ## Psychology and measurement {#psychology}
 
