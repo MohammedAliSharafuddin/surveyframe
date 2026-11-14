@@ -1537,6 +1537,18 @@ arithmetic.
 
 ## SurveyBuilder
 
+* **The question list and its panel read in full** (owner check of the Docs
+  screenshots, 2026-11-15). The selected question stands out by a stronger
+  ground, an accent bar and a bold label, beside its `aria-current`. A
+  question's text wraps to 2 lines before it is cut, and hovering shows it
+  all. Its tags are words: Required, Reverse-scored, Attention check, Single
+  choice, Multiple choice, Short text, Section break, Text block, Pairwise
+  comparison, Criteria weights. The welcome and thank-you panels have the
+  question panels' padding, name the page in full in their header, and
+  offer Duplicate and Delete to questions alone.
+  SurveyStudio's logo reads "SurveyStudio", as its name is written
+  everywhere else.
+
 * **One preview.** The builder's Preview shows the deployable survey,
   the page `export_survey(preview = TRUE)` writes and SurveyStudio's
   Preview Survey screen shows. Answering, required checks and branching
