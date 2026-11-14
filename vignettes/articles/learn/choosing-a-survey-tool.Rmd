@@ -3,9 +3,10 @@ title: "Choosing a survey tool for research"
 description: "What to look for in a survey tool for research: the analysis plan, preregistration, reporting, data ownership and reproducibility, and where surveyframe fits."
 ---
 
-Most survey tools are built to collect answers. Research asks for more: a
-plan written before the data, analyses that can be reproduced, and a report
-in a journal's style. These are the questions worth asking of any tool.
+When you choose a tool for survey research, consider questionnaire design,
+analysis planning, collection, reporting and how you will preserve the study
+record. These are the questions worth asking of any tool, with what
+surveyframe does for each.
 
 | Question | What surveyframe does |
 |---|---|

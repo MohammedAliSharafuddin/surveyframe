@@ -22,15 +22,18 @@ names the file's hash, so the registration identifies the exact instrument.
 
 ## How are answers collected?
 
-SurveyStudio's Collect screen downloads the survey as 1 HTML file, which you
-can put on any web host or send. With a Google Sheet and its Apps Script
-collector, each answer is stored in a sheet you own. No server is needed.
+Export the questionnaire from SurveyStudio's Collect screen as 1 HTML file,
+and choose how to host it, such as on your institution's web space. To collect
+responses in a Google Sheet you own, configure the Apps Script collector, as
+the Collect screen's steps show.
 
-## How does a reader check that a questionnaire was not changed?
+## How does a reader check which questionnaire was used?
 
 Open the `.sframe` file at [surveyframe.org/verify](https://surveyframe.org/verify/).
-A file changed after it was sealed fails the check, and a change made on the
-record shows in its amendment log.
+The page checks whether the file matches the hash recorded when it was saved,
+and shows its recorded amendments. To identify a registered version, compare
+the hash with the one in the independently preserved registration, such as on
+OSF.
 
 ## Are the demo data real?
 

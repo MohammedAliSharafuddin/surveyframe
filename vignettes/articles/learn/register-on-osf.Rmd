@@ -4,7 +4,9 @@ description: "How to preregister a surveyframe study on the Open Science Framewo
 ---
 
 A preregistration fixes your plan before you see the data. surveyframe
-writes most of it for you.
+prepares a readable draft from the study information and analysis plan you
+have entered. Review the draft and complete the remaining registration fields
+before you submit it.
 
 ## 1. Write the plan
 
@@ -25,13 +27,16 @@ rule.
 The plan ends with **To complete before submission**: exclusion rules, the
 stopping rule, primary and secondary outcomes, multiplicity and contingency
 decisions. Write them into the study's Preregistration fields in SurveyStudio
-(Survey settings, Study), so they are sealed in the file, or answer them in
+(Survey settings, Study), so they are saved in the file, or answer them in
 the registration form.
 
 ## 3. Register
 
-On [osf.io](https://osf.io), create a project, choose a registration
-template, and upload the plan and the `.sframe` file. The file's hash in the
+On [osf.io](https://osf.io), create a project and add the plan and the
+`.sframe` file to it. Then start a registration from the project, choose a
+registration template and complete its fields, using the plan's answers.
+OSF's own [registration guide](https://help.osf.io/article/330-welcome-to-registrations)
+explains each step. The file's hash in the
 plan lets a reader check, at [surveyframe.org/verify](https://surveyframe.org/verify/),
 that the questionnaire you analysed is the one you registered.
 
