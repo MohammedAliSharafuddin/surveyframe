@@ -481,6 +481,13 @@ render_report <- function(
   # Research Report" whatever the study (Ethos request 23).
   report_title <- as.character(title %||% (if (is.null(data)) sframe_plan_title(instrument)) %||%
                                  instrument$meta$title %||% "Survey report")[1]
+  # Demonstration data stamps the title, and every table and figure title
+  # through the captions both engines build (owner 2026-11-05).
+  demo_data <- sframe_is_demo_data(data)
+  old_demo <- .sframe_demo_env$on
+  .sframe_demo_env$on <- demo_data
+  on.exit(.sframe_demo_env$on <- old_demo, add = TRUE)
+  report_title <- sframe_demo_stamp(report_title, on = demo_data)
   report_authors <- as.character(authors %||% instrument$meta$authors %||% character(0))
   report_authors <- report_authors[!is.na(report_authors) & nzchar(trimws(report_authors))]
   plot_palette <- rlang::arg_match(plot_palette)
@@ -1053,6 +1060,11 @@ sframe_clean_interpretations <- function(interpretations) {
   # What the report was built from, first (NAMING decision 6).
   # With no data the report is the pre-analysis plan (Session 10), built by
   # sframe_plan_blocks() as the Quarto template builds it, with no results rows.
+  # Demonstration data says so first (owner 2026-11-05).
+  demo_lead <- if (sframe_is_demo_data(data)) {
+    sprintf("<p class=\"sf-banner\" role=\"note\"><strong>%s.</strong> Every number, table and figure here was computed from it.</p>",
+            sframe_demo_data_status)
+  }
   if (is.null(data)) {
     ref_index <- sframe_reference_index(instrument, references)
     sections <- sframe_plan_html(sframe_plan_blocks(instrument, title = title, authors = authors,
@@ -1355,7 +1367,7 @@ sframe_clean_interpretations <- function(interpretations) {
       sframe_sources_html(instrument, "instrument", "Draws on") |>
         sub(pattern = "^<p>", replacement = "<p class=\"meta\">"), ref_index),
       sframe_builtin_banner(plan = is.null(data))),
-    paste(sections, collapse = "\n")
+    paste(c(demo_lead, sections), collapse = "\n")
   )
 
   # Every table and figure numbered in reading order (CX-22).
@@ -1725,6 +1737,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
        amendments = sframe_report_amendments(instrument),
        quality_note = quality_note,
        plan_md = if (is.null(data)) sframe_plan_md(sframe_plan_blocks(instrument, references = references)),
+       demo_data = sframe_is_demo_data(data),
        descriptives = if (!is.null(data)) tryCatch(
          sframe_report_descriptives(instrument, data),
          error = function(e) conditionMessage(e)))

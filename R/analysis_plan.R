@@ -2321,6 +2321,15 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
       class = "sframe_error"
     )
   }
+  # Every APA sentence from demonstration data says so (owner 2026-11-14).
+  if (sframe_is_demo_data(data)) {
+    for (k in seq_along(results)) {
+      a <- if (is.list(results[[k]])) results[[k]]$apa else NULL
+      if (length(a) == 1 && !is.na(a) && nzchar(a)) {
+        results[[k]]$apa <- sframe_demo_stamp(a, on = TRUE)
+      }
+    }
+  }
   sframe_next_stage(
     paste0("Ran ", length(results), " planned analyses."),
     "write the report with render_report(instrument, responses).",
