@@ -1,0 +1,32 @@
+---
+title: "Cite surveyframe"
+description: "How to cite surveyframe in a thesis or paper: the APA 7 reference, the BibTeX entry and the DOI."
+---
+
+If surveyframe helped your research, please cite it. In R,
+`citation("surveyframe")` prints the reference for the version you have.
+
+## APA 7
+
+Sharafuddin, M. A. (2026). *surveyframe: Survey instrument workflows* (R
+package version 0.4.3) [Computer software].
+https://doi.org/10.32614/CRAN.package.surveyframe
+
+## BibTeX
+
+```
+@Manual{surveyframe,
+  title  = {surveyframe: Survey Instrument Workflows},
+  author = {Mohammed Ali Sharafuddin},
+  year   = {2026},
+  note   = {R package version 0.4.3},
+  url    = {https://CRAN.R-project.org/package=surveyframe},
+  doi    = {10.32614/CRAN.package.surveyframe},
+}
+```
+
+## Cite the instrument too
+
+A study's `.sframe` file carries a SHA-256 hash. Name it beside the citation,
+so a reader can check at [surveyframe.org/verify](https://surveyframe.org/verify/)
+that the questionnaire analysed is the one planned.

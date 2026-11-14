@@ -1,0 +1,35 @@
+---
+title: "Get started with surveyframe, no coding needed"
+description: "Install surveyframe in R, then open a complete survey study in SurveyStudio from RStudio's Addins menu, in about 5 minutes."
+---
+
+surveyframe runs a survey study from the questionnaire to the APA 7 report in
+SurveyStudio, a window that opens from R. You need R and RStudio, both free,
+and 2 steps.
+
+## 1. Install surveyframe
+
+Open RStudio and run this line in the Console:
+
+```r
+install.packages("surveyframe")
+```
+
+## 2. Open a study
+
+In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo**, and
+pick a study. It opens in SurveyStudio on the Design screen, with its
+questionnaire, analysis plan and demonstration responses loaded, so every
+stage has something to show.
+
+![SurveyStudio's Design screen.](../studies/paired/design.png){width=100%}
+
+To start your own study, choose **surveyframe: Open analysis workspace** from
+the same menu and go to Design.
+
+## What next
+
+- [Survey studies to start from](studies.html), by audience.
+- [Two ways to run a study](two-ways-to-run-a-study.html): the 5 stages in
+  SurveyStudio and in R.
+- [Frequently asked questions](learn/faq.html).

@@ -1,0 +1,42 @@
+---
+title: "Frequently asked questions"
+description: "Answers about surveyframe: using it for a thesis, preregistering on OSF, working without code, collecting answers, and checking a questionnaire file."
+---
+
+## Can I use surveyframe for my thesis?
+
+Yes. Start from one of the [studies](../studies.html), replace its questions
+with yours, and submit the pre-analysis plan to your supervisor or ethics
+committee before you collect data. The report follows APA 7.
+
+## Does it work without coding?
+
+Yes. After `install.packages("surveyframe")`, everything runs in SurveyStudio,
+opened from RStudio's Addins menu. See [Get started](../start.html).
+
+## How do I preregister my analysis plan on OSF?
+
+Write the pre-analysis plan from SurveyStudio, or with `render_report()` and
+no data, and upload it to OSF or Zenodo with the `.sframe` file. The plan
+names the file's hash, so the registration identifies the exact instrument.
+
+## How are answers collected?
+
+SurveyStudio's Collect screen downloads the survey as 1 HTML file, which you
+can put on any web host or send. With a Google Sheet and its Apps Script
+collector, each answer is stored in a sheet you own. No server is needed.
+
+## How does a reader check that a questionnaire was not changed?
+
+Open the `.sframe` file at [surveyframe.org/verify](https://surveyframe.org/verify/).
+A file changed after it was sealed fails the check, and a change made on the
+record shows in its amendment log.
+
+## Are the demo data real?
+
+No. The demos' responses are simulated. Each respondent id starts with
+`DEMO-`, and every result and report made from them says "demonstration data".
+
+## How do I cite surveyframe?
+
+See [Cite surveyframe](../cite.html).

@@ -40,19 +40,19 @@ template:
 # Favicons are in pkgdown/favicon/ and picked up by pkgdown >= 2.0.
 
 home:
-  title: "Proactive Survey Research Workflows for R"
+  title: "surveyframe: plan, run and report survey research, with or without code"
   description: >
-    Survey instrument workflows for R.
-    Define instruments, design them visually, deploy surveys,
-    check data quality, score scales, run psychometric diagnostics,
-    and generate reproducible reports from one source object.
+    surveyframe takes a survey study from the questionnaire to the APA 7
+    report: design the instrument and its analysis plan, collect the answers,
+    check them, run the planned analyses and write the report, in
+    SurveyStudio or in R.
   links:
     - text: Verify a .sframe file
       href: verify/
-    - text: SurveyBuilder
-      href: reference/launch_builder.html
-    - text: SurveyStudio interface
-      href: articles/surveyframe.html
+    - text: Get started, no code
+      href: articles/start.html
+    - text: Cite surveyframe
+      href: articles/cite.html
     - text: GitHub repository
       href: https://github.com/MohammedAliSharafuddin/surveyframe
     - text: Report a bug
@@ -60,18 +60,53 @@ home:
 
 navbar:
   title: "surveyframe"
-  left:
-    - text: "Get started"
-      href: articles/surveyframe.html
-    - text: "Reference"
-      href: reference/index.html
-    - text: "Changelog"
-      href: news/index.html
-  right:
-    - text: "Verify a file"
+  structure:
+    left: [studies, start, learn, rusers]
+    right: [verify, cite, github]
+  components:
+    studies:
+      text: "Studies"
+      menu:
+        - text: "Students and thesis supervisors"
+          href: articles/studies.html#students
+        - text: "University and teaching evaluation"
+          href: articles/studies.html#teaching
+        - text: "Organisations"
+          href: articles/studies.html#organisations
+        - text: "Research labs"
+          href: articles/studies.html#research-labs
+        - text: "All studies"
+          href: articles/studies.html
+    start:
+      text: "Get started"
+      href: articles/start.html
+    learn:
+      text: "Learn"
+      menu:
+        - text: "Two ways to run a study"
+          href: articles/two-ways-to-run-a-study.html
+        - text: "Method guides"
+          href: articles/learn-by-example.html
+        - text: "Frequently asked questions"
+          href: articles/learn/faq.html
+    rusers:
+      text: "For R users"
+      menu:
+        - text: "Reference"
+          href: reference/index.html
+        - text: "Articles"
+          href: articles/index.html
+        - text: "Changelog"
+          href: news/index.html
+    verify:
+      text: "Verify a file"
       href: verify/
       aria-label: "Verify a .sframe file's integrity hash"
-    - icon: fa-github
+    cite:
+      text: "Cite"
+      href: articles/cite.html
+    github:
+      icon: fa-github
       href: https://github.com/MohammedAliSharafuddin/surveyframe
       aria-label: GitHub
 
@@ -85,6 +120,15 @@ articles:
     contents:
       - articles/studies
       - starts_with("articles/studies/")
+  - title: "Get started and learn"
+    desc: >
+      Install and open a study with no code, the frequently asked questions,
+      and how to cite surveyframe. Web only.
+    navbar: ~
+    contents:
+      - articles/start
+      - articles/cite
+      - starts_with("articles/learn/")
   - title: "Start here"
     desc: >
       The 5 stages of a study, in SurveyStudio or in R, then 25 small surveys,
