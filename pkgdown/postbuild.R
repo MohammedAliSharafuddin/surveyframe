@@ -71,6 +71,10 @@ for (p in pages) {
   if (any(grepl("rel=\"canonical\"", h, fixed = TRUE)) || any(grepl("http-equiv=\"refresh\"", h, fixed = TRUE))) next
   head_end <- grep("</head>", h, fixed = TRUE)[1]
   if (is.na(head_end)) next
+  # A reference page's title, "Title \u2014 name" from pkgdown, reads
+  # "Title (name)" in <title> and og:title (Codex WR561): no dash on the site.
+  h <- gsub("(<title>|og:title\" content=\")([^<\"]*?) \u2014 ([A-Za-z0-9._]+)", "\\1\\2 (\\3)", h, perl = TRUE)
+  writeLines(h, f, useBytes = TRUE)
   url <- paste0(site, sub("(^|/)index\\.html$", "\\1", p))
   h <- append(h, sprintf("<link rel=\"canonical\" href=\"%s\" />", url), after = head_end - 1)
   writeLines(h, f, useBytes = TRUE)
