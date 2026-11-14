@@ -4,6 +4,9 @@ date: "`r format(Sys.Date(), '%B %d, %Y')`"
 format:
   html:
     toc: true
+    # Only the HTML file is published or written, so no links to the other
+    # formats, which pointed to files that did not exist (Codex WR95).
+    format-links: false
     toc-depth: 3
     toc-location: left
     embed-resources: true

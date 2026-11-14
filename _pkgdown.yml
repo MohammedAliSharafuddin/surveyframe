@@ -6,6 +6,10 @@ template:
   bslib:
     primary: "#0B3A78"
     secondary: "#16B3B1"
+    # Link text #0a6f6d is 6.0:1 on white (WCAG AA). Flatly's default
+    # #18bc9c was 2.4:1 (Codex WR01, owner UI check).
+    link-color: "#0a6f6d"
+    link-hover-color: "#064c4b"
     base_font: {google: "Inter"}
     heading_font: {google: "Inter"}
     code_font: {google: "JetBrains Mono"}

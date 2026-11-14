@@ -30,6 +30,10 @@ pre.sourceCode a:empty { display: none; }
 ```
 
 ```{r setup, include = FALSE}
+# On surveyframe.org (pkgdown sets IN_PKGDOWN) the code shows but its printed
+# results and plots do not: the site shows no numbers from demonstration data
+# (owner rule, Codex WR02 to WR80). Installed copies show everything.
+if (identical(Sys.getenv("IN_PKGDOWN"), "true")) knitr::opts_chunk$set(results = "hide", fig.show = "hide")
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)
 ```
@@ -78,7 +82,7 @@ significance level, the variables that fill each role, and the decision rule.
 The form offers only the role set a method needs and reads the measurement
 level of each variable, so a saved plan is coherent.
 
-```{r fig-builder-analyse, echo = FALSE, out.width = "100%", fig.alt = "SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the null and alternative hypotheses, the reporting references, the planned output and assumptions, and the decision rule."}
+```{r fig-builder-analyse, echo = FALSE, fig.show = "asis", out.width = "100%", fig.alt = "SurveyBuilder in Plan mode with the Edit Analysis Plan dialog open. The dialog shows the research question, Variable X and Variable Y role dropdowns, Pearson correlation as the method, a significance level of 0.05, the null and alternative hypotheses, the reporting references, the planned output and assumptions, and the decision rule."}
 knitr::include_graphics("figures/gui-builder-analyse-plan.png")
 ```
 
@@ -105,7 +109,7 @@ Plan and Preview), Collect (Collect and Responses), Analyse (Quality, Explore,
 Reliability and Analyse), Report, and Record (References and Amendments).
 Design holds the SurveyBuilder, and Plan opens it in its Plan mode.
 
-```{r fig-studio-responses, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Responses screen. The left navigation lists the screens in their groups. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
+```{r fig-studio-responses, echo = FALSE, fig.show = "asis", out.width = "100%", fig.alt = "SurveyStudio's Responses screen. The left navigation lists the screens in their groups. The main panel has a CSV file chooser, respondent ID and submitted-at column fields, a strict column check, and help on loading responses collected elsewhere or from a Google Sheet."}
 knitr::include_graphics("figures/gui-studio-responses.png")
 ```
 
@@ -211,7 +215,7 @@ In RStudio, the same tools open from the **Addins** menu in the toolbar. The
 4 commands are listed under **surveyframe:** and are searchable by that
 prefix in the command palette. Each one needs the rstudioapi package.
 
-```{r fig-rstudio-addins, echo = FALSE, fig.alt = "The RStudio Addins menu filtered by the word surveyframe, listing 4 commands: Design an instrument, Open analysis workspace, Analyse an existing instrument, and Insert starter instrument."}
+```{r fig-rstudio-addins, echo = FALSE, fig.show = "asis", fig.alt = "The RStudio Addins menu filtered by the word surveyframe, listing 4 commands: Design an instrument, Open analysis workspace, Analyse an existing instrument, and Insert starter instrument."}
 knitr::include_graphics("figures/gui-rstudio-addins.png")
 ```
 
@@ -293,7 +297,7 @@ launch_studio(
 
 Use the Explore screen after data collection to explore responses. Each filter takes the question's label and choice labels, and the date range follows `submitted_at`.
 
-```{r fig-dashboard, echo = FALSE, out.width = "100%", fig.alt = "SurveyStudio's Explore screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary."}
+```{r fig-dashboard, echo = FALSE, fig.show = "asis", out.width = "100%", fig.alt = "SurveyStudio's Explore screen on its Overview tab: 3 filters named by their questions and a date range on submitted_at, tiles for 120 responses, 120 filtered responses, 19 items, 2 scales, 1 check and the date range, and the instrument summary."}
 knitr::include_graphics("figures/gui-dashboard.png")
 ```
 

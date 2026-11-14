@@ -40,7 +40,7 @@ jobs:
         run: Rscript pkgdown/build_templates.R
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE, examples = FALSE)
         shell: Rscript {0}
 
       - name: Add robots.txt
