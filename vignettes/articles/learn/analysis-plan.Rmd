@@ -1,0 +1,38 @@
+---
+title: "Plan first, analyse second: the analysis plan in surveyframe"
+description: "Why surveyframe asks for the analysis plan before the data, what a plan block holds, and how a later change is recorded as an amendment."
+---
+
+In surveyframe the analysis plan is part of the questionnaire file. Each
+research question is a plan block, written before any answer arrives, and the
+analyses run as declared.
+
+## What a plan block holds
+
+- **The research question**, in words.
+- **The hypotheses**, H0 and H1.
+- **The method**, such as an independent samples t-test or a binary logistic
+  regression.
+- **The variables**, each in its role: the outcome, the group, the predictors.
+- **The significance level**, alpha, where the method tests a hypothesis.
+- **The decision rule**: what result will count as support.
+- **The objective** of the study it serves.
+
+## Why before the data
+
+A plan written after seeing the data can bend to fit it. Declared first, and
+sealed in the file's hash, it shows a reader which analyses were planned and
+which were added.
+
+## The pre-analysis plan
+
+`render_report()` with no data, or SurveyStudio before any responses are
+loaded, writes the plan as a document: the study, the questionnaire, each
+research question with its method and decision rule, and what a
+preregistration still asks for. See [Register your plan on OSF](register-on-osf.html).
+
+## When the plan must change
+
+A change after the answers arrive is recorded as an **amendment**, with its
+reason, its tier and a deviation report, and the report prints it. The
+amendment log stays in the file, so the change is on the record.
