@@ -1,0 +1,31 @@
+---
+title: "Question types: the 13 kinds of question surveyframe asks"
+description: "The 13 answerable question types in surveyframe, from Likert and single choice to pairwise comparisons and criteria weights, with what each collects and the analyses it suits."
+---
+
+surveyframe asks 13 kinds of question, and 2 more elements lay the survey
+out. Each type stores its answer in a declared shape, so the analysis plan
+knows what it can do with it. The `input_types` demo holds all 13: open it
+from RStudio's Addins menu with **surveyframe: Try a demo**.
+
+| Type | What the respondent does | What it stores | Suits |
+|---|---|---|---|
+| Likert | Rates agreement on a labelled scale | 1 coded value | Scales, reliability, ordinal tests |
+| Single choice | Picks 1 option | 1 code | Frequencies, cross-tabulations, group comparisons |
+| Multiple choice | Picks any options | 1 column per option | Frequencies, Cochran's Q |
+| Numeric | Types a number | A number | Descriptives, t-tests, regression |
+| Short text | Types a line | Text | Text analysis |
+| Long text | Types a paragraph | Text | Text analysis, topic models |
+| Date | Picks a date | A date | Descriptives |
+| Grid (matrix) | Rates several rows on 1 scale | 1 column per row | Descriptives, scales |
+| Slider | Drags to a value | A number | Descriptives, correlation |
+| Ranking | Orders options | The order | Rank descriptives |
+| Star rating | Gives stars | A number | Descriptives, ordinal tests |
+| Pairwise comparison | Judges which of 2 matters more, and by how much (Saaty), or how much 1 influences another (0 to 4) | 1 column per pair | AHP, ANP, DEMATEL |
+| Criteria weights | Divides 100 points across criteria | 1 column per criterion | Decision methods |
+
+The 2 layout elements are a **section break**, which starts a new page with
+a heading, and a **text block**, which shows text and collects nothing.
+
+Any question can be **required**, shown only when an earlier answer allows it
+(**branching**), or checked for attention (**attention checks**).

@@ -1,0 +1,41 @@
+---
+title: "Register your analysis plan on OSF"
+description: "How to preregister a surveyframe study on the Open Science Framework: write the pre-analysis plan, complete the remaining fields, and upload it with the .sframe file."
+---
+
+A preregistration fixes your plan before you see the data. surveyframe
+writes most of it for you.
+
+## 1. Write the plan
+
+In SurveyStudio, open your study before loading any responses and export the
+report, or in R:
+
+```r
+render_report(instrument, output_file = "plan.pdf", format = "pdf")
+```
+
+The document is titled "Pre-analysis plan". It names the instrument's hash,
+and lists the study, the participant information, the questionnaire, the
+scales, and each research question with its hypotheses, method and decision
+rule.
+
+## 2. Complete the remaining fields
+
+The plan ends with **To complete before submission**: exclusion rules, the
+stopping rule, primary and secondary outcomes, multiplicity and contingency
+decisions. Write them into the study's Preregistration fields in SurveyStudio
+(Survey settings, Study), so they are sealed in the file, or answer them in
+the registration form.
+
+## 3. Register
+
+On [osf.io](https://osf.io), create a project, choose a registration
+template, and upload the plan and the `.sframe` file. The file's hash in the
+plan lets a reader check, at [surveyframe.org/verify](https://surveyframe.org/verify/),
+that the questionnaire you analysed is the one you registered.
+
+## After registering
+
+Change nothing silently. A change to the questionnaire or the plan is an
+amendment, recorded with its reason, and printed in the report.

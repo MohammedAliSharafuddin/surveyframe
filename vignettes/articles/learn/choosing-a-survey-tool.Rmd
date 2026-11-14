@@ -1,0 +1,29 @@
+---
+title: "Choosing a survey tool for research"
+description: "What to look for in a survey tool for research: the analysis plan, preregistration, reporting, data ownership and reproducibility, and where surveyframe fits."
+---
+
+Most survey tools are built to collect answers. Research asks for more: a
+plan written before the data, analyses that can be reproduced, and a report
+in a journal's style. These are the questions worth asking of any tool.
+
+| Question | What surveyframe does |
+|---|---|
+| Can I declare the analysis plan before collecting? | Yes. The plan is part of the questionnaire file, with hypotheses and decision rules. |
+| Can I preregister it? | Yes. It writes a pre-analysis plan to submit to OSF, Zenodo or an ethics committee. |
+| Can a reader check the questionnaire analysed is the one planned? | Yes. Each file carries a hash anyone can verify. |
+| Is a change after collection recorded? | Yes, as an amendment with its reason, printed in the report. |
+| Does it write the report? | Yes, in APA 7, as HTML, Word, PDF or OpenDocument. |
+| Who holds the data? | You. Answers go to a Google Sheet you own, or stay on your computer. |
+| Can I run it without code? | Yes, in SurveyStudio. Everything is also open to R code. |
+| What does it cost? | Nothing. It is free and open source (MIT), on CRAN. |
+
+surveyframe does not host surveys for you. It writes 1 HTML file that you put
+on any web host, and collects with a sheet you own.
+
+## surveyframe beside other tools
+
+- [surveyframe and Qualtrics](../compare/qualtrics.html)
+- [surveyframe and Google Forms](../compare/google-forms.html)
+- [surveyframe and LimeSurvey](../compare/limesurvey.html)
+- [surveyframe and surveydown](../compare/surveydown.html)

@@ -1,0 +1,37 @@
+---
+title: "surveyframe and surveydown"
+description: "How surveyframe relates to surveydown: what each does, what surveyframe adds for research, and how to use the 2 together."
+---
+
+surveydown is an open-source R package that builds surveys from Quarto documents and runs them as Shiny apps, storing the answers in a database. surveyframe is a free R package (MIT, on CRAN) for the
+whole research workflow around a survey: the questionnaire and its analysis
+plan, the collection, the checks, the planned analyses and the APA 7 report.
+
+## What surveyframe adds for research
+
+- An analysis plan declared before the data, with hypotheses and decision
+  rules, sealed in the questionnaire file.
+- A pre-analysis plan to submit to OSF, Zenodo or an ethics committee.
+- A hash anyone can check at [surveyframe.org/verify](https://surveyframe.org/verify/),
+  and amendments recorded with their reasons.
+- Quality checks, scale reliability, the planned analyses and a report in
+  APA 7, in SurveyStudio or in R.
+
+## Using surveydown with surveyframe
+
+You can collect with surveydown and analyse with surveyframe. Describe the
+questionnaire as a surveyframe instrument, with item ids that match the
+columns of the exported answers, then read the export:
+
+```r
+responses <- read_responses("answers.csv", instrument, respondent_id = "id")
+results <- run_analysis_plan(responses, instrument)
+```
+
+The plan, the checks and the report then work as they do for answers
+surveyframe collected itself.
+
+## Related
+
+- [Choosing a survey tool for research](../learn/choosing-a-survey-tool.html)
+- [Get started](../start.html)
