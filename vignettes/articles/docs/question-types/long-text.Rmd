@@ -15,7 +15,7 @@ Add a question and choose Long text for a paragraph.
 
 ## Settings
 
-- **Required.** Usually off: an open comment is better skipped than filled to move on.
+- **Required.** Leave it off for an open comment, so a respondent with nothing to add moves on and the comments you receive are considered ones.
 
 ## Best practices for research
 

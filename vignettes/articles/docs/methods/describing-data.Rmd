@@ -1,11 +1,11 @@
 ---
 title: "Describe the answers and their quality"
-description: "Who answered what, how complete the answers are, and which responses fail the quality checks."
+description: "These methods describe who answered what, how complete the answers are, and which responses the quality checks flag."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-Who answered what, how complete the answers are, and which responses fail the quality checks.
+These methods describe who answered what, how complete the answers are, and which responses the quality checks flag.
 
 **Assumptions.** None beyond the data: these describe, they do not test.
 

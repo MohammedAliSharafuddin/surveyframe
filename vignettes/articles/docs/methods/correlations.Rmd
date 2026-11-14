@@ -1,11 +1,11 @@
 ---
 title: "Measure how answers go together"
-description: "How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant."
+description: "These methods measure how strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-How strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant.
+These methods measure how strongly 2 numeric or ordered answers move together, and whether that holds with a third held constant.
 
 **Assumptions.** Pearson's r assumes a straight-line relation, the rank correlations a steady direction. A correlation shows association, and a claim of cause needs a design that tests it.
 

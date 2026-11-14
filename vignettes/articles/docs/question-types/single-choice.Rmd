@@ -15,9 +15,9 @@ Add a question, choose Single choice, and give the options the respondent picks 
 
 ## Settings
 
-- **Answer set.** The options, each with a stored code and the label respondents see.
+- **Choice set.** The answer options, each with the label respondents see and the code stored in the data.
 - **Other, please specify.** Adds a text box for an answer the options miss, kept beside the code.
-- **Ordered.** Marks the options as ordered, so the item is analysed as ordinal.
+- **Ordered.** Tick it when the options follow a meaningful sequence, such as low, medium and high, so the analysis treats them as ranked.
 
 ## Best practices for research
 

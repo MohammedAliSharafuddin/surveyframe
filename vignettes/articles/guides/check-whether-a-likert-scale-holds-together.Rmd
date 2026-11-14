@@ -10,7 +10,7 @@ The example in this guide is *Was the event well organised?* A thesis questionna
 ## In SurveyStudio
 
 1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `likert_scale`.
-2. On **Design**, select an item and check its **Scale** and **Reverse-scored** settings. Every item of the scale shares 1 answer set.
+2. On **Design**, select an item and check its **Scale** and **Reverse-scored** settings. Every item of the scale shares 1 choice set.
 3. Open **Reliability** to see the scale's reliability and how each item relates to the rest.
 4. On **Analyse**, read the item diagnostics before reporting the scale score.
 

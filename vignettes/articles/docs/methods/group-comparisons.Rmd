@@ -1,11 +1,11 @@
 ---
 title: "Compare groups"
-description: "Whether an outcome differs between 2 or more groups of respondents."
+description: "These methods test whether an outcome differs between 2 or more groups of respondents."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-Whether an outcome differs between 2 or more groups of respondents.
+These methods test whether an outcome differs between 2 or more groups of respondents.
 
 **Assumptions.** Independent respondents. The t-test and ANOVA assume a roughly normal outcome in each group and similar spread, the rank-based tests do not. ANCOVA adds a straight-line relation with the covariate.
 

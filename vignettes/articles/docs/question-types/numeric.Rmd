@@ -15,7 +15,7 @@ Add a question, choose Numeric, and set the range the answer may take.
 
 ## Settings
 
-- **Minimum and maximum.** Refuses an answer outside the range at entry, so a typing slip does not reach the data.
+- **Minimum and maximum.** The accepted range. A respondent whose entry is outside it is asked to correct it.
 
 ## Best practices for research
 

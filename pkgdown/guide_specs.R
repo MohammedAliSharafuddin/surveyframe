@@ -25,7 +25,7 @@ guide_specs <- list(
   likert_scale = list(
     outcome = "Check whether the items of a Likert scale measure 1 thing well enough to combine into a score.",
     studio = c(open_demo("likert_scale"),
-      "On **Design**, select an item and check its **Scale** and **Reverse-scored** settings. Every item of the scale shares 1 answer set.",
+      "On **Design**, select an item and check its **Scale** and **Reverse-scored** settings. Every item of the scale shares 1 choice set.",
       "Open **Reliability** to see the scale's reliability and how each item relates to the rest.",
       "On **Analyse**, read the item diagnostics before reporting the scale score."),
     r = c("d <- sframe_demo(\"likert_scale\")",

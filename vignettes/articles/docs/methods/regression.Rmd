@@ -1,11 +1,11 @@
 ---
 title: "Predict an outcome"
-description: "How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice."
+description: "These methods estimate how much predictors explain a numeric outcome, or how they change the odds of a yes, an ordered rating or a choice."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-How much predictors explain a numeric outcome, or change the odds of a yes, an ordered rating or a choice.
+These methods estimate how much predictors explain a numeric outcome, or how they change the odds of a yes, an ordered rating or a choice.
 
 **Assumptions.** Independent respondents, predictors only loosely related to each other, and for linear regression a straight-line relation with roughly normal residuals. Firth's correction suits small samples and rare outcomes.
 

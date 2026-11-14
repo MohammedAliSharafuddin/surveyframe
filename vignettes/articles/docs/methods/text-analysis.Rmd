@@ -1,11 +1,11 @@
 ---
 title: "Analyse open answers"
-description: "Which words, phrases, contexts, tones and topics open answers hold."
+description: "These methods find the words, phrases, contexts, tones and topics in open answers."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-Which words, phrases, contexts, tones and topics open answers hold.
+These methods find the words, phrases, contexts, tones and topics in open answers.
 
 **Assumptions.** Enough text per answer for the method. Topic models need many answers.
 
