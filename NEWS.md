@@ -2056,6 +2056,13 @@ arithmetic.
 
 ## Demos
 
+* **The `factor_structure` demo is an employee engagement study
+  throughout**, "Employee engagement at work", with the scales "How my work
+  is organised" and "The content of my work", where its title and scale
+  labels still spoke of event attendees. The Employee engagement survey
+  template is built on it. The file has a new hash, and its items' codes,
+  responses and results are unchanged.
+
 * **The `sem_pls` demo's second model is "The same paths, as PLS-SEM
   syntax"**, where it read "estimated by PLS": surveyframe writes its
   seminr syntax for the reader to fit. The `input_types` reference dataset
