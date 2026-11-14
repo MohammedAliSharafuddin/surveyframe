@@ -363,8 +363,15 @@ sframe_check_weights <- function(w, column) {
 # Checks the weight column of `data` when one is named and present. Returns
 # the usable data with the check, or an error to hand back as the block error.
 sframe_apply_weights <- function(data, weights) {
-  if (is.null(weights) || !nzchar(weights) || !weights %in% colnames(data)) {
+  if (is.null(weights) || is.na(weights) || !nzchar(weights)) {
     return(list(data = data, dropped = 0L, note = NULL, error = NULL))
+  }
+  # A named weight the responses lack used to be skipped, which gave an
+  # unweighted result under a weighted plan.
+  if (!weights %in% colnames(data)) {
+    return(list(data = data, dropped = 0L, note = NULL, error = sprintf(
+      "The weight column '%s' is not in the responses. Add it, read with read_responses(meta_cols = \"%s\"), or remove the weights role.",
+      weights, weights)))
   }
   chk <- sframe_check_weights(data[[weights]], weights)
   list(data = data[chk$keep, , drop = FALSE], dropped = chk$dropped,
@@ -2158,6 +2165,15 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' and the Total column of column percentages is the row distribution. The
 #' report then shows each count with its percentage beside it, and the chart
 #' draws the percentages.
+#' @section Weights:
+#' A frequency, descriptives, cross-tabulation or chi-square block may name a
+#' case-weight column in its `weights` role. A design weight is set by the
+#' researcher, not asked of respondents, so it may be a column that is not an
+#' item: [validate_sframe()] notes it, and it must then be in the responses,
+#' read with `read_responses(meta_cols = )`. A block whose weight column is
+#' missing, or holds a negative, non-finite or non-numeric value, fails with
+#' a message saying so.
+#'
 #' @section How answers are coded:
 #' Categories follow 1 order in every locale: the codes of the item's choice
 #' set as the instrument declares them, then factor levels, then any other

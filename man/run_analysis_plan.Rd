@@ -78,6 +78,17 @@ report then shows each count with its percentage beside it, and the chart
 draws the percentages.
 }
 
+\section{Weights}{
+
+A frequency, descriptives, cross-tabulation or chi-square block may name a
+case-weight column in its \code{weights} role. A design weight is set by the
+researcher, not asked of respondents, so it may be a column that is not an
+item: \code{\link[=validate_sframe]{validate_sframe()}} notes it, and it must then be in the responses,
+read with \code{read_responses(meta_cols = )}. A block whose weight column is
+missing, or holds a negative, non-finite or non-numeric value, fails with
+a message saying so.
+}
+
 \section{How answers are coded}{
 
 Categories follow 1 order in every locale: the codes of the item's choice

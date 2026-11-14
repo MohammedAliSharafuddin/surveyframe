@@ -344,7 +344,8 @@ sframe_require_columns <- function(data, cols, method) {
 #'   columns are used.
 #' @param split_by Optional grouping variable.
 #' @param conf_level Confidence level for the mean interval.
-#' @param weights Optional case-weight column.
+#' @param weights Optional case-weight column, such as a design weight the
+#'   researcher set. A named column missing from `data` is an error.
 #'
 #' @return An object of class `sframe_descriptives_report`. Its `table` has
 #'   1 row per variable and group. `valid_n` and `missing_n` count the
@@ -382,7 +383,11 @@ sframe_descriptives_results <- function(
   }
   group_levels <- unique(groups)
   if (length(group_levels) == 0) group_levels <- "All"
-  w <- if (!is.null(weights) && weights %in% colnames(data)) data[[weights]] else NULL
+  if (!is.null(weights) && !weights %in% colnames(data)) {
+    rlang::abort(sprintf("The weight column '%s' is not in the data.", weights),
+                 class = c("sframe_validation_error", "sframe_error"))
+  }
+  w <- if (!is.null(weights)) data[[weights]] else NULL
   if (!is.null(w)) {
     chk <- sframe_check_weights(w, weights)
     if (!is.null(chk$error)) {
