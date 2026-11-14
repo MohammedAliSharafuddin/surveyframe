@@ -126,11 +126,10 @@ test_that("a report with data is unchanged", {
   expect_false(grepl("Pre-analysis plan", html, fixed = TRUE))
 })
 
-test_that("the plan renders through Quarto in HTML, Word and PDF", {
-  skip_if_not_slow()
+plan_formats_check <- function(fmts) {
   ins <- sframe_demo("two_group", preview = FALSE)$instrument
   hash <- surveyframe:::sframe_hash_value(ins)
-  for (fmt in c("html", "docx", "pdf")) {
+  for (fmt in fmts) {
     out <- suppressMessages(render_report(ins, output_file = tempfile(fileext = paste0(".", fmt)),
                                           format = fmt, open = FALSE))
     expect_identical(attr(out, "engine"), "quarto", info = fmt)
@@ -146,6 +145,24 @@ test_that("the plan renders through Quarto in HTML, Word and PDF", {
     expect_match(txt, "Independent samples t-test", fixed = TRUE, info = fmt)
     expect_match(gsub("\\s+", "", txt), hash, fixed = TRUE, info = fmt)
   }
+}
+
+test_that("the plan renders through Quarto in HTML and Word", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  plan_formats_check(c("html", "docx"))
+})
+
+# The same guards as the report's PDF test (test-report-formats.R): CI's
+# TinyTeX had no Latin Modern font, so lualatex could not compile there.
+test_that("the plan renders through Quarto in PDF when LaTeX works", {
+  skip_on_cran()
+  skip_if_not_slow()
+  skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")
+  skip_if(!surveyframe:::sframe_latex_available(), "no LaTeX engine")
+  skip_if_latex_broken()
+  plan_formats_check("pdf")
 })
 
 test_that("the title and the body write the same date, in words", {

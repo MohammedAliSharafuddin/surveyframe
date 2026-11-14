@@ -90,7 +90,12 @@ test_that("each style renders 1 reference through Quarto", {
   ins <- one_ref_instrument()
   for (nm in style_names) {
     out <- tempfile(fileext = ".html")
-    res <- suppressMessages(render_report(ins, output_file = out, csl = nm, open = FALSE))
+    # With responses and no analysis section, so this is the results report
+    # citing only the instrument's reference: with no data render_report()
+    # writes the pre-analysis plan (48b585e).
+    res <- suppressMessages(render_report(ins, data = sframe_demo("likert_scale")$responses,
+      output_file = out, csl = nm, open = FALSE, include_analysis = FALSE,
+      include_reliability = FALSE, include_models = FALSE))
     expect_identical(attr(res, "engine"), "quarto", info = nm)
     doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
     entries <- regmatches(doc, gregexpr("class=\"csl-entry\"", doc, fixed = TRUE))[[1]]

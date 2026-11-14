@@ -70,7 +70,12 @@ test_that("(e) the Quarto report gives the version and the amendments", {
   old <- options(surveyframe.use_quarto = TRUE)
   on.exit(options(old), add = TRUE)
   out <- tempfile(fileext = ".html")
-  render_report(amended_instr(), output_file = out, open = FALSE)
+  # With responses, so this is the results report: with no data
+  # render_report() writes the pre-analysis plan (48b585e).
+  ins <- amended_instr()
+  resp <- sframe_demo("likert_scale")$responses
+  resp <- resp[, setdiff(names(resp), "org_4"), drop = FALSE]
+  render_report(ins, data = resp, output_file = out, open = FALSE)
   doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
   expect_match(doc, "Instrument version:</strong> 1.1.0", fixed = TRUE)
   expect_match(doc, "Amendments (2)", fixed = TRUE)

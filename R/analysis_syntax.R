@@ -385,9 +385,11 @@ sframe_syntax_result <- function(x, which = NULL, data_expr = "scored",
   if (is.null(body)) return(NULL)
 
   question <- as.character(x$research_question %||% "")[1]
+  # Comments wrap at 72 characters: a code block does not wrap in a PDF, so
+  # a long research question ran past the page edge (P1-05, 2026-11-14).
   lines <- c(
-    if (nzchar(question)) paste0("# ", question),
-    sprintf("# %s", sframe_syntax_note(x)),
+    if (nzchar(question)) strwrap(question, width = 72, prefix = "# "),
+    strwrap(sframe_syntax_note(x), width = 72, prefix = "# "),
     body
   )
   if (isTRUE(header)) lines <- c(sframe_syntax_header(data_expr), "", lines)
