@@ -128,7 +128,7 @@ sections <- list(
        contents = NULL),
   list(title = "Demos", family = "Demo functions",
        desc = paste(
-         "22 small teaching demos, each doing one job, and 2 larger reference",
+         "25 small teaching demos, each doing one job, and 2 larger reference",
          "datasets. Each comes with an instrument and response data, and the",
          "teaching demos with a codebook and the results surveyframe",
          "produced. See the \"Learn by example\" article."),

@@ -1,0 +1,232 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "27cb1a5e0f90a5e41eba77d4a72349c9e90829b62dfc7fe168e0a058666486c9",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Trust in a new team leader",
+    "version": "1.0.0",
+    "description": "A study of trust in a new team leader, measured with items adapted from a published model of trust, with each source cited where it is used.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-11-14T09:15:53Z"
+  },
+  "items": [
+    {
+      "id": "tenure",
+      "label": "How long have you worked in this team?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "tenure",
+      "reverse": false
+    },
+    {
+      "id": "trust_1",
+      "label": "My team leader keeps the promises they make.",
+      "type": "likert",
+      "required": true,
+      "choice_set": "agree5",
+      "scale_id": "trust",
+      "reverse": false
+    },
+    {
+      "id": "trust_2",
+      "label": "My team leader looks out for what matters to me.",
+      "type": "likert",
+      "required": true,
+      "choice_set": "agree5",
+      "scale_id": "trust",
+      "reverse": false
+    },
+    {
+      "id": "trust_3",
+      "label": "My team leader has the skills the job needs.",
+      "type": "likert",
+      "required": true,
+      "choice_set": "agree5",
+      "scale_id": "trust",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "agree5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "tenure",
+      "values": ["under_1", "over_1"],
+      "labels": ["Under a year", "A year or more"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [
+    {
+      "id": "trust",
+      "label": "Trust in the team leader",
+      "items": ["trust_1", "trust_2", "trust_3"],
+      "method": "mean",
+      "min_valid": null
+    }
+  ],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "How much do team members trust their new leader?",
+      "family": "descriptive",
+      "method": "scale_descriptives",
+      "roles": {
+        "scales": "trust"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "scale_descriptives",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "Does the trust scale hold together?",
+      "family": "reliability",
+      "method": "reliability_alpha",
+      "roles": {
+        "scales": "trust"
+      },
+      "objective": "O1",
+      "decision_rule": "Treat the scale as reliable when Cronbach's alpha is .70 or above [@cronbach_1951].",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "reliability_alpha",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "Do newer and longer-serving members trust the leader differently?",
+      "family": "group_comparison",
+      "method": "t_test_ind",
+      "roles": {
+        "group": "tenure",
+        "outcome": "trust"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Mean trust does not differ between newer and longer-serving members.",
+        "alternative": "Mean trust differs between newer and longer-serving members."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "t_test_ind",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Trust in a new team leader",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Teams with a new leader report low trust, and the organisation needs a short measure grounded in an established model of trust.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Measure trust in the new leader and check the scale."
+      },
+      {
+        "id": "O2",
+        "text": "Compare newer and longer-serving team members."
+      }
+    ],
+    "sampling": {
+      "population": "Members of teams with a leader appointed this year",
+      "method": "cluster",
+      "planned_n": 90
+    }
+  },
+  "references": [
+    {
+      "id": "mayer_1995",
+      "type": "article-journal",
+      "title": "An integrative model of organizational trust",
+      "author": [
+        {
+          "family": "Mayer",
+          "given": "R. C."
+        },
+        {
+          "family": "Davis",
+          "given": "J. H."
+        },
+        {
+          "family": "Schoorman",
+          "given": "F. D."
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            1995
+          ]
+        ]
+      },
+      "container-title": "Academy of Management Review",
+      "volume": "20",
+      "issue": "3",
+      "page": "709-734",
+      "DOI": "10.5465/amr.1995.9508080335",
+      "cited_by": ["scale:trust", "study"]
+    },
+    {
+      "id": "cronbach_1951",
+      "type": "article-journal",
+      "title": "Coefficient alpha and the internal structure of tests",
+      "author": [
+        {
+          "family": "Cronbach",
+          "given": "L. J."
+        }
+      ],
+      "issued": {
+        "date-parts": [
+          [
+            1951
+          ]
+        ]
+      },
+      "container-title": "Psychometrika",
+      "volume": "16",
+      "issue": "3",
+      "page": "297-334",
+      "DOI": "10.1007/BF02310555",
+      "cited_by": ["plan:RQ2"]
+    }
+  ]
+}

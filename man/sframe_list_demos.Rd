@@ -20,7 +20,7 @@ Every demo does one job, so a failure points at one method and a reader can
 hold the whole questionnaire in view. Use \code{\link[=sframe_demo]{sframe_demo()}} to load one.
 }
 \details{
-The 22 teaching demos come first. The last 2 rows, with focus
+The 25 teaching demos come first. The last 2 rows, with focus
 \code{"reference"}, are larger datasets: \code{"tourism_services"}, a realistic
 multi-scale instrument, and \code{"input_types"}, which uses every input type
 SurveyBuilder and SurveyStudio support.

@@ -42,8 +42,8 @@ knowing which survey to build, so this article works the other way round: it
 starts from the survey you are trying to run and shows the whole path, from
 the questionnaire to the report.
 
-There are **22 demos**: 17 analysis examples, three presentation examples, and
-two provenance examples. Each has an instrument, response data, a codebook,
+There are **25 demos**: 19 analysis examples, three presentation examples, and
+three provenance examples. Each has an instrument, response data, a codebook,
 and surveyframe's expected results. Presentation and provenance demos reuse the
 matching analysis data where appropriate.
 
@@ -59,7 +59,7 @@ results <- run_analysis_plan(demo$responses, demo$instrument)
 sframe_demo_qmd("first_survey") # write an editable Quarto notebook
 ```
 
-The package stores the 22 compact instruments and datasets, and generates a
+The package stores the 25 compact instruments and datasets, and generates a
 notebook only when you ask: `sframe_demo_qmd()` creates one for whichever demo
 you choose.
 

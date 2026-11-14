@@ -179,7 +179,8 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE,
   status <- "not run"
   if (isTRUE(run_plan)) {
     r <- read_responses(responses, instrument, respondent_id = "respondent_id",
-                        meta_cols = c("started_at", "submitted_at"))
+                        meta_cols = c("started_at", "submitted_at",
+                                      intersect("survey_weight", names(responses))))
     res <- run_analysis_plan(r, instrument)
     errs <- Filter(function(b) !is.null(b$error), res)
     # A block whose method needs an optional package that is absent here is a
@@ -1150,6 +1151,136 @@ conversational_branching <- sf_instrument(
 )
 write_demo("conversational_branching", conversational_branching, br,
            reuse_responses = "branching")
+
+# --- 23. weighted_survey ---------------------------------------------------
+# A sample that over-represents 1 region, and the design weight that brings
+# it back to the population's shares (Session 10). The weight is not a
+# question, so it travels as a metadata column, survey_weight, which
+# sframe_demo() reads for this demo.
+set.seed(4123)
+n <- 120
+weighted_survey <- sf_instrument(
+  title = "Satisfaction across regions", version = "1.0.0",
+  description = "Weights.",
+  components = list(
+    agree5(),
+    sf_choices("region", c("north", "south", "east"), c("North", "South", "East")),
+    sf_choices("yn", c("no", "yes"), c("No", "Yes")),
+    sf_item("region", "Which region do you live in?", type = "single_choice",
+            choice_set = "region", required = TRUE),
+    sf_item("satisfied", "I am satisfied with the service in my area.", type = "likert",
+            choice_set = "agree5", required = TRUE),
+    sf_item("recommend", "Would you recommend the service to a neighbour?",
+            type = "single_choice", choice_set = "yn", required = TRUE)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "How is the sample spread across regions, before weighting?",
+         family = "descriptive", method = "frequency", roles = list(variable = "region")),
+    list(id = "RQ2", research_question = "How is the population spread across regions, after weighting?",
+         family = "descriptive", method = "frequency",
+         roles = list(variable = "region", weights = "survey_weight")),
+    list(id = "RQ3", research_question = "How satisfied are residents, weighted to the population?",
+         family = "descriptive", method = "descriptives",
+         roles = list(variables = "satisfied", weights = "survey_weight")),
+    list(id = "RQ4", research_question = "Is region associated with recommending the service, weighted?",
+         family = "categorical", method = "chi_square",
+         roles = list(row = "region", column = "recommend", weights = "survey_weight"))
+  )
+)
+ws <- frame_of(n, 23)
+# The sample is 60% north, the population 40% north, 35% south, 25% east.
+ws$region <- sample(c("north", "south", "east"), n, TRUE, c(0.60, 0.25, 0.15))
+pop <- c(north = 0.40, south = 0.35, east = 0.25)
+samp <- table(factor(ws$region, levels = names(pop))) / n
+ws$satisfied <- lik(stats::rnorm(n, ifelse(ws$region == "north", 0.6, -0.2), 1))
+ws$recommend <- ifelse(stats::runif(n) < ifelse(ws$region == "north", 0.75, 0.45), "yes", "no")
+ws$survey_weight <- round(as.numeric(pop[ws$region] / samp[ws$region]), 4)
+write_demo("weighted_survey", weighted_survey, ws)
+
+# --- 24. citing_sources ----------------------------------------------------
+# An adapted scale cited where it is used: the source of its items, the
+# method behind its reliability check and the work the study builds on, each
+# listed once at the end of the report (Session 10).
+set.seed(4124)
+n <- 90
+citing_sources <- sf_instrument(
+  title = "Trust in a new team leader", version = "1.0.0",
+  description = "References.",
+  components = list(
+    agree5(),
+    sf_choices("tenure", c("under_1", "over_1"), c("Under a year", "A year or more")),
+    sf_item("tenure", "How long have you worked in this team?", type = "single_choice",
+            choice_set = "tenure", required = TRUE),
+    sf_item("trust_1", "My team leader keeps the promises they make.", type = "likert",
+            choice_set = "agree5", required = TRUE, scale_id = "trust"),
+    sf_item("trust_2", "My team leader looks out for what matters to me.", type = "likert",
+            choice_set = "agree5", required = TRUE, scale_id = "trust"),
+    sf_item("trust_3", "My team leader has the skills the job needs.", type = "likert",
+            choice_set = "agree5", required = TRUE, scale_id = "trust"),
+    sframe_scale("trust", "Trust in the team leader", items = c("trust_1", "trust_2", "trust_3"),
+                 method = "mean")
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "How much do team members trust their new leader?",
+         family = "descriptive", method = "scale_descriptives", roles = list(scales = "trust")),
+    list(id = "RQ2", research_question = "Does the trust scale hold together?",
+         family = "reliability", method = "reliability_alpha", roles = list(scales = "trust")),
+    list(id = "RQ3", research_question = "Do newer and longer-serving members trust the leader differently?",
+         family = "group_comparison", method = "t_test_ind",
+         roles = list(group = "tenure", outcome = "trust"))
+  )
+)
+citing_sources <- sframe_add_references(citing_sources,
+  sframe_reference("mayer_1995", "An integrative model of organizational trust",
+                   author = c("Mayer, R. C.", "Davis, J. H.", "Schoorman, F. D."), year = 1995,
+                   container = "Academy of Management Review", volume = "20", issue = "3",
+                   pages = "709-734", doi = "10.5465/amr.1995.9508080335",
+                   cited_by = c("scale:trust", "study")),
+  sframe_reference("cronbach_1951", "Coefficient alpha and the internal structure of tests",
+                   author = "Cronbach, L. J.", year = 1951, container = "Psychometrika",
+                   volume = "16", issue = "3", pages = "297-334", doi = "10.1007/BF02310555",
+                   cited_by = "plan:RQ2"))
+cs <- frame_of(n, 24)
+cs$tenure <- sample(c("under_1", "over_1"), n, TRUE, c(0.4, 0.6))
+latent <- stats::rnorm(n, ifelse(cs$tenure == "over_1", 0.4, 0), 1)
+for (j in 1:3) cs[[paste0("trust_", j)]] <- lik(latent + stats::rnorm(n, 0, 0.6))
+write_demo("citing_sources", citing_sources, cs)
+
+# --- 25. mediation_moderation ----------------------------------------------
+# Workload raises stress, stress lowers wellbeing, and support from a manager
+# softens the first step (Session 10).
+set.seed(4125)
+n <- 200
+mediation_moderation <- sf_instrument(
+  title = "Workload, stress and wellbeing", version = "1.0.0",
+  description = "Mediation and moderation.",
+  components = list(
+    sf_item("workload", "In a typical week, how heavy is your workload? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100, slider_step = 1, required = TRUE),
+    sf_item("support", "How much support does your manager give you? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100, slider_step = 1, required = TRUE),
+    sf_item("stress", "How stressed have you felt at work this month? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100, slider_step = 1, required = TRUE),
+    sf_item("wellbeing", "How would you rate your wellbeing this month? (0 to 100)",
+            type = "slider", slider_min = 0, slider_max = 100, slider_step = 1, required = TRUE)
+  ),
+  analysis_plan = list(
+    list(id = "RQ1", research_question = "Does stress carry the effect of workload to wellbeing?",
+         family = "model", method = "mediation",
+         roles = list(predictor = "workload", mediator = "stress", outcome = "wellbeing")),
+    list(id = "RQ2", research_question = "Does manager support weaken the link from workload to stress?",
+         family = "model", method = "moderation",
+         roles = list(predictor = "workload", moderator = "support", outcome = "stress"))
+  )
+)
+mm <- frame_of(n, 25)
+w <- stats::rnorm(n); su <- stats::rnorm(n)
+st <- 0.5 * w - 0.2 * su - 0.25 * w * su + stats::rnorm(n, 0, 0.8)
+wb <- -0.55 * st + 0.1 * w + stats::rnorm(n, 0, 0.8)
+to100 <- function(z) round(pmin(100, pmax(0, 50 + 15 * z)))
+mm$workload <- to100(w); mm$support <- to100(su)
+mm$stress <- to100(st); mm$wellbeing <- to100(wb)
+write_demo("mediation_moderation", mediation_moderation, mm)
 
 # --- 21. instrument_revision ----------------------------------------------
 # A disclosed amendment: what changed, why, and who signed it off.

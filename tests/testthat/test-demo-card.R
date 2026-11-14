@@ -98,7 +98,7 @@ test_that("sframe_list_demos() prints 1 line per demo, grouped, two_group first"
   x <- sframe_list_demos()
   out <- capture.output(print(x))
   expect_identical(out[1], 'Start here: sframe_demo("two_group")')
-  expect_true(all(c("Analysis (17)", "Presentation (3)", "Provenance (2)",
+  expect_true(all(c("Analysis (19)", "Presentation (3)", "Provenance (3)",
                     "Reference datasets (2)") %in% out))
   for (nm in x$name) expect_true(any(startsWith(out, paste0("  ", nm, " "))), info = nm)
   expect_lte(length(out), 35)
