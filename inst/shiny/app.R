@@ -1887,6 +1887,12 @@ ui <- fluidPage(
               title = "Redo (Ctrl+Y)", `aria-label` = "Redo", disabled = NA, HTML("&#8631;")),
             tags$button(type = "button", id = "design_save", class = "btn btn-primary sf-primary",
               title = "Make this survey the instrument Studio has open (Ctrl+S)", "Save to Studio"))),
+        # The cue to the pre-analysis plan (owner UI check, 2026-11-14): the
+        # plan is written here, and exported from the Report screen.
+        tags$p(class = "hint design-plan-cue",
+          "Plan complete? Save to Studio, then ",
+          tags$a(href = "#export", `data-tab` = "export", "export it as a pre-analysis plan"),
+          " for OSF, Zenodo or your ethics committee."),
         tags$iframe(id = "design_frame", title = "SurveyBuilder",
           src = studio_asset_src("survey_builder.html", "host=studio"),
           style = paste("width: 100%; height: calc(100vh - 150px); min-height: 600px;",
@@ -4110,7 +4116,15 @@ server <- function(input, output, session) {
   })
 
   output$export_report_ui <- renderUI({
-    if (!is.null(rv$instrument)) {
+    if (!is.null(rv$instrument) && is.null(rv$responses)) {
+      # With no responses, render_report() writes the pre-analysis plan, the
+      # document a student submits to OSF, Zenodo or an ethics committee, so
+      # the button says so (owner UI check, 2026-11-14).
+      tagList(
+        downloadButton("download_report_btn", "Export pre-analysis plan", class = "btn-primary sf-primary"),
+        tags$p(class = "hint",
+          "No responses are loaded, so this writes your pre-analysis plan, ready to submit to OSF, Zenodo or an ethics committee."))
+    } else if (!is.null(rv$instrument)) {
       downloadButton("download_report_btn", "Export report", class = "btn-primary sf-primary")
     } else {
       export_disabled_btn(
@@ -4319,7 +4333,8 @@ server <- function(input, output, session) {
     filename = function() {
       paste0(
         gsub("[^a-zA-Z0-9]", "_", (rv$instrument$meta$title %||% "survey")),
-        "_report.", input$rpt_format %||% "html"
+        if (is.null(rv$responses)) "_pre_analysis_plan." else "_report.",
+        input$rpt_format %||% "html"
       )
     },
     content = function(file) {
