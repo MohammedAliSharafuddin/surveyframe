@@ -57,6 +57,10 @@ sframe_demo_index <- function() {
       "single_choice, numeric", "mann_whitney, fisher_exact, firth_logistic"),
     d("multi_response", "analysis", "Items that expand into one column per option",
       "multiple_choice, ranking", "descriptives, cochran_q"),
+    d("weighted_survey", "analysis", "Design weights that bring a sample back to its population",
+      "single_choice, likert", "frequency, descriptives, chi_square"),
+    d("mediation_moderation", "analysis", "A mediator that carries an effect and a moderator that changes it",
+      "slider", "mediation, moderation"),
     d("branded_survey", "presentation", "A welcome page, a logo, a colour and a thank you page",
       "as first_survey", "frequency", "first_survey"),
     d("conversational_survey", "presentation", "One question at a time",
@@ -66,7 +70,9 @@ sframe_demo_index <- function() {
     d("instrument_revision", "provenance", "Changing an instrument mid-study, on the record",
       "as first_survey", "frequency, descriptives, missing_data, quality", "first_survey"),
     d("verification", "provenance", "Proving a file is the one you think it is",
-      "as first_survey", "frequency, descriptives, missing_data, quality", "first_survey")
+      "as first_survey", "frequency, descriptives, missing_data, quality", "first_survey"),
+    d("citing_sources", "provenance", "Citing the sources of a scale and a method where they are used",
+      "likert, single_choice", "scale_descriptives, reliability_alpha, t_test_ind")
   )
 }
 
@@ -123,7 +129,7 @@ sframe_reference_demo <- function(name) {
 #' Every demo does one job, so a failure points at one method and a reader can
 #' hold the whole questionnaire in view. Use [sframe_demo()] to load one.
 #'
-#' The 22 teaching demos come first. The last 2 rows, with focus
+#' The 25 teaching demos come first. The last 2 rows, with focus
 #' `"reference"`, are larger datasets: `"tourism_services"`, a realistic
 #' multi-scale instrument, and `"input_types"`, which uses every input type
 #' SurveyBuilder and SurveyStudio support.
@@ -182,8 +188,8 @@ sframe_demo_dir <- function() {
 
 #' Load one bundled demo
 #'
-#' One of the 22-item teaching library: 17 analysis examples, 3
-#' presentation examples, and 2 provenance examples. Or 1 of the 2 reference
+#' One of the 25-item teaching library: 19 analysis examples, 3
+#' presentation examples, and 3 provenance examples. Or 1 of the 2 reference
 #' datasets: `"tourism_services"`, a realistic multi-scale instrument, and
 #' `"input_types"`, which uses every input type SurveyBuilder and
 #' SurveyStudio support in a single instrument.
@@ -257,8 +263,10 @@ sframe_demo <- function(name, branded = FALSE, preview = interactive()) {
   # by hand needs the same argument.
   raw <- utils::read.csv(responses_path, stringsAsFactors = FALSE,
                          check.names = FALSE)
+  # A demo's columns that are not questions, such as a design weight.
+  extra_meta <- intersect(c("survey_weight"), names(raw))
   responses <- read_responses(raw, instrument, respondent_id = "respondent_id",
-                              meta_cols = c("started_at", "submitted_at"))
+                              meta_cols = c("started_at", "submitted_at", extra_meta))
   sframe_demo_preview(sframe_demo_object(list(
     instrument = instrument, responses = responses,
     instrument_path = instrument_path, responses_path = responses_path,

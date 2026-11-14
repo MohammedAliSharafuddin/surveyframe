@@ -1,0 +1,183 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "c4ad310f8d5e965b7b4e4a61de8cc665089b5fb8b17fe82b10a13eecc98c467a",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Satisfaction across regions",
+    "version": "1.0.0",
+    "description": "A resident satisfaction survey whose sample over-represents 1 region, weighted back to the population's regional shares.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-11-14T09:15:15Z"
+  },
+  "items": [
+    {
+      "id": "region",
+      "label": "Which region do you live in?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "region",
+      "reverse": false
+    },
+    {
+      "id": "satisfied",
+      "label": "I am satisfied with the service in my area.",
+      "type": "likert",
+      "required": true,
+      "choice_set": "agree5",
+      "reverse": false
+    },
+    {
+      "id": "recommend",
+      "label": "Would you recommend the service to a neighbour?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "yn",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "agree5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "region",
+      "values": ["north", "south", "east"],
+      "labels": ["North", "South", "East"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "yn",
+      "values": ["no", "yes"],
+      "labels": ["No", "Yes"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "How is the sample spread across regions, before weighting?",
+      "family": "descriptive",
+      "method": "frequency",
+      "roles": {
+        "variable": "region"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "frequency",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "How is the population spread across regions, after weighting?",
+      "family": "descriptive",
+      "method": "frequency",
+      "roles": {
+        "variable": "region",
+        "weights": "survey_weight"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "frequency",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "How satisfied are residents, weighted to the population?",
+      "family": "descriptive",
+      "method": "descriptives",
+      "roles": {
+        "variables": "satisfied",
+        "weights": "survey_weight"
+      },
+      "objective": "O2",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "descriptives",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ4",
+      "research_question": "Is region associated with recommending the service, weighted?",
+      "family": "categorical",
+      "method": "chi_square",
+      "roles": {
+        "row": "region",
+        "column": "recommend",
+        "weights": "survey_weight"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Weighted to the population, region and recommending are independent.",
+        "alternative": "Weighted to the population, region and recommending are associated."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "chi_square",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Satisfaction across regions",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "An online sample drew most of its answers from the north, so unweighted figures would overstate the north's view of the service.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe the sample and the population across regions."
+      },
+      {
+        "id": "O2",
+        "text": "Estimate satisfaction and its link with region for the population."
+      }
+    ],
+    "sampling": {
+      "population": "Adult residents of the 3 regions",
+      "method": "quota",
+      "planned_n": 120
+    }
+  }
+}

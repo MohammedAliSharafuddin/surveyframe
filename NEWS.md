@@ -1866,7 +1866,7 @@ arithmetic.
   a call typed at the top level, so a script, a render, a test, a server
   and the package's own calls stay as quiet as before. Their class is
   `sframe_next_stage`, and `suppressMessages()` silences them.
-* **The RStudio Addins menu has "Try a demo".** It lists the 24 bundled
+* **The RStudio Addins menu has "Try a demo".** It lists the 27 bundled
   demos with what each teaches, and opens the chosen one in SurveyStudio on
   the Design screen with its responses loaded, so each of the 5 stages has
   something to show. It is the same as `launch_studio(demo = "two_group",
@@ -2013,6 +2013,17 @@ arithmetic.
 
 ## Demos
 
+* **3 new teaching demos**, 25 in all. `weighted_survey`: a resident
+  satisfaction survey whose sample over-represents 1 region, with frequency,
+  descriptives and a chi-square test weighted by a design weight carried in
+  the responses as `survey_weight`, a column that is not a question and that
+  `sframe_demo()` reads. `citing_sources`: a trust scale adapted from a
+  published model, with that source cited by the scale and the study and
+  Cronbach (1951) by the reliability check, each listed once at the end.
+  `mediation_moderation`: whether stress carries the effect of workload on
+  wellbeing, and whether a manager's support weakens the link from workload
+  to stress. Each has a study, "Demo author", hypotheses, a codebook and its
+  stored results, from the tracked generator.
 * **The all-types demo holds all 13 answerable types.** `input_types`
   gains a pairwise comparison on the Saaty scale, 1 on the influence scale
   and a criteria weight, over price, location and service, with seeded
@@ -2084,7 +2095,7 @@ arithmetic.
   with `preview = FALSE` or `options(surveyframe.demo_preview = FALSE)`.
 * **`sframe_list_demos()` prints 1 line per demo**, grouped as analysis,
   presentation, provenance and reference datasets, with `two_group` named
-  as the place to start, in 32 lines. It returns a data frame of class
+  as the place to start, in 35 lines. It returns a data frame of class
   `sframe_demo_list`, and `as.data.frame()` gives the full table.
 * **In RStudio the commands on the card and the list are links that run
   them**, through `cli`, now in Suggests. Without `cli`, or in a console

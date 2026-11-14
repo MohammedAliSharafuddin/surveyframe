@@ -305,6 +305,46 @@ demo_stories <- list(
       sampling = list(population = "Everyone admitted to the event", method = "census", planned_n = 60L)),
     serves = c(RQ1 = "O1")),
 
+  weighted_survey = list(
+    description = "A resident satisfaction survey whose sample over-represents 1 region, weighted back to the population's regional shares.",
+    study = list(
+      problem = "An online sample drew most of its answers from the north, so unweighted figures would overstate the north's view of the service.",
+      objectives = obj(O1 = "Describe the sample and the population across regions.",
+                       O2 = "Estimate satisfaction and its link with region for the population."),
+      sampling = list(population = "Adult residents of the 3 regions", method = "quota", planned_n = 120L)),
+    serves = c(RQ1 = "O1", RQ2 = "O1", RQ3 = "O2", RQ4 = "O2"),
+    hyp = list(RQ4 = hyp("Weighted to the population, region and recommending are independent.",
+                         "Weighted to the population, region and recommending are associated.")),
+    rules = c(RQ4 = rule_p)),
+
+  citing_sources = list(
+    description = "A study of trust in a new team leader, measured with items adapted from a published model of trust, with each source cited where it is used.",
+    study = list(
+      problem = "Teams with a new leader report low trust, and the organisation needs a short measure grounded in an established model of trust.",
+      objectives = obj(O1 = "Measure trust in the new leader and check the scale.",
+                       O2 = "Compare newer and longer-serving team members."),
+      sampling = list(population = "Members of teams with a leader appointed this year", method = "cluster", planned_n = 90L)),
+    serves = c(RQ1 = "O1", RQ2 = "O1", RQ3 = "O2"),
+    hyp = list(RQ3 = hyp("Mean trust does not differ between newer and longer-serving members.",
+                         "Mean trust differs between newer and longer-serving members.")),
+    rules = c(RQ2 = "Treat the scale as reliable when Cronbach's alpha is .70 or above [@cronbach_1951].",
+              RQ3 = rule_p)),
+
+  mediation_moderation = list(
+    description = "An employee wellbeing study of whether stress carries the effect of workload to wellbeing, and whether a manager's support weakens the link from workload to stress.",
+    study = list(
+      problem = "Heavy workloads are linked to poor wellbeing, and an organisation needs to know whether stress is the route and whether managers can soften it.",
+      objectives = obj(O1 = "Test whether stress mediates the effect of workload on wellbeing.",
+                       O2 = "Test whether manager support moderates the effect of workload on stress."),
+      sampling = list(population = "Employees of 1 organisation", method = "simple_random", planned_n = 200L)),
+    serves = c(RQ1 = "O1", RQ2 = "O2"),
+    hyp = list(RQ1 = hyp("Stress does not carry the effect of workload to wellbeing.",
+                         "Stress carries part of the effect of workload to wellbeing."),
+               RQ2 = hyp("The effect of workload on stress does not depend on manager support.",
+                         "The effect of workload on stress depends on manager support.")),
+    rules = c(RQ1 = "Treat the indirect effect as present when its 95% bootstrap confidence interval excludes 0.",
+              RQ2 = "Reject H0 if p < .05 for the interaction term, and report the simple slopes.")),
+
   # instrument_revision is first_survey amended, so it takes first_survey's
   # story before the amendment and has none of its own.
   verification = NULL

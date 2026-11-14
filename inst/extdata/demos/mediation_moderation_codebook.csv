@@ -1,0 +1,5 @@
+"item_id","item_label","type","scale_id","value","value_label"
+"workload","In a typical week, how heavy is your workload? (0 to 100)","slider",,,
+"support","How much support does your manager give you? (0 to 100)","slider",,,
+"stress","How stressed have you felt at work this month? (0 to 100)","slider",,,
+"wellbeing","How would you rate your wellbeing this month? (0 to 100)","slider",,,

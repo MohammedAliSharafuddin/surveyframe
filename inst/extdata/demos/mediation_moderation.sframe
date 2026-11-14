@@ -1,0 +1,145 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "4136f7e48a023a5a8c952dd65dbceafbf8a5ac45f33ebb56b258f1e892470b34",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Workload, stress and wellbeing",
+    "version": "1.0.0",
+    "description": "An employee wellbeing study of whether stress carries the effect of workload to wellbeing, and whether a manager's support weakens the link from workload to stress.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-11-14T09:16:23Z"
+  },
+  "items": [
+    {
+      "id": "workload",
+      "label": "In a typical week, how heavy is your workload? (0 to 100)",
+      "type": "slider",
+      "required": true,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    },
+    {
+      "id": "support",
+      "label": "How much support does your manager give you? (0 to 100)",
+      "type": "slider",
+      "required": true,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    },
+    {
+      "id": "stress",
+      "label": "How stressed have you felt at work this month? (0 to 100)",
+      "type": "slider",
+      "required": true,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    },
+    {
+      "id": "wellbeing",
+      "label": "How would you rate your wellbeing this month? (0 to 100)",
+      "type": "slider",
+      "required": true,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    }
+  ],
+  "choices": [],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "Does stress carry the effect of workload to wellbeing?",
+      "family": "model",
+      "method": "mediation",
+      "roles": {
+        "predictor": "workload",
+        "mediator": "stress",
+        "outcome": "wellbeing"
+      },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Stress does not carry the effect of workload to wellbeing.",
+        "alternative": "Stress carries part of the effect of workload to wellbeing."
+      },
+      "decision_rule": "Treat the indirect effect as present when its 95% bootstrap confidence interval excludes 0.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "mediation",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "Does manager support weaken the link from workload to stress?",
+      "family": "model",
+      "method": "moderation",
+      "roles": {
+        "predictor": "workload",
+        "moderator": "support",
+        "outcome": "stress"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "The effect of workload on stress does not depend on manager support.",
+        "alternative": "The effect of workload on stress depends on manager support."
+      },
+      "decision_rule": "Reject H0 if p < .05 for the interaction term, and report the simple slopes.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "moderation",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Workload, stress and wellbeing",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Heavy workloads are linked to poor wellbeing, and an organisation needs to know whether stress is the route and whether managers can soften it.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Test whether stress mediates the effect of workload on wellbeing."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether manager support moderates the effect of workload on stress."
+      }
+    ],
+    "sampling": {
+      "population": "Employees of 1 organisation",
+      "method": "simple_random",
+      "planned_n": 200
+    }
+  }
+}

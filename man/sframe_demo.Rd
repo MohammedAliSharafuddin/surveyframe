@@ -33,8 +33,8 @@ same data through another package. The 2 reference datasets have no
 codebook or results table, so those 2 paths are \code{NA}.
 }
 \description{
-One of the 22-item teaching library: 17 analysis examples, 3
-presentation examples, and 2 provenance examples. Or 1 of the 2 reference
+One of the 25-item teaching library: 19 analysis examples, 3
+presentation examples, and 3 provenance examples. Or 1 of the 2 reference
 datasets: \code{"tourism_services"}, a realistic multi-scale instrument, and
 \code{"input_types"}, which uses every input type SurveyBuilder and
 SurveyStudio support in a single instrument.
