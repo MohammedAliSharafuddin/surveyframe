@@ -1,12 +1,12 @@
 ---
 lang: en-GB
-title: "Learn by example: 22 small surveys"
+title: "Learn by example: 25 small surveys"
 output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{Learn by example: 22 small surveys}
+  %\VignetteIndexEntry{Learn by example: 25 small surveys}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
