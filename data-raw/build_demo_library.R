@@ -764,7 +764,7 @@ sem_model <- sf_model(
 # same 3 constructs are declared twice, once for each engine, and a reader
 # sees that the model type decides the syntax.
 pls_model <- sf_model(
-  id = "m2", label = "The same paths, estimated by PLS", type = "pls_sem",
+  id = "m2", label = "The same paths, as PLS-SEM syntax", type = "pls_sem",
   engine = "seminr",
   constructs = list(
     sf_construct("content_quality", items = paste0("cq_", 1:3), mode = "composite"),
