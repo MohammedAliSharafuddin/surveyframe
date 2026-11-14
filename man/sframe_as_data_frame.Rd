@@ -35,7 +35,7 @@ diagnostics.
 These tables are a summary of the columns a reader scans first. The item
 table leaves out help text, placeholder, matrix rows, comparison items and
 scale, slider and rating settings, date bounds, section introduction and
-page; the scale table leaves out \code{min_valid}, the reverse key and the
+page. The scale table leaves out \code{min_valid}, the reverse key and the
 weights. Read the stored declaration in full through \code{\link[=sframe_get_items]{sframe_get_items()}},
 \code{\link[=sframe_get_scales]{sframe_get_scales()}} and the rest of \link{sframe_accessors}, each of which returns the
 component objects themselves, or through \code{\link[=write_sframe]{write_sframe()}} for the

@@ -13,11 +13,11 @@ data frame (as produced internally by \code{\link[=run_analysis_plan]{run_analys
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
-A named list of four ggplot2 objects (\code{residuals_fitted}, \code{qq},
+A named list of 4 ggplot2 objects (\code{residuals_fitted}, \code{qq},
 \code{scale_location}, \code{leverage}), or \code{NULL} if diagnostics are unavailable.
 }
 \description{
-The four standard diagnostic panels (residuals vs fitted, normal Q-Q,
+The 4 standard diagnostic panels (residuals vs fitted, normal Q-Q,
 scale-location, residuals vs leverage), built from the plain data frame
 \code{\link[=run_analysis_plan]{run_analysis_plan()}} attaches to a \code{regression_linear} result rather than
 the \code{lm} object itself, so the result stays JSON-serialisable.

@@ -24,7 +24,7 @@ sframe_posthoc_results(
 
 \item{group}{Grouping variable for group comparisons.}
 
-\item{table_vars}{Two categorical variables for chi-square residuals and
+\item{table_vars}{2 categorical variables for chi-square residuals and
 pairwise proportion tests.}
 
 \item{measures}{Repeated binary measures for pairwise McNemar tests.}

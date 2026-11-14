@@ -37,7 +37,7 @@ sframe_efa_solution(
 }
 \value{
 An object of class \code{sframe_efa_solution}. Alongside the psych
-objects it carries three tidy data frames ready for plotting and
+objects it carries 3 tidy data frames ready for plotting and
 reporting: \code{loadings_long} (item_id, factor, loading),
 \code{communalities_table} (item_id, communality, uniqueness), and
 \code{variance_table} (factor, ss_loadings, proportion_var,

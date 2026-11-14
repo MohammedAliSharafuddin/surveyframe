@@ -7,7 +7,7 @@
 sframe_cohens_d_ci(x, y, R = 2000, conf.level = 0.95, seed = NULL)
 }
 \arguments{
-\item{x, y}{Numeric vectors, one per group.}
+\item{x, y}{Numeric vectors, 1 per group.}
 
 \item{R}{Integer. Number of bootstrap resamples. Defaults to 2000.}
 
@@ -24,7 +24,7 @@ leaves a sampling distribution to read. The bounds
 are \code{NA} when either group has fewer than 3 finite values.
 }
 \description{
-Percentile bootstrap for the standardised mean difference between two
+Percentile bootstrap for the standardised mean difference between 2
 independent groups. The difference is signed, the mean of \code{x} minus the
 mean of \code{y}, so the interval can include zero. Each resample draws within
 each group, preserving the group sizes.

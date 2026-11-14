@@ -370,7 +370,7 @@ sframe_validation_checks <- c(
 #' - Model specifications referencing missing indicators or constructs
 #'
 #' @section Changed in 0.4.0:
-#' Earlier versions returned two different things depending on `strict`: the
+#' Earlier versions returned 2 different things depending on `strict`: the
 #' instrument itself, invisibly, when `strict = TRUE`, and a bare unclassed
 #' list when `strict = FALSE`. A validator should report a diagnostic, so
 #' both paths now return an [sframe_validation] object, and they return it

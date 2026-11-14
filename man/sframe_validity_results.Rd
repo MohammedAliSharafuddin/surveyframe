@@ -21,7 +21,7 @@ Fornell-Larcker and inter-construct correlations.}
 each a data.frame of that construct's item-level responses. When
 supplied, \code{htmt} is the Henseler heterotrait-monotrait ratio: the mean
 absolute heterotrait-heteromethod correlation over the geometric mean
-of the two constructs' mean absolute monotrait-heteromethod
+of the 2 constructs' mean absolute monotrait-heteromethod
 correlations. Constructs with a single item have no monotrait
 correlations, so their HTMT entries are \code{NA}. Without this argument,
 \code{htmt} falls back to the absolute inter-construct correlation matrix

@@ -24,7 +24,7 @@ sframe_assumption_results(
 
 \item{predictors}{Optional regression predictors.}
 
-\item{table_vars}{Optional two categorical variables for expected-count
+\item{table_vars}{Optional 2 categorical variables for expected-count
 checks.}
 }
 \value{

@@ -15,11 +15,11 @@ sframe_plot_paired_comparison(result, data, palette = c("web", "print"))
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
-A ggplot2 object, or \code{NULL} if fewer than two complete pairs
+A ggplot2 object, or \code{NULL} if fewer than 2 complete pairs
 remain, or ggplot2 is unavailable.
 }
 \description{
-One line per respondent connecting their two paired values, shared by
+One line per respondent connecting their 2 paired values, shared by
 \code{t_test_pair} and \code{wilcoxon_pair} (both carry \code{vars = c(x_column, y_column)} on the same respondents). The standard visual for a paired
 design: it shows the direction and consistency of individual change,
 which a plain bar-of-means would hide.

@@ -21,13 +21,13 @@ Plots a \code{co_occurrence_network} result's node table (\code{term}, \code{fre
 line segments underneath, nodes as points sized by term frequency and
 coloured by Louvain cluster, with term labels on the larger points only.
 Labelling every point on a dense network risks overlap chaos, so only
-the top 15 nodes by frequency are labelled; the full term list stays
+the top 15 nodes by frequency are labelled, and the full term list stays
 available in \code{result$table}.
 }
 \details{
 Clusters beyond the first 8 (ranked largest first) are folded into a
 single "Other" bucket rather than cycling or interpolating a new hue,
-per the dataviz skill's categorical-colour guidance; see
+per the dataviz skill's categorical-colour guidance, as
 \code{.sframe_cluster_palette()}.
 }
 \examples{

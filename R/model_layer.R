@@ -610,7 +610,7 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #' @param cross_loading Maximum secondary loading before a warning is raised.
 #'
 #' @return An object of class `sframe_efa_solution`. Alongside the psych
-#'   objects it carries three tidy data frames ready for plotting and
+#'   objects it carries 3 tidy data frames ready for plotting and
 #'   reporting: `loadings_long` (item_id, factor, loading),
 #'   `communalities_table` (item_id, communality, uniqueness), and
 #'   `variance_table` (factor, ss_loadings, proportion_var,

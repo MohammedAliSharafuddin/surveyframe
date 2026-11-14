@@ -434,7 +434,7 @@ sframe_amendment_preview <- function(previous, instrument) {
 #' who rewrites both a file and its log, and recomputes the hashes, is not
 #' detected, and nothing here establishes who made a change or when.
 #'
-#' Amendments come in two tiers. A `"pipeline"` amendment (data corrections,
+#' Amendments come in 2 tiers. A `"pipeline"` amendment (data corrections,
 #' bot removal) needs only a reason. A `"design"` amendment also requires a
 #' `deviation_report` describing what changed in the research question,
 #' method or model, and why. The tier follows the change itself: an amendment

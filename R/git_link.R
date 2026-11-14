@@ -48,8 +48,7 @@ sframe_git_run <- function(args, repo_path) {
 #'
 #' Git is entirely optional. When `repo_path` is not inside a Git
 #' repository, or the `git` executable is not on the `PATH`, this returns a
-#' clear, non-error result with `linked = FALSE` rather than aborting --
-#' the rest of surveyframe never requires Git.
+#' clear, non-error result with `linked = FALSE` rather than aborting. The rest of surveyframe never requires Git.
 #'
 #' @param instrument An `sframe` object.
 #' @param repo_path Character. Path to check for a Git repository. Defaults

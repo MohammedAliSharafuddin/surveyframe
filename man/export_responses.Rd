@@ -46,10 +46,10 @@ do not start with a letter, and names over the format's length limit (64
 bytes for SPSS, 32 characters for Stata). Matrix row columns such as
 \verb{session__Reading materials} are renamed to valid names, with illegal
 characters turned into \verb{_}, a leading \code{v} where the first character is not
-a letter, and a number added where two names would otherwise match. Variable
+a letter, and a number added where 2 names would otherwise match. Variable
 labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
-keeps its full label. One message lists each change as old -> new.
+keeps its full label. 1 message lists each change as old -> new.
 }
 
 \examples{

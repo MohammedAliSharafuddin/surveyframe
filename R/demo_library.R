@@ -510,10 +510,10 @@ print.sframe_branding <- function(x, ...) {
 #' bytes for SPSS, 32 characters for Stata). Matrix row columns such as
 #' `session__Reading materials` are renamed to valid names, with illegal
 #' characters turned into `_`, a leading `v` where the first character is not
-#' a letter, and a number added where two names would otherwise match. Variable
+#' a letter, and a number added where 2 names would otherwise match. Variable
 #' labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 #' labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
-#' keeps its full label. One message lists each change as old -> new.
+#' keeps its full label. 1 message lists each change as old -> new.
 #'
 #' @return The path, invisibly. When any name or label was changed, the path
 #'   carries an attribute `"renamed"`, a data frame with the columns `kind`

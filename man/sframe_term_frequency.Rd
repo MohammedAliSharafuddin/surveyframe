@@ -23,7 +23,7 @@ A data.frame with columns \code{term}, \code{n}, and \code{pct}.
 Tokenises \code{text} (splitting on whitespace, lower-casing, and stripping
 punctuation), removes stop words, and counts term frequency. Ships a
 small built-in English stop-word list so this works with zero optional
-packages; pass \code{stop_words = character(0)} to disable filtering, or a
+packages. Pass \code{stop_words = character(0)} to disable filtering, or a
 custom vector to override it.
 }
 \examples{

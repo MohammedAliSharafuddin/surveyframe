@@ -67,7 +67,7 @@ codes outside 1 evenly spaced run (1 to 5 and 99 for "do not know"), which
 }
 \section{Changed in 0.4.0}{
 
-Earlier versions returned two different things depending on \code{strict}: the
+Earlier versions returned 2 different things depending on \code{strict}: the
 instrument itself, invisibly, when \code{strict = TRUE}, and a bare unclassed
 list when \code{strict = FALSE}. A validator should report a diagnostic, so
 both paths now return an \link{sframe_validation} object, and they return it

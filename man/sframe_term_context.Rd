@@ -29,7 +29,7 @@ can judge how a term is actually being used rather than reading a bare
 frequency count. Matching is on whole words only, so searching for
 "room" does not match "roomy". \code{text} is expected to already have been
 run through \code{\link[=sframe_clean_text]{sframe_clean_text()}} (its \code{respondent} attribute is used
-to cite the original row index for each match; when absent, positions
+to cite the original row index for each match, and when absent, positions
 \code{seq_along(text)} are used instead). Tokenisation here is a plain
 whitespace split, not the internal stop-word-stripping tokeniser behind
 \code{\link[=sframe_term_frequency]{sframe_term_frequency()}}: stop words are part of a match's context and

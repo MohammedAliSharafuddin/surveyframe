@@ -59,7 +59,7 @@ sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
 #' not state delivery in it. It appears below the status line in every case
 #' except a failed send, and defaults to "Thank you for participating."
 #'
-#' Two settings in the instrument's `render` block suit a host too.
+#' 2 settings in the instrument's `render` block suit a host too.
 #' `render$thankyou$show_restart = FALSE` hides "Submit another response".
 #' `render$save_draft = TRUE` keeps the answers in the browser's local storage
 #' as the respondent goes, under a key drawn from the instrument's content, so

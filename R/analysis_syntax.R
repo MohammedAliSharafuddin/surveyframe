@@ -322,7 +322,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #'
 #' @param x An `sframe_analysis_results` object from [run_analysis_plan()], or
 #'   one block's result from it.
-#' @param which Character or NULL. One block id, when `x` holds several.
+#' @param which Character or NULL. One block id, when `x` holds more than 1 block.
 #' @param data_expr Character. The expression the code should read its data
 #'   from. Defaults to `"scored"`, the scored frame the header sets up.
 #' @param header Logical. Whether to include the lines that load the
@@ -330,7 +330,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #'   that runs on its own.
 #'
 #' @return A character vector of R code lines, or `NULL` for a method this does
-#'   not cover. For several blocks, a named list of such vectors.
+#'   not cover. For more than 1 block, a named list of such vectors.
 #' @export
 #' @seealso [run_analysis_plan()], [sframe_syntax_cfa()], [render_report()]
 #'

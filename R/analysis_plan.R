@@ -2408,7 +2408,7 @@ sframe_md_em <- function(x) {
 #'   the only one the report writes. `"ama"` and `"vancouver"` were accepted
 #'   before 0.4.3 and never applied, so they are refused with a message.
 #' @param title Character or NULL. Report title. Defaults to the instrument
-#'   title with " -- Results" appended.
+#'   title with `" -- Results"` appended.
 #' @param interpretations Named list or NULL. Written interpretations keyed
 #'   by analysis-plan block id, added after the results are known. A block
 #'   with an entry shows that text in its Interpretation section, labelled

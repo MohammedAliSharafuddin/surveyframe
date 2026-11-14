@@ -7,7 +7,7 @@
 #' Save instruments as `.sframe` files from the browser and load them into R
 #' with [read_sframe()].
 #'
-#' The builder includes a three-mode interface.
+#' The builder includes a 3-mode interface.
 #'
 #' \describe{
 #'   \item{Build}{An item editor with a persistent inspector panel,

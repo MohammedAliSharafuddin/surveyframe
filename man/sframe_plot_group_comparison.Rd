@@ -7,7 +7,7 @@
 sframe_plot_group_comparison(result, data, palette = c("web", "print"))
 }
 \arguments{
-\item{result}{A result list from one of the four runners above, with
+\item{result}{A result list from one of the 4 runners above, with
 \code{vars = c(group_column, outcome_column)}.}
 
 \item{data}{The response data frame the result was computed from.}
@@ -16,16 +16,16 @@ sframe_plot_group_comparison(result, data, palette = c("web", "print"))
 }
 \value{
 A ggplot2 object, or \code{NULL} if the columns are missing, fewer
-than two groups remain after removing missing values, or ggplot2 is
+than 2 groups remain after removing missing values, or ggplot2 is
 unavailable.
 }
 \description{
 Boxplot with jittered points, shared across every runner whose result
 carries \code{vars = c(group_column, outcome_column)}: \code{t_test_ind},
-\code{mann_whitney}, \code{kruskal_wallis}, and \code{anova_one}. One function instead of
-four, since the underlying comparison (an outcome split by a grouping
+\code{mann_whitney}, \code{kruskal_wallis}, and \code{anova_one}. 1 function instead of
+4, since the underlying comparison (an outcome split by a grouping
 factor) and the data shape needed to plot it are identical across all
-four tests, and only the inferential statistic differs.
+4 tests, and only the inferential statistic differs.
 }
 \examples{
 \donttest{
