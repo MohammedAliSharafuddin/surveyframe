@@ -1,19 +1,23 @@
 ---
 title: "Plan first, analyse second: the analysis plan in surveyframe"
-description: "Why surveyframe asks for the analysis plan before the data, what a plan block holds, and how a later change is recorded as an amendment."
+description: "How to plan your analysis before collecting responses: for each research question, what you expect to find, the measurements you will use and how you will analyse them."
 ---
 
-In surveyframe the analysis plan is part of the questionnaire file. Each
-research question is a plan block, written before any answer arrives, and the
-analyses run as declared.
+For each research question, record what you expect to find, which
+measurements you will use and how you will analyse them, before any responses
+arrive. surveyframe keeps this plan in the questionnaire file. You enter each
+research question under **Plan** on the Design screen, and the analyses run as
+written.
 
-## What a plan block holds
+## What each research question records
 
 - **The research question**, in words.
-- **The hypotheses**, H0 and H1.
+- **The hypotheses**: the null hypothesis (H0), that there is no difference or
+  relation, and the alternative hypothesis (H1), what you expect to find.
 - **The method**, such as an independent samples t-test or a binary logistic
   regression.
-- **The variables**, each in its role: the outcome, the group, the predictors.
+- **The variables**, each in its role, such as the outcome you measure, the
+  group you compare, or the predictors you use.
 - **The significance level**, alpha, where the method tests a hypothesis.
 - **The decision rule**: what result will count as support.
 - **The objective** of the study it serves.
