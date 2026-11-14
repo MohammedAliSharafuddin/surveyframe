@@ -2032,6 +2032,12 @@ arithmetic.
 
 ## Demos
 
+* **The `sem_pls` demo's RQ5 asks "And what seminr code would estimate the
+  PLS model?"**, where it asked what a PLS estimate gives. Its `pls_sem`
+  block returns the seminr syntax for the model, which the reader fits in
+  seminr. The file has a new hash, and its results and codebook are
+  unchanged.
+
 * **Demonstration data says so wherever it goes.** Every demo's responses
   have respondent ids `DEMO-001` and on, and a `data_status` column,
   "Demonstration data, not collected from participants". `read_responses()`
