@@ -1,13 +1,13 @@
 ---
 title: "Customer satisfaction survey"
-description: "A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report."
+description: "A customer study of return intention: whether customers who use a service more come back, and how that use relates to their satisfaction and the offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report."
 ---
 
 ```{=html}
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Customer satisfaction survey","description":"A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/customer-satisfaction-survey.html"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Customer satisfaction survey","description":"A customer study of return intention: whether customers who use a service more come back, and how that use relates to their satisfaction and the offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.","about":{"@type":"SoftwareSourceCode","name":"surveyframe","url":"https://surveyframe.org"},"url":"https://surveyframe.org/articles/templates/customer-satisfaction-survey.html"}</script>
 ```
 
-A customer study of whether using a service more predicts that customers return, how satisfied they are and which offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.
+A customer study of return intention: whether customers who use a service more come back, and how that use relates to their satisfaction and the offer they prefer. surveyframe gives you the questionnaire, a plan with logistic regressions declared in advance, and the report.
 
 ## Preview the questionnaire
 
