@@ -352,7 +352,10 @@ style.
   instrument a change to it is a design amendment. `validate_sframe()`
   refuses an empty block, a blank or non-text field and an unknown field,
   and the published instrument profile declares it. An instrument with no
-  preregistration hashes as before.
+  preregistration hashes as before. SurveyBuilder edits the 6 fields on
+  its Study tab, below the sampling plan, and its Plan mode, also Studio's
+  Plan screen, has a "Preregistration fields" button that opens them. A
+  blank field is left out, as R writes it.
 * **Text fields may hold Markdown and equations.** A research question,
   H0, H1, decision rule, interpretation, study problem or deviation report
   may use bold, italic, lists, links, `[@key]` citations, `~sub~`, `^sup^`,
