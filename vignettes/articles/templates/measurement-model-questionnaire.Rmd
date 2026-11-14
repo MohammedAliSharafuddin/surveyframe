@@ -33,7 +33,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ![Analyse screen with the declared plan.](../../templates/sem_pls/analyse.png){width=100%}
 ![Report screen.](../../templates/sem_pls/report.png){width=100%}
 
-## Start in 2 steps (no coding)
+## Start in 2 steps in SurveyStudio
 
 1. Install surveyframe in R: `install.packages("surveyframe")`
 2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `sem_pls`. The study opens in SurveyStudio.
@@ -48,7 +48,7 @@ surveyframe writes the syntax for lavaan (covariance-based SEM and CFA) and semi
 
 Yes. Constructs, paths and the indirect effect are declared in the instrument and sealed with it.
 
-### Does it work without coding?
+### Can I run the whole study in SurveyStudio?
 
 Yes. The model layer opens in SurveyStudio from RStudio's Addins menu.
 

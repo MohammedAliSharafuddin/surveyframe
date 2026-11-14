@@ -33,7 +33,7 @@ The study in SurveyStudio, stage by stage: design, collect, check, analyse and r
 ![Analyse screen with the declared plan.](../../templates/mcdm_choice/analyse.png){width=100%}
 ![Report screen.](../../templates/mcdm_choice/report.png){width=100%}
 
-## Start in 2 steps (no coding)
+## Start in 2 steps in SurveyStudio
 
 1. Install surveyframe in R: `install.packages("surveyframe")`
 2. In RStudio, open the Addins menu, choose **surveyframe: Try a demo**, and pick `mcdm_choice`. The study opens in SurveyStudio.
