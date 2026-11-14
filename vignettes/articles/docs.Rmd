@@ -21,3 +21,16 @@ Docs answer how to set something up. The [method guides](guides.html) answer how
 - [Ask for pairwise comparisons](docs/question-types/pairwise-comparison.html)
 - [Ask respondents to weight criteria](docs/question-types/criteria-weights.html)
 
+## Methods (10 pages) {#methods}
+
+- [Compare groups](docs/methods/group-comparisons.html)
+- [Compare the same people over time](docs/methods/repeated-measures.html)
+- [Test an association between categories](docs/methods/associations.html)
+- [Measure how answers go together](docs/methods/correlations.html)
+- [Predict an outcome](docs/methods/regression.html)
+- [Score a scale and check its reliability](docs/methods/scales-reliability.html)
+- [Check structure and test models](docs/methods/factor-models.html)
+- [Describe the answers and their quality](docs/methods/describing-data.html)
+- [Analyse open answers](docs/methods/text-analysis.html)
+- [Choose between options](docs/methods/decisions.html)
+
