@@ -23,7 +23,8 @@ columns are used.}
 
 \item{conf_level}{Confidence level for the mean interval.}
 
-\item{weights}{Optional case-weight column.}
+\item{weights}{Optional case-weight column, such as a design weight the
+researcher set. A named column missing from \code{data} is an error.}
 }
 \value{
 An object of class \code{sframe_descriptives_report}. Its \code{table} has

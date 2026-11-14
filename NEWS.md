@@ -536,6 +536,15 @@ style.
 
 ## Analysis
 
+* **A plan may weight by a column that is not a question.** A design
+  weight is set by the researcher, not asked of respondents, so the
+  `weights` role of a frequency, descriptives, cross-tabulation or
+  chi-square block may now name a column that is not an item.
+  `validate_sframe()` notes it ("weights column survey_weight is not an
+  item, so it must be in the responses"), where it refused the plan.
+  Read it with `read_responses(meta_cols = )`. A named weight column the
+  responses lack fails the block with a message saying so, where it was
+  skipped and the result came out unweighted.
 * **Cross-tab percentages and totals.** A `crosstab` or `chi_square`
   result carries `$totals`, the counts with a Total row and column. With
   `options$percent = "row"`, `"column"` or `"total"` it also carries

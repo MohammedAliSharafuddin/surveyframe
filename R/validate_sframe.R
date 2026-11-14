@@ -870,6 +870,19 @@ validate_sframe <- function(instrument, strict = TRUE) {
                                                      recursive = TRUE, use.names = FALSE))
       model_ref_values <- as.character(model_ref_values[!is.na(model_ref_values)])
       data_refs <- setdiff(role_refs, model_ref_values)
+      # A design weight is set by the researcher, not asked, so the weights
+      # role alone may name a column that is not an item (Session 10,
+      # coordinator 2026-11-14). It is noted, never silent, and
+      # run_analysis_plan() refuses it when the responses lack it.
+      weight_refs <- as.character(unlist(block$roles[intersect(role_names, c("weights", "weight"))],
+                                         use.names = FALSE))
+      weight_refs <- setdiff(weight_refs[!is.na(weight_refs) & nzchar(weight_refs)], known_vars)
+      for (wc in unique(weight_refs)) {
+        log$notes <- c(log$notes, sprintf(
+          "Analysis plan '%s': weights column %s is not an item, so it must be in the responses.",
+          block_id, wc))
+      }
+      data_refs <- setdiff(data_refs, weight_refs)
       refs <- c(refs, data_refs)
     }
     model_ref_values <- model_ref_values[nzchar(model_ref_values)]
