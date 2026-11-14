@@ -1,11 +1,11 @@
 ---
 title: "Choose between options"
-description: "How much each criterion weighs, and which option ranks best."
+description: "These methods weigh each criterion and rank the options."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-How much each criterion weighs, and which option ranks best.
+These methods weigh each criterion and rank the options.
 
 **Assumptions.** Consistent pairwise judgements (a consistency ratio below .10) and a performance score for each option on each criterion.
 

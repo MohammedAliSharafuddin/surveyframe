@@ -16,7 +16,7 @@ Add a question, choose Matrix, list the rows, and pick the scale every row is ra
 ## Settings
 
 - **Rows.** The things rated. Each row becomes its own column, named after it.
-- **Answer set.** The scale every row shares.
+- **Choice set.** The answer options every row is rated on.
 
 ## Best practices for research
 

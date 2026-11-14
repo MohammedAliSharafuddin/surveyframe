@@ -15,7 +15,7 @@ Add a question, choose Ranking, and give the options to put in order.
 
 ## Settings
 
-- **Answer set.** The options. The answer is their order, first to last.
+- **Choice set.** The options respondents put in order. Each option gets its own column in the data, holding its position, 1 for first.
 
 ## Best practices for research
 

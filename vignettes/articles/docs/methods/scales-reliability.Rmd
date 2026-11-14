@@ -1,11 +1,11 @@
 ---
 title: "Score a scale and check its reliability"
-description: "A scale's score, and whether its items hold together."
+description: "These methods give a scale's score and test whether its items hold together."
 ---
 
 [Documentation](../../docs.html) / [Methods](../../docs.html#methods)
 
-A scale's score, and whether its items hold together.
+These methods give a scale's score and test whether its items hold together.
 
 **Assumptions.** Items that measure 1 idea, with reverse-worded items scored back. Alpha assumes items contribute equally, omega does not.
 
