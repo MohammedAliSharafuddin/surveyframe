@@ -17,7 +17,7 @@ test_that("the message names the version, the citation and the site", {
   expect_match(txt, as.character(utils::packageVersion("surveyframe")),
                fixed = TRUE)
   expect_match(txt, 'citation("surveyframe")', fixed = TRUE)
-  expect_match(txt, "https://mohammedalisharafuddin.github.io/surveyframe/",
+  expect_match(txt, "https://surveyframe.org/",
                fixed = TRUE)
 })
 

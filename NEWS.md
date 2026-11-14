@@ -1390,6 +1390,10 @@ arithmetic.
 
 ## Documentation
 
+* **The website moves to https://surveyframe.org.** DESCRIPTION's URL
+  field names it first, with the GitHub repository second, and the
+  start-up message, the README, the verifier page's canonical link and the
+  sitemap point to it. The old address redirects.
 * **New vignette, "Two ways to run a study"**, with SurveyStudio
   screenshots: the 5 stages (design, collect, check, analyse, report), each
   in SurveyStudio and in R, on the `paired` demo, and the pre-analysis plan

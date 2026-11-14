@@ -31,7 +31,7 @@ Description: Provides a design-first survey research workflow. An
     networks, sentiment, document-feature matrices, and topic modelling
     via LDA or structural topic models).
 License: MIT + file LICENSE
-URL: https://mohammedalisharafuddin.github.io/surveyframe/,
+URL: https://surveyframe.org,
     https://github.com/MohammedAliSharafuddin/surveyframe
 BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 Encoding: UTF-8
