@@ -1,5 +1,5 @@
 ---
-title: "Ask an open-ended question"
+title: "Add an open-ended question"
 description: "Add a question and choose Long text for a paragraph."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question and choose Long text for a paragraph."
 
 Add a question and choose Long text for a paragraph.
 
-![The open-ended question question selected in the editor, its settings outlined.](../../../docs/question-types/long-text-editor.png){width=100%}
+![The questionnaire editor with the open-ended question selected and its settings panel outlined.](../../../docs/question-types/long-text-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/long-text-preview.png){width=90%}
+![The open-ended question as the respondent sees it.](../../../docs/question-types/long-text-preview.png){width=90%}
 
 ## Settings
 

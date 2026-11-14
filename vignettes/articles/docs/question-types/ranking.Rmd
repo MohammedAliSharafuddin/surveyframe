@@ -1,5 +1,5 @@
 ---
-title: "Ask respondents to rank options"
+title: "Add a ranking question"
 description: "Add a question, choose Ranking, and give the options to put in order."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Ranking, and give the options to put in ord
 
 Add a question, choose Ranking, and give the options to put in order.
 
-![The respondents to rank options question selected in the editor, its settings outlined.](../../../docs/question-types/ranking-editor.png){width=100%}
+![The questionnaire editor with the ranking question selected and its settings panel outlined.](../../../docs/question-types/ranking-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/ranking-preview.png){width=90%}
+![The ranking question as the respondent sees it.](../../../docs/question-types/ranking-preview.png){width=90%}
 
 ## Settings
 

@@ -1,31 +1,52 @@
 ---
-title: "Question types: the 13 kinds of question surveyframe asks"
-description: "The 13 answerable question types in surveyframe, from Likert and single choice to pairwise comparisons and criteria weights, with what each collects and the analyses it suits."
+title: "Choosing questions for your survey"
+description: "Choose a question type to match the information you need, from agreement ratings and dates to written feedback and ranked options, with the analyses each type suits."
 ---
 
-surveyframe asks 13 kinds of question, and 2 more elements lay the survey
-out. Each type stores its answer in a declared shape, so the analysis plan
-knows what it can do with it. The `input_types` demo holds all 13: open it
-from RStudio's Addins menu with **surveyframe: Try a demo**.
+Choose a question type to match the information you need, from agreement
+ratings and dates to written feedback and ranked options. Each type below
+links to a page that shows how to add it. The `input_types` demo holds all
+13: open it from RStudio's Addins menu with **surveyframe: Try a demo**.
 
-| Type | What the respondent does | What it stores | Suits |
-|---|---|---|---|
-| Likert | Rates agreement on a labelled scale | 1 coded value | Scales, reliability, ordinal tests |
-| Single choice | Picks 1 option | 1 code | Frequencies, cross-tabulations, group comparisons |
-| Multiple choice | Picks any options | 1 column per option | Frequencies, Cochran's Q |
-| Numeric | Types a number | A number | Descriptives, t-tests, regression |
-| Short text | Types a line | Text | Text analysis |
-| Long text | Types a paragraph | Text | Text analysis, topic models |
-| Date | Picks a date | A date | Descriptives |
-| Grid (matrix) | Rates several rows on 1 scale | 1 column per row | Descriptives, scales |
-| Slider | Drags to a value | A number | Descriptives, correlation |
-| Ranking | Orders options | The order | Rank descriptives |
-| Star rating | Gives stars | A number | Descriptives, ordinal tests |
-| Pairwise comparison | Judges which of 2 matters more, and by how much (Saaty), or how much 1 influences another (0 to 4) | 1 column per pair | AHP, ANP, DEMATEL |
-| Criteria weights | Divides 100 points across criteria | 1 column per criterion | Decision methods |
+## Questions, response options and scales
+
+A **question** asks 1 thing. Its **response options** are the labelled
+choices it offers, such as Strongly disagree to Strongly agree, and related
+questions can share 1 set of options. A **scored scale** combines a group of
+related questions into 1 score, such as an organisation score from 4
+agreement questions, and its reliability is checked as a whole.
+[Add a Likert question to a scale](../docs/question-types/likert.html) shows
+the steps.
+
+## The 13 question types
+
+| Type | What the respondent does | Suits |
+|---|---|---|
+| [Likert](../docs/question-types/likert.html) | Rates agreement on a labelled scale | Scored scales, reliability, ordinal tests |
+| [Single choice](../docs/question-types/single-choice.html) | Picks 1 option | Frequencies, cross-tabulations, group comparisons |
+| [Multiple choice](../docs/question-types/multiple-choice.html) | Picks any options | Frequencies, Cochran's Q |
+| [Numeric](../docs/question-types/numeric.html) | Types a number | Descriptives, t-tests, regression |
+| [Short text](../docs/question-types/short-text.html) | Types a line | Text analysis |
+| [Long text](../docs/question-types/long-text.html) | Types a paragraph | Text analysis, topic models |
+| [Date](../docs/question-types/date.html) | Picks a date | Descriptives |
+| [Grid (matrix)](../docs/question-types/grid.html) | Rates a set of rows on 1 scale | Descriptives, scored scales |
+| [Slider](../docs/question-types/slider.html) | Drags to a value | Descriptives, correlation |
+| [Ranking](../docs/question-types/ranking.html) | Orders options | Rank descriptives |
+| [Star rating](../docs/question-types/star-rating.html) | Gives stars | Descriptives, ordinal tests |
+| [Pairwise comparison](../docs/question-types/pairwise-comparison.html) | Judges which of 2 criteria matters more (Saaty), or how much 1 influences another (0 to 4) | AHP, ANP, DEMATEL |
+| [Criteria weights](../docs/question-types/criteria-weights.html) | Divides 100 points across criteria | Decision methods |
 
 The 2 layout elements are a **section break**, which starts a new page with
-a heading, and a **text block**, which shows text and collects nothing.
+a heading, and a **text block**, which shows text and collects no answer.
 
 Any question can be **required**, shown only when an earlier answer allows it
 (**branching**), or checked for attention (**attention checks**).
+
+## For analysis: how answers are stored
+
+Each type stores its answer in a declared shape, so the analysis plan matches
+each method to the answers it can use. Likert, single choice, slider, star
+rating and numeric questions store 1 value. A multiple choice question stores
+1 column per option, a grid 1 column per row, a pairwise comparison 1 column
+per pair compared, and criteria weights 1 column per criterion. Text and date
+questions store the text or date given, and a ranking stores the order.

@@ -1,5 +1,5 @@
 ---
-title: "Ask a single-choice question"
+title: "Add a single-choice question"
 description: "Add a question, choose Single choice, and give the options the respondent picks 1 from."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Single choice, and give the options the res
 
 Add a question, choose Single choice, and give the options the respondent picks 1 from.
 
-![The single-choice question question selected in the editor, its settings outlined.](../../../docs/question-types/single-choice-editor.png){width=100%}
+![The questionnaire editor with the single-choice question selected and its settings panel outlined.](../../../docs/question-types/single-choice-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/single-choice-preview.png){width=90%}
+![The single-choice question as the respondent sees it.](../../../docs/question-types/single-choice-preview.png){width=90%}
 
 ## Settings
 

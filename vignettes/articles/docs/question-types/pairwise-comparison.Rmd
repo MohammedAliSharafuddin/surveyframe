@@ -1,21 +1,21 @@
 ---
-title: "Ask for pairwise comparisons"
-description: "Add a question, choose Pairwise comparison, list the criteria, and pick the scale: Saaty for importance, or influence."
+title: "Add pairwise comparisons"
+description: "Choose the task first. To find which criteria matter most (AHP, ANP), use Saaty's importance scale. To find how criteria influence each other (DEMATEL), use the influence scale. Then add a question, choose Pairwise comparison and list the criteria."
 ---
 
 [Documentation](../../docs.html) / [Question types](../../docs.html#question-types)
 
-Add a question, choose Pairwise comparison, list the criteria, and pick the scale: Saaty for importance, or influence.
+Choose the task first. To find which criteria matter most (AHP, ANP), use Saaty's importance scale. To find how criteria influence each other (DEMATEL), use the influence scale. Then add a question, choose Pairwise comparison and list the criteria.
 
-![The pairwise comparisons question selected in the editor, its settings outlined.](../../../docs/question-types/pairwise-comparison-editor.png){width=100%}
+![The questionnaire editor with the pairwise comparisons selected and its settings panel outlined.](../../../docs/question-types/pairwise-comparison-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/pairwise-comparison-preview.png){width=90%}
+![The pairwise comparisons as the respondent sees it.](../../../docs/question-types/pairwise-comparison-preview.png){width=90%}
 
 ## Settings
 
-- **Criteria.** The things compared. Every pair is asked once.
+- **Criteria.** The things compared. On Saaty's scale each pair is asked once, since judging A against B also answers B against A. On the influence scale each pair is asked in both directions, since the influence of A on B can differ from that of B on A.
 - **Scale.** Saaty's 1 to 9 for which matters more and by how much (AHP, ANP), or 0 to 4 for how much 1 influences another (DEMATEL).
 
 ## Best practices for research

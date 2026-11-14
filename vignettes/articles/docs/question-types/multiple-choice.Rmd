@@ -1,5 +1,5 @@
 ---
-title: "Ask a choose-any question"
+title: "Add a choose-any question"
 description: "Add a question, choose Multiple choice, and give the options the respondent may tick."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question, choose Multiple choice, and give the options the r
 
 Add a question, choose Multiple choice, and give the options the respondent may tick.
 
-![The choose-any question question selected in the editor, its settings outlined.](../../../docs/question-types/multiple-choice-editor.png){width=100%}
+![The questionnaire editor with the choose-any question selected and its settings panel outlined.](../../../docs/question-types/multiple-choice-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/multiple-choice-preview.png){width=90%}
+![The choose-any question as the respondent sees it.](../../../docs/question-types/multiple-choice-preview.png){width=90%}
 
 ## Settings
 

@@ -1,5 +1,5 @@
 ---
-title: "Ask for a star rating"
+title: "Add a star rating"
 description: "Add a question and choose Rating for a row of stars."
 ---
 
@@ -7,11 +7,11 @@ description: "Add a question and choose Rating for a row of stars."
 
 Add a question and choose Rating for a row of stars.
 
-![The a star rating question selected in the editor, its settings outlined.](../../../docs/question-types/star-rating-editor.png){width=100%}
+![The questionnaire editor with the star rating selected and its settings panel outlined.](../../../docs/question-types/star-rating-editor.png){width=100%}
 
 ## What the respondent sees
 
-![The question as the respondent sees it.](../../../docs/question-types/star-rating-preview.png){width=90%}
+![The star rating as the respondent sees it.](../../../docs/question-types/star-rating-preview.png){width=90%}
 
 ## Settings
 
