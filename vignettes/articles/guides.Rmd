@@ -1,13 +1,23 @@
 ---
 title: "How-to guides"
-description: "How to answer a research question with a survey: compare groups, check a scale, predict an outcome, analyse open answers and more, each in SurveyStudio and in R."
+description: "Follow a complete task, from setting up a questionnaire to analysing responses and documenting your study, in SurveyStudio and in R."
 ---
 
-Each guide answers 1 research question, with the SurveyStudio route first and the R code after.
+Follow a complete task, from setting up a questionnaire to analysing responses and documenting your study. Each guide gives the SurveyStudio steps first and the R code after.
 
-## Analyse
+## Run a complete study
 
 - [How to run a complete survey, from questionnaire to report, in R](guides/run-a-complete-survey-from-questionnaire-to-report-in-r.html)
+
+## Design the questionnaire
+
+- [How to ask questions only of those they apply to](guides/ask-questions-only-of-those-they-apply-to.html)
+- [How to add a welcome page, a logo and a colour to a survey](guides/add-a-welcome-page-a-logo-and-a-colour-to-a-survey.html)
+- [How to show a survey 1 question at a time](guides/show-a-survey-1-question-at-a-time.html)
+- [How to combine 1 question at a time with skip logic](guides/combine-1-question-at-a-time-with-skip-logic.html)
+
+## Analyse and report
+
 - [How to check whether a Likert scale holds together](guides/check-whether-a-likert-scale-holds-together.html)
 - [How to analyse a grid of rating questions](guides/analyse-a-grid-of-rating-questions.html)
 - [How to compare 2 groups on a survey outcome](guides/compare-2-groups-on-a-survey-outcome.html)
@@ -19,21 +29,14 @@ Each guide answers 1 research question, with the SurveyStudio route first and th
 - [How to predict a yes or no, an ordered rating or a choice](guides/predict-a-yes-or-no-an-ordered-rating-or-a-choice.html)
 - [How to check whether your items measure the factors you assumed](guides/check-whether-your-items-measure-the-factors-you-assumed.html)
 - [How to test a measurement and structural model](guides/test-a-measurement-and-structural-model.html)
-- [How to ask questions only of those they apply to](guides/ask-questions-only-of-those-they-apply-to.html)
 - [How to analyse open-ended answers](guides/analyse-open-ended-answers.html)
-- [How to choose between options on several criteria](guides/choose-between-options-on-several-criteria.html)
+- [How to choose between options on multiple criteria](guides/choose-between-options-on-multiple-criteria.html)
 - [How to analyse a survey with fewer than 30 respondents](guides/analyse-a-survey-with-fewer-than-30-respondents.html)
 - [How to analyse choose-any and ranking questions](guides/analyse-choose-any-and-ranking-questions.html)
 - [How to weight a survey sample to its population](guides/weight-a-survey-sample-to-its-population.html)
 - [How to test mediation and moderation](guides/test-mediation-and-moderation.html)
 
-## Present the survey
-
-- [How to add a welcome page, a logo and a colour to a survey](guides/add-a-welcome-page-a-logo-and-a-colour-to-a-survey.html)
-- [How to show a survey 1 question at a time](guides/show-a-survey-1-question-at-a-time.html)
-- [How to combine 1 question at a time with skip logic](guides/combine-1-question-at-a-time-with-skip-logic.html)
-
-## Keep the record
+## Record your research
 
 - [How to change a questionnaire mid-study, on the record](guides/change-a-questionnaire-mid-study-on-the-record.html)
 - [How to prove a questionnaire file is the one you planned](guides/prove-a-questionnaire-file-is-the-one-you-planned.html)

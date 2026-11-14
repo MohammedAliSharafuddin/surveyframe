@@ -1,32 +1,36 @@
 ---
 title: "How to check whether your items measure the factors you assumed"
-description: "An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work. surveyframe declares the analysis in advance (Factorability checks (KMO and Bartlett's test), Exploratory factor analysis) and reports it in APA 7."
+description: "Explore whether your items group into the factors you expected."
 ---
 
-An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work. surveyframe declares the analysis in advance (Factorability checks (KMO and Bartlett's test), Exploratory factor analysis) and reports it in APA 7.
+Explore whether your items group into the factors you expected.
+
+The example in this guide is *Two things attendees judge*. An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work.
 
 ## In SurveyStudio
 
-In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `factor_structure`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `factor_structure`.
+2. On **Design**, see the 8 items written for 2 constructs.
+3. On **Design**, choose **Plan**. RQ1 checks whether the data suit factor analysis, and RQ2 estimates the factors and the items that load on each.
+4. On **Analyse**, run the plan and compare the loadings with the structure you expected.
 
-![The Design screen with the factor_structure study.](../../templates/factor_structure/design.png){width=100%}
+![The Design screen with the Two things attendees judge study open.](../../templates/factor_structure/design.png){width=100%}
 
 ## In R
 
 ```r
 d <- sframe_demo("factor_structure")
 results <- run_analysis_plan(d$responses, d$instrument)
-render_report(d$instrument, d$responses)
 ```
 
-## What the report gives
+## The research questions and what the report gives
 
 | Research question | Method | What the report gives |
 |---|---|---|
-| Is this data suitable for factor analysis? | Factorability checks (KMO and Bartlett's test) | The APA 7 sentence, its table and chart |
-| How many factors, and which items load where? | Exploratory factor analysis | The APA 7 sentence, its table and chart |
+| Is this data suitable for factor analysis? | Factorability checks (KMO and Bartlett's test) | The APA 7 sentence and a table, with a chart where the method has one |
+| How many factors, and which items load where? | Exploratory factor analysis | The APA 7 sentence and a table, with a chart where the method has one |
 
-The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+Run the example in SurveyStudio or R to see the results, each marked as demonstration data.
 
 ## Related
 

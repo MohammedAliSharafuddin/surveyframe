@@ -1,30 +1,35 @@
 ---
 title: "How to ask questions only of those they apply to"
-description: "A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics) and reports it in APA 7."
+description: "Show a question only to respondents whose earlier answer makes it apply to them."
 ---
 
-A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer. surveyframe declares the analysis in advance (Frequencies and percentages, Descriptive statistics) and reports it in APA 7.
+Show a question only to respondents whose earlier answer makes it apply to them.
+
+The example in this guide is *Questions that depend on who you are*. A survey with skip logic, asking about sessions only of those who attended them, to separate a skipped question from a missing answer.
 
 ## In SurveyStudio
 
-In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `branching`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `branching`.
+2. On **Design**, select the question that depends on an earlier answer and open **Add Branching Rule**. Choose the controlling question, the condition and whether the question is shown or hidden.
+3. On **Preview**, answer the first question in different ways to see the dependent question appear.
+4. In the data, a question skipped by a rule is left blank as structural, separate from a missing answer.
 
 ## In R
 
 ```r
 d <- sframe_demo("branching")
+sframe_get_branches(d$instrument)    # each rule, its condition and target
 results <- run_analysis_plan(d$responses, d$instrument)
-render_report(d$instrument, d$responses)
 ```
 
-## What the report gives
+## The research questions and what the report gives
 
 | Research question | Method | What the report gives |
 |---|---|---|
-| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence, its table and chart |
-| Among those asked, how many sessions did they attend? | Descriptive statistics | The APA 7 sentence, its table and chart |
+| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence and a table, with a chart where the method has one |
+| Among those asked, how many sessions did they attend? | Descriptive statistics | The APA 7 sentence and a table, with a chart where the method has one |
 
-The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+Run the example in SurveyStudio or R to see the results, each marked as demonstration data.
 
 ## Related
 

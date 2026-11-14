@@ -1,0 +1,47 @@
+---
+title: "How to choose between options on multiple criteria"
+description: "Rank decision options by criteria weighted by the people you asked."
+---
+
+Rank decision options by criteria weighted by the people you asked.
+
+The example in this guide is *Choosing next year's venue*. A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods.
+
+## In SurveyStudio
+
+1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `mcdm_choice`.
+2. On **Design**, see the criteria weight question and the 2 pairwise comparison questions, 1 on Saaty's importance scale and 1 on the influence scale.
+3. On **Design**, choose **Plan**. RQ1 to RQ3 derive the criteria weights (AHP, ANP) and their influence on each other (DEMATEL). RQ4 to RQ10 rank the venues with those weights by 7 ranking methods.
+4. On **Analyse**, run the plan and check the consistency ratio before using the weights.
+
+![The Design screen with the Choosing next year's venue study open.](../../templates/mcdm_choice/design.png){width=100%}
+
+## In R
+
+```r
+d <- sframe_demo("mcdm_choice")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|---|---|---|
+| What weight does each criterion carry? | Analytic hierarchy process (AHP) | The APA 7 sentence and a table, with a chart where the method has one |
+| The same weights with network dependence allowed. | Analytic network process (ANP) | The APA 7 sentence and a table, with a chart where the method has one |
+| Which criteria drive the others? | DEMATEL | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks best overall? | TOPSIS | The APA 7 sentence and a table, with a chart where the method has one |
+| And by compromise ranking? | VIKOR | The APA 7 sentence and a table, with a chart where the method has one |
+| And by ratio analysis? | MOORA | The APA 7 sentence and a table, with a chart where the method has one |
+| And by simple multi-attribute rating? | SMART | The APA 7 sentence and a table, with a chart where the method has one |
+| And by weighted aggregated sum product? | WASPAS | The APA 7 sentence and a table, with a chart where the method has one |
+| And by outranking flows? | PROMETHEE | The APA 7 sentence and a table, with a chart where the method has one |
+| And by outranking with thresholds? | ELECTRE | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as demonstration data.
+
+## Related
+
+- [Questionnaire templates](../templates.html)
+- [All how-to guides](../guides.html)
+

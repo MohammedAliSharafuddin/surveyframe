@@ -1,40 +1,44 @@
 ---
 title: "How to analyse open-ended answers"
-description: "An open-ended feedback study: what attendees say worked and what to change, analysed as text. surveyframe declares the analysis in advance (Word frequencies, Phrase frequencies, Words in context, Word co-occurrence, Word co-occurrence network, Sentiment analysis, Document-feature matrix, Topic model (LDA), Structural topic model) and reports it in APA 7."
+description: "Explore what respondents wrote in open-ended answers: the frequent words, how a word is used, the topics and the tone."
 ---
 
-An open-ended feedback study: what attendees say worked and what to change, analysed as text. surveyframe declares the analysis in advance (Word frequencies, Phrase frequencies, Words in context, Word co-occurrence, Word co-occurrence network, Sentiment analysis, Document-feature matrix, Topic model (LDA), Structural topic model) and reports it in APA 7.
+Explore what respondents wrote in open-ended answers: the frequent words, how a word is used, the topics and the tone.
+
+The example in this guide is *What worked, and what to change*. An open-ended feedback study: what attendees say worked and what to change, analysed as text.
 
 ## In SurveyStudio
 
-In RStudio, open the Addins menu, choose **surveyframe: Try a demo** and pick `open_text`. The study opens on the Design screen. Plan shows each research question with its method and decision rule, Analyse runs them as declared, and Report writes the APA 7 report.
+1. In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo** and pick `open_text`.
+2. On **Design**, choose **Plan** and pick a text question for each research question: word and word pair counts, a key word in context, words that appear together, sentiment and topics.
+3. On **Analyse**, run the plan and read each term in context before interpreting it.
 
-![The Design screen with the open_text study.](../../templates/open_text/design.png){width=100%}
+![The Design screen with the What worked, and what to change study open.](../../templates/open_text/design.png){width=100%}
 
 ## In R
 
 ```r
 d <- sframe_demo("open_text")
 results <- run_analysis_plan(d$responses, d$instrument)
-render_report(d$instrument, d$responses)
+sframe_term_context(d$responses$what_worked, "session")
 ```
 
-## What the report gives
+## The research questions and what the report gives
 
 | Research question | Method | What the report gives |
 |---|---|---|
-| Which words come up most often? | Word frequencies | The APA 7 sentence, its table and chart |
-| And which pairs of words? | Phrase frequencies | The APA 7 sentence, its table and chart |
-| How is a key word actually used? | Words in context | The APA 7 sentence, its table and chart |
-| Which words appear together? | Word co-occurrence | The APA 7 sentence, its table and chart |
-| Do in-person and online attendees say different things? | Word frequencies | The APA 7 sentence, its table and chart |
-| Which words cluster together? | Word co-occurrence network | The APA 7 sentence, its table and chart |
-| Is the tone positive or negative? | Sentiment analysis | The APA 7 sentence, its table and chart |
-| What does a document-feature matrix show? | Document-feature matrix | The APA 7 sentence, its table and chart |
-| What topics are people writing about? | Topic model (LDA) | The APA 7 sentence, its table and chart |
-| The same question with a structural topic model. | Structural topic model | The APA 7 sentence, its table and chart |
+| Which words come up most often? | Word frequencies | The APA 7 sentence and a table, with a chart where the method has one |
+| And which pairs of words? | Phrase frequencies | The APA 7 sentence and a table, with a chart where the method has one |
+| How is a key word actually used? | Words in context | The APA 7 sentence and a table, with a chart where the method has one |
+| Which words appear together? | Word co-occurrence | The APA 7 sentence and a table, with a chart where the method has one |
+| Do in-person and online attendees say different things? | Word frequencies | The APA 7 sentence and a table, with a chart where the method has one |
+| Which words cluster together? | Word co-occurrence network | The APA 7 sentence and a table, with a chart where the method has one |
+| Is the tone positive or negative? | Sentiment analysis | The APA 7 sentence and a table, with a chart where the method has one |
+| What does a document-feature matrix show? | Document-feature matrix | The APA 7 sentence and a table, with a chart where the method has one |
+| What topics are people writing about? | Topic model (LDA) | The APA 7 sentence and a table, with a chart where the method has one |
+| The same question with a structural topic model. | Structural topic model | The APA 7 sentence and a table, with a chart where the method has one |
 
-The demo's data is simulated, so the site shows no numbers. Run it in SurveyStudio or R to see the results, each marked as demonstration data.
+Run the example in SurveyStudio or R to see the results, each marked as demonstration data.
 
 ## Related
 
