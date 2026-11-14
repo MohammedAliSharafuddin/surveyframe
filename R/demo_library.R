@@ -117,7 +117,7 @@ sframe_reference_demo <- function(name) {
     responses_path, instrument,
     respondent_id = "respondent_id",
     submitted_at = "submitted_at",
-    meta_cols = "started_at",
+    meta_cols = c("started_at", "data_status"),
     strict = identical(name, "input_types"))
   list(instrument = instrument, responses = responses,
        instrument_path = instrument_path, responses_path = responses_path,
@@ -264,7 +264,7 @@ sframe_demo <- function(name, branded = FALSE, preview = interactive()) {
   raw <- utils::read.csv(responses_path, stringsAsFactors = FALSE,
                          check.names = FALSE)
   # A demo's columns that are not questions, such as a design weight.
-  extra_meta <- intersect(c("survey_weight"), names(raw))
+  extra_meta <- intersect(c("data_status", "survey_weight"), names(raw))
   responses <- read_responses(raw, instrument, respondent_id = "respondent_id",
                               meta_cols = c("started_at", "submitted_at", extra_meta))
   sframe_demo_preview(sframe_demo_object(list(
@@ -285,6 +285,11 @@ sframe_demo_preview <- function(demo, preview) {
   }
   demo
 }
+
+# The value of the data_status column in every demo's responses. Outputs made
+# from data that carries it are stamped (owner 2026-11-05), also after the
+# data is copied into another project.
+sframe_demo_data_status <- "Demonstration data, not collected from participants"
 
 # A demo is the plain list sframe_demo() has always returned, with the class
 # sframe_demo and its name as an attribute, so printing it shows a short card

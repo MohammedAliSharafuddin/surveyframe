@@ -1,91 +1,91 @@
-"respondent_id","started_at","submitted_at","tenure","trust_1","trust_2","trust_3"
-"R001","2026-06-01T09:24:00Z","2026-06-01T09:28:00Z","under_1",5,3,4
-"R002","2026-06-01T09:24:37Z","2026-06-01T09:28:37Z","under_1",3,2,3
-"R003","2026-06-01T09:25:14Z","2026-06-01T09:29:14Z","under_1",3,3,4
-"R004","2026-06-01T09:25:51Z","2026-06-01T09:29:51Z","under_1",1,2,1
-"R005","2026-06-01T09:26:28Z","2026-06-01T09:30:28Z","under_1",4,1,4
-"R006","2026-06-01T09:27:05Z","2026-06-01T09:31:05Z","over_1",5,5,4
-"R007","2026-06-01T09:27:42Z","2026-06-01T09:31:42Z","over_1",2,2,4
-"R008","2026-06-01T09:28:19Z","2026-06-01T09:32:19Z","over_1",5,5,4
-"R009","2026-06-01T09:28:56Z","2026-06-01T09:32:56Z","under_1",4,2,2
-"R010","2026-06-01T09:29:33Z","2026-06-01T09:33:33Z","over_1",1,1,1
-"R011","2026-06-01T09:30:10Z","2026-06-01T09:34:10Z","under_1",2,4,5
-"R012","2026-06-01T09:30:47Z","2026-06-01T09:34:47Z","over_1",2,2,2
-"R013","2026-06-01T09:31:24Z","2026-06-01T09:35:24Z","over_1",2,5,2
-"R014","2026-06-01T09:32:01Z","2026-06-01T09:36:01Z","under_1",2,3,4
-"R015","2026-06-01T09:32:38Z","2026-06-01T09:36:38Z","under_1",4,5,3
-"R016","2026-06-01T09:33:15Z","2026-06-01T09:37:15Z","under_1",1,1,1
-"R017","2026-06-01T09:33:52Z","2026-06-01T09:37:52Z","over_1",5,5,5
-"R018","2026-06-01T09:34:29Z","2026-06-01T09:38:29Z","under_1",3,4,5
-"R019","2026-06-01T09:35:06Z","2026-06-01T09:39:06Z","over_1",1,4,4
-"R020","2026-06-01T09:35:43Z","2026-06-01T09:39:43Z","over_1",5,4,1
-"R021","2026-06-01T09:36:20Z","2026-06-01T09:40:20Z","over_1",2,5,4
-"R022","2026-06-01T09:36:57Z","2026-06-01T09:40:57Z","over_1",5,5,4
-"R023","2026-06-01T09:37:34Z","2026-06-01T09:41:34Z","under_1",4,5,5
-"R024","2026-06-01T09:38:11Z","2026-06-01T09:42:11Z","over_1",5,5,5
-"R025","2026-06-01T09:38:48Z","2026-06-01T09:42:48Z","over_1",2,2,2
-"R026","2026-06-01T09:39:25Z","2026-06-01T09:43:25Z","under_1",1,1,1
-"R027","2026-06-01T09:40:02Z","2026-06-01T09:44:02Z","over_1",4,4,4
-"R028","2026-06-01T09:40:39Z","2026-06-01T09:44:39Z","under_1",5,5,5
-"R029","2026-06-01T09:41:16Z","2026-06-01T09:45:16Z","over_1",3,1,1
-"R030","2026-06-01T09:41:53Z","2026-06-01T09:45:53Z","over_1",1,1,2
-"R031","2026-06-01T09:42:30Z","2026-06-01T09:46:30Z","over_1",5,4,5
-"R032","2026-06-01T09:43:07Z","2026-06-01T09:47:07Z","over_1",1,1,1
-"R033","2026-06-01T09:43:44Z","2026-06-01T09:47:44Z","over_1",5,5,3
-"R034","2026-06-01T09:44:21Z","2026-06-01T09:48:21Z","over_1",4,5,5
-"R035","2026-06-01T09:44:58Z","2026-06-01T09:48:58Z","over_1",1,1,1
-"R036","2026-06-01T09:45:35Z","2026-06-01T09:49:35Z","over_1",3,2,5
-"R037","2026-06-01T09:46:12Z","2026-06-01T09:50:12Z","over_1",3,5,4
-"R038","2026-06-01T09:46:49Z","2026-06-01T09:50:49Z","over_1",5,5,5
-"R039","2026-06-01T09:47:26Z","2026-06-01T09:51:26Z","under_1",4,4,5
-"R040","2026-06-01T09:48:03Z","2026-06-01T09:52:03Z","over_1",3,2,3
-"R041","2026-06-01T09:48:40Z","2026-06-01T09:52:40Z","over_1",3,4,3
-"R042","2026-06-01T09:49:17Z","2026-06-01T09:53:17Z","over_1",4,1,2
-"R043","2026-06-01T09:49:54Z","2026-06-01T09:53:54Z","under_1",4,4,3
-"R044","2026-06-01T09:50:31Z","2026-06-01T09:54:31Z","over_1",5,5,3
-"R045","2026-06-01T09:51:08Z","2026-06-01T09:55:08Z","over_1",2,4,4
-"R046","2026-06-01T09:51:45Z","2026-06-01T09:55:45Z","over_1",3,3,2
-"R047","2026-06-01T09:52:22Z","2026-06-01T09:56:22Z","over_1",1,5,2
-"R048","2026-06-01T09:52:59Z","2026-06-01T09:56:59Z","over_1",2,1,1
-"R049","2026-06-01T09:53:36Z","2026-06-01T09:57:36Z","under_1",1,3,1
-"R050","2026-06-01T09:54:13Z","2026-06-01T09:58:13Z","under_1",4,5,5
-"R051","2026-06-01T09:54:50Z","2026-06-01T09:58:50Z","under_1",1,2,2
-"R052","2026-06-01T09:55:27Z","2026-06-01T09:59:27Z","under_1",1,3,1
-"R053","2026-06-01T09:56:04Z","2026-06-01T10:00:04Z","under_1",5,3,4
-"R054","2026-06-01T09:56:41Z","2026-06-01T10:00:41Z","over_1",4,5,5
-"R055","2026-06-01T09:57:18Z","2026-06-01T10:01:18Z","under_1",5,4,5
-"R056","2026-06-01T09:57:55Z","2026-06-01T10:01:55Z","over_1",4,4,5
-"R057","2026-06-01T09:58:32Z","2026-06-01T10:02:32Z","over_1",1,1,1
-"R058","2026-06-01T09:59:09Z","2026-06-01T10:03:09Z","over_1",5,4,5
-"R059","2026-06-01T09:59:46Z","2026-06-01T10:03:46Z","over_1",5,5,4
-"R060","2026-06-01T10:00:23Z","2026-06-01T10:04:23Z","over_1",4,5,5
-"R061","2026-06-01T10:01:00Z","2026-06-01T10:05:00Z","under_1",3,4,4
-"R062","2026-06-01T10:01:37Z","2026-06-01T10:05:37Z","over_1",4,5,4
-"R063","2026-06-01T10:02:14Z","2026-06-01T10:06:14Z","under_1",2,3,5
-"R064","2026-06-01T10:02:51Z","2026-06-01T10:06:51Z","under_1",1,3,2
-"R065","2026-06-01T10:03:28Z","2026-06-01T10:07:28Z","under_1",1,4,3
-"R066","2026-06-01T10:04:05Z","2026-06-01T10:08:05Z","over_1",1,2,5
-"R067","2026-06-01T10:04:42Z","2026-06-01T10:08:42Z","over_1",4,5,3
-"R068","2026-06-01T10:05:19Z","2026-06-01T10:09:19Z","over_1",3,2,1
-"R069","2026-06-01T10:05:56Z","2026-06-01T10:09:56Z","under_1",5,2,4
-"R070","2026-06-01T10:06:33Z","2026-06-01T10:10:33Z","over_1",5,5,5
-"R071","2026-06-01T10:07:10Z","2026-06-01T10:11:10Z","over_1",4,3,4
-"R072","2026-06-01T10:07:47Z","2026-06-01T10:11:47Z","over_1",3,4,5
-"R073","2026-06-01T10:08:24Z","2026-06-01T10:12:24Z","under_1",1,1,2
-"R074","2026-06-01T10:09:01Z","2026-06-01T10:13:01Z","over_1",1,1,1
-"R075","2026-06-01T10:09:38Z","2026-06-01T10:13:38Z","over_1",3,1,2
-"R076","2026-06-01T10:10:15Z","2026-06-01T10:14:15Z","over_1",1,2,1
-"R077","2026-06-01T10:10:52Z","2026-06-01T10:14:52Z","under_1",3,4,4
-"R078","2026-06-01T10:11:29Z","2026-06-01T10:15:29Z","over_1",4,3,3
-"R079","2026-06-01T10:12:06Z","2026-06-01T10:16:06Z","over_1",5,5,5
-"R080","2026-06-01T10:12:43Z","2026-06-01T10:16:43Z","under_1",2,5,4
-"R081","2026-06-01T10:13:20Z","2026-06-01T10:17:20Z","over_1",1,1,2
-"R082","2026-06-01T10:13:57Z","2026-06-01T10:17:57Z","over_1",5,1,2
-"R083","2026-06-01T10:14:34Z","2026-06-01T10:18:34Z","under_1",3,5,5
-"R084","2026-06-01T10:15:11Z","2026-06-01T10:19:11Z","over_1",4,4,5
-"R085","2026-06-01T10:15:48Z","2026-06-01T10:19:48Z","over_1",5,4,5
-"R086","2026-06-01T10:16:25Z","2026-06-01T10:20:25Z","over_1",4,3,5
-"R087","2026-06-01T10:17:02Z","2026-06-01T10:21:02Z","under_1",5,2,3
-"R088","2026-06-01T10:17:39Z","2026-06-01T10:21:39Z","over_1",1,2,1
-"R089","2026-06-01T10:18:16Z","2026-06-01T10:22:16Z","over_1",2,1,1
-"R090","2026-06-01T10:18:53Z","2026-06-01T10:22:53Z","over_1",5,5,5
+"respondent_id","started_at","submitted_at","data_status","tenure","trust_1","trust_2","trust_3"
+"DEMO-001","2026-06-01T09:24:00Z","2026-06-01T09:28:00Z","Demonstration data, not collected from participants","under_1",5,3,4
+"DEMO-002","2026-06-01T09:24:37Z","2026-06-01T09:28:37Z","Demonstration data, not collected from participants","under_1",3,2,3
+"DEMO-003","2026-06-01T09:25:14Z","2026-06-01T09:29:14Z","Demonstration data, not collected from participants","under_1",3,3,4
+"DEMO-004","2026-06-01T09:25:51Z","2026-06-01T09:29:51Z","Demonstration data, not collected from participants","under_1",1,2,1
+"DEMO-005","2026-06-01T09:26:28Z","2026-06-01T09:30:28Z","Demonstration data, not collected from participants","under_1",4,1,4
+"DEMO-006","2026-06-01T09:27:05Z","2026-06-01T09:31:05Z","Demonstration data, not collected from participants","over_1",5,5,4
+"DEMO-007","2026-06-01T09:27:42Z","2026-06-01T09:31:42Z","Demonstration data, not collected from participants","over_1",2,2,4
+"DEMO-008","2026-06-01T09:28:19Z","2026-06-01T09:32:19Z","Demonstration data, not collected from participants","over_1",5,5,4
+"DEMO-009","2026-06-01T09:28:56Z","2026-06-01T09:32:56Z","Demonstration data, not collected from participants","under_1",4,2,2
+"DEMO-010","2026-06-01T09:29:33Z","2026-06-01T09:33:33Z","Demonstration data, not collected from participants","over_1",1,1,1
+"DEMO-011","2026-06-01T09:30:10Z","2026-06-01T09:34:10Z","Demonstration data, not collected from participants","under_1",2,4,5
+"DEMO-012","2026-06-01T09:30:47Z","2026-06-01T09:34:47Z","Demonstration data, not collected from participants","over_1",2,2,2
+"DEMO-013","2026-06-01T09:31:24Z","2026-06-01T09:35:24Z","Demonstration data, not collected from participants","over_1",2,5,2
+"DEMO-014","2026-06-01T09:32:01Z","2026-06-01T09:36:01Z","Demonstration data, not collected from participants","under_1",2,3,4
+"DEMO-015","2026-06-01T09:32:38Z","2026-06-01T09:36:38Z","Demonstration data, not collected from participants","under_1",4,5,3
+"DEMO-016","2026-06-01T09:33:15Z","2026-06-01T09:37:15Z","Demonstration data, not collected from participants","under_1",1,1,1
+"DEMO-017","2026-06-01T09:33:52Z","2026-06-01T09:37:52Z","Demonstration data, not collected from participants","over_1",5,5,5
+"DEMO-018","2026-06-01T09:34:29Z","2026-06-01T09:38:29Z","Demonstration data, not collected from participants","under_1",3,4,5
+"DEMO-019","2026-06-01T09:35:06Z","2026-06-01T09:39:06Z","Demonstration data, not collected from participants","over_1",1,4,4
+"DEMO-020","2026-06-01T09:35:43Z","2026-06-01T09:39:43Z","Demonstration data, not collected from participants","over_1",5,4,1
+"DEMO-021","2026-06-01T09:36:20Z","2026-06-01T09:40:20Z","Demonstration data, not collected from participants","over_1",2,5,4
+"DEMO-022","2026-06-01T09:36:57Z","2026-06-01T09:40:57Z","Demonstration data, not collected from participants","over_1",5,5,4
+"DEMO-023","2026-06-01T09:37:34Z","2026-06-01T09:41:34Z","Demonstration data, not collected from participants","under_1",4,5,5
+"DEMO-024","2026-06-01T09:38:11Z","2026-06-01T09:42:11Z","Demonstration data, not collected from participants","over_1",5,5,5
+"DEMO-025","2026-06-01T09:38:48Z","2026-06-01T09:42:48Z","Demonstration data, not collected from participants","over_1",2,2,2
+"DEMO-026","2026-06-01T09:39:25Z","2026-06-01T09:43:25Z","Demonstration data, not collected from participants","under_1",1,1,1
+"DEMO-027","2026-06-01T09:40:02Z","2026-06-01T09:44:02Z","Demonstration data, not collected from participants","over_1",4,4,4
+"DEMO-028","2026-06-01T09:40:39Z","2026-06-01T09:44:39Z","Demonstration data, not collected from participants","under_1",5,5,5
+"DEMO-029","2026-06-01T09:41:16Z","2026-06-01T09:45:16Z","Demonstration data, not collected from participants","over_1",3,1,1
+"DEMO-030","2026-06-01T09:41:53Z","2026-06-01T09:45:53Z","Demonstration data, not collected from participants","over_1",1,1,2
+"DEMO-031","2026-06-01T09:42:30Z","2026-06-01T09:46:30Z","Demonstration data, not collected from participants","over_1",5,4,5
+"DEMO-032","2026-06-01T09:43:07Z","2026-06-01T09:47:07Z","Demonstration data, not collected from participants","over_1",1,1,1
+"DEMO-033","2026-06-01T09:43:44Z","2026-06-01T09:47:44Z","Demonstration data, not collected from participants","over_1",5,5,3
+"DEMO-034","2026-06-01T09:44:21Z","2026-06-01T09:48:21Z","Demonstration data, not collected from participants","over_1",4,5,5
+"DEMO-035","2026-06-01T09:44:58Z","2026-06-01T09:48:58Z","Demonstration data, not collected from participants","over_1",1,1,1
+"DEMO-036","2026-06-01T09:45:35Z","2026-06-01T09:49:35Z","Demonstration data, not collected from participants","over_1",3,2,5
+"DEMO-037","2026-06-01T09:46:12Z","2026-06-01T09:50:12Z","Demonstration data, not collected from participants","over_1",3,5,4
+"DEMO-038","2026-06-01T09:46:49Z","2026-06-01T09:50:49Z","Demonstration data, not collected from participants","over_1",5,5,5
+"DEMO-039","2026-06-01T09:47:26Z","2026-06-01T09:51:26Z","Demonstration data, not collected from participants","under_1",4,4,5
+"DEMO-040","2026-06-01T09:48:03Z","2026-06-01T09:52:03Z","Demonstration data, not collected from participants","over_1",3,2,3
+"DEMO-041","2026-06-01T09:48:40Z","2026-06-01T09:52:40Z","Demonstration data, not collected from participants","over_1",3,4,3
+"DEMO-042","2026-06-01T09:49:17Z","2026-06-01T09:53:17Z","Demonstration data, not collected from participants","over_1",4,1,2
+"DEMO-043","2026-06-01T09:49:54Z","2026-06-01T09:53:54Z","Demonstration data, not collected from participants","under_1",4,4,3
+"DEMO-044","2026-06-01T09:50:31Z","2026-06-01T09:54:31Z","Demonstration data, not collected from participants","over_1",5,5,3
+"DEMO-045","2026-06-01T09:51:08Z","2026-06-01T09:55:08Z","Demonstration data, not collected from participants","over_1",2,4,4
+"DEMO-046","2026-06-01T09:51:45Z","2026-06-01T09:55:45Z","Demonstration data, not collected from participants","over_1",3,3,2
+"DEMO-047","2026-06-01T09:52:22Z","2026-06-01T09:56:22Z","Demonstration data, not collected from participants","over_1",1,5,2
+"DEMO-048","2026-06-01T09:52:59Z","2026-06-01T09:56:59Z","Demonstration data, not collected from participants","over_1",2,1,1
+"DEMO-049","2026-06-01T09:53:36Z","2026-06-01T09:57:36Z","Demonstration data, not collected from participants","under_1",1,3,1
+"DEMO-050","2026-06-01T09:54:13Z","2026-06-01T09:58:13Z","Demonstration data, not collected from participants","under_1",4,5,5
+"DEMO-051","2026-06-01T09:54:50Z","2026-06-01T09:58:50Z","Demonstration data, not collected from participants","under_1",1,2,2
+"DEMO-052","2026-06-01T09:55:27Z","2026-06-01T09:59:27Z","Demonstration data, not collected from participants","under_1",1,3,1
+"DEMO-053","2026-06-01T09:56:04Z","2026-06-01T10:00:04Z","Demonstration data, not collected from participants","under_1",5,3,4
+"DEMO-054","2026-06-01T09:56:41Z","2026-06-01T10:00:41Z","Demonstration data, not collected from participants","over_1",4,5,5
+"DEMO-055","2026-06-01T09:57:18Z","2026-06-01T10:01:18Z","Demonstration data, not collected from participants","under_1",5,4,5
+"DEMO-056","2026-06-01T09:57:55Z","2026-06-01T10:01:55Z","Demonstration data, not collected from participants","over_1",4,4,5
+"DEMO-057","2026-06-01T09:58:32Z","2026-06-01T10:02:32Z","Demonstration data, not collected from participants","over_1",1,1,1
+"DEMO-058","2026-06-01T09:59:09Z","2026-06-01T10:03:09Z","Demonstration data, not collected from participants","over_1",5,4,5
+"DEMO-059","2026-06-01T09:59:46Z","2026-06-01T10:03:46Z","Demonstration data, not collected from participants","over_1",5,5,4
+"DEMO-060","2026-06-01T10:00:23Z","2026-06-01T10:04:23Z","Demonstration data, not collected from participants","over_1",4,5,5
+"DEMO-061","2026-06-01T10:01:00Z","2026-06-01T10:05:00Z","Demonstration data, not collected from participants","under_1",3,4,4
+"DEMO-062","2026-06-01T10:01:37Z","2026-06-01T10:05:37Z","Demonstration data, not collected from participants","over_1",4,5,4
+"DEMO-063","2026-06-01T10:02:14Z","2026-06-01T10:06:14Z","Demonstration data, not collected from participants","under_1",2,3,5
+"DEMO-064","2026-06-01T10:02:51Z","2026-06-01T10:06:51Z","Demonstration data, not collected from participants","under_1",1,3,2
+"DEMO-065","2026-06-01T10:03:28Z","2026-06-01T10:07:28Z","Demonstration data, not collected from participants","under_1",1,4,3
+"DEMO-066","2026-06-01T10:04:05Z","2026-06-01T10:08:05Z","Demonstration data, not collected from participants","over_1",1,2,5
+"DEMO-067","2026-06-01T10:04:42Z","2026-06-01T10:08:42Z","Demonstration data, not collected from participants","over_1",4,5,3
+"DEMO-068","2026-06-01T10:05:19Z","2026-06-01T10:09:19Z","Demonstration data, not collected from participants","over_1",3,2,1
+"DEMO-069","2026-06-01T10:05:56Z","2026-06-01T10:09:56Z","Demonstration data, not collected from participants","under_1",5,2,4
+"DEMO-070","2026-06-01T10:06:33Z","2026-06-01T10:10:33Z","Demonstration data, not collected from participants","over_1",5,5,5
+"DEMO-071","2026-06-01T10:07:10Z","2026-06-01T10:11:10Z","Demonstration data, not collected from participants","over_1",4,3,4
+"DEMO-072","2026-06-01T10:07:47Z","2026-06-01T10:11:47Z","Demonstration data, not collected from participants","over_1",3,4,5
+"DEMO-073","2026-06-01T10:08:24Z","2026-06-01T10:12:24Z","Demonstration data, not collected from participants","under_1",1,1,2
+"DEMO-074","2026-06-01T10:09:01Z","2026-06-01T10:13:01Z","Demonstration data, not collected from participants","over_1",1,1,1
+"DEMO-075","2026-06-01T10:09:38Z","2026-06-01T10:13:38Z","Demonstration data, not collected from participants","over_1",3,1,2
+"DEMO-076","2026-06-01T10:10:15Z","2026-06-01T10:14:15Z","Demonstration data, not collected from participants","over_1",1,2,1
+"DEMO-077","2026-06-01T10:10:52Z","2026-06-01T10:14:52Z","Demonstration data, not collected from participants","under_1",3,4,4
+"DEMO-078","2026-06-01T10:11:29Z","2026-06-01T10:15:29Z","Demonstration data, not collected from participants","over_1",4,3,3
+"DEMO-079","2026-06-01T10:12:06Z","2026-06-01T10:16:06Z","Demonstration data, not collected from participants","over_1",5,5,5
+"DEMO-080","2026-06-01T10:12:43Z","2026-06-01T10:16:43Z","Demonstration data, not collected from participants","under_1",2,5,4
+"DEMO-081","2026-06-01T10:13:20Z","2026-06-01T10:17:20Z","Demonstration data, not collected from participants","over_1",1,1,2
+"DEMO-082","2026-06-01T10:13:57Z","2026-06-01T10:17:57Z","Demonstration data, not collected from participants","over_1",5,1,2
+"DEMO-083","2026-06-01T10:14:34Z","2026-06-01T10:18:34Z","Demonstration data, not collected from participants","under_1",3,5,5
+"DEMO-084","2026-06-01T10:15:11Z","2026-06-01T10:19:11Z","Demonstration data, not collected from participants","over_1",4,4,5
+"DEMO-085","2026-06-01T10:15:48Z","2026-06-01T10:19:48Z","Demonstration data, not collected from participants","over_1",5,4,5
+"DEMO-086","2026-06-01T10:16:25Z","2026-06-01T10:20:25Z","Demonstration data, not collected from participants","over_1",4,3,5
+"DEMO-087","2026-06-01T10:17:02Z","2026-06-01T10:21:02Z","Demonstration data, not collected from participants","under_1",5,2,3
+"DEMO-088","2026-06-01T10:17:39Z","2026-06-01T10:21:39Z","Demonstration data, not collected from participants","over_1",1,2,1
+"DEMO-089","2026-06-01T10:18:16Z","2026-06-01T10:22:16Z","Demonstration data, not collected from participants","over_1",2,1,1
+"DEMO-090","2026-06-01T10:18:53Z","2026-06-01T10:22:53Z","Demonstration data, not collected from participants","over_1",5,5,5

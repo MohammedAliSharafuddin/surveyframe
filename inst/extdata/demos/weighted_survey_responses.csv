@@ -1,121 +1,121 @@
-"respondent_id","started_at","submitted_at","region","satisfied","recommend","survey_weight"
-"R001","2026-06-01T09:23:00Z","2026-06-01T09:27:00Z","east",3,"no",1.7647
-"R002","2026-06-01T09:23:37Z","2026-06-01T09:27:37Z","north",5,"yes",0.6234
-"R003","2026-06-01T09:24:14Z","2026-06-01T09:28:14Z","north",5,"no",0.6234
-"R004","2026-06-01T09:24:51Z","2026-06-01T09:28:51Z","north",3,"yes",0.6234
-"R005","2026-06-01T09:25:28Z","2026-06-01T09:29:28Z","north",3,"yes",0.6234
-"R006","2026-06-01T09:26:05Z","2026-06-01T09:30:05Z","north",2,"yes",0.6234
-"R007","2026-06-01T09:26:42Z","2026-06-01T09:30:42Z","north",5,"no",0.6234
-"R008","2026-06-01T09:27:19Z","2026-06-01T09:31:19Z","east",3,"yes",1.7647
-"R009","2026-06-01T09:27:56Z","2026-06-01T09:31:56Z","south",1,"no",1.6154
-"R010","2026-06-01T09:28:33Z","2026-06-01T09:32:33Z","north",4,"yes",0.6234
-"R011","2026-06-01T09:29:10Z","2026-06-01T09:33:10Z","north",5,"yes",0.6234
-"R012","2026-06-01T09:29:47Z","2026-06-01T09:33:47Z","east",1,"yes",1.7647
-"R013","2026-06-01T09:30:24Z","2026-06-01T09:34:24Z","north",5,"no",0.6234
-"R014","2026-06-01T09:31:01Z","2026-06-01T09:35:01Z","north",2,"yes",0.6234
-"R015","2026-06-01T09:31:38Z","2026-06-01T09:35:38Z","east",3,"no",1.7647
-"R016","2026-06-01T09:32:15Z","2026-06-01T09:36:15Z","south",1,"no",1.6154
-"R017","2026-06-01T09:32:52Z","2026-06-01T09:36:52Z","south",2,"no",1.6154
-"R018","2026-06-01T09:33:29Z","2026-06-01T09:37:29Z","south",5,"yes",1.6154
-"R019","2026-06-01T09:34:06Z","2026-06-01T09:38:06Z","north",4,"no",0.6234
-"R020","2026-06-01T09:34:43Z","2026-06-01T09:38:43Z","south",3,"yes",1.6154
-"R021","2026-06-01T09:35:20Z","2026-06-01T09:39:20Z","south",5,"no",1.6154
-"R022","2026-06-01T09:35:57Z","2026-06-01T09:39:57Z","north",5,"yes",0.6234
-"R023","2026-06-01T09:36:34Z","2026-06-01T09:40:34Z","north",4,"no",0.6234
-"R024","2026-06-01T09:37:11Z","2026-06-01T09:41:11Z","north",5,"yes",0.6234
-"R025","2026-06-01T09:37:48Z","2026-06-01T09:41:48Z","east",2,"no",1.7647
-"R026","2026-06-01T09:38:25Z","2026-06-01T09:42:25Z","north",4,"yes",0.6234
-"R027","2026-06-01T09:39:02Z","2026-06-01T09:43:02Z","north",3,"yes",0.6234
-"R028","2026-06-01T09:39:39Z","2026-06-01T09:43:39Z","north",5,"no",0.6234
-"R029","2026-06-01T09:40:16Z","2026-06-01T09:44:16Z","south",5,"no",1.6154
-"R030","2026-06-01T09:40:53Z","2026-06-01T09:44:53Z","north",2,"yes",0.6234
-"R031","2026-06-01T09:41:30Z","2026-06-01T09:45:30Z","north",5,"yes",0.6234
-"R032","2026-06-01T09:42:07Z","2026-06-01T09:46:07Z","north",5,"yes",0.6234
-"R033","2026-06-01T09:42:44Z","2026-06-01T09:46:44Z","north",4,"yes",0.6234
-"R034","2026-06-01T09:43:21Z","2026-06-01T09:47:21Z","north",5,"yes",0.6234
-"R035","2026-06-01T09:43:58Z","2026-06-01T09:47:58Z","north",1,"yes",0.6234
-"R036","2026-06-01T09:44:35Z","2026-06-01T09:48:35Z","north",4,"yes",0.6234
-"R037","2026-06-01T09:45:12Z","2026-06-01T09:49:12Z","south",5,"no",1.6154
-"R038","2026-06-01T09:45:49Z","2026-06-01T09:49:49Z","east",3,"no",1.7647
-"R039","2026-06-01T09:46:26Z","2026-06-01T09:50:26Z","north",4,"yes",0.6234
-"R040","2026-06-01T09:47:03Z","2026-06-01T09:51:03Z","south",1,"no",1.6154
-"R041","2026-06-01T09:47:40Z","2026-06-01T09:51:40Z","north",4,"no",0.6234
-"R042","2026-06-01T09:48:17Z","2026-06-01T09:52:17Z","south",4,"yes",1.6154
-"R043","2026-06-01T09:48:54Z","2026-06-01T09:52:54Z","north",4,"yes",0.6234
-"R044","2026-06-01T09:49:31Z","2026-06-01T09:53:31Z","north",5,"yes",0.6234
-"R045","2026-06-01T09:50:08Z","2026-06-01T09:54:08Z","north",5,"no",0.6234
-"R046","2026-06-01T09:50:45Z","2026-06-01T09:54:45Z","north",5,"yes",0.6234
-"R047","2026-06-01T09:51:22Z","2026-06-01T09:55:22Z","south",1,"no",1.6154
-"R048","2026-06-01T09:51:59Z","2026-06-01T09:55:59Z","south",2,"no",1.6154
-"R049","2026-06-01T09:52:36Z","2026-06-01T09:56:36Z","north",5,"no",0.6234
-"R050","2026-06-01T09:53:13Z","2026-06-01T09:57:13Z","south",3,"yes",1.6154
-"R051","2026-06-01T09:53:50Z","2026-06-01T09:57:50Z","south",5,"yes",1.6154
-"R052","2026-06-01T09:54:27Z","2026-06-01T09:58:27Z","north",5,"no",0.6234
-"R053","2026-06-01T09:55:04Z","2026-06-01T09:59:04Z","north",3,"yes",0.6234
-"R054","2026-06-01T09:55:41Z","2026-06-01T09:59:41Z","east",4,"yes",1.7647
-"R055","2026-06-01T09:56:18Z","2026-06-01T10:00:18Z","south",4,"no",1.6154
-"R056","2026-06-01T09:56:55Z","2026-06-01T10:00:55Z","north",5,"yes",0.6234
-"R057","2026-06-01T09:57:32Z","2026-06-01T10:01:32Z","north",4,"yes",0.6234
-"R058","2026-06-01T09:58:09Z","2026-06-01T10:02:09Z","north",5,"yes",0.6234
-"R059","2026-06-01T09:58:46Z","2026-06-01T10:02:46Z","south",4,"yes",1.6154
-"R060","2026-06-01T09:59:23Z","2026-06-01T10:03:23Z","north",1,"yes",0.6234
-"R061","2026-06-01T10:00:00Z","2026-06-01T10:04:00Z","north",1,"yes",0.6234
-"R062","2026-06-01T10:00:37Z","2026-06-01T10:04:37Z","north",4,"yes",0.6234
-"R063","2026-06-01T10:01:14Z","2026-06-01T10:05:14Z","south",4,"no",1.6154
-"R064","2026-06-01T10:01:51Z","2026-06-01T10:05:51Z","north",5,"no",0.6234
-"R065","2026-06-01T10:02:28Z","2026-06-01T10:06:28Z","east",2,"yes",1.7647
-"R066","2026-06-01T10:03:05Z","2026-06-01T10:07:05Z","north",5,"yes",0.6234
-"R067","2026-06-01T10:03:42Z","2026-06-01T10:07:42Z","north",4,"yes",0.6234
-"R068","2026-06-01T10:04:19Z","2026-06-01T10:08:19Z","north",1,"yes",0.6234
-"R069","2026-06-01T10:04:56Z","2026-06-01T10:08:56Z","north",4,"yes",0.6234
-"R070","2026-06-01T10:05:33Z","2026-06-01T10:09:33Z","north",5,"no",0.6234
-"R071","2026-06-01T10:06:10Z","2026-06-01T10:10:10Z","north",5,"yes",0.6234
-"R072","2026-06-01T10:06:47Z","2026-06-01T10:10:47Z","north",2,"yes",0.6234
-"R073","2026-06-01T10:07:24Z","2026-06-01T10:11:24Z","south",1,"yes",1.6154
-"R074","2026-06-01T10:08:01Z","2026-06-01T10:12:01Z","south",5,"no",1.6154
-"R075","2026-06-01T10:08:38Z","2026-06-01T10:12:38Z","east",5,"yes",1.7647
-"R076","2026-06-01T10:09:15Z","2026-06-01T10:13:15Z","north",4,"yes",0.6234
-"R077","2026-06-01T10:09:52Z","2026-06-01T10:13:52Z","north",5,"no",0.6234
-"R078","2026-06-01T10:10:29Z","2026-06-01T10:14:29Z","north",5,"yes",0.6234
-"R079","2026-06-01T10:11:06Z","2026-06-01T10:15:06Z","north",5,"yes",0.6234
-"R080","2026-06-01T10:11:43Z","2026-06-01T10:15:43Z","north",2,"no",0.6234
-"R081","2026-06-01T10:12:20Z","2026-06-01T10:16:20Z","north",5,"yes",0.6234
-"R082","2026-06-01T10:12:57Z","2026-06-01T10:16:57Z","north",4,"yes",0.6234
-"R083","2026-06-01T10:13:34Z","2026-06-01T10:17:34Z","east",2,"yes",1.7647
-"R084","2026-06-01T10:14:11Z","2026-06-01T10:18:11Z","north",4,"yes",0.6234
-"R085","2026-06-01T10:14:48Z","2026-06-01T10:18:48Z","north",5,"yes",0.6234
-"R086","2026-06-01T10:15:25Z","2026-06-01T10:19:25Z","south",2,"no",1.6154
-"R087","2026-06-01T10:16:02Z","2026-06-01T10:20:02Z","south",2,"no",1.6154
-"R088","2026-06-01T10:16:39Z","2026-06-01T10:20:39Z","north",2,"yes",0.6234
-"R089","2026-06-01T10:17:16Z","2026-06-01T10:21:16Z","east",1,"yes",1.7647
-"R090","2026-06-01T10:17:53Z","2026-06-01T10:21:53Z","north",4,"yes",0.6234
-"R091","2026-06-01T10:18:30Z","2026-06-01T10:22:30Z","north",2,"yes",0.6234
-"R092","2026-06-01T10:19:07Z","2026-06-01T10:23:07Z","north",2,"yes",0.6234
-"R093","2026-06-01T10:19:44Z","2026-06-01T10:23:44Z","north",5,"no",0.6234
-"R094","2026-06-01T10:20:21Z","2026-06-01T10:24:21Z","north",5,"yes",0.6234
-"R095","2026-06-01T10:20:58Z","2026-06-01T10:24:58Z","north",2,"yes",0.6234
-"R096","2026-06-01T10:21:35Z","2026-06-01T10:25:35Z","north",3,"yes",0.6234
-"R097","2026-06-01T10:22:12Z","2026-06-01T10:26:12Z","north",1,"yes",0.6234
-"R098","2026-06-01T10:22:49Z","2026-06-01T10:26:49Z","north",4,"no",0.6234
-"R099","2026-06-01T10:23:26Z","2026-06-01T10:27:26Z","north",3,"yes",0.6234
-"R100","2026-06-01T10:24:03Z","2026-06-01T10:28:03Z","north",2,"no",0.6234
-"R101","2026-06-01T10:24:40Z","2026-06-01T10:28:40Z","north",5,"yes",0.6234
-"R102","2026-06-01T10:25:17Z","2026-06-01T10:29:17Z","north",4,"yes",0.6234
-"R103","2026-06-01T10:25:54Z","2026-06-01T10:29:54Z","east",2,"yes",1.7647
-"R104","2026-06-01T10:26:31Z","2026-06-01T10:30:31Z","north",4,"yes",0.6234
-"R105","2026-06-01T10:27:08Z","2026-06-01T10:31:08Z","south",1,"no",1.6154
-"R106","2026-06-01T10:27:45Z","2026-06-01T10:31:45Z","north",5,"no",0.6234
-"R107","2026-06-01T10:28:22Z","2026-06-01T10:32:22Z","south",1,"yes",1.6154
-"R108","2026-06-01T10:28:59Z","2026-06-01T10:32:59Z","north",5,"yes",0.6234
-"R109","2026-06-01T10:29:36Z","2026-06-01T10:33:36Z","south",2,"yes",1.6154
-"R110","2026-06-01T10:30:13Z","2026-06-01T10:34:13Z","east",1,"no",1.7647
-"R111","2026-06-01T10:30:50Z","2026-06-01T10:34:50Z","north",2,"yes",0.6234
-"R112","2026-06-01T10:31:27Z","2026-06-01T10:35:27Z","east",1,"yes",1.7647
-"R113","2026-06-01T10:32:04Z","2026-06-01T10:36:04Z","north",2,"yes",0.6234
-"R114","2026-06-01T10:32:41Z","2026-06-01T10:36:41Z","east",3,"yes",1.7647
-"R115","2026-06-01T10:33:18Z","2026-06-01T10:37:18Z","east",1,"no",1.7647
-"R116","2026-06-01T10:33:55Z","2026-06-01T10:37:55Z","south",1,"no",1.6154
-"R117","2026-06-01T10:34:32Z","2026-06-01T10:38:32Z","south",1,"yes",1.6154
-"R118","2026-06-01T10:35:09Z","2026-06-01T10:39:09Z","north",2,"yes",0.6234
-"R119","2026-06-01T10:35:46Z","2026-06-01T10:39:46Z","north",3,"yes",0.6234
-"R120","2026-06-01T10:36:23Z","2026-06-01T10:40:23Z","east",1,"no",1.7647
+"respondent_id","started_at","submitted_at","data_status","region","satisfied","recommend","survey_weight"
+"DEMO-001","2026-06-01T09:23:00Z","2026-06-01T09:27:00Z","Demonstration data, not collected from participants","east",3,"no",1.7647
+"DEMO-002","2026-06-01T09:23:37Z","2026-06-01T09:27:37Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-003","2026-06-01T09:24:14Z","2026-06-01T09:28:14Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-004","2026-06-01T09:24:51Z","2026-06-01T09:28:51Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-005","2026-06-01T09:25:28Z","2026-06-01T09:29:28Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-006","2026-06-01T09:26:05Z","2026-06-01T09:30:05Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-007","2026-06-01T09:26:42Z","2026-06-01T09:30:42Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-008","2026-06-01T09:27:19Z","2026-06-01T09:31:19Z","Demonstration data, not collected from participants","east",3,"yes",1.7647
+"DEMO-009","2026-06-01T09:27:56Z","2026-06-01T09:31:56Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-010","2026-06-01T09:28:33Z","2026-06-01T09:32:33Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-011","2026-06-01T09:29:10Z","2026-06-01T09:33:10Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-012","2026-06-01T09:29:47Z","2026-06-01T09:33:47Z","Demonstration data, not collected from participants","east",1,"yes",1.7647
+"DEMO-013","2026-06-01T09:30:24Z","2026-06-01T09:34:24Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-014","2026-06-01T09:31:01Z","2026-06-01T09:35:01Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-015","2026-06-01T09:31:38Z","2026-06-01T09:35:38Z","Demonstration data, not collected from participants","east",3,"no",1.7647
+"DEMO-016","2026-06-01T09:32:15Z","2026-06-01T09:36:15Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-017","2026-06-01T09:32:52Z","2026-06-01T09:36:52Z","Demonstration data, not collected from participants","south",2,"no",1.6154
+"DEMO-018","2026-06-01T09:33:29Z","2026-06-01T09:37:29Z","Demonstration data, not collected from participants","south",5,"yes",1.6154
+"DEMO-019","2026-06-01T09:34:06Z","2026-06-01T09:38:06Z","Demonstration data, not collected from participants","north",4,"no",0.6234
+"DEMO-020","2026-06-01T09:34:43Z","2026-06-01T09:38:43Z","Demonstration data, not collected from participants","south",3,"yes",1.6154
+"DEMO-021","2026-06-01T09:35:20Z","2026-06-01T09:39:20Z","Demonstration data, not collected from participants","south",5,"no",1.6154
+"DEMO-022","2026-06-01T09:35:57Z","2026-06-01T09:39:57Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-023","2026-06-01T09:36:34Z","2026-06-01T09:40:34Z","Demonstration data, not collected from participants","north",4,"no",0.6234
+"DEMO-024","2026-06-01T09:37:11Z","2026-06-01T09:41:11Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-025","2026-06-01T09:37:48Z","2026-06-01T09:41:48Z","Demonstration data, not collected from participants","east",2,"no",1.7647
+"DEMO-026","2026-06-01T09:38:25Z","2026-06-01T09:42:25Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-027","2026-06-01T09:39:02Z","2026-06-01T09:43:02Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-028","2026-06-01T09:39:39Z","2026-06-01T09:43:39Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-029","2026-06-01T09:40:16Z","2026-06-01T09:44:16Z","Demonstration data, not collected from participants","south",5,"no",1.6154
+"DEMO-030","2026-06-01T09:40:53Z","2026-06-01T09:44:53Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-031","2026-06-01T09:41:30Z","2026-06-01T09:45:30Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-032","2026-06-01T09:42:07Z","2026-06-01T09:46:07Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-033","2026-06-01T09:42:44Z","2026-06-01T09:46:44Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-034","2026-06-01T09:43:21Z","2026-06-01T09:47:21Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-035","2026-06-01T09:43:58Z","2026-06-01T09:47:58Z","Demonstration data, not collected from participants","north",1,"yes",0.6234
+"DEMO-036","2026-06-01T09:44:35Z","2026-06-01T09:48:35Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-037","2026-06-01T09:45:12Z","2026-06-01T09:49:12Z","Demonstration data, not collected from participants","south",5,"no",1.6154
+"DEMO-038","2026-06-01T09:45:49Z","2026-06-01T09:49:49Z","Demonstration data, not collected from participants","east",3,"no",1.7647
+"DEMO-039","2026-06-01T09:46:26Z","2026-06-01T09:50:26Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-040","2026-06-01T09:47:03Z","2026-06-01T09:51:03Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-041","2026-06-01T09:47:40Z","2026-06-01T09:51:40Z","Demonstration data, not collected from participants","north",4,"no",0.6234
+"DEMO-042","2026-06-01T09:48:17Z","2026-06-01T09:52:17Z","Demonstration data, not collected from participants","south",4,"yes",1.6154
+"DEMO-043","2026-06-01T09:48:54Z","2026-06-01T09:52:54Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-044","2026-06-01T09:49:31Z","2026-06-01T09:53:31Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-045","2026-06-01T09:50:08Z","2026-06-01T09:54:08Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-046","2026-06-01T09:50:45Z","2026-06-01T09:54:45Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-047","2026-06-01T09:51:22Z","2026-06-01T09:55:22Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-048","2026-06-01T09:51:59Z","2026-06-01T09:55:59Z","Demonstration data, not collected from participants","south",2,"no",1.6154
+"DEMO-049","2026-06-01T09:52:36Z","2026-06-01T09:56:36Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-050","2026-06-01T09:53:13Z","2026-06-01T09:57:13Z","Demonstration data, not collected from participants","south",3,"yes",1.6154
+"DEMO-051","2026-06-01T09:53:50Z","2026-06-01T09:57:50Z","Demonstration data, not collected from participants","south",5,"yes",1.6154
+"DEMO-052","2026-06-01T09:54:27Z","2026-06-01T09:58:27Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-053","2026-06-01T09:55:04Z","2026-06-01T09:59:04Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-054","2026-06-01T09:55:41Z","2026-06-01T09:59:41Z","Demonstration data, not collected from participants","east",4,"yes",1.7647
+"DEMO-055","2026-06-01T09:56:18Z","2026-06-01T10:00:18Z","Demonstration data, not collected from participants","south",4,"no",1.6154
+"DEMO-056","2026-06-01T09:56:55Z","2026-06-01T10:00:55Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-057","2026-06-01T09:57:32Z","2026-06-01T10:01:32Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-058","2026-06-01T09:58:09Z","2026-06-01T10:02:09Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-059","2026-06-01T09:58:46Z","2026-06-01T10:02:46Z","Demonstration data, not collected from participants","south",4,"yes",1.6154
+"DEMO-060","2026-06-01T09:59:23Z","2026-06-01T10:03:23Z","Demonstration data, not collected from participants","north",1,"yes",0.6234
+"DEMO-061","2026-06-01T10:00:00Z","2026-06-01T10:04:00Z","Demonstration data, not collected from participants","north",1,"yes",0.6234
+"DEMO-062","2026-06-01T10:00:37Z","2026-06-01T10:04:37Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-063","2026-06-01T10:01:14Z","2026-06-01T10:05:14Z","Demonstration data, not collected from participants","south",4,"no",1.6154
+"DEMO-064","2026-06-01T10:01:51Z","2026-06-01T10:05:51Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-065","2026-06-01T10:02:28Z","2026-06-01T10:06:28Z","Demonstration data, not collected from participants","east",2,"yes",1.7647
+"DEMO-066","2026-06-01T10:03:05Z","2026-06-01T10:07:05Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-067","2026-06-01T10:03:42Z","2026-06-01T10:07:42Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-068","2026-06-01T10:04:19Z","2026-06-01T10:08:19Z","Demonstration data, not collected from participants","north",1,"yes",0.6234
+"DEMO-069","2026-06-01T10:04:56Z","2026-06-01T10:08:56Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-070","2026-06-01T10:05:33Z","2026-06-01T10:09:33Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-071","2026-06-01T10:06:10Z","2026-06-01T10:10:10Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-072","2026-06-01T10:06:47Z","2026-06-01T10:10:47Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-073","2026-06-01T10:07:24Z","2026-06-01T10:11:24Z","Demonstration data, not collected from participants","south",1,"yes",1.6154
+"DEMO-074","2026-06-01T10:08:01Z","2026-06-01T10:12:01Z","Demonstration data, not collected from participants","south",5,"no",1.6154
+"DEMO-075","2026-06-01T10:08:38Z","2026-06-01T10:12:38Z","Demonstration data, not collected from participants","east",5,"yes",1.7647
+"DEMO-076","2026-06-01T10:09:15Z","2026-06-01T10:13:15Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-077","2026-06-01T10:09:52Z","2026-06-01T10:13:52Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-078","2026-06-01T10:10:29Z","2026-06-01T10:14:29Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-079","2026-06-01T10:11:06Z","2026-06-01T10:15:06Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-080","2026-06-01T10:11:43Z","2026-06-01T10:15:43Z","Demonstration data, not collected from participants","north",2,"no",0.6234
+"DEMO-081","2026-06-01T10:12:20Z","2026-06-01T10:16:20Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-082","2026-06-01T10:12:57Z","2026-06-01T10:16:57Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-083","2026-06-01T10:13:34Z","2026-06-01T10:17:34Z","Demonstration data, not collected from participants","east",2,"yes",1.7647
+"DEMO-084","2026-06-01T10:14:11Z","2026-06-01T10:18:11Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-085","2026-06-01T10:14:48Z","2026-06-01T10:18:48Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-086","2026-06-01T10:15:25Z","2026-06-01T10:19:25Z","Demonstration data, not collected from participants","south",2,"no",1.6154
+"DEMO-087","2026-06-01T10:16:02Z","2026-06-01T10:20:02Z","Demonstration data, not collected from participants","south",2,"no",1.6154
+"DEMO-088","2026-06-01T10:16:39Z","2026-06-01T10:20:39Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-089","2026-06-01T10:17:16Z","2026-06-01T10:21:16Z","Demonstration data, not collected from participants","east",1,"yes",1.7647
+"DEMO-090","2026-06-01T10:17:53Z","2026-06-01T10:21:53Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-091","2026-06-01T10:18:30Z","2026-06-01T10:22:30Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-092","2026-06-01T10:19:07Z","2026-06-01T10:23:07Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-093","2026-06-01T10:19:44Z","2026-06-01T10:23:44Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-094","2026-06-01T10:20:21Z","2026-06-01T10:24:21Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-095","2026-06-01T10:20:58Z","2026-06-01T10:24:58Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-096","2026-06-01T10:21:35Z","2026-06-01T10:25:35Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-097","2026-06-01T10:22:12Z","2026-06-01T10:26:12Z","Demonstration data, not collected from participants","north",1,"yes",0.6234
+"DEMO-098","2026-06-01T10:22:49Z","2026-06-01T10:26:49Z","Demonstration data, not collected from participants","north",4,"no",0.6234
+"DEMO-099","2026-06-01T10:23:26Z","2026-06-01T10:27:26Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-100","2026-06-01T10:24:03Z","2026-06-01T10:28:03Z","Demonstration data, not collected from participants","north",2,"no",0.6234
+"DEMO-101","2026-06-01T10:24:40Z","2026-06-01T10:28:40Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-102","2026-06-01T10:25:17Z","2026-06-01T10:29:17Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-103","2026-06-01T10:25:54Z","2026-06-01T10:29:54Z","Demonstration data, not collected from participants","east",2,"yes",1.7647
+"DEMO-104","2026-06-01T10:26:31Z","2026-06-01T10:30:31Z","Demonstration data, not collected from participants","north",4,"yes",0.6234
+"DEMO-105","2026-06-01T10:27:08Z","2026-06-01T10:31:08Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-106","2026-06-01T10:27:45Z","2026-06-01T10:31:45Z","Demonstration data, not collected from participants","north",5,"no",0.6234
+"DEMO-107","2026-06-01T10:28:22Z","2026-06-01T10:32:22Z","Demonstration data, not collected from participants","south",1,"yes",1.6154
+"DEMO-108","2026-06-01T10:28:59Z","2026-06-01T10:32:59Z","Demonstration data, not collected from participants","north",5,"yes",0.6234
+"DEMO-109","2026-06-01T10:29:36Z","2026-06-01T10:33:36Z","Demonstration data, not collected from participants","south",2,"yes",1.6154
+"DEMO-110","2026-06-01T10:30:13Z","2026-06-01T10:34:13Z","Demonstration data, not collected from participants","east",1,"no",1.7647
+"DEMO-111","2026-06-01T10:30:50Z","2026-06-01T10:34:50Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-112","2026-06-01T10:31:27Z","2026-06-01T10:35:27Z","Demonstration data, not collected from participants","east",1,"yes",1.7647
+"DEMO-113","2026-06-01T10:32:04Z","2026-06-01T10:36:04Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-114","2026-06-01T10:32:41Z","2026-06-01T10:36:41Z","Demonstration data, not collected from participants","east",3,"yes",1.7647
+"DEMO-115","2026-06-01T10:33:18Z","2026-06-01T10:37:18Z","Demonstration data, not collected from participants","east",1,"no",1.7647
+"DEMO-116","2026-06-01T10:33:55Z","2026-06-01T10:37:55Z","Demonstration data, not collected from participants","south",1,"no",1.6154
+"DEMO-117","2026-06-01T10:34:32Z","2026-06-01T10:38:32Z","Demonstration data, not collected from participants","south",1,"yes",1.6154
+"DEMO-118","2026-06-01T10:35:09Z","2026-06-01T10:39:09Z","Demonstration data, not collected from participants","north",2,"yes",0.6234
+"DEMO-119","2026-06-01T10:35:46Z","2026-06-01T10:39:46Z","Demonstration data, not collected from participants","north",3,"yes",0.6234
+"DEMO-120","2026-06-01T10:36:23Z","2026-06-01T10:40:23Z","Demonstration data, not collected from participants","east",1,"no",1.7647

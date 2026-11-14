@@ -1,51 +1,51 @@
-"respondent_id","started_at","submitted_at","attendee_type","sessions_attended","comment"
-"R001","2026-06-01T09:13:00Z","2026-06-01T09:17:00Z","delegate",6,"Better catering"
-"R002","2026-06-01T09:13:37Z","2026-06-01T09:17:37Z","delegate",10,"Longer sessions"
-"R003","2026-06-01T09:14:14Z","2026-06-01T09:18:14Z","delegate",9,""
-"R004","2026-06-01T09:14:51Z","2026-06-01T09:18:51Z","exhibitor",,
-"R005","2026-06-01T09:15:28Z","2026-06-01T09:19:28Z","exhibitor",,
-"R006","2026-06-01T09:16:05Z","2026-06-01T09:20:05Z","visitor",,
-"R007","2026-06-01T09:16:42Z","2026-06-01T09:20:42Z","speaker",6,""
-"R008","2026-06-01T09:17:19Z","2026-06-01T09:21:19Z","speaker",10,"More breaks"
-"R009","2026-06-01T09:17:56Z","2026-06-01T09:21:56Z","exhibitor",,
-"R010","2026-06-01T09:18:33Z","2026-06-01T09:22:33Z","delegate",10,"More breaks"
-"R011","2026-06-01T09:19:10Z","2026-06-01T09:23:10Z","visitor",,
-"R012","2026-06-01T09:19:47Z","2026-06-01T09:23:47Z","delegate",7,""
-"R013","2026-06-01T09:20:24Z","2026-06-01T09:24:24Z","speaker",6,"Better catering"
-"R014","2026-06-01T09:21:01Z","2026-06-01T09:25:01Z","delegate",8,"Better catering"
-"R015","2026-06-01T09:21:38Z","2026-06-01T09:25:38Z","delegate",3,"Longer sessions"
-"R016","2026-06-01T09:22:15Z","2026-06-01T09:26:15Z","delegate",3,""
-"R017","2026-06-01T09:22:52Z","2026-06-01T09:26:52Z","delegate",6,""
-"R018","2026-06-01T09:23:29Z","2026-06-01T09:27:29Z","delegate",4,"Better catering"
-"R019","2026-06-01T09:24:06Z","2026-06-01T09:28:06Z","speaker",7,"Longer sessions"
-"R020","2026-06-01T09:24:43Z","2026-06-01T09:28:43Z","exhibitor",,
-"R021","2026-06-01T09:25:20Z","2026-06-01T09:29:20Z","delegate",5,"Longer sessions"
-"R022","2026-06-01T09:25:57Z","2026-06-01T09:29:57Z","delegate",9,""
-"R023","2026-06-01T09:26:34Z","2026-06-01T09:30:34Z","delegate",8,""
-"R024","2026-06-01T09:27:11Z","2026-06-01T09:31:11Z","delegate",8,"More breaks"
-"R025","2026-06-01T09:27:48Z","2026-06-01T09:31:48Z","delegate",9,"Better catering"
-"R026","2026-06-01T09:28:25Z","2026-06-01T09:32:25Z","exhibitor",,
-"R027","2026-06-01T09:29:02Z","2026-06-01T09:33:02Z","delegate",8,"Longer sessions"
-"R028","2026-06-01T09:29:39Z","2026-06-01T09:33:39Z","delegate",4,"Longer sessions"
-"R029","2026-06-01T09:30:16Z","2026-06-01T09:34:16Z","speaker",5,"Better catering"
-"R030","2026-06-01T09:30:53Z","2026-06-01T09:34:53Z","exhibitor",,
-"R031","2026-06-01T09:31:30Z","2026-06-01T09:35:30Z","delegate",6,"Longer sessions"
-"R032","2026-06-01T09:32:07Z","2026-06-01T09:36:07Z","speaker",9,"Longer sessions"
-"R033","2026-06-01T09:32:44Z","2026-06-01T09:36:44Z","delegate",10,"More breaks"
-"R034","2026-06-01T09:33:21Z","2026-06-01T09:37:21Z","delegate",9,""
-"R035","2026-06-01T09:33:58Z","2026-06-01T09:37:58Z","delegate",8,"Longer sessions"
-"R036","2026-06-01T09:34:35Z","2026-06-01T09:38:35Z","visitor",,
-"R037","2026-06-01T09:35:12Z","2026-06-01T09:39:12Z","speaker",7,"Longer sessions"
-"R038","2026-06-01T09:35:49Z","2026-06-01T09:39:49Z","delegate",5,"More breaks"
-"R039","2026-06-01T09:36:26Z","2026-06-01T09:40:26Z","exhibitor",,
-"R040","2026-06-01T09:37:03Z","2026-06-01T09:41:03Z","speaker",6,"Longer sessions"
-"R041","2026-06-01T09:37:40Z","2026-06-01T09:41:40Z","delegate",8,""
-"R042","2026-06-01T09:38:17Z","2026-06-01T09:42:17Z","delegate",6,""
-"R043","2026-06-01T09:38:54Z","2026-06-01T09:42:54Z","exhibitor",,
-"R044","2026-06-01T09:39:31Z","2026-06-01T09:43:31Z","delegate",10,""
-"R045","2026-06-01T09:40:08Z","2026-06-01T09:44:08Z","delegate",7,"Better catering"
-"R046","2026-06-01T09:40:45Z","2026-06-01T09:44:45Z","exhibitor",,
-"R047","2026-06-01T09:41:22Z","2026-06-01T09:45:22Z","delegate",10,""
-"R048","2026-06-01T09:41:59Z","2026-06-01T09:45:59Z","delegate",7,"More breaks"
-"R049","2026-06-01T09:42:36Z","2026-06-01T09:46:36Z","delegate",3,""
-"R050","2026-06-01T09:43:13Z","2026-06-01T09:47:13Z","delegate",5,"Better catering"
+"respondent_id","started_at","submitted_at","data_status","attendee_type","sessions_attended","comment"
+"DEMO-001","2026-06-01T09:13:00Z","2026-06-01T09:17:00Z","Demonstration data, not collected from participants","delegate",6,"Better catering"
+"DEMO-002","2026-06-01T09:13:37Z","2026-06-01T09:17:37Z","Demonstration data, not collected from participants","delegate",10,"Longer sessions"
+"DEMO-003","2026-06-01T09:14:14Z","2026-06-01T09:18:14Z","Demonstration data, not collected from participants","delegate",9,""
+"DEMO-004","2026-06-01T09:14:51Z","2026-06-01T09:18:51Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-005","2026-06-01T09:15:28Z","2026-06-01T09:19:28Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-006","2026-06-01T09:16:05Z","2026-06-01T09:20:05Z","Demonstration data, not collected from participants","visitor",,
+"DEMO-007","2026-06-01T09:16:42Z","2026-06-01T09:20:42Z","Demonstration data, not collected from participants","speaker",6,""
+"DEMO-008","2026-06-01T09:17:19Z","2026-06-01T09:21:19Z","Demonstration data, not collected from participants","speaker",10,"More breaks"
+"DEMO-009","2026-06-01T09:17:56Z","2026-06-01T09:21:56Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-010","2026-06-01T09:18:33Z","2026-06-01T09:22:33Z","Demonstration data, not collected from participants","delegate",10,"More breaks"
+"DEMO-011","2026-06-01T09:19:10Z","2026-06-01T09:23:10Z","Demonstration data, not collected from participants","visitor",,
+"DEMO-012","2026-06-01T09:19:47Z","2026-06-01T09:23:47Z","Demonstration data, not collected from participants","delegate",7,""
+"DEMO-013","2026-06-01T09:20:24Z","2026-06-01T09:24:24Z","Demonstration data, not collected from participants","speaker",6,"Better catering"
+"DEMO-014","2026-06-01T09:21:01Z","2026-06-01T09:25:01Z","Demonstration data, not collected from participants","delegate",8,"Better catering"
+"DEMO-015","2026-06-01T09:21:38Z","2026-06-01T09:25:38Z","Demonstration data, not collected from participants","delegate",3,"Longer sessions"
+"DEMO-016","2026-06-01T09:22:15Z","2026-06-01T09:26:15Z","Demonstration data, not collected from participants","delegate",3,""
+"DEMO-017","2026-06-01T09:22:52Z","2026-06-01T09:26:52Z","Demonstration data, not collected from participants","delegate",6,""
+"DEMO-018","2026-06-01T09:23:29Z","2026-06-01T09:27:29Z","Demonstration data, not collected from participants","delegate",4,"Better catering"
+"DEMO-019","2026-06-01T09:24:06Z","2026-06-01T09:28:06Z","Demonstration data, not collected from participants","speaker",7,"Longer sessions"
+"DEMO-020","2026-06-01T09:24:43Z","2026-06-01T09:28:43Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-021","2026-06-01T09:25:20Z","2026-06-01T09:29:20Z","Demonstration data, not collected from participants","delegate",5,"Longer sessions"
+"DEMO-022","2026-06-01T09:25:57Z","2026-06-01T09:29:57Z","Demonstration data, not collected from participants","delegate",9,""
+"DEMO-023","2026-06-01T09:26:34Z","2026-06-01T09:30:34Z","Demonstration data, not collected from participants","delegate",8,""
+"DEMO-024","2026-06-01T09:27:11Z","2026-06-01T09:31:11Z","Demonstration data, not collected from participants","delegate",8,"More breaks"
+"DEMO-025","2026-06-01T09:27:48Z","2026-06-01T09:31:48Z","Demonstration data, not collected from participants","delegate",9,"Better catering"
+"DEMO-026","2026-06-01T09:28:25Z","2026-06-01T09:32:25Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-027","2026-06-01T09:29:02Z","2026-06-01T09:33:02Z","Demonstration data, not collected from participants","delegate",8,"Longer sessions"
+"DEMO-028","2026-06-01T09:29:39Z","2026-06-01T09:33:39Z","Demonstration data, not collected from participants","delegate",4,"Longer sessions"
+"DEMO-029","2026-06-01T09:30:16Z","2026-06-01T09:34:16Z","Demonstration data, not collected from participants","speaker",5,"Better catering"
+"DEMO-030","2026-06-01T09:30:53Z","2026-06-01T09:34:53Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-031","2026-06-01T09:31:30Z","2026-06-01T09:35:30Z","Demonstration data, not collected from participants","delegate",6,"Longer sessions"
+"DEMO-032","2026-06-01T09:32:07Z","2026-06-01T09:36:07Z","Demonstration data, not collected from participants","speaker",9,"Longer sessions"
+"DEMO-033","2026-06-01T09:32:44Z","2026-06-01T09:36:44Z","Demonstration data, not collected from participants","delegate",10,"More breaks"
+"DEMO-034","2026-06-01T09:33:21Z","2026-06-01T09:37:21Z","Demonstration data, not collected from participants","delegate",9,""
+"DEMO-035","2026-06-01T09:33:58Z","2026-06-01T09:37:58Z","Demonstration data, not collected from participants","delegate",8,"Longer sessions"
+"DEMO-036","2026-06-01T09:34:35Z","2026-06-01T09:38:35Z","Demonstration data, not collected from participants","visitor",,
+"DEMO-037","2026-06-01T09:35:12Z","2026-06-01T09:39:12Z","Demonstration data, not collected from participants","speaker",7,"Longer sessions"
+"DEMO-038","2026-06-01T09:35:49Z","2026-06-01T09:39:49Z","Demonstration data, not collected from participants","delegate",5,"More breaks"
+"DEMO-039","2026-06-01T09:36:26Z","2026-06-01T09:40:26Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-040","2026-06-01T09:37:03Z","2026-06-01T09:41:03Z","Demonstration data, not collected from participants","speaker",6,"Longer sessions"
+"DEMO-041","2026-06-01T09:37:40Z","2026-06-01T09:41:40Z","Demonstration data, not collected from participants","delegate",8,""
+"DEMO-042","2026-06-01T09:38:17Z","2026-06-01T09:42:17Z","Demonstration data, not collected from participants","delegate",6,""
+"DEMO-043","2026-06-01T09:38:54Z","2026-06-01T09:42:54Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-044","2026-06-01T09:39:31Z","2026-06-01T09:43:31Z","Demonstration data, not collected from participants","delegate",10,""
+"DEMO-045","2026-06-01T09:40:08Z","2026-06-01T09:44:08Z","Demonstration data, not collected from participants","delegate",7,"Better catering"
+"DEMO-046","2026-06-01T09:40:45Z","2026-06-01T09:44:45Z","Demonstration data, not collected from participants","exhibitor",,
+"DEMO-047","2026-06-01T09:41:22Z","2026-06-01T09:45:22Z","Demonstration data, not collected from participants","delegate",10,""
+"DEMO-048","2026-06-01T09:41:59Z","2026-06-01T09:45:59Z","Demonstration data, not collected from participants","delegate",7,"More breaks"
+"DEMO-049","2026-06-01T09:42:36Z","2026-06-01T09:46:36Z","Demonstration data, not collected from participants","delegate",3,""
+"DEMO-050","2026-06-01T09:43:13Z","2026-06-01T09:47:13Z","Demonstration data, not collected from participants","delegate",5,"Better catering"
