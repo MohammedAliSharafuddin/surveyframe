@@ -147,3 +147,24 @@ test_that("the plan renders through Quarto in HTML, Word and PDF", {
     expect_match(gsub("\\s+", "", txt), hash, fixed = TRUE, info = fmt)
   }
 })
+
+test_that("the title and the body write the same date, in words", {
+  expect_identical(surveyframe:::sframe_plan_date(as.Date("2026-11-04")), "4 November 2026")
+  md <- plan_md("two_group")
+  expect_match(md, paste0("**Date:** ", surveyframe:::sframe_plan_date()), fixed = TRUE)
+  tpl <- sframe_installed_text("inst", "templates", "plan.qmd")
+  expect_match(tpl, "date: today\ndate-format: \"D MMMM YYYY\"", fixed = TRUE)
+})
+
+test_that("the Quarto plan's title page shows the date as the body does", {
+  skip_if_not_slow()
+  ins <- sframe_demo("two_group", preview = FALSE)$instrument
+  out <- suppressMessages(render_report(ins, output_file = tempfile(fileext = ".html"), open = FALSE))
+  skip_if(!identical(attr(out, "engine"), "quarto"), "Quarto not used")
+  html <- paste(readLines(out, warn = FALSE), collapse = "\n")
+  # The ISO date stays in the dcterms.date meta tag, for machines.
+  shown <- gsub("<meta[^>]*>", "", html)
+  expect_false(grepl(format(Sys.Date(), "%Y-%m-%d"), shown, fixed = TRUE))
+  expect_match(html, paste0("<p class=\"date\">", surveyframe:::sframe_plan_date(), "</p>"), fixed = TRUE)
+  expect_gte(lengths(regmatches(html, gregexpr(surveyframe:::sframe_plan_date(), html, fixed = TRUE))), 2L)
+})

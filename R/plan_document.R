@@ -100,7 +100,7 @@ sframe_plan_blocks <- function(instrument, title = NULL, authors = NULL,
   add("kv", label = "Instrument", text = meta$title %||% "Untitled")
   if (length(authors)) add("kv", label = "Authors", text = paste(authors, collapse = ", "))
   add("kv", label = "Version", text = as.character(meta$version %||% instrument$version %||% ""))
-  add("kv", label = "Date", text = format(Sys.Date(), "%d %B %Y"))
+  add("kv", label = "Date", text = sframe_plan_date())
   # On its own line, as code, so a PDF neither hyphenates it nor runs it
   # past the margin.
   add("kv", label = "Instrument hash (SHA-256)", text = "")
@@ -324,6 +324,11 @@ sframe_prereg_prompts <- c(
   multiplicity = "how the tests are corrected for being run together, if at all.",
   contingency = "what you will do if an assumption fails or the planned sample is not reached.",
   significance_level = "the alpha each test is judged against.")
+
+# The plan's date in words, 14 November 2026, as plan.qmd's title shows it.
+sframe_plan_date <- function(date = Sys.Date()) {
+  sub("^0", "", format(as.Date(date), "%d %B %Y"))
+}
 
 sframe_plan_title <- function(instrument) {
   paste0("Pre-analysis plan: ", instrument$meta$title %||% "Untitled")

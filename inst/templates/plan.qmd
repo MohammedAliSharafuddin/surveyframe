@@ -1,6 +1,9 @@
 ---
 title: "Pre-analysis plan"
-date: "`r format(Sys.Date(), '%B %d, %Y')`"
+# The date as the plan's title page writes it, 14 November 2026, where
+# Quarto's default printed 2026-11-14 (owner preview of 48b585e).
+date: today
+date-format: "D MMMM YYYY"
 format:
   html:
     toc: true
