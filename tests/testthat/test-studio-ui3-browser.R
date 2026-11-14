@@ -51,7 +51,9 @@ test_that("every Studio screen has exactly 1 filled primary, 40 px high and size
     expect_true(all(p$height >= 40), info = screen)
     expect_true(all(p$slack <= 2), info = paste(screen, paste(p$slack, collapse = ",")))
     s <- lv[lv$level == "secondary", ]
-    if (nrow(s)) expect_true(all(s$height >= 36), info = paste(screen, paste(s$text[s$height < 36], collapse = "|")))
+    # Unconditional, so the count of expectations does not depend on whether
+    # a screen's secondary buttons have drawn yet (all() of none is TRUE).
+    expect_true(all(s$height >= 36), info = paste(screen, paste(s$text[s$height < 36], collapse = "|")))
   }
 })
 
