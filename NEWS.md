@@ -1808,6 +1808,13 @@ arithmetic.
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
+* **`launch_builder(instrument = )` opens an instrument of your own in
+  SurveyBuilder.** The builder opens from a temporary copy that loads it at
+  start-up through the same route as its Open button, so the file is
+  checked as an opened file is, and its study, designs, amendments and
+  references are kept on the next save. `demo =` and `instrument =` cannot
+  be used together. With `launch_studio(instrument, screen = "design")`,
+  this gives both routes a way to open an instrument held in R.
 * **Each stage names the next.** At the console, `write_sframe()`,
   `export_survey()`, `export_google_sheet()`, `read_responses()`,
   `run_analysis_plan()` and `render_report()` end with 1 message saying

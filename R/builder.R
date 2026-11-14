@@ -34,9 +34,14 @@
 #'   then opens from a temporary copy with that demo's questions, scales and
 #'   analysis plan already loaded. `"input_types"` shows every input type
 #'   the builder supports.
+#' @param instrument Optional. An `sframe` instrument. The builder then opens
+#'   from a temporary copy with this instrument loaded, as if it had been
+#'   opened with the builder's Open button, so its study, designs,
+#'   amendments and references are kept on the next save. Supply `demo` or
+#'   `instrument`, not both.
 #'
 #' @return The path to the builder HTML file, invisibly: the bundled file, or
-#'   the temporary copy when `demo` is given.
+#'   the temporary copy when `demo` or `instrument` is given.
 #' @export
 #' @seealso [launch_studio()], [read_sframe()], [run_analysis_plan()]
 #'
@@ -48,9 +53,19 @@
 #' # The same builder with a demo preloaded
 #' path <- launch_builder(demo = "two_group", open = FALSE)
 #' sframe_show(path)
+#'
+#' # Or with an instrument of your own
+#' ins <- sframe_demo("likert_scale", preview = FALSE)$instrument
+#' path <- launch_builder(instrument = ins, open = FALSE)
+#' sframe_show(path)
 #' @family Design functions
-launch_builder <- function(open = TRUE, demo = NULL) {
-  builder_path <- if (is.null(demo)) {
+launch_builder <- function(open = TRUE, demo = NULL, instrument = NULL) {
+  if (!is.null(demo) && !is.null(instrument)) {
+    rlang::abort("Supply `demo` or `instrument`, not both.", class = "sframe_error")
+  }
+  builder_path <- if (!is.null(instrument)) {
+    sframe_builder_instrument_html(instrument)
+  } else if (is.null(demo)) {
     system.file("builder", "survey_builder.html", package = "surveyframe")
   } else {
     sframe_builder_demo_html(demo)

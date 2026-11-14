@@ -100,3 +100,43 @@ sframe_builder_demo_html <- function(name) {
   writeLines(builder_html, demo_builder_path, useBytes = FALSE)
   demo_builder_path
 }
+
+# Writes a temporary copy of the SurveyBuilder that opens the given instrument
+# on load, through openSframeText(), the route the builder's own Open button
+# takes. So the file is checked as an opened file is, and the fields the
+# builder does not edit (study, designs, amendments, references) are carried
+# to its next save. Used by launch_builder(instrument =).
+sframe_builder_instrument_html <- function(instrument) {
+  sframe_check_instrument(instrument)
+  instrument <- as_sframe(validate_sframe(instrument, strict = TRUE))
+  payload <- sframe_serialization_payload(instrument)
+  sframe_check_na_schema(payload)
+  payload$hash$value <- sframe_hash_payload(payload)
+  text <- sframe_payload_json(payload, pretty = FALSE)
+  # A JavaScript string literal, with </ escaped so the text cannot close the
+  # script element it sits in.
+  literal <- gsub("</", "<\\/", as.character(jsonlite::toJSON(text, auto_unbox = TRUE)),
+                  fixed = TRUE)
+
+  src_path <- system.file("builder", "survey_builder.html", package = "surveyframe")
+  if (!nzchar(src_path) || !file.exists(src_path)) {
+    rlang::abort("SurveyBuilder HTML not found. Please reinstall surveyframe.",
+                 class = "sframe_error")
+  }
+  html <- paste(readLines(src_path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+  init_marker <- "chkAutoSave();"
+  if (!grepl(init_marker, html, fixed = TRUE)) {
+    rlang::abort("Could not open the instrument in survey_builder.html. Please reinstall surveyframe.",
+                 class = "sframe_error")
+  }
+  html <- sub(init_marker, paste0(
+    "try{localStorage.removeItem('sf_as');}catch(e){}\n", init_marker,
+    "\nopenSframeText(", literal, ");"), html, fixed = TRUE)
+
+  dir <- file.path(tempdir(), "surveyframe-builder-instrument")
+  dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  slug <- gsub("[^A-Za-z0-9]+", "_", instrument$meta$title %||% "instrument")
+  path <- file.path(dir, paste0("survey_builder_", substr(slug, 1, 40), ".html"))
+  writeLines(html, path, useBytes = FALSE)
+  path
+}
