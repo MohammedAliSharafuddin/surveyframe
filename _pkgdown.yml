@@ -78,11 +78,13 @@ navbar:
 articles:
   - title: "Start here"
     desc: >
-      Twenty-two small surveys, each doing one job, with the whole path from
-      the questionnaire to the report. Choose the demo that matches the data
-      you have rather than the name of a test.
+      The 5 stages of a study, in SurveyStudio or in R, then 25 small surveys,
+      each doing one job, with the whole path from the questionnaire to the
+      report. Choose the demo that matches the data you have rather than the
+      name of a test.
     navbar: ~
     contents:
+      - two-ways-to-run-a-study
       - learn-by-example
   - title: "Survey research workflow"
     desc: >

@@ -1390,6 +1390,13 @@ arithmetic.
 
 ## Documentation
 
+* **New vignette, "Two ways to run a study"**, with SurveyStudio
+  screenshots: the 5 stages (design, collect, check, analyse, report), each
+  in SurveyStudio and in R, on the `paired` demo, and the pre-analysis plan
+  before collecting. The standalone SurveyBuilder is named once, as the
+  offline designer. It leads the "Start here" articles. "Deploying and
+  collecting" describes SurveyStudio's Collect screen where it said "from
+  the SurveyBuilder" (UX-22).
 * **`sframe_show()` opens a file surveyframe wrote** (new export). In an
   interactive session an HTML page goes to the viewer of RStudio, Positron
   or VS Code, else the browser, and any other file to the program the

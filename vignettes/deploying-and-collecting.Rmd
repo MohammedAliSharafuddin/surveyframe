@@ -44,13 +44,13 @@ The deployment has three parts.
 2. The survey HTML carries that endpoint URL and posts each submission to it.
 3. A free static host serves the HTML file to respondents.
 
-You can do all of this from the SurveyBuilder without writing R, or from R with
-two function calls. Both routes produce the same files.
+You can do all of this on SurveyStudio's Collect screen without writing R, or
+from R with two function calls. Both routes produce the same files.
 
 ## What you need
 
 * A Google account, for the Sheet and the Apps Script collector.
-* A finished instrument, either an `.sframe` file from the SurveyBuilder or an
+* A finished instrument, either an `.sframe` file from SurveyStudio or an
   `sframe` object in R.
 * A free static host. This guide covers GitHub Pages and Blogger. Netlify Drop
   and Google Sites work the same way.
@@ -61,9 +61,8 @@ Create an empty Google Sheet. The collector adds a `Responses` tab with the
 correct column headers on the first submission, so you do not prepare the sheet
 by hand.
 
-Generate the Apps Script collector. From the SurveyBuilder, open
-Survey settings, choose the Google Sheets tab, paste your Sheet URL, and click
-**Download collector (.gs)**. From R, call `export_google_sheet()`.
+Generate the Apps Script collector. On SurveyStudio's Collect screen, paste
+your Sheet URL under Google Sheet URL and click **Download Apps Script (.gs)**. From R, call `export_google_sheet()`.
 
 ```{r collector, eval = FALSE}
 study <- read_sframe("my_study.sframe")
@@ -103,9 +102,8 @@ This URL is your collection endpoint. Keep it for the next step.
 The exported survey posts each response to whatever endpoint it carries. Set the
 endpoint before you export.
 
-From the SurveyBuilder, paste the Web App URL into the
-Apps Script Web App URL field on the Google Sheets settings tab, then click
-**Export survey**. From R, store the URL on the instrument and call
+On SurveyStudio's Collect screen, paste the Web App URL into Web app address
+that receives the responses, then click **Download survey (.html)**. From R, store the URL on the instrument and call
 `export_survey()`.
 
 ```{r endpoint-export, eval = FALSE}
