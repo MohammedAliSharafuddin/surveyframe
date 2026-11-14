@@ -4,7 +4,7 @@
 \alias{sframe_demo}
 \title{Load one bundled demo}
 \usage{
-sframe_demo(name, branded = FALSE)
+sframe_demo(name, branded = FALSE, preview = interactive())
 }
 \arguments{
 \item{name}{Character. A demo name, as listed by \code{\link[=sframe_list_demos]{sframe_list_demos()}}.}
@@ -13,6 +13,12 @@ sframe_demo(name, branded = FALSE)
 standard welcome page, logo, theme colour and thank you page spliced into
 its \code{render} block. The bundled file on disk is left unchanged, so the
 same branding can be shown on whichever demo matches your own survey.}
+
+\item{preview}{Logical. When \code{TRUE}, in an interactive session, the survey
+opens as a respondent sees it, in the viewer of RStudio, Positron or VS
+Code, else the browser, through \code{\link[=sframe_show]{sframe_show()}}. It is a preview, so
+answers go nowhere. Nothing opens in a script, a knitr or Quarto render,
+or with \code{options(surveyframe.demo_preview = FALSE)}.}
 }
 \value{
 A list of class \code{sframe_demo} with \code{instrument}, \code{responses}, and

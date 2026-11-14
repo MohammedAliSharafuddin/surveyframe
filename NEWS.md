@@ -1955,12 +1955,23 @@ arithmetic.
 
 ## Demos
 
-* **`sframe_demo()` prints a short card.** At the console a demo printed
-  every response, 125 to 1,112 lines. It is now a list of class
-  `sframe_demo`, and printing it shows what the demo teaches, its size, its
-  files, that its data was not collected from participants, and the
-  commands to try next, in 15 lines at most. `demo$instrument`,
-  `demo$responses` and the 4 paths are unchanged.
+* **`sframe_demo()` prints a short card and shows the survey.** At the
+  console a demo printed every response, 125 to 1,112 lines. It is now a
+  list of class `sframe_demo`, and printing it shows what the demo teaches,
+  its questions, responses and planned methods, its files, that its data
+  was not collected from participants, and the commands to try next, in 15
+  lines at most. `demo$instrument`, `demo$responses` and the 4 paths are
+  unchanged. With `preview = interactive()`, the new default, the survey
+  also opens as a respondent sees it, in the viewer or the browser through
+  `sframe_show()`. Nothing opens in a script, a knitr or Quarto render, or
+  with `preview = FALSE` or `options(surveyframe.demo_preview = FALSE)`.
+* **`sframe_list_demos()` prints 1 line per demo**, grouped as analysis,
+  presentation, provenance and reference datasets, with `two_group` named
+  as the place to start, in 32 lines. It returns a data frame of class
+  `sframe_demo_list`, and `as.data.frame()` gives the full table.
+* **In RStudio the commands on the card and the list are links that run
+  them**, through `cli`, now in Suggests. Without `cli`, or in a console
+  with no run links, the same text prints plain.
 * **Every demo has welcome, consent and thank-you screens.** 19 of the 22
   shipped with none, so a respondent met the questions with no consent step.
   They now carry plain screens in the default look, consent required, and

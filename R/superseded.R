@@ -627,14 +627,14 @@ sframe_demos <- function(...) {
 #' @export
 sframe_demo_data <- function() {
   sframe_superseded("sframe_demo_data()", "sframe_demo(\"tourism_services\")")
-  sframe_demo("tourism_services")
+  sframe_demo("tourism_services", preview = FALSE)
 }
 
 #' @rdname superseded
 #' @export
 sframe_input_types_demo_data <- function() {
   sframe_superseded("sframe_input_types_demo_data()", "sframe_demo(\"input_types\")")
-  sframe_demo("input_types")
+  sframe_demo("input_types", preview = FALSE)
 }
 
 #' @rdname superseded
@@ -642,7 +642,7 @@ sframe_input_types_demo_data <- function() {
 launch_builder_demo <- function(open = TRUE) {
   sframe_superseded("launch_builder_demo()", "launch_builder(demo = \"input_types\")")
   path <- launch_builder(open = open, demo = "input_types")
-  demo <- sframe_demo("input_types")
+  demo <- sframe_demo("input_types", preview = FALSE)
   invisible(list(builder_path = path, demo_file = demo$instrument_path,
                  responses_path = demo$responses_path))
 }

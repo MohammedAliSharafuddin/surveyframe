@@ -128,18 +128,46 @@ sframe_reference_demo <- function(name) {
 #' multi-scale instrument, and `"input_types"`, which uses every input type
 #' SurveyBuilder and SurveyStudio support.
 #'
-#' @return A data frame with 1 row per demo: its `name`, whether its `focus`
-#'   is analysis, presentation, provenance or reference, what it `teaches`,
-#'   the input `fields` it uses, the statistical `technique` it demonstrates,
-#'   and the demo whose responses it reuses, if any.
+#' @return A data frame of class `sframe_demo_list` with 1 row per demo: its
+#'   `name`, whether its `focus` is analysis, presentation, provenance or
+#'   reference, what it `teaches`, the input `fields` it uses, the statistical
+#'   `technique` it demonstrates, and the demo whose responses it reuses, if
+#'   any. Printed, it shows 1 line per demo, grouped by focus, with
+#'   `two_group` named as the place to start. `as.data.frame()` gives the
+#'   full table.
 #' @export
 #' @seealso [sframe_demo()], [sframe_demo_qmd()]
 #' @examples
-#' head(sframe_list_demos(), 3)
-#' subset(sframe_list_demos(), focus == "provenance")
+#' sframe_list_demos()
+#' head(as.data.frame(sframe_list_demos()), 3)
 #' @family Demo functions
 sframe_list_demos <- function() {
-  rbind(sframe_demo_index(), sframe_reference_demo_index())
+  structure(rbind(sframe_demo_index(), sframe_reference_demo_index()),
+            class = c("sframe_demo_list", "data.frame"))
+}
+
+#' @export
+print.sframe_demo_list <- function(x, ...) {
+  groups <- c(analysis = "Analysis", presentation = "Presentation",
+              provenance = "Provenance", reference = "Reference datasets")
+  width <- max(nchar(x$name), 1)
+  out <- if ("two_group" %in% x$name) {
+    c(paste0("Start here: ", sframe_run_link("sframe_demo(\"two_group\")")), "")
+  }
+  for (g in intersect(names(groups), unique(x$focus))) {
+    rows <- x[x$focus == g, , drop = FALSE]
+    out <- c(out, paste0(groups[[g]], " (", nrow(rows), ")"))
+    for (i in seq_len(nrow(rows))) {
+      nm <- rows$name[i]
+      pad <- formatC(nm, width = -width)
+      link <- sub(nm, sframe_run_link(paste0("sframe_demo(\"", nm, "\")"), nm),
+                  pad, fixed = TRUE)
+      out <- c(out, paste0("  ", link, "  ", gsub("[\r\n]+", " ", rows$teaches[i])))
+    }
+  }
+  out <- c(out, "", "Load one with sframe_demo(name). as.data.frame() gives the full table.")
+  cat(out, sep = "\n")
+  invisible(x)
 }
 
 sframe_demo_dir <- function() {
@@ -165,6 +193,11 @@ sframe_demo_dir <- function() {
 #'   standard welcome page, logo, theme colour and thank you page spliced into
 #'   its `render` block. The bundled file on disk is left unchanged, so the
 #'   same branding can be shown on whichever demo matches your own survey.
+#' @param preview Logical. When `TRUE`, in an interactive session, the survey
+#'   opens as a respondent sees it, in the viewer of RStudio, Positron or VS
+#'   Code, else the browser, through [sframe_show()]. It is a preview, so
+#'   answers go nowhere. Nothing opens in a script, a knitr or Quarto render,
+#'   or with `options(surveyframe.demo_preview = FALSE)`.
 #'
 #' @return A list of class `sframe_demo` with `instrument`, `responses`, and
 #'   the paths behind them. Printed, it shows a short card: what the demo
@@ -183,7 +216,7 @@ sframe_demo_dir <- function() {
 #' demo
 #' head(demo$responses)
 #' @family Demo functions
-sframe_demo <- function(name, branded = FALSE) {
+sframe_demo <- function(name, branded = FALSE, preview = interactive()) {
   idx <- sframe_demo_index()
   if (missing(name)) {
     rlang::abort(
@@ -199,7 +232,7 @@ sframe_demo <- function(name, branded = FALSE) {
     if (isTRUE(branded)) {
       demo$instrument$render <- unclass(sframe_demo_branding())
     }
-    return(sframe_demo_object(demo, name))
+    return(sframe_demo_preview(sframe_demo_object(demo, name), preview))
   }
   if (!isTRUE(name %in% idx$name)) {
     rlang::abort(
@@ -226,11 +259,23 @@ sframe_demo <- function(name, branded = FALSE) {
                          check.names = FALSE)
   responses <- read_responses(raw, instrument, respondent_id = "respondent_id",
                               meta_cols = c("started_at", "submitted_at"))
-  sframe_demo_object(list(
+  sframe_demo_preview(sframe_demo_object(list(
     instrument = instrument, responses = responses,
     instrument_path = instrument_path, responses_path = responses_path,
     codebook_path = file.path(dir, paste0(name, "_codebook.csv")),
-    results_path  = file.path(dir, paste0(name, "_results.csv"))), name)
+    results_path  = file.path(dir, paste0(name, "_results.csv"))), name), preview)
+}
+
+# Opens the demo's survey as a respondent sees it, where sframe_show() would
+# show a file, and returns the demo either way.
+sframe_demo_preview <- function(demo, preview) {
+  if (isTRUE(preview) && sframe_is_interactive() &&
+      !isTRUE(getOption("knitr.in.progress")) &&
+      !isFALSE(getOption("surveyframe.demo_preview"))) {
+    path <- suppressMessages(preview_survey(demo$instrument, open = FALSE))
+    sframe_show(path, quiet = TRUE, option = "surveyframe.demo_preview")
+  }
+  demo
 }
 
 # A demo is the plain list sframe_demo() has always returned, with the class
@@ -246,33 +291,63 @@ print.sframe_demo <- function(x, ...) {
   idx <- sframe_list_demos()
   teaches <- idx$teaches[match(name, idx$name)]
   ins <- x$instrument
-  n_plan <- length(ins$analysis_plan)
+  plan <- ins$analysis_plan %||% list()
+  methods <- unique(vapply(plan, function(b) {
+    as.character(b$method %||% b$test %||% NA_character_)[1]
+  }, character(1)))
+  methods <- methods[!is.na(methods)]
+  if (length(methods) > 3) {
+    methods <- c(methods[1:3], paste(length(methods) - 3, "more"))
+  }
+  n_q <- sum(!vapply(ins$items, function(it) {
+    isTRUE(it$type %in% c("section_break", "text_block"))
+  }, logical(1)))
   files <- c(x$instrument_path, x$responses_path, x$codebook_path,
              x$results_path)
   files <- basename(files[!is.na(files)])
   q <- paste0("\"", name, "\"")
+  head <- paste0("-- Demo: ", name, " ")
   lines <- c(
-    paste0("<surveyframe demo: ", name, ">"),
-    paste0("Title:      ", ins$meta$title %||% name),
-    if (!is.na(teaches %||% NA)) paste0("Teaches:    ", teaches),
-    paste0("Instrument: ", length(ins$items), " items, ",
-           length(ins$scales), " scales, ", n_plan, " plan blocks"),
-    paste0("Responses:  ", NROW(x$responses), " rows, ",
-           NCOL(x$responses), " columns"),
-    paste0("Files:      ", paste(files, collapse = ", ")),
+    paste0(head, strrep("-", max(3, 60 - nchar(head)))),
+    paste0(ins$meta$title %||% name,
+           if (!is.na(teaches %||% NA)) paste0("   ", teaches)),
+    paste0(n_q, " questions, ", NROW(x$responses), " responses, ",
+           length(plan), " planned analyses",
+           if (length(methods)) paste0(" (", paste(methods, collapse = ", "), ")")),
+    paste0("Files: ", paste(files, collapse = ", ")),
     "Demonstration data, not collected from participants.",
-    "Next:"
+    "",
+    "Try next:"
   )
-  cmd <- c(paste0("preview_survey(", q, ")"),
+  is_ref <- name %in% sframe_reference_demo_index()$name
+  cmd <- c(if (length(plan)) "run_analysis_plan(d$responses, d$instrument)",
            paste0("launch_studio(demo = ", q, ")"),
-           if (n_plan > 0) "run_analysis_plan(demo$responses, demo$instrument)",
-           "demo$instrument", "demo$responses")
-  note <- c("respondent view", "SurveyStudio, all 5 stages",
-            if (n_plan > 0) "the declared plan",
+           paste0("preview_survey(", q, ")"),
+           if (!is_ref) paste0("sframe_demo_qmd(", q, ")"),
+           "d$instrument", "d$responses")
+  note <- c(if (length(plan)) "run the planned analyses",
+            "open it in SurveyStudio", "the respondent view",
+            if (!is_ref) "the whole study as a notebook",
             "the instrument", "the data")
-  cmd <- formatC(cmd, width = -max(nchar(cmd)))
-  cat(c(lines, paste0("  ", cmd, "  # ", note)), sep = "\n")
+  pad <- formatC(cmd, width = -max(nchar(cmd)))
+  shown <- vapply(seq_along(cmd), function(i) {
+    sub(cmd[i], sframe_run_link(cmd[i]), pad[i], fixed = TRUE)
+  }, character(1))
+  cat(c(lines, paste0("  ", shown, "   ", note)), sep = "\n")
   invisible(x)
+}
+
+# A command as a link that runs it, where the console supports run links
+# (RStudio with cli installed), and as plain text everywhere else, so the card reads
+# the same without cli.
+sframe_run_link <- function(cmd, text = cmd) {
+  if (!sframe_has_run_links()) return(text)
+  cli::style_hyperlink(text, paste0("x-r-run:", cmd))
+}
+
+sframe_has_run_links <- function() {
+  requireNamespace("cli", quietly = TRUE) &&
+    isTRUE(cli::ansi_hyperlink_types()$run)
 }
 
 # The welcome, consent and thank-you screens every unbranded demo ships with

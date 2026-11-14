@@ -111,7 +111,7 @@ launch_studio <- function(
                "`demo` loads its own instrument and responses."),
         class = "sframe_error")
     }
-    d <- sframe_demo(demo)
+    d <- sframe_demo(demo, preview = FALSE)
     instrument <- d$instrument
     responses <- d$responses
   }
