@@ -66,9 +66,9 @@ treats analysing that text the same way it treats every other analysis: a
 research question, a technique, and the roles that fill it, declared in the
 instrument's analysis plan before the numbers exist.
 
-Nine methods are available, from plain term counting through to topic
+9 methods are available, from plain term counting through to topic
 modelling. The base path (`term_freq`, `ngram_freq`, `term_context`,
-`co_occurrence`) runs on the package alone. Five more
+`co_occurrence`) runs on the package alone. 5 more
 (`co_occurrence_network`, `tidy_sentiment`, `quanteda_dfm`,
 `topic_model_lda`, `stm_topics`) need one or more Suggests-only packages, guarded
 with `rlang::check_installed()`, and every guarded section below knits
@@ -403,7 +403,7 @@ cat("_quanteda is not installed in this environment, so this section did not run
 
 `stm_topics` fits a structural topic model via the optional `stm` package
 (tokenising uses `tidytext`, so both are needed). A small `k` keeps this
-example fast. A real study would try three to six values of `k` and
+example fast. A real study would try 3 to 6 values of `k` and
 compare fit. `k = 3` (or `topic_model_lda`'s default `k = 4`) is a
 demonstration value chosen to keep the example fast, with a fit criterion
 left out of it. The accepted way to choose `k` is to fit a range of

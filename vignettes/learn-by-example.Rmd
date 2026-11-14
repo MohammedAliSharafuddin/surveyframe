@@ -48,8 +48,8 @@ knowing which survey to build, so this article works the other way round: it
 starts from the survey you are trying to run and shows the whole path, from
 the questionnaire to the report.
 
-There are **25 demos**: 19 analysis examples, three presentation examples, and
-three provenance examples. Each has an instrument, response data, a codebook,
+There are **25 demos**: 19 analysis examples, 3 presentation examples, and
+3 provenance examples. Each has an instrument, response data, a codebook,
 and surveyframe's expected results. Presentation and provenance demos reuse the
 matching analysis data where appropriate.
 
@@ -93,24 +93,24 @@ Choose by the data you have, and let the name of the test follow from it.
 | You have | Use | Demo |
 |---|---|---|
 | A few questions and no plan yet | Start here | `first_survey` |
-| Four items meant to measure one thing | A scale, and its reliability | `likert_scale` |
+| 4 items meant to measure one thing | A scale, and its reliability | `likert_scale` |
 | A grid of items rated on one scale | A matrix item | `matrix_likert` |
-| One number and two groups | A two-group comparison | `two_group` |
+| 1 number and 2 groups | A 2-group comparison | `two_group` |
 | The same people measured twice | A paired test | `paired` |
-| One number and three or more groups | ANOVA and its alternatives | `multi_group` |
-| The same people measured three times | Repeated measures | `repeated` |
-| Two categorical questions | A crosstab and a test of association | `categorical` |
-| Four numbers that may go together | Correlation and regression | `correlation_regression` |
+| 1 number and 3 or more groups | ANOVA and its alternatives | `multi_group` |
+| The same people measured 3 times | Repeated measures | `repeated` |
+| 2 categorical questions | A crosstab and a test of association | `categorical` |
+| 4 numbers that may go together | Correlation and regression | `correlation_regression` |
 | A yes/no, ordered, or multi-category outcome | Logistic regression | `logistic` |
 | Many items and a hunch about the structure | Factor analysis | `factor_structure` |
 | Constructs and a path model | SEM and PLS | `sem_pls` |
 | Questions only some people should see | Skip logic | `branching` |
 | Free-text answers | Text analysis | `open_text` |
-| A decision between options on four criteria | MCDA | `mcdm_choice` |
+| A decision between options on 4 criteria | MCDA | `mcdm_choice` |
 | Fewer than 30 respondents | Small-sample methods | `small_sample` |
 | Tick-all-that-apply, or a ranking | Items that expand | `multi_response` |
 
-The remaining five demos teach presentation and provenance, not a new
+The remaining 5 demos teach presentation and provenance, not a new
 statistical method:
 
 | You want to learn | Demo |
@@ -144,7 +144,7 @@ demo <- sframe_demo("first_survey")
 demo$instrument
 ```
 
-Four questions, a section break, and a plan with four blocks. This is what a
+4 questions, a section break, and a plan with 4 blocks. This is what a
 respondent sees:
 
 ```{r first-survey-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The Event feedback survey as a respondent sees it: a required question on whether they attended before, age, the day attended, then an optional section asking what to do differently next year, and a Submit button."}
@@ -173,7 +173,7 @@ declare your own plan, and the rest is unchanged.
 
 ### Two groups on one outcome
 
-The commonest comparison there is: one number, and two groups of people.
+The commonest comparison there is: 1 number, and 2 groups of people.
 
 ```{r two-group-shot, echo = FALSE, results = "markup", fig.show = "asis", out.width = "100%", fig.alt = "The In person or online survey: a required question on how the respondent attended, with 2 options, and a number field for how many sessions they attended."}
 knitr::include_graphics("figures/survey-two-group.png")
@@ -239,7 +239,7 @@ handles it and remembers for you.
 ### Factor structure, and a path model
 
 `factor_structure` asks whether the data supports the factors you assumed.
-`sem_pls` declares three constructs and a path model, and generates the
+`sem_pls` declares 3 constructs and a path model, and generates the
 syntax for both lavaan and seminr. The model type decides which: asking for
 PLS syntax from a covariance-based model is refused, because it would
 estimate a different model from the one you declared.
@@ -350,7 +350,7 @@ knitr::include_graphics("figures/presentation-conversational-branching.png")
 
 ## Collect responses, and share the results
 
-Three routes, and the same instrument serves all three.
+3 routes, and the same instrument serves all 3.
 
 ```{r routes, eval = FALSE}
 # 1. One self-contained HTML file you can host or email
@@ -416,7 +416,7 @@ A file can also be checked outside R, on the documentation site's
 
 Good. Please check us against the software you already trust.
 
-Every demo ships four things: the instrument, the response data, a codebook
+Every demo ships 4 things: the instrument, the response data, a codebook
 of variable and value labels, and the results surveyframe produced.
 
 ```{r artefacts}

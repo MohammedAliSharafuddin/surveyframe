@@ -78,13 +78,13 @@ c(respondents = nrow(responses), criteria = 4, suppliers = 5)
 
 ## Where the numbers come from
 
-An MCDM result needs two things: a performance matrix saying how each
+An MCDM result needs 2 things: a performance matrix saying how each
 alternative scores on each criterion, and a weight vector saying how much
 each criterion matters. They can come from different places, and being
 explicit about which is the difference between a defensible result and a
 plausible-looking one.
 
-This instrument declares three sources at once, so the example exercises all
+This instrument declares 3 sources at once, so the example exercises all
 of them.
 
 ```{r sources, echo = FALSE}
@@ -125,7 +125,7 @@ kable(ahp$table, row.names = FALSE,
 
 Pairwise judgements can contradict each other. If service beats price, and
 price beats delivery, then service ought to beat delivery by roughly the
-product of the two. The consistency ratio measures how far the judgements
+product of the 2. The consistency ratio measures how far the judgements
 depart from that.
 
 ```{r consistency}
@@ -182,7 +182,7 @@ kable(rated$table, row.names = FALSE,
                       "constant-sum question."))
 ```
 
-The two rankings disagree, and that is the useful part. Comparing them is
+The 2 rankings disagree, and that is the useful part. Comparing them is
 a finding in its own right, and it belongs in the write-up.
 
 ```{r compare, echo = FALSE}
@@ -206,7 +206,7 @@ where a higher rating is better. Had it asked respondents to rate price
 directly, a higher rating would mean more expensive and the criterion would be
 a `cost`.
 
-Nothing in the data distinguishes those two cases. The wording of the question
+Nothing in the data distinguishes those 2 cases. The wording of the question
 does, and the declaration has to match it. This is the single easiest way to
 produce a confident, precise, and completely inverted ranking.
 
@@ -247,7 +247,7 @@ kable(as.data.frame(sens), row.names = FALSE,
 plot(sens)
 ```
 
-This example is worth reading closely, because it is the awkward case. Four
+This example is worth reading closely, because it is the awkward case. 4
 of the 8 perturbations changed the ranking, so `stable` is `FALSE`. But
 `top_changed` is `FALSE` throughout: the order shuffles among the middle
 suppliers while Equator stays first under every nudge.
@@ -318,19 +318,19 @@ The decision family ranks and weights. The choice of method stays with the
 researcher, and it matters: the 10 available methods encode
 different assumptions about how criteria trade off against one another.
 
-Two limits are worth stating plainly. surveyframe does not estimate choice
+2 limits are worth stating plainly. surveyframe does not estimate choice
 models, so `sframe_conjoint_design()` declares a conjoint design without
 analysing its responses. And PROMETHEE defaults to Brans and Vincke's type I
 step function, where some implementations default to the linear function,
 because the linear function needs thresholds that are commonly derived
 from the data range, which makes a result depend on a choice nobody declared.
 See `?sframe_decision_options` for the detail, including how far rankings
-move between the two.
+move between the 2.
 
 ## How each method was checked
 
 A ranking is only as trustworthy as the arithmetic under it, so the evidence
-behind each method is recorded here in full. Two kinds appear. An *oracle*
+behind each method is recorded here in full. 2 kinds appear. An *oracle*
 check computes the same method on the same matrix with RMCDA, an independent
 package, and compares the numbers. A *derived* check compares against values
 worked out by hand from the published formula, or against a worked example

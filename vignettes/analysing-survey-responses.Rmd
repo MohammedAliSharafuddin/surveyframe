@@ -183,7 +183,7 @@ sframe_plan(instr) <- list(
        roles = list(x = "digital_marketing", y = "satisfaction"),
        options = list(alpha = 0.05)),
   list(id = "RQ2",
-       research_question = "Do the three perception scales predict satisfaction?",
+       research_question = "Do the 3 perception scales predict satisfaction?",
        family = "regression", method = "regression_linear",
        roles = list(predictors = c("digital_marketing", "service_quality", "sustainability"),
                     dependent = "satisfaction"),

@@ -75,7 +75,7 @@ the vignette builds offline. Replacing the simulated data with a call to
 `read_sheet_responses()` connects the same workflow to live responses that grow
 with each submission.
 
-Allow about 30 minutes for the complete case study. For a five-minute runnable
+Allow about 30 minutes for the complete case study. For a 5-minute runnable
 introduction, begin with the “Learn by example” vignette and its `first_survey`
 demo. Return here for the full design-to-report workflow.
 
@@ -86,7 +86,7 @@ The questionnaire and concept are adopted from:
 > Satisfaction: A Study of Thailand's Tourism Services. *Administrative
 > Sciences*, *14*(11), 273. https://doi.org/10.3390/admsci14110273
 
-The instrument covers five research areas applicable to any tourism services
+The instrument covers 5 research areas applicable to any tourism services
 context: digital marketing effectiveness (relevance, accessibility, ease of use,
 and perceived value), destination service quality (accommodation and local
 transport), destination sustainability quality, tourist satisfaction, and
@@ -100,7 +100,7 @@ and analysis plan to their own context.
 
 ### Shared Likert scale
 
-All rated items use a five-point agreement scale.
+All rated items use a 5-point agreement scale.
 
 ```{r choices}
 likert5 <- sframe_choice_set(
@@ -478,12 +478,12 @@ schema_path <- system.file("schema", "sframe_schema.json", package = "surveyfram
 jsonlite::fromJSON(schema_path, simplifyVector = FALSE)$required
 ```
 
-Because the file is plain text, two versions of it diff the same way any
+Because the file is plain text, 2 versions of it diff the same way any
 source file does. If `tourism_services_v1.sframe` were committed to a Git
 repository, revising it and running `git diff` on the file would show
 exactly which lines, which item, which choice, which plan block, changed,
 alongside Git's own commit history for who changed it and when. That diff
-is Git's job, and the next section shows how the two connect.
+is Git's job, and the next section shows how the 2 connect.
 
 ### Disclosed revision: `amend_sframe()`
 
@@ -495,7 +495,7 @@ instead: it compares the instrument before and after a change, and appends
 a record of what changed and why, directly inside the `.sframe` file next
 to the content it explains, never overwriting an earlier entry.
 
-Amendments come in two tiers, because not every change carries the same
+Amendments come in 2 tiers, because not every change carries the same
 risk to the plan's design-time-binding logic:
 
 - **`"pipeline"`** amendments (`data_correction`, `bot_removal`) are
@@ -554,7 +554,7 @@ every change is disclosed in the first place.
 ### Linking a saved instrument to its Git commit
 
 A bare hash carries the file's identity alone. A diff, an author and an
-explanation come from Git, which already provides all three.
+explanation come from Git, which already provides all 3.
 `sframe_link_git_commit()` points the instrument at Git and leaves the history
 there: it records the current commit's SHA and
 subject line, so the SHA-256 hash's role narrows to confirming that the
@@ -614,7 +614,7 @@ so the line below re-skins the whole survey on its own.
 study$render$theme <- "#0f766e"
 ```
 
-Two things about the export matter for planning a real deployment.
+2 things about the export matter for planning a real deployment.
 
 * **It is designed for a phone first.** Option cards and touch targets meet a
   44 pixel minimum, and a matrix question (see the input-types demo in the
@@ -633,8 +633,8 @@ Google Sheet and it creates a response tab with the correct column headers.
 Matrix, multiple-choice, and ranking questions each need more than one
 column, so the collector expands them automatically: a matrix gets one column
 per row, a multiple-choice question gets one 0/1 column per option, and a
-ranking question gets one column per option holding its rank. A five-option
-multiple-choice item named `channels`, for example, becomes five columns,
+ranking question gets one column per option holding its rank. A 5-option
+multiple-choice item named `channels`, for example, becomes 5 columns,
 `channels__option1` through `channels__option5`, each holding `0` or `1`,
 ready for analysis, with the splitting already done.
 
@@ -894,7 +894,7 @@ if (requireNamespace("psych", quietly = TRUE)) {
 ```
 
 A KMO value and Bartlett's test provide preliminary screening evidence, one
-input among several toward judging whether a particular factor model is
+input among a few toward judging whether a particular factor model is
 appropriate. Treat 0.60 as a
 rough, informal KMO convention. The factor count from
 parallel analysis is also a guide to interpret with theory, design, loadings,
