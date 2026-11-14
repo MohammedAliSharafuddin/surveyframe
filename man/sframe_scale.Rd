@@ -70,6 +70,7 @@ sat_scale <- sframe_scale(
   min_valid     = 2,
   reverse_items = NULL
 )
+sat_scale
 }
 \seealso{
 \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=score_scales]{score_scales()}}, \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}

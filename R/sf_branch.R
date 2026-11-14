@@ -50,6 +50,7 @@ sframe_branch_in_values <- function(value) {
 #'   value      = "other",
 #'   action     = "show"
 #' )
+#' rule
 #' @family Design functions
 sframe_branch <- function(
     item_id,

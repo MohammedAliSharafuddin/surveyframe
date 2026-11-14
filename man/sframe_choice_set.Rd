@@ -63,6 +63,7 @@ often <- sframe_choice_set(
   labels  = c("Rarely", "Sometimes", "Often", "Always"),
   ordered = TRUE
 )
+often
 }
 \seealso{
 \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=sframe_instrument]{sframe_instrument()}}

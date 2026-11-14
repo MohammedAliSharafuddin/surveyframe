@@ -231,7 +231,10 @@ sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
 #'   a codebook.
 #' @seealso [sframe_accessors], [sframe_plan<-]
 #' @examples
-#' sframe_plan(sframe_demo("tourism_services")$instrument)
+#' plan <- sframe_plan(sframe_demo("two_group")$instrument)
+#' length(plan)
+#' # 1 block, its fields
+#' str(plan[[1]], max.level = 1)
 #' @export
 #' @family Plan functions
 sframe_plan <- function(x, ...) UseMethod("sframe_plan")

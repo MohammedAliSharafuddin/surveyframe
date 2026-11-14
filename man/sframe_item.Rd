@@ -109,6 +109,8 @@ item <- sframe_item(
 
 sec <- sframe_item("sec_1", "Demographic Information", type = "section_break",
                section_intro = "Please answer the following questions.")
+item
+sec
 }
 \seealso{
 \code{\link[=sframe_instrument]{sframe_instrument()}}, \code{\link[=sframe_choice_set]{sframe_choice_set()}}, \code{\link[=sframe_scale]{sframe_scale()}}

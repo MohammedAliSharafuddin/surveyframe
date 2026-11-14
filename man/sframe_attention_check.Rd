@@ -65,6 +65,7 @@ chk <- sframe_attention_check(
   fail_action = "flag",
   label       = "Attention check 1"
 )
+chk
 }
 \seealso{
 \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=sframe_instrument]{sframe_instrument()}}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}

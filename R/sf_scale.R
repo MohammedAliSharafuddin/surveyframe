@@ -51,6 +51,7 @@
 #'   min_valid     = 2,
 #'   reverse_items = NULL
 #' )
+#' sat_scale
 #' @family Design functions
 sframe_scale <- function(
     id,
