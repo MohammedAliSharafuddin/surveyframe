@@ -188,7 +188,9 @@ demo_stories <- list(
               RQ3 = "Reject H0 if the likelihood-ratio test of use has p < .05.")),
 
   factor_structure = list(
+    title = "Employee engagement at work",
     description = "An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work.",
+    scale_labels = c(organisation = "How my work is organised", content = "The content of my work"),
     labels = c(org_1 = "My work is planned well in advance.",
                org_2 = "I know where to find what I need to do my job.",
                org_3 = "My manager helps when I have a question.",
@@ -356,6 +358,19 @@ apply_story <- function(instrument, story) {
   if (is.null(story)) return(instrument)
   instrument$meta$authors <- demo_author
   if (!is.null(story$description)) instrument$meta$description <- story$description
+  # A story's own title, which the welcome page shows too when it carried the
+  # build's title (owner 2026-11-15, factor_structure as an employee study).
+  if (!is.null(story$title)) {
+    old <- instrument$meta$title
+    instrument$meta$title <- story$title
+    w <- instrument$render$welcome
+    if (is.list(w) && identical(w$title, old)) instrument$render$welcome$title <- story$title
+  }
+  for (id in names(story$scale_labels)) {
+    k <- which(vapply(instrument$scales, function(s) identical(s$id, id), logical(1)))
+    stopifnot(length(k) == 1)
+    instrument$scales[[k]]$label <- story$scale_labels[[id]]
+  }
   if (!is.null(story$study)) instrument$study <- story$study
   for (id in names(story$labels)) {
     k <- which(vapply(instrument$items, function(it) identical(it$id, id), logical(1)))

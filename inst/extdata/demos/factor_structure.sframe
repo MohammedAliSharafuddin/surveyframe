@@ -2,12 +2,12 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "200f6f4f4fc9ab15d302490782f3027a46277b2d495b7258b08a478dc686e2dc",
+    "value": "4b6fcc73ca2bd9a0762fa4eab731c8c318b94ee0831e1b3a7a1262aa77ce8dff",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
   "meta": {
-    "title": "Two things attendees judge",
+    "title": "Employee engagement at work",
     "version": "1.0.0",
     "description": "An employee engagement survey of 8 items, written to measure 2 things employees judge: how their work is organised, and the content of their work.",
     "authors": "Demo author",
@@ -101,14 +101,14 @@
   "scales": [
     {
       "id": "organisation",
-      "label": "Perceived organisation",
+      "label": "How my work is organised",
       "items": ["org_1", "org_2", "org_3", "org_4"],
       "method": "mean",
       "min_valid": null
     },
     {
       "id": "content",
-      "label": "Perceived content quality",
+      "label": "The content of my work",
       "items": ["con_1", "con_2", "con_3", "con_4"],
       "method": "mean",
       "min_valid": null
@@ -175,7 +175,7 @@
   "models": [],
   "render": {
     "welcome": {
-      "title": "Two things attendees judge",
+      "title": "Employee engagement at work",
       "intro_text": "Thank you for taking part. This survey takes a few minutes.",
       "consent_text": "I agree to take part, and for my answers to be used for this study.",
       "consent_required": true,

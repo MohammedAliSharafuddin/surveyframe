@@ -692,21 +692,23 @@ write_demo("logistic", logistic, lg)
 # settle on the right number of factors.
 set.seed(4111)
 n <- 120
-org_items <- c("The event ran to time.", "It was easy to find my way around.",
-               "Staff were helpful.", "The venue suited the event.")
-con_items <- c("The sessions were relevant to my work.",
-               "The material went deep enough.", "The speakers knew their subject.",
-               "The handouts were useful.")
+# An employee engagement study (owner 2026-11-15). The item wording, study
+# and title come from data-raw/demo_stories.R, which this matches.
+org_items <- c("My work is planned well in advance.", "I know where to find what I need to do my job.",
+               "My manager helps when I have a question.", "My workplace suits the work I do.")
+con_items <- c("My work is relevant to my goals.",
+               "My work challenges me enough.", "The people I work with know their subject.",
+               "The tools I am given are useful.")
 comp <- list(agree5())
 for (k in 1:4) comp <- c(comp, list(sf_item(sprintf("org_%d", k), org_items[k],
   type = "likert", choice_set = "agree5", scale_id = "organisation")))
 for (k in 1:4) comp <- c(comp, list(sf_item(sprintf("con_%d", k), con_items[k],
   type = "likert", choice_set = "agree5", scale_id = "content")))
 comp <- c(comp, list(
-  sf_scale("organisation", "Perceived organisation", items = paste0("org_", 1:4)),
-  sf_scale("content", "Perceived content quality", items = paste0("con_", 1:4))))
+  sf_scale("organisation", "How my work is organised", items = paste0("org_", 1:4)),
+  sf_scale("content", "The content of my work", items = paste0("con_", 1:4))))
 factor_structure <- sf_instrument(
-  title = "Two things attendees judge", version = "1.0.0",
+  title = "Employee engagement at work", version = "1.0.0",
   description = "Eight items, 2 factors, and whether the data supports that.",
   components = comp,
   analysis_plan = list(
