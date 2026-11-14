@@ -111,6 +111,7 @@ sframe_check_svg <- function() {
 #'   paths <- sframe_save_figures(res, file.path(tempdir(), "figures"),
 #'                                width = 6, height = 4, dpi = 300)
 #'   basename(paths)
+#'   sframe_show(paths[1])
 #' }
 #' }
 #' @family Report functions

@@ -82,7 +82,7 @@ instr <- read_sframe(
               package = "surveyframe")
 )
 out <- write_sframe(instr, tempfile(fileext = ".sframe"))
-file.exists(out)
+sframe_show(out)
 }
 \seealso{
 \code{\link[=read_sframe]{read_sframe()}}, \code{\link[=validate_sframe]{validate_sframe()}}

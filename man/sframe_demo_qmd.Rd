@@ -26,8 +26,8 @@ results, render analysis and full reports, and export the data for checking
 elsewhere.
 }
 \examples{
-out <- sframe_demo_qmd("two_group", dir = tempdir())
-basename(out)
+out <- sframe_demo_qmd("two_group", dir = tempfile("demo-qmd-"))
+sframe_show(out)
 }
 \seealso{
 \code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_list_demos]{sframe_list_demos()}}

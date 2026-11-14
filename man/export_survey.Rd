@@ -107,8 +107,8 @@ instr <- sframe_instrument("Customer Satisfaction Survey",
 # Write to a temp file without opening the browser
 out <- export_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
-                             open = FALSE)
-file.exists(out)
+                             open = FALSE, overwrite = TRUE)
+sframe_show(out)
 
 \donttest{
 # Write to a temp file and open in the default browser
@@ -124,6 +124,7 @@ export_survey(
   open         = FALSE,
   overwrite    = TRUE
 )
+sframe_show(file.path(tempdir(), "sat_endpoint.html"))
 }
 }
 \seealso{

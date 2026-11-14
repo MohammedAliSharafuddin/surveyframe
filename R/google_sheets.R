@@ -68,7 +68,7 @@
 #'   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
 #'   output_dir = tempdir()
 #' )
-#' file.exists(script)
+#' sframe_show(script)
 #' @family Collect functions
 export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   sframe_check_instrument(instrument)

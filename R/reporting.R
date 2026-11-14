@@ -434,7 +434,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   ),
 #'   finally = options(old)
 #' )
-#' file.exists(out)
+#' sframe_show(out)
 #' }
 #' @family Report functions
 render_report <- function(
@@ -972,7 +972,7 @@ sframe_report_result <- function(dest, engine, open = FALSE) {
            " engine: ", normalizePath(dest, mustWork = FALSE)),
     class = "sframe_report_engine"
   )
-  if (isTRUE(open)) sframe_show(dest)
+  if (isTRUE(open)) sframe_show(dest, quiet = TRUE)
   attr(dest, "engine") <- engine
   invisible(dest)
 }

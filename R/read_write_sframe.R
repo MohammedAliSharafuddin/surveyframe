@@ -662,7 +662,7 @@ sframe_hash_value <- function(instrument) {
 #'               package = "surveyframe")
 #' )
 #' out <- write_sframe(instr, tempfile(fileext = ".sframe"))
-#' file.exists(out)
+#' sframe_show(out)
 #' @family Design functions
 write_sframe <- function(instrument, path, pretty = TRUE, overwrite = FALSE,
                          new_instrument = FALSE) {
