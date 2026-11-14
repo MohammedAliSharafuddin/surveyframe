@@ -1,0 +1,30 @@
+---
+title: "Ask respondents to weight criteria"
+description: "Add a question, choose Criteria weight, and list the criteria to divide 100 points across."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Criteria weight, and list the criteria to divide 100 points across.
+
+![The respondents to weight criteria question selected in the editor, its settings outlined.](../../../docs/question-types/criteria-weights-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/criteria-weights-preview.png){width=90%}
+
+## Settings
+
+- **Criteria.** The things weighted. The points must add up to 100.
+
+## Best practices for research
+
+Use points when respondents can judge all criteria at once. For many criteria, pairwise comparisons are easier to answer.
+
+Reference: Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

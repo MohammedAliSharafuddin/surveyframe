@@ -1,0 +1,30 @@
+---
+title: "Ask for a short text answer"
+description: "Add a question and choose Short text for a word or a line."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question and choose Short text for a word or a line.
+
+![The a short text answer question selected in the editor, its settings outlined.](../../../docs/question-types/short-text-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/short-text-preview.png){width=90%}
+
+## Settings
+
+- **Required.** Asks for an answer before the respondent goes on. Leave open questions optional where you can.
+
+## Best practices for research
+
+Ask for a short text only where the answer cannot be listed: open answers take longer and are skipped more.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

@@ -1,0 +1,30 @@
+---
+title: "Ask an open-ended question"
+description: "Add a question and choose Long text for a paragraph."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question and choose Long text for a paragraph.
+
+![The open-ended question question selected in the editor, its settings outlined.](../../../docs/question-types/long-text-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/long-text-preview.png){width=90%}
+
+## Settings
+
+- **Required.** Usually off: an open comment is better skipped than filled to move on.
+
+## Best practices for research
+
+Ask 1 specific thing, such as what to change, rather than for any comments: specific prompts give answers you can code.
+
+Reference: Krosnick, J. A., & Presser, S. (2010). Question and questionnaire design. In P. V. Marsden & J. D. Wright (Eds.), *Handbook of survey research* (2nd ed., pp. 263-313). Emerald.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

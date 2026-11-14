@@ -1,0 +1,30 @@
+---
+title: "Ask for a rating on a slider"
+description: "Add a question, choose Slider, and set its range and step."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Slider, and set its range and step.
+
+![The a rating on a slider question selected in the editor, its settings outlined.](../../../docs/question-types/slider-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/slider-preview.png){width=90%}
+
+## Settings
+
+- **Minimum, maximum and step.** The range and how finely the respondent can place the handle.
+
+## Best practices for research
+
+Label both ends with what they mean. A slider that starts at a value records it as an answer, so check what was moved.
+
+Reference: Dillman, D. A., Smyth, J. D., & Christian, L. M. (2014). *Internet, phone, mail, and mixed-mode surveys: The tailored design method* (4th ed.). Wiley.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

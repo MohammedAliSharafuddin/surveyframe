@@ -1,0 +1,105 @@
+---
+title: "Analyse open answers"
+description: "Which words, phrases, contexts, tones and topics open answers hold."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+Which words, phrases, contexts, tones and topics open answers hold.
+
+**Assumptions.** Enough text per answer for the method. Topic models need many answers.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Word frequencies
+
+![The Plan card for a Word frequencies block, from the `open_text` demo.](../../../docs/methods/term_freq.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Which words come up most often?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Phrase frequencies
+
+![The Plan card for a Phrase frequencies block, from the `open_text` demo.](../../../docs/methods/ngram_freq.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** And which pairs of words?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Words in context
+
+![The Plan card for a Words in context block, from the `open_text` demo.](../../../docs/methods/term_context.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** How is a key word actually used?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Word co-occurrence
+
+![The Plan card for a Word co-occurrence block, from the `open_text` demo.](../../../docs/methods/co_occurrence.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ4.** Which words appear together?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Word co-occurrence network
+
+![The Plan card for a Word co-occurrence network block, from the `open_text` demo.](../../../docs/methods/co_occurrence_network.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ6.** Which words cluster together?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Blondel, V. D., Guillaume, J.-L., Lambiotte, R., & Lefebvre, E. (2008). Fast unfolding of communities in large networks. *Journal of Statistical Mechanics: Theory and Experiment*, *2008*(10), P10008. https://doi.org/10.1088/1742-5468/2008/10/P10008 Fruchterman, T. M. J., & Reingold, E. M. (1991). Graph drawing by force-directed placement. *Software: Practice and Experience*, *21*(11), 1129-1164. https://doi.org/10.1002/spe.4380211102
+
+## Sentiment analysis
+
+![The Plan card for a Sentiment analysis block, from the `open_text` demo.](../../../docs/methods/tidy_sentiment.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ7.** Is the tone positive or negative?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Document-feature matrix
+
+![The Plan card for a Document-feature matrix block, from the `open_text` demo.](../../../docs/methods/quanteda_dfm.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ8.** What does a document-feature matrix show?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Topic model (LDA)
+
+![The Plan card for a Topic model (LDA) block, from the `open_text` demo.](../../../docs/methods/topic_model_lda.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ9.** What topics are people writing about?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Structural topic model
+
+![The Plan card for a Structural topic model block, from the `open_text` demo.](../../../docs/methods/stm_topics.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ10.** The same question with a structural topic model.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+

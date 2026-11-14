@@ -1,0 +1,32 @@
+---
+title: "Ask a single-choice question"
+description: "Add a question, choose Single choice, and give the options the respondent picks 1 from."
+---
+
+[Docs](../../docs.html) / [Question types](../../docs.html#question-types)
+
+Add a question, choose Single choice, and give the options the respondent picks 1 from.
+
+![The single-choice question question selected in the editor, its settings outlined.](../../../docs/question-types/single-choice-editor.png){width=100%}
+
+## What the respondent sees
+
+![The question as the respondent sees it.](../../../docs/question-types/single-choice-preview.png){width=90%}
+
+## Settings
+
+- **Answer set.** The options, each with a stored code and the label respondents see.
+- **Other, please specify.** Adds a text box for an answer the options miss, kept beside the code.
+- **Ordered.** Marks the options as ordered, so the item is analysed as ordinal.
+
+## Best practices for research
+
+Make the options exhaustive and mutually exclusive, or add Other: a respondent with no fitting option guesses.
+
+Reference: Krosnick, J. A., & Presser, S. (2010). Question and questionnaire design. In P. V. Marsden & J. D. Wright (Eds.), *Handbook of survey research* (2nd ed., pp. 263-313). Emerald.
+
+## Related
+
+- [All question types](../../learn/question-types.html)
+- [The analysis plan](../../learn/analysis-plan.html)
+

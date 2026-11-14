@@ -4,7 +4,7 @@
 .Ruserdata
 *.Rproj
 inst/doc
-docs
+/docs/
 *.sframe
 !inst/extdata/*.sframe
 # The negation above does not recurse, so the demo library's instruments

@@ -1,0 +1,109 @@
+---
+title: "Check structure and test models"
+description: "Whether items measure the factors assumed, and how constructs relate in a declared model."
+---
+
+[Docs](../../docs.html) / [Methods](../../docs.html#methods)
+
+Whether items measure the factors assumed, and how constructs relate in a declared model.
+
+**Assumptions.** Enough respondents for the number of items, and items that correlate. Model syntax runs in lavaan or seminr.
+
+In SurveyStudio, open Plan, add a research question, choose the method and assign each variable its role. Declare the hypotheses and the decision rule before the data arrives.
+
+## Factorability checks (KMO and Bartlett's test)
+
+![The Plan card for a Factorability checks (KMO and Bartlett's test) block, from the `factor_structure` demo.](../../../docs/methods/efa_readiness.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** Is this data suitable for factor analysis?
+> **Planned decision rule:** Proceed when KMO is .60 or above and Bartlett's test has p < .05.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Exploratory factor analysis
+
+![The Plan card for a Exploratory factor analysis block, from the `factor_structure` demo.](../../../docs/methods/efa_solution.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** How many factors, and which items load where?
+> **Planned decision rule:** Retain the factors parallel analysis supports, and read loadings of .40 or above.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Confirmatory factor analysis (lavaan syntax)
+
+![The Plan card for a Confirmatory factor analysis (lavaan syntax) block, from the `sem_pls` demo.](../../../docs/methods/cfa_lavaan_syntax.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ4.** What CFA syntax does the measurement model generate?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Structural equation model (lavaan syntax)
+
+![The Plan card for a Structural equation model (lavaan syntax) block, from the `sem_pls` demo.](../../../docs/methods/sem_lavaan_syntax.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ1.** What lavaan syntax does this model generate?
+> **Null hypothesis (H0):** The declared model reproduces the observed covariances.
+> **Alternative hypothesis (H1):** The declared model does not reproduce the observed covariances.
+> **Planned decision rule:** Judge the model's fit as acceptable when CFI is .95 or above and RMSEA is .06 or below.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## PLS structural equation model (seminr syntax)
+
+![The Plan card for a PLS structural equation model (seminr syntax) block, from the `sem_pls` demo.](../../../docs/methods/seminr_syntax.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ2.** And the seminr syntax for a PLS estimate?
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## PLS structural equation model
+
+![The Plan card for a PLS structural equation model block, from the `sem_pls` demo.](../../../docs/methods/pls_sem.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ5.** And what does a PLS estimate give?
+> **Planned decision rule:** Report a path as supported when its bootstrap confidence interval excludes 0.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+## Mediation analysis
+
+![The Plan card for a Mediation analysis block, from the `sem_pls` demo.](../../../docs/methods/mediation.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ3.** Does satisfaction carry content quality through to intention?
+> **Null hypothesis (H0):** Satisfaction does not carry the effect of content quality to intention.
+> **Alternative hypothesis (H1):** Satisfaction carries part of the effect of content quality to intention.
+> **Planned decision rule:** Treat the indirect effect as present when its 95% bootstrap confidence interval excludes 0.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: MacKinnon, D. P. (2008). *Introduction to statistical mediation analysis*. Lawrence Erlbaum.
+
+## Moderation analysis
+
+![The Plan card for a Moderation analysis block, from the `sem_pls` demo.](../../../docs/methods/moderation.png){width=90%}
+
+In the pre-analysis plan:
+
+> **RQ6.** Does content quality matter more to some attendees than others?
+> **Null hypothesis (H0):** The effect of content quality on intention does not depend on the moderator.
+> **Alternative hypothesis (H1):** The effect of content quality on intention depends on the moderator.
+> **Planned decision rule:** Reject H0 if p < .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence, a table and a chart, each titled with the research question.
+
+References: Aiken, L. S., & West, S. G. (1991). *Multiple regression: Testing and interpreting interactions*. SAGE.
+
