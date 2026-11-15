@@ -52,9 +52,17 @@
   <meta name="description" content="{{.}}" />
   <meta property="og:description" content="{{.}}" />
 {{/description}}
+{{^description}}
+  <meta name="description" content="{{pagetitle}}" />
+  <meta property="og:description" content="{{pagetitle}}" />
+{{/description}}
 {{#image}}
   <meta property="og:image" content="{{{src}}}" />
   {{#alt}}<meta property="og:image:alt" content="{{{.}}}" />{{/alt}}
+{{/image}}
+{{^image}}
+  <meta property="og:image" content="https://surveyframe.org/man/figures/pkgdown-wordmark-tagline.png" />
+  <meta property="og:image:alt" content="surveyframe: From research design to reporting" />
 {{/image}}
 {{#twitter}}
   {{#card}}<meta name="twitter:card" content="{{{.}}}" />{{/card}}
