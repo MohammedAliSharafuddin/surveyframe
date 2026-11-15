@@ -2056,6 +2056,10 @@ arithmetic.
 
 ## Demos
 
+* **2 guided tours now run through R's `demo()` system.** Run `demo("tour",
+  package = "surveyframe")` for the 5 study stages, or `demo("verify", package
+  = "surveyframe")` to see an integrity check catch a changed copy.
+
 * **Demo research questions now stand alone.** Each question names its method,
   outcome or comparison where the earlier wording depended on the question above it.
 

@@ -364,7 +364,8 @@ print.sframe_demo <- function(x, ...) {
     paste0("Files: ", paste(files, collapse = ", ")),
     "Demonstration data, not collected from participants.",
     "",
-    "Try next:"
+    "Try next:",
+    "Take the tour: demo(\"tour\", package = \"surveyframe\")"
   )
   is_ref <- name %in% sframe_reference_demo_index()$name
   cmd <- c(if (length(plan)) "run_analysis_plan(d$responses, d$instrument)",

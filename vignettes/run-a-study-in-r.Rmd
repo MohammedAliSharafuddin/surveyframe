@@ -24,6 +24,10 @@ The examples use the `paired` demo, a training evaluation measured before and
 after. Its data is demonstration data, not collected from participants, and
 every output made from it says so.
 
+For a guided tour at the R console, run `demo("tour", package =
+"surveyframe")`. The `verify` guided tour seals an instrument, changes a copy
+and shows the integrity check with `demo("verify", package = "surveyframe")`.
+
 ## Open a study
 
 ```{r}
