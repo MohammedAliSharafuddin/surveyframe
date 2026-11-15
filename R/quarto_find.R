@@ -134,6 +134,22 @@ sframe_quarto_label <- function(found) {
   paste0(found$version, ", ", where)
 }
 
+# Typst 0.12 added the keep-together support used by the report template.
+# Quarto first bundled a later Typst release in 1.7. Keep older Quarto copies
+# working, and state the 1 layout limitation before rendering.
+sframe_quarto_typst_note <- function(version, minimum = "1.7.0") {
+  current <- tryCatch(numeric_version(version), error = function(e) NULL)
+  needed <- numeric_version(minimum)
+  if (!is.null(current) && current < needed) {
+    rlang::inform(
+      paste0("Quarto ", version, " will render this Typst PDF. Quarto ", minimum,
+             " or later keeps a long table's number and title together at a page break."),
+      class = "sframe_quarto_version_note"
+    )
+  }
+  invisible(NULL)
+}
+
 # Whether a LaTeX engine is at hand for a Quarto PDF: xelatex, lualatex or
 # pdflatex on the PATH, or a TinyTeX install, where Quarto looks for one.
 # options(surveyframe.latex = FALSE) hides LaTeX, so the Typst route can be

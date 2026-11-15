@@ -37,6 +37,7 @@ URL: https://surveyframe.org,
 BugReports: https://github.com/MohammedAliSharafuddin/surveyframe/issues
 Encoding: UTF-8
 Language: en-GB
+SystemRequirements: Quarto (>= 1.7.0) for Typst PDF table caption layout
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)
