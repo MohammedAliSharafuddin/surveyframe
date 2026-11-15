@@ -26,7 +26,7 @@ instr <- sframe_instrument("My Survey", components = list(item))
 summary(instr)
 }
 \seealso{
-Other print, format and summary methods:
+Other printing formatting and summary methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
@@ -48,4 +48,4 @@ Other print, format and summary methods:
 \code{\link[=summary.sf_model]{summary.sf_model()}},
 \code{\link[=summary.sf_scale]{summary.sf_scale()}}
 }
-\concept{print, format and summary methods}
+\concept{printing formatting and summary methods}

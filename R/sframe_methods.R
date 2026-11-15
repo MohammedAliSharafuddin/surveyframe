@@ -30,7 +30,7 @@ sframe_status_text <- function(x, short = FALSE) {
 #'                 choice_set = "agree5")
 #' instr <- sframe_instrument("My Survey", components = list(item))
 #' print(instr)
-#' @family print, format and summary methods
+#' @family printing formatting and summary methods
 print.sframe <- function(x, ...) {
   n_items  <- length(x$items)
   n_scales <- length(x$scales)
@@ -61,7 +61,7 @@ print.sframe <- function(x, ...) {
 #'
 #' @return A single character string.
 #' @exportS3Method format sframe
-#' @family print, format and summary methods
+#' @family printing formatting and summary methods
 format.sframe <- function(x, ...) {
   sprintf(
     "<sframe: %s v%s | %s | %s | %s | %s>",
@@ -90,7 +90,7 @@ format.sframe <- function(x, ...) {
 #'                 choice_set = "agree5")
 #' instr <- sframe_instrument("My Survey", components = list(item))
 #' summary(instr)
-#' @family print, format and summary methods
+#' @family printing formatting and summary methods
 summary.sframe <- function(object, ...) {
   types <- vapply(object$items, function(i) i$type, character(1))
   type_counts <- sort(table(types), decreasing = TRUE)
