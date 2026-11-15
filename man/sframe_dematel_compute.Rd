@@ -40,7 +40,8 @@ truncated series.
 influence <- matrix(c(0, 2, 1, 0), nrow = 2, byrow = TRUE,
                     dimnames = list(c("cost", "quality"),
                                     c("cost", "quality")))
-result <- sframe_dematel_compute(influence)
+compute <- getFromNamespace("sframe_dematel_compute", "surveyframe")
+result <- compute(influence)
 result[c("prominence", "relation", "role")]
 }
 \seealso{
