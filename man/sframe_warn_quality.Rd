@@ -13,6 +13,10 @@ sframe_warn_quality(message, respondent_ids = NULL, ...)
 
 \item{...}{Additional named fields passed to \code{rlang::warn()}.}
 }
+\value{
+\code{NULL}, invisibly, after signalling a warning of class
+\code{sframe_quality_warning}.
+}
 \description{
 Warn about a data quality issue
 }

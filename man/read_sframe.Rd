@@ -15,11 +15,11 @@ give \code{text} to read a payload held in memory.}
 validation only. \code{verify} controls the integrity hash.}
 
 \item{text}{Character. The \code{.sframe} JSON itself, for example a payload a
-host keeps in a database, read with no temporary file. One string, or
+host keeps in a database, read directly from memory. One string, or
 lines to be joined.}
 
 \item{verify}{Logical. Whether to refuse content whose hash is missing or
-does not match. Defaults to \code{TRUE}. With \code{FALSE}, such content is read
+differs. Defaults to \code{TRUE}. With \code{FALSE}, such content is read
 with a warning of class \code{sframe_unverified_warning} and the instrument is
 marked unverified (see the Unverified reads section).}
 }
@@ -29,14 +29,14 @@ An \code{sframe} object.
 \description{
 Reads a \code{.sframe} JSON file, or the same JSON held as text, and
 reconstructs an \code{sframe} instrument object. The SHA-256 integrity hash is
-verified by default, and content that does not match its hash is refused. The hash covers a canonical form of the
+verified by default, and content must match its hash. The hash covers a canonical form of the
 content, so it detects a change to the content of a written file, and it
 ignores whitespace and key order. It is unsigned, so anyone who edits a file
 can also recompute it.
 }
 \details{
 The hash's \code{canonical} field names the form it was taken in. A file naming
-\code{"rfc8785"} is checked in RFC 8785 alone. A file naming no form was written
+\code{"rfc8785"} is checked in RFC 8785 alone. A file with an empty form was written
 before the field existed: it is checked in RFC 8785 and then in the forms
 surveyframe used before 0.4.3, and any match is accepted with a message of
 class \code{sframe_locale_order_hash} asking you to save it again. A file naming
@@ -47,12 +47,12 @@ The instrument remembers the content and amendment log it was read with, so
 }
 \section{Unverified reads}{
 
-\code{verify = FALSE} is for a host holding a payload it cannot vouch for, which
-it would otherwise rebuild by hand and lose fields doing so. The result
+\code{verify = FALSE} lets a host preserve every field in a payload whose
+integrity it has not established. The result
 carries the attribute \code{sframe_verified}, \code{FALSE} (it is \code{TRUE} on every
 verified read), and \code{print()} says so. \code{\link[=write_sframe]{write_sframe()}} refuses to write an
 unverified instrument unless \code{new_instrument = TRUE} declares it new, since
-nothing ties its content to a state anyone wrote. That holds with the
+its content lacks a link to a state someone wrote. That holds with the
 amendment log it was read with too, since the log was read unchecked: a
 sign-off, a tier or a timestamp edited as text would otherwise be written
 back and read verified. A new instrument starts a new log, so clear the old

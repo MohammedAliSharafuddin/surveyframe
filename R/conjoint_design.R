@@ -82,12 +82,12 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' Declare a choice-experiment (conjoint) design
 #'
 #' Generates and stores a conjoint profile set and task schedule as part of
-#' the instrument's pre-declared contract. This is a design generator, not an
-#' estimator: it fixes what respondents will be shown, and it does not fit or
-#' analyse choice models.
+#' the instrument's pre-declared contract. It fixes what respondents will be
+#' shown. Fit and analyse the resulting choice responses with a choice-model
+#' estimator.
 #'
 #' The design is reproducible by construction. `seed` is always recorded, and
-#' generated when not supplied, so regenerating from the stored declaration
+#' generated when omitted, so regenerating from the stored declaration
 #' returns the identical profiles and tasks.
 #'
 #' @section Choosing a method:
@@ -97,10 +97,9 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' subset with the most even level spread and the weakest association between
 #' attributes.
 #'
-#' `"balanced"` is a search, not a construction. It does not produce a
-#' catalogued orthogonal fractional factorial and does not claim the
-#' guarantees of one. The achieved balance is reported in `$balance` so the
-#' design can be inspected rather than trusted. A study needing a specific
+#' `"balanced"` uses a search. A catalogued orthogonal fractional factorial
+#' provides different guarantees. The achieved balance is reported in
+#' `$balance` for inspection. A study needing a specific
 #' D-optimal or orthogonal design should generate it elsewhere and pass it in
 #' through `profiles`, which keeps the declaration in the contract either way.
 #'
@@ -117,7 +116,7 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' @param n_tasks Choice tasks per block. Defaults to as many whole tasks as
 #'   the profile set supports.
 #' @param blocks Number of blocks the tasks are split across, default 1.
-#' @param seed Integer seed. Generated and stored when not supplied.
+#' @param seed Integer seed. Generated and stored when omitted.
 #' @param profiles Optional data frame of pre-built profiles, one column per
 #'   attribute. Supplying this bypasses generation and declares the design as
 #'   given.

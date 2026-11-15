@@ -38,10 +38,11 @@ sframe_box_collections <- function(component, fields) {
 
 #' The `.sframe` format version, written into every file as `sframe_format`.
 #'
-#' Tracks the shape of the serialised object, not the package version and not
-#' the instrument's own version. Bump it only when the file's structure
+#' Tracks the shape of the serialised object. The package version and the
+#' instrument's own version are separate. Bump it only when the file's structure
 #' changes in a way a consumer must react to. `sframe-schema` conformance
 #' profiles are keyed to this value.
+#' @return A character scalar containing the current `.sframe` format version.
 #' @keywords internal
 SFRAME_FORMAT_VERSION <- "1.0"
 
@@ -600,14 +601,14 @@ sframe_hash_value <- function(instrument) {
 #'
 #' Serialises an `sframe` instrument object to a UTF-8 JSON file with a
 #' SHA-256 integrity hash. The instrument is always validated before writing,
-#' and an invalid instrument is refused. The hash is computed over the content
+#' and writes an instrument that passes validation. The hash is computed over the content
 #' with `hash.value` set to an empty string, in the canonical form of RFC 8785,
 #' the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
-#' and no whitespace. So it identifies content, not the exact bytes, and
+#' and whitespace removed. It identifies content independently of the exact bytes, and
 #' SurveyBuilder and the verifier page on the package website compute the same
 #' hash. An `NA` is written as null where the published schema allows null for
-#' that field, and refused with the field named anywhere else, as is a number
-#' JSON cannot hold, such as `Inf`.
+#' that field. Elsewhere, the function names and rejects `NA` or a number
+#' outside JSON's finite range, such as `Inf`.
 #'
 #' The hash object is `{"algo": "sha256", "value": ..., "canonical": "rfc8785"}`.
 #' `canonical` names the canonical form the hash was taken in. It sits inside
@@ -624,8 +625,8 @@ sframe_hash_value <- function(instrument) {
 #' `new_instrument = TRUE`.
 #'
 #' These are checks on the content in hand. The hash is unsigned and can be
-#' recomputed by anyone who edits a file, so it does not establish who wrote an
-#' instrument or when.
+#' recomputed by anyone who edits a file, so it establishes content integrity.
+#' Use a separate signing record to establish who wrote an instrument and when.
 #'
 #' The link between an instrument and the file it was read from is an
 #' attribute, `sframe_origin`, that [read_sframe()] sets. These checks rest on
@@ -634,8 +635,8 @@ sframe_hash_value <- function(instrument) {
 #' `sframe_plan<-` and [sframe_add_model()], as do `$<-`, [modifyList()] and
 #' [saveRDS()] with [readRDS()]. Base R that builds a new list from the parts
 #' drops it, such as `x[names(x)]`, `c(x)` or [lapply()] over the fields:
-#' the result is an instrument read from no file, and its changes are then
-#' written with no amendment recorded. Change a read instrument's fields in
+#' the result is an instrument built from its parts, and its changes are then
+#' written outside the amendment record. Change a read instrument's fields in
 #' place, and record the change with [amend_sframe()].
 #'
 #' @param instrument An `sframe` object created by [sframe_instrument()].
@@ -646,8 +647,8 @@ sframe_hash_value <- function(instrument) {
 #' @param overwrite Logical. Whether to overwrite an existing file. Defaults
 #'   to `FALSE`.
 #' @param new_instrument Logical. `TRUE` declares that the content is a new
-#'   instrument, not a revision of the one it was read from, so no amendment is
-#'   required. The instrument must carry no amendment log, and an instrument
+#'   instrument, separate from the one it was read from, so an amendment is
+#'   unnecessary. The instrument must carry an empty amendment log, and an instrument
 #'   read with [read_sframe()] must have a new `meta$title` or `meta$version`,
 #'   so 2 different files never claim to be one instrument. Defaults to
 #'   `FALSE`.
@@ -995,13 +996,13 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #'
 #' Reads a `.sframe` JSON file, or the same JSON held as text, and
 #' reconstructs an `sframe` instrument object. The SHA-256 integrity hash is
-#' verified by default, and content that does not match its hash is refused. The hash covers a canonical form of the
+#' verified by default, and content must match its hash. The hash covers a canonical form of the
 #' content, so it detects a change to the content of a written file, and it
 #' ignores whitespace and key order. It is unsigned, so anyone who edits a file
 #' can also recompute it.
 #'
 #' The hash's `canonical` field names the form it was taken in. A file naming
-#' `"rfc8785"` is checked in RFC 8785 alone. A file naming no form was written
+#' `"rfc8785"` is checked in RFC 8785 alone. A file with an empty form was written
 #' before the field existed: it is checked in RFC 8785 and then in the forms
 #' surveyframe used before 0.4.3, and any match is accepted with a message of
 #' class `sframe_locale_order_hash` asking you to save it again. A file naming
@@ -1016,20 +1017,20 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #'   [validate_sframe()]. Defaults to `TRUE`. This controls structural
 #'   validation only. `verify` controls the integrity hash.
 #' @param text Character. The `.sframe` JSON itself, for example a payload a
-#'   host keeps in a database, read with no temporary file. One string, or
+#'   host keeps in a database, read directly from memory. One string, or
 #'   lines to be joined.
 #' @param verify Logical. Whether to refuse content whose hash is missing or
-#'   does not match. Defaults to `TRUE`. With `FALSE`, such content is read
+#'   differs. Defaults to `TRUE`. With `FALSE`, such content is read
 #'   with a warning of class `sframe_unverified_warning` and the instrument is
 #'   marked unverified (see the Unverified reads section).
 #'
 #' @section Unverified reads:
-#' `verify = FALSE` is for a host holding a payload it cannot vouch for, which
-#' it would otherwise rebuild by hand and lose fields doing so. The result
+#' `verify = FALSE` lets a host preserve every field in a payload whose
+#' integrity it has not established. The result
 #' carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on every
 #' verified read), and `print()` says so. [write_sframe()] refuses to write an
 #' unverified instrument unless `new_instrument = TRUE` declares it new, since
-#' nothing ties its content to a state anyone wrote. That holds with the
+#' its content lacks a link to a state someone wrote. That holds with the
 #' amendment log it was read with too, since the log was read unchecked: a
 #' sign-off, a tier or a timestamp edited as text would otherwise be written
 #' back and read verified. A new instrument starts a new log, so clear the old

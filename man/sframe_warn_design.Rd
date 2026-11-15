@@ -13,6 +13,10 @@ sframe_warn_design(message, item_id = NULL, ...)
 
 \item{...}{Additional named fields passed to \code{rlang::warn()}.}
 }
+\value{
+\code{NULL}, invisibly, after signalling a warning of class
+\code{sframe_design_warning}.
+}
 \description{
 Advisory only. Used where a declaration is legal but likely to cost the
 researcher data quality, such as a pairwise comparison item large enough to

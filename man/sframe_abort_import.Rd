@@ -13,6 +13,10 @@ sframe_abort_import(message, path = NULL, ...)
 
 \item{...}{Additional named fields passed to \code{rlang::abort()}.}
 }
+\value{
+This function does not return. It signals an error of class
+\code{sframe_import_error}.
+}
 \description{
 Abort with an import error
 }

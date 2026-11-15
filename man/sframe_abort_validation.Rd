@@ -14,6 +14,10 @@ validated, included in the condition metadata when supplied.}
 
 \item{...}{Additional named fields passed to \code{rlang::abort()}.}
 }
+\value{
+This function does not return. It signals an error of class
+\code{sframe_validation_error}.
+}
 \description{
 Abort with a validation error
 }

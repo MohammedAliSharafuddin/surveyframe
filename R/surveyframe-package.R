@@ -119,8 +119,8 @@
 #'   [sframe_reliability_results()], which return results and write no file,
 #'   the `sframe_syntax_` generators, the plots and the demo library.
 #'
-#' No 2 names sit 1 letter apart: a lister is `sframe_get_items()`, never
-#' `sframe_items()`. The names used before 0.4.3 still work, silently. See
+#' Lister names use the `sframe_get_` prefix, such as `sframe_get_items()`.
+#' The names used before 0.4.3 still work, silently. See
 #' [superseded].
 #'
 #' ## File format

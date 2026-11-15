@@ -17,7 +17,7 @@ every declared column.
 }
 \description{
 A partial export gives a quality report every column it holds, and none of
-the ones it dropped. This names the declared columns that never arrived, so
+the ones it dropped. This names the declared columns absent from the responses, so
 a missingness figure can be read against what was expected. They count as
 missing for every respondent in \code{\link[=sframe_quality_results]{sframe_quality_results()}}'s rates.
 }

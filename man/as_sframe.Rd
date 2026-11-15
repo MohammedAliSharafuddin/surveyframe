@@ -18,7 +18,7 @@ An \code{sframe} object. When the validation passed, its
 \description{
 Recovers the \code{sframe} instrument from a validation diagnostic. This is the
 migration path for code that used the \code{strict = TRUE} return of
-\code{\link[=validate_sframe]{validate_sframe()}} as an instrument, which it no longer is.
+\code{\link[=validate_sframe]{validate_sframe()}} as an instrument after its class has changed.
 }
 \examples{
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")

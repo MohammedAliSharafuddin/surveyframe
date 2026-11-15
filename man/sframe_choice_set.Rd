@@ -25,8 +25,8 @@ Must have the same length as \code{values}.}
 
 \item{allow_other}{Logical. Whether to append an open-text "Other, please
 specify" option at the end of the choice list. Defaults to \code{FALSE}. It
-is submitted as the code \code{"other"}, so a set holding the value
-\code{"other"} or \code{"other_text"} cannot allow it, and nor can an ordered set.}
+is submitted as the code \code{"other"}. Use it with an unordered set whose
+declared values exclude \code{"other"} and \code{"other_text"}.}
 
 \item{randomise}{Logical. Whether to randomise the display order of options
 at render time. Defaults to \code{FALSE}.}

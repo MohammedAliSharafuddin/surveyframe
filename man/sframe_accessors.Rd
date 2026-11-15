@@ -26,15 +26,15 @@ model or plan block.\tabular{lll}{
    \code{sframe_get_items()} \tab \code{sf_component_list} of items \tab data frame of items \cr
    \code{sframe_get_scales()} \tab \code{sf_component_list} of scales \tab data frame of scales \cr
    \code{sframe_get_choice_sets()} \tab \code{sf_component_list} of choice sets \tab data frame of choice sets \cr
-   \code{sframe_get_branches()} \tab \code{sf_component_list} of branching rules \tab not available \cr
-   \code{sframe_get_attention_checks()} \tab \code{sf_component_list} of checks \tab not available \cr
+   \code{sframe_get_branches()} \tab \code{sf_component_list} of branching rules \tab use the instrument \cr
+   \code{sframe_get_attention_checks()} \tab \code{sf_component_list} of checks \tab use the instrument \cr
    \code{sframe_get_models()} \tab \code{sf_component_list} of models \tab data frame of models \cr
    \code{sframe_plan()} \tab list of plan blocks \tab data frame of plan blocks \cr
 }
 
 
 \code{as.data.frame()} on an instrument gives its items as a table, which is one
-part of it, and a component list has no coercion of its own. For every
+part of it. A component list remains a list. For every
 table an instrument can produce, use \code{\link[=sframe_codebook]{sframe_codebook()}}.
 }
 \examples{

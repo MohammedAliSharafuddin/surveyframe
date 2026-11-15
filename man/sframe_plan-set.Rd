@@ -16,7 +16,7 @@ The updated \code{sframe} object.
 }
 \description{
 The replacement counterpart to \code{\link[=sframe_plan]{sframe_plan()}}. Declaring the plan is the step
-the whole workflow turns on, so it has a named function rather than
+the whole workflow turns on, so a named function provides
 assignment into the object's internals.
 }
 \examples{

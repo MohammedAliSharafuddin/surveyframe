@@ -6,9 +6,12 @@
 \usage{
 SFRAME_FORMAT_VERSION
 }
+\value{
+A character scalar containing the current \code{.sframe} format version.
+}
 \description{
-Tracks the shape of the serialised object, not the package version and not
-the instrument's own version. Bump it only when the file's structure
+Tracks the shape of the serialised object. The package version and the
+instrument's own version are separate. Bump it only when the file's structure
 changes in a way a consumer must react to. \code{sframe-schema} conformance
 profiles are keyed to this value.
 }

@@ -13,6 +13,10 @@ sframe_warn_scoring(message, scale_id = NULL, ...)
 
 \item{...}{Additional named fields passed to \code{rlang::warn()}.}
 }
+\value{
+\code{NULL}, invisibly, after signalling a warning of class
+\code{sframe_scoring_warning}.
+}
 \description{
 Warn about a scoring issue
 }
