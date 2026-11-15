@@ -3,8 +3,8 @@
 Normalises the direct-influence matrix `X` by the larger of its greatest
 row sum and its greatest column sum (the standard DEMATEL normalisation,
 which keeps the Neumann series `N + N^2 + N^3 + ...` convergent), then
-solves the total-relation matrix `T = N(I - N)^-1` in closed form rather
-than by truncating the series. `D` is each criterion's row sum of `T`
+solves the total-relation matrix `T = N(I - N)^-1` in closed form. This
+avoids truncating the series. `D` is each criterion's row sum of `T`
 (how much it influences the others, direct and indirect combined) and
 `R` its column sum (how much it is influenced). Prominence `D + R` is
 overall involvement in the system, while relation `D - R` is net
@@ -37,8 +37,8 @@ A list with `normalised` (N), `total_relation` (T), `D`, `R`,
 The series converges only when the spectral radius of `N` is below 1.
 Normalisation keeps the radius at or below 1, and it equals 1 when
 criteria influence each other in a closed group with equal totals. That
-case returns an `error` explaining it, and no truncated series is
-substituted.
+case returns an `error` explaining it. The function returns that error
+in place of a truncated series.
 
 ## See also
 
@@ -49,3 +49,14 @@ Other Decision analysis functions:
 [`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
 [`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md),
 [`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
+
+## Examples
+
+``` r
+influence <- matrix(c(0, 2, 1, 0), nrow = 2, byrow = TRUE,
+                    dimnames = list(c("cost", "quality"),
+                                    c("cost", "quality")))
+compute <- getFromNamespace("sframe_dematel_compute", "surveyframe")
+result <- compute(influence)
+result[c("prominence", "relation", "role")]
+```

@@ -23,3 +23,8 @@ sframe_abort_validation(message, instrument_title = NULL, ...)
 
   Additional named fields passed to
   [`rlang::abort()`](https://rlang.r-lib.org/reference/abort.html).
+
+## Value
+
+This function does not return. It signals an error of class
+`sframe_validation_error`.

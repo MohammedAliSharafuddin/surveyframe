@@ -24,3 +24,8 @@ sframe_warn_design(message, item_id = NULL, ...)
 
   Additional named fields passed to
   [`rlang::warn()`](https://rlang.r-lib.org/reference/abort.html).
+
+## Value
+
+`NULL`, invisibly, after signalling a warning of class
+`sframe_design_warning`.

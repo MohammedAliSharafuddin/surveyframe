@@ -46,7 +46,7 @@ teaches, its size, its files and the commands to try next. The parts are
 value labels, so the data means something outside R. The results table
 is what surveyframe reports for this demo, which is the reference to
 compare against when you run the same data through another package. The
-2 reference datasets have no codebook or results table, so those 2 paths
+2 reference datasets omit codebook or results table, so those 2 paths
 are `NA`.
 
 ## How the demos may be used
@@ -60,8 +60,8 @@ ends with "(demonstration data)", and a report's title, its opening line
 and each table and figure title carry the same, also after the data is
 copied into another project. Use the demos to learn, teach and test a
 method or an instrument. Presenting their results as findings, or
-editing the data to hide where it came from, is fabrication, which no
-check can stop: the stamp makes a copy visible.
+editing the data to hide where it came from, is fabrication. The stamp
+makes a copied output visible to a reader.
 
 ## See also
 

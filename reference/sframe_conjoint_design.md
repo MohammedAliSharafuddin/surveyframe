@@ -1,9 +1,9 @@
 # Declare a choice-experiment (conjoint) design
 
 Generates and stores a conjoint profile set and task schedule as part of
-the instrument's pre-declared contract. This is a design generator, not
-an estimator: it fixes what respondents will be shown, and it does not
-fit or analyse choice models.
+the instrument's pre-declared contract. It fixes what respondents will
+be shown. Fit and analyse the resulting choice responses with a
+choice-model estimator.
 
 ## Usage
 
@@ -60,7 +60,7 @@ sframe_conjoint_design(
 
 - seed:
 
-  Integer seed. Generated and stored when not supplied.
+  Integer seed. Generated and stored when omitted.
 
 - profiles:
 
@@ -80,8 +80,8 @@ model), `$balance`, and the declaration that produced them.
 ## Details
 
 The design is reproducible by construction. `seed` is always recorded,
-and generated when not supplied, so regenerating from the stored
-declaration returns the identical profiles and tasks.
+and generated when omitted, so regenerating from the stored declaration
+returns the identical profiles and tasks.
 
 ## Choosing a method
 
@@ -91,13 +91,11 @@ random subset of that size. `"balanced"` samples repeatedly and keeps
 the subset with the most even level spread and the weakest association
 between attributes.
 
-`"balanced"` is a search, not a construction. It does not produce a
-catalogued orthogonal fractional factorial and does not claim the
-guarantees of one. The achieved balance is reported in `$balance` so the
-design can be inspected rather than trusted. A study needing a specific
-D-optimal or orthogonal design should generate it elsewhere and pass it
-in through `profiles`, which keeps the declaration in the contract
-either way.
+`"balanced"` uses a search. A catalogued orthogonal fractional factorial
+provides different guarantees. The achieved balance is reported in
+`$balance` for inspection. A study needing a specific D-optimal or
+orthogonal design should generate it elsewhere and pass it in through
+`profiles`, which keeps the declaration in the contract either way.
 
 ## See also
 

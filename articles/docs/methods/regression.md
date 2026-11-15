@@ -77,12 +77,12 @@ Ordinal logistic regression research question, from the `logistic` demo.
 
 In the pre-analysis plan:
 
-> **RQ2.** And does it predict how satisfied they were? **Null
-> hypothesis (H0):** Use does not change the odds of a higher
-> satisfaction rating. **Alternative hypothesis (H1):** Use changes the
-> odds of a higher satisfaction rating. **Planned decision rule:**
-> Reject H0 if p \< .05 for the use coefficient, and report its odds
-> ratio with a 95% confidence interval.
+> **RQ2.** Does attending more sessions predict a higher satisfaction
+> rating? **Null hypothesis (H0):** Use does not change the odds of a
+> higher satisfaction rating. **Alternative hypothesis (H1):** Use
+> changes the odds of a higher satisfaction rating. **Planned decision
+> rule:** Reject H0 if p \< .05 for the use coefficient, and report its
+> odds ratio with a 95% confidence interval.
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -102,10 +102,11 @@ demo.
 
 In the pre-analysis plan:
 
-> **RQ3.** And which session type they prefer? **Null hypothesis (H0):**
-> Use does not change which offer is preferred. **Alternative hypothesis
-> (H1):** Use changes which offer is preferred. **Planned decision
-> rule:** Reject H0 if the likelihood-ratio test of use has p \< .05.
+> **RQ3.** Does attending more sessions predict which session type an
+> attendee prefers? **Null hypothesis (H0):** Use does not change which
+> offer is preferred. **Alternative hypothesis (H1):** Use changes which
+> offer is preferred. **Planned decision rule:** Reject H0 if the
+> likelihood-ratio test of use has p \< .05.
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.

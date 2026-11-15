@@ -20,7 +20,7 @@ Rendered
 
 **Instrument hash (SHA-256):**
 
-`eba433d9f51f994355a2ce09516270cb152bd4e848de02386c465ccb0d12c9e4`
+`f8d89092bd31f0906c2272af6b8eaaed6c9942191b8c19d8ec1ae352836027c9`
 
 The hash identifies the instrument file this plan describes. Anyone can
 check that a .sframe file is the one planned by opening it at
@@ -38,7 +38,7 @@ a service more are the ones who come back.
 | Objective | Research questions |
 |----|----|
 | O1: Test whether use predicts returning. | RQ1 (Does using the service more predict returning?) |
-| O2: Test whether use predicts satisfaction and the offer preferred. | RQ2 (And does it predict how satisfied they were?); RQ3 (And which session type they prefer?) |
+| O2: Test whether use predicts satisfaction and the offer preferred. | RQ2 (Does attending more sessions predict a higher satisfaction rating?); RQ3 (Does attending more sessions predict which session type an attendee prefers?) |
 
 **Table 1**  
 *Objectives and the research questions that serve them* {.caption-top
@@ -99,7 +99,7 @@ coefficient, and report its odds ratio with a 95% confidence interval.
 
 **Method reference:** (Hosmer et al., 2013)
 
-### RQ2: And does it predict how satisfied they were?
+### RQ2: Does attending more sessions predict a higher satisfaction rating?
 
 **Null hypothesis (H0):** Use does not change the odds of a higher
 satisfaction rating.
@@ -118,7 +118,7 @@ coefficient, and report its odds ratio with a 95% confidence interval.
 
 **Method reference:** (Hosmer et al., 2013)
 
-### RQ3: And which session type they prefer?
+### RQ3: Does attending more sessions predict which session type an attendee prefers?
 
 **Null hypothesis (H0):** Use does not change which offer is preferred.
 

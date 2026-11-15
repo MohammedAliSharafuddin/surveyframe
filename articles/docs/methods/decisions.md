@@ -48,7 +48,8 @@ demo.
 
 In the pre-analysis plan:
 
-> **RQ2.** The same weights with network dependence allowed.
+> **RQ2.** What weight does each criterion carry when network dependence
+> is allowed?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -109,7 +110,7 @@ VIKOR research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ5.** And by compromise ranking?
+> **RQ5.** Which venue ranks highest by compromise ranking?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -130,7 +131,7 @@ MOORA research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ6.** And by ratio analysis?
+> **RQ6.** Which venue ranks highest by ratio analysis?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -150,7 +151,7 @@ SMART research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ7.** And by simple multi-attribute rating?
+> **RQ7.** Which venue ranks highest by simple multi-attribute rating?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -171,7 +172,7 @@ WASPAS research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ8.** And by weighted aggregated sum product?
+> **RQ8.** Which venue ranks highest by weighted aggregated sum product?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -192,7 +193,7 @@ PROMETHEE research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ9.** And by outranking flows?
+> **RQ9.** Which venue ranks highest by outranking flows?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.
@@ -213,7 +214,7 @@ ELECTRE research question, from the `mcdm_choice` demo.
 
 In the pre-analysis plan:
 
-> **RQ10.** And by outranking with thresholds?
+> **RQ10.** Which venue ranks highest by outranking with thresholds?
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.

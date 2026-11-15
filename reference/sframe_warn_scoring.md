@@ -22,3 +22,8 @@ sframe_warn_scoring(message, scale_id = NULL, ...)
 
   Additional named fields passed to
   [`rlang::warn()`](https://rlang.r-lib.org/reference/abort.html).
+
+## Value
+
+`NULL`, invisibly, after signalling a warning of class
+`sframe_scoring_warning`.

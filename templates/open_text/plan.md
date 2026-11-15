@@ -20,7 +20,7 @@ Rendered
 
 **Instrument hash (SHA-256):**
 
-`8b7793fd1757b614c2d6fdc9706e0766fd6feb9dc9692cf5c3c1da8e8605bb70`
+`30d927bee3e2da554cb34e9219c0358b06f0a5a2daba60f0c091c3ab3ee8f01d`
 
 The hash identifies the instrument file this plan describes. Anyone can
 check that a .sframe file is the one planned by opening it at
@@ -36,7 +36,7 @@ attendees liked the event, not why. The open answers hold the reasons.
 
 | Objective | Research questions |
 |----|----|
-| O1: Describe the words and topics in what worked and what to change. | RQ1 (Which words come up most often?); RQ2 (And which pairs of words?); RQ3 (How is a key word actually used?); RQ4 (Which words appear together?); RQ6 (Which words cluster together?); RQ7 (Is the tone positive or negative?); RQ8 (What does a document-feature matrix show?); RQ9 (What topics are people writing about?); RQ10 (The same question with a structural topic model.) |
+| O1: Describe the words and topics in what worked and what to change. | RQ1 (Which words come up most often?); RQ2 (Which pairs of words appear most often?); RQ3 (How is a key word actually used?); RQ4 (Which words appear together?); RQ6 (Which words cluster together?); RQ7 (Is the tone positive or negative?); RQ8 (What does a document-feature matrix show?); RQ9 (What topics are people writing about?); RQ10 (What topics appear according to a structural topic model?) |
 | O2: Compare what in-person and online attendees write. | RQ5 (Do in-person and online attendees say different things?) |
 
 **Table 1**  
@@ -82,7 +82,7 @@ The instrument declares no scales.
 
 **Variables:** what_worked
 
-### RQ2: And which pairs of words?
+### RQ2: Which pairs of words appear most often?
 
 **Method:** Phrase frequencies
 
@@ -133,7 +133,7 @@ The instrument declares no scales.
 
 **Variables:** what_to_improve
 
-### RQ10: The same question with a structural topic model.
+### RQ10: What topics appear according to a structural topic model?
 
 **Method:** Structural topic model
 

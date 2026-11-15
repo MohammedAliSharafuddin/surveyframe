@@ -20,7 +20,7 @@ Rendered
 
 **Instrument hash (SHA-256):**
 
-`9afe289123c27eab5734788cec817fe31065e170113cec09d18b5ab355ae93dd`
+`4224221a18b60bea18c6e8984d39de1b485d2139af34e4d7ab165fb08ce02181`
 
 The hash identifies the instrument file this plan describes. Anyone can
 check that a .sframe file is the one planned by opening it at
@@ -31,14 +31,13 @@ https://surveyframe.org/verify or with read_sframe() in R.
 **Purpose:** A decision study choosing next year’s venue from candidate
 venues, weighting the criteria and ranking the venues by 10 methods.
 
-**Research problem:** The organising committee must choose a venue on
-several criteria at once, and needs a defensible ranking rather than a
-vote.
+**Research problem:** The organising committee must choose a venue on 4
+criteria at once and needs a defensible ranking in place of a vote.
 
 | Objective | Research questions |
 |----|----|
-| O1: Weight the decision criteria. | RQ1 (What weight does each criterion carry?); RQ2 (The same weights with network dependence allowed.); RQ3 (Which criteria drive the others?) |
-| O2: Rank the venues, and check whether the methods agree. | RQ4 (Which venue ranks best overall?); RQ5 (And by compromise ranking?); RQ6 (And by ratio analysis?); RQ7 (And by simple multi-attribute rating?); RQ8 (And by weighted aggregated sum product?); RQ9 (And by outranking flows?); RQ10 (And by outranking with thresholds?) |
+| O1: Weight the decision criteria. | RQ1 (What weight does each criterion carry?); RQ2 (What weight does each criterion carry when network dependence is allowed?); RQ3 (Which criteria drive the others?) |
+| O2: Rank the venues, and check whether the methods agree. | RQ4 (Which venue ranks best overall?); RQ5 (Which venue ranks highest by compromise ranking?); RQ6 (Which venue ranks highest by ratio analysis?); RQ7 (Which venue ranks highest by simple multi-attribute rating?); RQ8 (Which venue ranks highest by weighted aggregated sum product?); RQ9 (Which venue ranks highest by outranking flows?); RQ10 (Which venue ranks highest by outranking with thresholds?) |
 
 **Table 1**  
 *Objectives and the research questions that serve them* {.caption-top
@@ -89,7 +88,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Saaty, 1980)
 
-### RQ2: The same weights with network dependence allowed.
+### RQ2: What weight does each criterion carry when network dependence is allowed?
 
 **Method:** Analytic network process (ANP)
 
@@ -113,7 +112,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Hwang & Yoon, 1981)
 
-### RQ5: And by compromise ranking?
+### RQ5: Which venue ranks highest by compromise ranking?
 
 **Method:** VIKOR
 
@@ -121,7 +120,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Opricovic & Tzeng, 2004)
 
-### RQ6: And by ratio analysis?
+### RQ6: Which venue ranks highest by ratio analysis?
 
 **Method:** MOORA
 
@@ -129,7 +128,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Brauers & Zavadskas, 2006)
 
-### RQ7: And by simple multi-attribute rating?
+### RQ7: Which venue ranks highest by simple multi-attribute rating?
 
 **Method:** SMART
 
@@ -137,7 +136,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Edwards, 1977)
 
-### RQ8: And by weighted aggregated sum product?
+### RQ8: Which venue ranks highest by weighted aggregated sum product?
 
 **Method:** WASPAS
 
@@ -145,7 +144,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Zavadskas et al., 2012)
 
-### RQ9: And by outranking flows?
+### RQ9: Which venue ranks highest by outranking flows?
 
 **Method:** PROMETHEE
 
@@ -153,7 +152,7 @@ consistency ratio is below .10.
 
 **Method reference:** (Brans & Vincke, 1985)
 
-### RQ10: And by outranking with thresholds?
+### RQ10: Which venue ranks highest by outranking with thresholds?
 
 **Method:** ELECTRE
 

@@ -31,15 +31,15 @@ block.
 | [`sframe_get_items()`](https://surveyframe.org/reference/sframe_get_items.md) | `sf_component_list` of items | data frame of items |
 | [`sframe_get_scales()`](https://surveyframe.org/reference/sframe_get_scales.md) | `sf_component_list` of scales | data frame of scales |
 | [`sframe_get_choice_sets()`](https://surveyframe.org/reference/sframe_get_choice_sets.md) | `sf_component_list` of choice sets | data frame of choice sets |
-| [`sframe_get_branches()`](https://surveyframe.org/reference/sframe_get_branches.md) | `sf_component_list` of branching rules | not available |
-| [`sframe_get_attention_checks()`](https://surveyframe.org/reference/sframe_get_attention_checks.md) | `sf_component_list` of checks | not available |
+| [`sframe_get_branches()`](https://surveyframe.org/reference/sframe_get_branches.md) | `sf_component_list` of branching rules | use the instrument |
+| [`sframe_get_attention_checks()`](https://surveyframe.org/reference/sframe_get_attention_checks.md) | `sf_component_list` of checks | use the instrument |
 | [`sframe_get_models()`](https://surveyframe.org/reference/sframe_get_models.md) | `sf_component_list` of models | data frame of models |
 | [`sframe_plan()`](https://surveyframe.org/reference/sframe_plan.md) | list of plan blocks | data frame of plan blocks |
 
 [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on an
-instrument gives its items as a table, which is one part of it, and a
-component list has no coercion of its own. For every table an instrument
-can produce, use
+instrument gives its items as a table, which is one part of it. A
+component list remains a list. For every table an instrument can
+produce, use
 [`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md).
 
 ## See also

@@ -2,8 +2,8 @@
 
 The replacement counterpart to
 [`sframe_plan()`](https://surveyframe.org/reference/sframe_plan.md).
-Declaring the plan is the step the whole workflow turns on, so it has a
-named function rather than assignment into the object's internals.
+Declaring the plan is the step the whole workflow turns on, so a named
+function provides assignment into the object's internals.
 
 ## Usage
 

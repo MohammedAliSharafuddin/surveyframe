@@ -3,7 +3,7 @@
 Recovers the `sframe` instrument from a validation diagnostic. This is
 the migration path for code that used the `strict = TRUE` return of
 [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
-as an instrument, which it no longer is.
+as an instrument after its class has changed.
 
 ## Usage
 

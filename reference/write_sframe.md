@@ -2,14 +2,15 @@
 
 Serialises an `sframe` instrument object to a UTF-8 JSON file with a
 SHA-256 integrity hash. The instrument is always validated before
-writing, and an invalid instrument is refused. The hash is computed over
-the content with `hash.value` set to an empty string, in the canonical
-form of RFC 8785, the JSON Canonicalization Scheme: keys sorted, numbers
-in their shortest form and no whitespace. So it identifies content, not
-the exact bytes, and SurveyBuilder and the verifier page on the package
-website compute the same hash. An `NA` is written as null where the
-published schema allows null for that field, and refused with the field
-named anywhere else, as is a number JSON cannot hold, such as `Inf`.
+writing, and writes an instrument that passes validation. The hash is
+computed over the content with `hash.value` set to an empty string, in
+the canonical form of RFC 8785, the JSON Canonicalization Scheme: keys
+sorted, numbers in their shortest form and whitespace removed. It
+identifies content independently of the exact bytes, and SurveyBuilder
+and the verifier page on the package website compute the same hash. An
+`NA` is written as null where the published schema allows null for that
+field. Elsewhere, the function names and rejects `NA` or a number
+outside JSON's finite range, such as `Inf`.
 
 ## Usage
 
@@ -46,9 +47,10 @@ write_sframe(
 
 - new_instrument:
 
-  Logical. `TRUE` declares that the content is a new instrument, not a
-  revision of the one it was read from, so no amendment is required. The
-  instrument must carry no amendment log, and an instrument read with
+  Logical. `TRUE` declares that the content is a new instrument,
+  separate from the one it was read from, so an amendment is
+  unnecessary. The instrument must carry an empty amendment log, and an
+  instrument read with
   [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
   must have a new `meta$title` or `meta$version`, so 2 different files
   never claim to be one instrument. Defaults to `FALSE`.
@@ -78,8 +80,9 @@ To publish changed content as a different instrument, remove its
 amendment log and set `new_instrument = TRUE`.
 
 These are checks on the content in hand. The hash is unsigned and can be
-recomputed by anyone who edits a file, so it does not establish who
-wrote an instrument or when.
+recomputed by anyone who edits a file, so it establishes content
+integrity. Use a separate signing record to establish who wrote an
+instrument and when.
 
 The link between an instrument and the file it was read from is an
 attribute, `sframe_origin`, that
@@ -97,9 +100,9 @@ and [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) with
 [`readRDS()`](https://rdrr.io/r/base/readRDS.html). Base R that builds a
 new list from the parts drops it, such as `x[names(x)]`, `c(x)` or
 [`lapply()`](https://rdrr.io/r/base/lapply.html) over the fields: the
-result is an instrument read from no file, and its changes are then
-written with no amendment recorded. Change a read instrument's fields in
-place, and record the change with
+result is an instrument built from its parts, and its changes are then
+written outside the amendment record. Change a read instrument's fields
+in place, and record the change with
 [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md).
 
 ## See also

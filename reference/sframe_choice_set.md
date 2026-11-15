@@ -40,8 +40,8 @@ sframe_choice_set(
 
   Logical. Whether to append an open-text "Other, please specify" option
   at the end of the choice list. Defaults to `FALSE`. It is submitted as
-  the code `"other"`, so a set holding the value `"other"` or
-  `"other_text"` cannot allow it, and nor can an ordered set.
+  the code `"other"`. Use it with an unordered set whose declared values
+  exclude `"other"` and `"other_text"`.
 
 - randomise:
 

@@ -36,8 +36,8 @@ results <- run_analysis_plan(d$responses, d$instrument)
 | Research question | Method | What the report gives |
 |----|----|----|
 | Does using the service more predict returning? | Binary logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
-| And does it predict how satisfied they were? | Ordinal logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
-| And which session type they prefer? | Multinomial logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
+| Does attending more sessions predict a higher satisfaction rating? | Ordinal logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
+| Does attending more sessions predict which session type an attendee prefers? | Multinomial logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
 
 Run the example in SurveyStudio or R to see the results, each marked as
 demonstration data.

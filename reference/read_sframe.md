@@ -2,11 +2,10 @@
 
 Reads a `.sframe` JSON file, or the same JSON held as text, and
 reconstructs an `sframe` instrument object. The SHA-256 integrity hash
-is verified by default, and content that does not match its hash is
-refused. The hash covers a canonical form of the content, so it detects
-a change to the content of a written file, and it ignores whitespace and
-key order. It is unsigned, so anyone who edits a file can also recompute
-it.
+is verified by default, and content must match its hash. The hash covers
+a canonical form of the content, so it detects a change to the content
+of a written file, and it ignores whitespace and key order. It is
+unsigned, so anyone who edits a file can also recompute it.
 
 ## Usage
 
@@ -31,15 +30,15 @@ read_sframe(path = NULL, validate = TRUE, text = NULL, verify = TRUE)
 - text:
 
   Character. The `.sframe` JSON itself, for example a payload a host
-  keeps in a database, read with no temporary file. One string, or lines
+  keeps in a database, read directly from memory. One string, or lines
   to be joined.
 
 - verify:
 
-  Logical. Whether to refuse content whose hash is missing or does not
-  match. Defaults to `TRUE`. With `FALSE`, such content is read with a
-  warning of class `sframe_unverified_warning` and the instrument is
-  marked unverified (see the Unverified reads section).
+  Logical. Whether to refuse content whose hash is missing or differs.
+  Defaults to `TRUE`. With `FALSE`, such content is read with a warning
+  of class `sframe_unverified_warning` and the instrument is marked
+  unverified (see the Unverified reads section).
 
 ## Value
 
@@ -48,12 +47,12 @@ An `sframe` object.
 ## Details
 
 The hash's `canonical` field names the form it was taken in. A file
-naming `"rfc8785"` is checked in RFC 8785 alone. A file naming no form
-was written before the field existed: it is checked in RFC 8785 and then
-in the forms surveyframe used before 0.4.3, and any match is accepted
-with a message of class `sframe_locale_order_hash` asking you to save it
-again. A file naming any other form is refused, since it needs a newer
-surveyframe.
+naming `"rfc8785"` is checked in RFC 8785 alone. A file with an empty
+form was written before the field existed: it is checked in RFC 8785 and
+then in the forms surveyframe used before 0.4.3, and any match is
+accepted with a message of class `sframe_locale_order_hash` asking you
+to save it again. A file naming any other form is refused, since it
+needs a newer surveyframe.
 
 The instrument remembers the content and amendment log it was read with,
 so [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
@@ -61,16 +60,15 @@ can refuse an undisclosed revision.
 
 ## Unverified reads
 
-`verify = FALSE` is for a host holding a payload it cannot vouch for,
-which it would otherwise rebuild by hand and lose fields doing so. The
-result carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on
-every verified read), and [`print()`](https://rdrr.io/r/base/print.html)
-says so.
+`verify = FALSE` lets a host preserve every field in a payload whose
+integrity it has not established. The result carries the attribute
+`sframe_verified`, `FALSE` (it is `TRUE` on every verified read), and
+[`print()`](https://rdrr.io/r/base/print.html) says so.
 [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 refuses to write an unverified instrument unless `new_instrument = TRUE`
-declares it new, since nothing ties its content to a state anyone wrote.
-That holds with the amendment log it was read with too, since the log
-was read unchecked: a sign-off, a tier or a timestamp edited as text
+declares it new, since its content lacks a link to a state someone
+wrote. That holds with the amendment log it was read with too, since the
+log was read unchecked: a sign-off, a tier or a timestamp edited as text
 would otherwise be written back and read verified. A new instrument
 starts a new log, so clear the old one first with
 `instrument$amendments <- list()`. No amendment can start from it:

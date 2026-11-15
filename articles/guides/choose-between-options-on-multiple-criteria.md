@@ -37,15 +37,15 @@ results <- run_analysis_plan(d$responses, d$instrument)
 | Research question | Method | What the report gives |
 |----|----|----|
 | What weight does each criterion carry? | Analytic hierarchy process (AHP) | The APA 7 sentence and a table, with a chart where the method has one |
-| The same weights with network dependence allowed. | Analytic network process (ANP) | The APA 7 sentence and a table, with a chart where the method has one |
+| What weight does each criterion carry when network dependence is allowed? | Analytic network process (ANP) | The APA 7 sentence and a table, with a chart where the method has one |
 | Which criteria drive the others? | DEMATEL | The APA 7 sentence and a table, with a chart where the method has one |
 | Which venue ranks best overall? | TOPSIS | The APA 7 sentence and a table, with a chart where the method has one |
-| And by compromise ranking? | VIKOR | The APA 7 sentence and a table, with a chart where the method has one |
-| And by ratio analysis? | MOORA | The APA 7 sentence and a table, with a chart where the method has one |
-| And by simple multi-attribute rating? | SMART | The APA 7 sentence and a table, with a chart where the method has one |
-| And by weighted aggregated sum product? | WASPAS | The APA 7 sentence and a table, with a chart where the method has one |
-| And by outranking flows? | PROMETHEE | The APA 7 sentence and a table, with a chart where the method has one |
-| And by outranking with thresholds? | ELECTRE | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by compromise ranking? | VIKOR | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by ratio analysis? | MOORA | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by simple multi-attribute rating? | SMART | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by weighted aggregated sum product? | WASPAS | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by outranking flows? | PROMETHEE | The APA 7 sentence and a table, with a chart where the method has one |
+| Which venue ranks highest by outranking with thresholds? | ELECTRE | The APA 7 sentence and a table, with a chart where the method has one |
 
 Run the example in SurveyStudio or R to see the results, each marked as
 demonstration data.

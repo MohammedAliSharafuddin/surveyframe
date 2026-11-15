@@ -5,8 +5,8 @@ on x and relation (D - R) on y, with a horizontal quadrant line at
 relation = 0 separating causes (above) from effects (below). This is
 deliberately a different shape from
 [`sframe_plot_decision_ranking()`](https://surveyframe.org/reference/sframe_plot_decision_ranking.md):
-DEMATEL classifies criteria on 2 axes rather than producing a single
-ranked score, so a ranking bar chart would misrepresent it.
+DEMATEL classifies criteria on 2 axes. It produces a causal map in place
+of a single ranked score, so a ranking bar chart would misrepresent it.
 
 ## Usage
 
@@ -29,7 +29,7 @@ sframe_plot_dematel_influence(result, palette = c("web", "print"))
 
 ## Value
 
-A ggplot2 object, or `NULL` when the result carries no DEMATEL fields to
+A ggplot2 object, or `NULL` when the result lacks a DEMATEL fields to
 plot.
 
 ## See also

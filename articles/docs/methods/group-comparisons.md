@@ -107,12 +107,12 @@ Kruskal-Wallis test research question, from the `multi_group` demo.
 
 In the pre-analysis plan:
 
-> **RQ2.** The same question without assuming normality. **Null
-> hypothesis (H0):** Sessions attended have the same distribution across
-> roles. **Alternative hypothesis (H1):** Sessions attended differ in
-> distribution for at least 1 role. **Planned decision rule:** Reject H0
-> if p \< .05 on this rank-based test, and report the effect size with
-> its 95% confidence interval.
+> **RQ2.** Do the 3 attendee roles differ in sessions attended according
+> to a Kruskal-Wallis test? **Null hypothesis (H0):** Sessions attended
+> have the same distribution across roles. **Alternative hypothesis
+> (H1):** Sessions attended differ in distribution for at least 1 role.
+> **Planned decision rule:** Reject H0 if p \< .05 on this rank-based
+> test, and report the effect size with its 95% confidence interval.
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.

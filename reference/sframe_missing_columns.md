@@ -1,9 +1,9 @@
 # Columns the instrument declares that the responses left out
 
 A partial export gives a quality report every column it holds, and none
-of the ones it dropped. This names the declared columns that never
-arrived, so a missingness figure can be read against what was expected.
-They count as missing for every respondent in
+of the ones it dropped. This names the declared columns absent from the
+responses, so a missingness figure can be read against what was
+expected. They count as missing for every respondent in
 [`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)'s
 rates.
 

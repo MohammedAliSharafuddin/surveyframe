@@ -26,3 +26,8 @@ sframe_warn_missing(message, item_id = NULL, rate = NULL, ...)
 
   Additional named fields passed to
   [`rlang::warn()`](https://rlang.r-lib.org/reference/abort.html).
+
+## Value
+
+`NULL`, invisibly, after signalling a warning of class
+`sframe_missing_data_warning`.

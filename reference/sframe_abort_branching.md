@@ -22,3 +22,8 @@ sframe_abort_branching(message, item_id = NULL, ...)
 
   Additional named fields passed to
   [`rlang::abort()`](https://rlang.r-lib.org/reference/abort.html).
+
+## Value
+
+This function does not return. It signals an error of class
+`sframe_branching_error`.

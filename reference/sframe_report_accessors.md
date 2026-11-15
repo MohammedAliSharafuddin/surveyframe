@@ -20,15 +20,15 @@ Given analysis results,
 answers for every block at once, as a character vector named by block.
 Given one of the standalone reports that carry a sentence of their own,
 an assumption report, a descriptives report, a missing-data report or a
-validity report, it returns that single sentence. A result with no
+validity report, it returns that single sentence. A result lacking a
 sentence gives an empty string, so the shape of the answer follows the
 number of blocks asked about.
 
 The sentence is plain text. APA 7 asks for italic Latin statistical
-symbols, so a manuscript needs `t`, `F`, `p`, `r`, `d` and the rest
-italicised after pasting: a character vector cannot carry that styling.
-Numbers are already APA-formatted, including no leading zero on `p` and
-a labelled confidence interval.
+symbols, so italicise `t`, `F`, `p`, `r`, `d` and the remaining Latin
+statistical symbols after pasting into a manuscript. Numbers are already
+APA-formatted, including the APA 7 form `.032` for `p` and a labelled
+confidence interval.
 
 [`sframe_flagged()`](https://surveyframe.org/reference/sframe_flagged.md)
 returns row positions in the response data, as one sorted vector with
