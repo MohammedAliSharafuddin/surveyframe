@@ -312,6 +312,27 @@ test_that("inside Studio, Google Sheets and References link to Studio's screens"
   expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='goto'&&m.screen==='references';})"))
 })
 
+test_that("Studio host mode sends its need, state and dirty messages", {
+  h <- ui2_studio_host()
+  on.exit(httpuv::stopServer(h$server), add = TRUE)
+  s <- h$session
+  b <- "document.getElementById('b').contentWindow"
+  expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='need-sframe';})"))
+
+  src <- tempfile(fileext = ".sframe")
+  write_sframe(centre_instrument(), src)
+  text <- paste(readLines(src, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  js(s, paste0(b, ".postMessage({type:'sframe',text:", q(text), "},location.origin);1"))
+  expect_true(ui2_wait(s, paste0(b, ".S&&", b, ".S.items.length===2")))
+  expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='state'&&m.dirty===false;})"))
+
+  js(s, paste0(b, ".setDirty();1"))
+  expect_true(ui2_wait(s, "window.__msgs.some(function(m){return m&&m.type==='dirty'&&m.dirty===true;})"))
+  state <- js(s, "window.__msgs.filter(function(m){return m&&m.type==='state';}).pop()")
+  expect_named(state, c("type", "undo", "redo", "saveDisabled", "dirty", "label"))
+  expect_true(state$dirty)
+})
+
 
 # -- allow_other and randomise on the exported page --------------------------------
 
