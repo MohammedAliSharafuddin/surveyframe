@@ -139,7 +139,7 @@ keep_open <- function(kind, rows = 0L) {
     # setspace sets a minipage single-spaced, so it takes the page's spacing.
     if (kind == "Figure") return(raw_out("latex", paste0(
       "\\edef\\sfstretch{\\baselinestretch}\\noindent\\begin{minipage}{\\linewidth}",
-      "\\ifdefined\\setstretch\\setstretch{\\sfstretch}\\fi")))
+      "\\ifdefined\\setstretch\\setstretch{\\sfstretch}\\fi\\setlength{\\parskip}{8pt}")))
     return(raw_out("latex", "\\sfneedspace{5\\baselineskip}"))
   }
   ""
