@@ -75,8 +75,8 @@ sframe_choice_content_problems <- function(values, labels) {
 #'   Must have the same length as `values`.
 #' @param allow_other Logical. Whether to append an open-text "Other, please
 #'   specify" option at the end of the choice list. Defaults to `FALSE`. It
-#'   is submitted as the code `"other"`, so a set holding the value
-#'   `"other"` or `"other_text"` cannot allow it, and nor can an ordered set.
+#'   is submitted as the code `"other"`. Use it with an unordered set whose
+#'   declared values exclude `"other"` and `"other_text"`.
 #' @param randomise Logical. Whether to randomise the display order of options
 #'   at render time. Defaults to `FALSE`.
 #' @param ordered Logical. Whether the options run in a meaningful order, from

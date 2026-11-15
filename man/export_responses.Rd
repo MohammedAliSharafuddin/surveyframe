@@ -18,11 +18,11 @@ chosen from the extension.}
 The path, invisibly. When any name or label was changed, the path
 carries an attribute \code{"renamed"}, a data frame with the columns \code{kind}
 (\code{"name"}, \code{"variable label"} or \code{"value label"}), \code{column}, \code{old} and
-\code{new}. With no changes there is no message and no attribute.
+\code{new}. An unchanged file returns silently with an empty attribute.
 }
 \description{
 A plain CSV carries codes. \code{dm_1} arrives in SPSS as a column of integers
-with no variable label and no value labels, and the reader has to
+with empty variable and value labels, and the reader has to
 reconstruct all of it from the questionnaire. This attaches both from the
 instrument: the variable label is the item's \code{label}, and the value labels
 come from the item's choice set, which stores its \code{values} and \code{labels}
@@ -36,16 +36,16 @@ set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A \code{.sav} keeps the text codes, which SPSS
 labels directly. Codes such as \code{"01"} and \code{"02"} are text, as
 \code{\link[=read_responses]{read_responses()}} reads them, since as numbers they would lose their
-leading zero and no longer match the instrument.
+leading zero and differ from the instrument.
 }
 
-\section{Names and labels that do not fit the format}{
+\section{How names and labels are adapted for each format}{
 
-SPSS and Stata refuse column names with spaces or punctuation, names that
-do not start with a letter, and names over the format's length limit (64
-bytes for SPSS, 32 characters for Stata). Matrix row columns such as
+SPSS and Stata use column names that start with a letter and stay within
+their format limits of 64 bytes for SPSS and 32 characters for Stata.
+Matrix row columns such as
 \verb{session__Reading materials} are renamed to valid names, with illegal
-characters turned into \verb{_}, a leading \code{v} where the first character is not
+characters turned into \verb{_}, a leading \code{v} where the first character is other than
 a letter, and a number added where 2 names would otherwise match. Variable
 labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 labels at 120 bytes for SPSS and 80 characters for Stata. Everything else

@@ -213,7 +213,7 @@ sframe_demo_dir <- function() {
 #'   The codebook carries variable and value labels, so the data means
 #'   something outside R. The results table is what surveyframe reports for
 #'   this demo, which is the reference to compare against when you run the
-#'   same data through another package. The 2 reference datasets have no
+#'   same data through another package. The 2 reference datasets omit
 #'   codebook or results table, so those 2 paths are `NA`.
 #' @section How the demos may be used:
 #' The demos' responses are simulated, not collected from participants. Each
@@ -225,7 +225,7 @@ sframe_demo_dir <- function() {
 #' also after the data is copied into another project. Use the demos to
 #' learn, teach and test a method or an instrument. Presenting their results
 #' as findings, or editing the data to hide where it came from, is
-#' fabrication, which no check can stop: the stamp makes a copy visible.
+#' fabrication. The stamp makes a copied output visible to a reader.
 #'
 #' @export
 #' @seealso [sframe_list_demos()], [export_responses()]
@@ -484,7 +484,7 @@ print.sframe_branding <- function(x, ...) {
 #' Write responses to SPSS or Stata with the labels attached
 #'
 #' A plain CSV carries codes. `dm_1` arrives in SPSS as a column of integers
-#' with no variable label and no value labels, and the reader has to
+#' with empty variable and value labels, and the reader has to
 #' reconstruct all of it from the questionnaire. This attaches both from the
 #' instrument: the variable label is the item's `label`, and the value labels
 #' come from the item's choice set, which stores its `values` and `labels`
@@ -502,14 +502,14 @@ print.sframe_branding <- function(x, ...) {
 #' Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
 #' labels directly. Codes such as `"01"` and `"02"` are text, as
 #' [read_responses()] reads them, since as numbers they would lose their
-#' leading zero and no longer match the instrument.
+#' leading zero and differ from the instrument.
 #'
-#' @section Names and labels that do not fit the format:
-#' SPSS and Stata refuse column names with spaces or punctuation, names that
-#' do not start with a letter, and names over the format's length limit (64
-#' bytes for SPSS, 32 characters for Stata). Matrix row columns such as
+#' @section How names and labels are adapted for each format:
+#' SPSS and Stata use column names that start with a letter and stay within
+#' their format limits of 64 bytes for SPSS and 32 characters for Stata.
+#' Matrix row columns such as
 #' `session__Reading materials` are renamed to valid names, with illegal
-#' characters turned into `_`, a leading `v` where the first character is not
+#' characters turned into `_`, a leading `v` where the first character is other than
 #' a letter, and a number added where 2 names would otherwise match. Variable
 #' labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 #' labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
@@ -518,7 +518,7 @@ print.sframe_branding <- function(x, ...) {
 #' @return The path, invisibly. When any name or label was changed, the path
 #'   carries an attribute `"renamed"`, a data frame with the columns `kind`
 #'   (`"name"`, `"variable label"` or `"value label"`), `column`, `old` and
-#'   `new`. With no changes there is no message and no attribute.
+#'   `new`. An unchanged file returns silently with an empty attribute.
 #' @export
 #' @seealso [sframe_demo()], [read_responses()]
 #' @examples

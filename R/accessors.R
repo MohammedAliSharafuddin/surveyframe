@@ -90,13 +90,13 @@ print.sf_component_list <- function(x, ...) {
 #' | `sframe_get_items()` | `sf_component_list` of items | data frame of items |
 #' | `sframe_get_scales()` | `sf_component_list` of scales | data frame of scales |
 #' | `sframe_get_choice_sets()` | `sf_component_list` of choice sets | data frame of choice sets |
-#' | `sframe_get_branches()` | `sf_component_list` of branching rules | not available |
-#' | `sframe_get_attention_checks()` | `sf_component_list` of checks | not available |
+#' | `sframe_get_branches()` | `sf_component_list` of branching rules | use the instrument |
+#' | `sframe_get_attention_checks()` | `sf_component_list` of checks | use the instrument |
 #' | `sframe_get_models()` | `sf_component_list` of models | data frame of models |
 #' | `sframe_plan()` | list of plan blocks | data frame of plan blocks |
 #'
 #' `as.data.frame()` on an instrument gives its items as a table, which is one
-#' part of it, and a component list has no coercion of its own. For every
+#' part of it. A component list remains a list. For every
 #' table an instrument can produce, use [sframe_codebook()].
 #'
 #'
@@ -286,7 +286,7 @@ sframe_plan.sframe <- function(x, ...) x$analysis_plan %||% list()
 #' Set the pre-declared analysis plan
 #'
 #' The replacement counterpart to [sframe_plan()]. Declaring the plan is the step
-#' the whole workflow turns on, so it has a named function rather than
+#' the whole workflow turns on, so a named function provides
 #' assignment into the object's internals.
 #'
 #' @param x An `sframe` object.
@@ -535,7 +535,7 @@ sframe_object.sframe_validation <- function(x, ...) x$object
 #'
 #' Recovers the `sframe` instrument from a validation diagnostic. This is the
 #' migration path for code that used the `strict = TRUE` return of
-#' [validate_sframe()] as an instrument, which it no longer is.
+#' [validate_sframe()] as an instrument after its class has changed.
 #'
 #' @param x An [sframe_validation] object or an `sframe`.
 #' @param ... Passed to methods.
@@ -587,13 +587,13 @@ as_sframe.sframe_validation <- function(x, ...) {
 #' character vector named by block. Given one of the standalone reports that
 #' carry a sentence of their own, an assumption report, a descriptives report,
 #' a missing-data report or a validity report, it returns that single
-#' sentence. A result with no sentence gives an empty string, so the shape of
+#' sentence. A result lacking a sentence gives an empty string, so the shape of
 #' the answer follows the number of blocks asked about.
 #'
 #' The sentence is plain text. APA 7 asks for italic Latin statistical symbols,
-#' so a manuscript needs `t`, `F`, `p`, `r`, `d` and the rest italicised after
-#' pasting: a character vector cannot carry that styling. Numbers are already
-#' APA-formatted, including no leading zero on `p` and a labelled confidence
+#' so italicise `t`, `F`, `p`, `r`, `d` and the remaining Latin statistical
+#' symbols after pasting into a manuscript. Numbers are already
+#' APA-formatted, including the APA 7 form `.032` for `p` and a labelled confidence
 #' interval.
 #'
 #' `sframe_flagged()` returns row positions in the response data, as one sorted
@@ -683,7 +683,7 @@ sframe_apa.sframe_assumption_report <- sframe_report_apa
 #' Columns the instrument declares that the responses left out
 #'
 #' A partial export gives a quality report every column it holds, and none of
-#' the ones it dropped. This names the declared columns that never arrived, so
+#' the ones it dropped. This names the declared columns absent from the responses, so
 #' a missingness figure can be read against what was expected. They count as
 #' missing for every respondent in [sframe_quality_results()]'s rates.
 #'

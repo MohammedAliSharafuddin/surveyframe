@@ -98,8 +98,8 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE, count = NULL) {
 #'
 #' The cells of a table from [run_analysis_plan()] as both report engines and
 #' [sframe_format_result()] print them, so a table shows the same numbers wherever it
-#' appears. A p value column shows 3 decimals with no leading zero, or
-#' `<.001`. A column that cannot exceed 1, such as `r`, `tau` or `alpha`, drops
+#' appears. A p value column shows 3 decimals with the APA 7 form `.032`, or
+#' `<.001`. A column bounded by 1, such as `r`, `tau` or `alpha`, uses
 #' its leading zero. Other numbers show 2 decimals, and whole numbers in an
 #' integer column, a column of counts (n, df, Frequency) or a percent column
 #' none. A p value

@@ -129,8 +129,8 @@ such as \code{\link[=sframe_plan]{sframe_plan()}}, the \verb{_results} functions
 the \code{sframe_syntax_} generators, the plots and the demo library.
 }
 
-No 2 names sit 1 letter apart: a lister is \code{sframe_get_items()}, never
-\code{sframe_items()}. The names used before 0.4.3 still work, silently. See
+Lister names use the \code{sframe_get_} prefix, such as \code{sframe_get_items()}.
+The names used before 0.4.3 still work, silently. See
 \link{superseded}.
 }
 

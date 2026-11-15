@@ -15,6 +15,10 @@ sframe_warn_missing(message, item_id = NULL, rate = NULL, ...)
 
 \item{...}{Additional named fields passed to \code{rlang::warn()}.}
 }
+\value{
+\code{NULL}, invisibly, after signalling a warning of class
+\code{sframe_missing_data_warning}.
+}
 \description{
 Warn about missing data
 }

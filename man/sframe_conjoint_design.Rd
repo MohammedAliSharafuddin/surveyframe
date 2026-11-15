@@ -38,7 +38,7 @@ the profile set supports.}
 
 \item{blocks}{Number of blocks the tasks are split across, default 1.}
 
-\item{seed}{Integer seed. Generated and stored when not supplied.}
+\item{seed}{Integer seed. Generated and stored when omitted.}
 
 \item{profiles}{Optional data frame of pre-built profiles, one column per
 attribute. Supplying this bypasses generation and declares the design as
@@ -53,13 +53,13 @@ choice model), \verb{$balance}, and the declaration that produced them.
 }
 \description{
 Generates and stores a conjoint profile set and task schedule as part of
-the instrument's pre-declared contract. This is a design generator, not an
-estimator: it fixes what respondents will be shown, and it does not fit or
-analyse choice models.
+the instrument's pre-declared contract. It fixes what respondents will be
+shown. Fit and analyse the resulting choice responses with a choice-model
+estimator.
 }
 \details{
 The design is reproducible by construction. \code{seed} is always recorded, and
-generated when not supplied, so regenerating from the stored declaration
+generated when omitted, so regenerating from the stored declaration
 returns the identical profiles and tasks.
 }
 \section{Choosing a method}{
@@ -70,10 +70,9 @@ random subset of that size. \code{"balanced"} samples repeatedly and keeps the
 subset with the most even level spread and the weakest association between
 attributes.
 
-\code{"balanced"} is a search, not a construction. It does not produce a
-catalogued orthogonal fractional factorial and does not claim the
-guarantees of one. The achieved balance is reported in \verb{$balance} so the
-design can be inspected rather than trusted. A study needing a specific
+\code{"balanced"} uses a search. A catalogued orthogonal fractional factorial
+provides different guarantees. The achieved balance is reported in
+\verb{$balance} for inspection. A study needing a specific
 D-optimal or orthogonal design should generate it elsewhere and pass it in
 through \code{profiles}, which keeps the declaration in the contract either way.
 }

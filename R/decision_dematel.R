@@ -55,8 +55,8 @@ sframe_check_dematel_input <- function(x) {
 #' Normalises the direct-influence matrix `X` by the larger of its greatest
 #' row sum and its greatest column sum (the standard DEMATEL normalisation,
 #' which keeps the Neumann series `N + N^2 + N^3 + ...` convergent), then
-#' solves the total-relation matrix `T = N(I - N)^-1` in closed form rather
-#' than by truncating the series. `D` is each criterion's row sum of `T`
+#' solves the total-relation matrix `T = N(I - N)^-1` in closed form. This
+#' avoids truncating the series. `D` is each criterion's row sum of `T`
 #' (how much it influences the others, direct and indirect combined) and `R`
 #' its column sum (how much it is influenced). Prominence `D + R` is overall
 #' involvement in the system, while relation `D - R` is net direction,
@@ -68,7 +68,8 @@ sframe_check_dematel_input <- function(x) {
 #' The series converges only when the spectral radius of `N` is below 1.
 #' Normalisation keeps the radius at or below 1, and it equals 1 when criteria
 #' influence each other in a closed group with equal totals. That case returns
-#' an `error` explaining it, and no truncated series is substituted.
+#' an `error` explaining it. The function returns that error in place of a
+#' truncated series.
 #'
 #' @param x A square numeric matrix of direct influence, zero diagonal.
 #' @return A list with `normalised` (N), `total_relation` (T), `D`, `R`,
@@ -76,6 +77,12 @@ sframe_check_dematel_input <- function(x) {
 #'   `role` (a character vector, `"cause"` where relation > 0, else
 #'   `"effect"`).
 #' @family Decision analysis functions
+#' @examples
+#' influence <- matrix(c(0, 2, 1, 0), nrow = 2, byrow = TRUE,
+#'                     dimnames = list(c("cost", "quality"),
+#'                                     c("cost", "quality")))
+#' result <- sframe_dematel_compute(influence)
+#' result[c("prominence", "relation", "role")]
 sframe_dematel_compute <- function(x) {
   n <- nrow(x)
   max_sum <- max(max(rowSums(x)), max(colSums(x)))
@@ -125,7 +132,7 @@ sframe_dematel_compute <- function(x) {
 # Resolves the square directed influence matrix DEMATEL needs, following the
 # same two-source order as the rest of the decision family (researcher-
 # supplied options first, a collected role second, a typed error naming what
-# is missing third), but over a `pairwise` role rather than
+# is missing third), but over a `pairwise` role in place of
 # `performance_items`/`weights_item`, since DEMATEL has neither alternatives
 # nor weights.
 sframe_resolve_dematel_matrix <- function(data, roles, options, instrument) {
@@ -285,14 +292,14 @@ sframe_run_dematel <- function(data, roles, options, instrument) {
 #' on x and relation (D - R) on y, with a horizontal quadrant line at
 #' relation = 0 separating causes (above) from effects (below). This is
 #' deliberately a different shape from [sframe_plot_decision_ranking()]:
-#' DEMATEL classifies criteria on 2 axes rather than producing a single
+#' DEMATEL classifies criteria on 2 axes. It produces a causal map in place of a single
 #' ranked score, so a ranking bar chart would misrepresent it.
 #'
 #' @param result A `dematel`-family result list from [run_analysis_plan()] or
 #'   `sframe_run_dematel()`, carrying `prominence`, `relation`, and
 #'   `criteria`.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return A ggplot2 object, or `NULL` when the result carries no DEMATEL
+#' @return A ggplot2 object, or `NULL` when the result lacks a DEMATEL
 #'   fields to plot.
 #' @export
 #' @seealso [sframe_plot_decision_ranking()]

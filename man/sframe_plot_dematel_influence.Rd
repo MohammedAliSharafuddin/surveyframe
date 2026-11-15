@@ -14,7 +14,7 @@ sframe_plot_dematel_influence(result, palette = c("web", "print"))
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
 \value{
-A ggplot2 object, or \code{NULL} when the result carries no DEMATEL
+A ggplot2 object, or \code{NULL} when the result lacks a DEMATEL
 fields to plot.
 }
 \description{
@@ -22,7 +22,7 @@ The dedicated DEMATEL chart: 1 point per criterion, prominence (D + R)
 on x and relation (D - R) on y, with a horizontal quadrant line at
 relation = 0 separating causes (above) from effects (below). This is
 deliberately a different shape from \code{\link[=sframe_plot_decision_ranking]{sframe_plot_decision_ranking()}}:
-DEMATEL classifies criteria on 2 axes rather than producing a single
+DEMATEL classifies criteria on 2 axes. It produces a causal map in place of a single
 ranked score, so a ranking bar chart would misrepresent it.
 }
 \examples{

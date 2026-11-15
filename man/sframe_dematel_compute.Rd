@@ -19,8 +19,8 @@ A list with \code{normalised} (N), \code{total_relation} (T), \code{D}, \code{R}
 Normalises the direct-influence matrix \code{X} by the larger of its greatest
 row sum and its greatest column sum (the standard DEMATEL normalisation,
 which keeps the Neumann series \code{N + N^2 + N^3 + ...} convergent), then
-solves the total-relation matrix \code{T = N(I - N)^-1} in closed form rather
-than by truncating the series. \code{D} is each criterion's row sum of \code{T}
+solves the total-relation matrix \code{T = N(I - N)^-1} in closed form. This
+avoids truncating the series. \code{D} is each criterion's row sum of \code{T}
 (how much it influences the others, direct and indirect combined) and \code{R}
 its column sum (how much it is influenced). Prominence \code{D + R} is overall
 involvement in the system, while relation \code{D - R} is net direction,
@@ -33,7 +33,15 @@ diagram.
 The series converges only when the spectral radius of \code{N} is below 1.
 Normalisation keeps the radius at or below 1, and it equals 1 when criteria
 influence each other in a closed group with equal totals. That case returns
-an \code{error} explaining it, and no truncated series is substituted.
+an \code{error} explaining it. The function returns that error in place of a
+truncated series.
+}
+\examples{
+influence <- matrix(c(0, 2, 1, 0), nrow = 2, byrow = TRUE,
+                    dimnames = list(c("cost", "quality"),
+                                    c("cost", "quality")))
+result <- sframe_dematel_compute(influence)
+result[c("prominence", "relation", "role")]
 }
 \seealso{
 Other Decision analysis functions:
