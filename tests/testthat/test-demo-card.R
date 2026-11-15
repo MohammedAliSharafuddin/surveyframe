@@ -16,6 +16,8 @@ test_that("the commands the card names parse and call exported functions", {
   out <- capture.output(print(sframe_demo("two_group")))
   cmds <- sub("\\s{3,}.*$", "", trimws(out[grepl("^  ", out)]))
   expect_length(cmds, 6)
+  expect_true(any(grepl('Take the tour: demo("tour", package = "surveyframe")',
+                        out, fixed = TRUE)))
   for (cmd in cmds) {
     expr <- parse(text = cmd)[[1]]
     if (is.call(expr) && is.name(expr[[1]]) && !identical(expr[[1]], as.name("$"))) {
