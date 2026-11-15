@@ -27,7 +27,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 In the pre-analysis plan:
 
-> **RQ2.** And which pairs of words?
+> **RQ2.** Which pairs of words appear most often?
 
 In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 
@@ -99,7 +99,7 @@ In the report: the APA 7 sentence and a table, with a chart where the method has
 
 In the pre-analysis plan:
 
-> **RQ10.** The same question with a structural topic model.
+> **RQ10.** What topics appear according to a structural topic model?
 
 In the report: the APA 7 sentence and a table, with a chart where the method has one, each titled with the research question.
 

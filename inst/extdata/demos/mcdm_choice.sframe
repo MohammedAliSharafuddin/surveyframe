@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "9afe289123c27eab5734788cec817fe31065e170113cec09d18b5ab355ae93dd",
+    "value": "4224221a18b60bea18c6e8984d39de1b485d2139af34e4d7ab165fb08ce02181",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -70,7 +70,7 @@
     },
     {
       "id": "RQ2",
-      "research_question": "The same weights with network dependence allowed.",
+      "research_question": "What weight does each criterion carry when network dependence is allowed?",
       "family": "decision",
       "method": "anp",
       "roles": {
@@ -178,7 +178,7 @@
     },
     {
       "id": "RQ5",
-      "research_question": "And by compromise ranking?",
+      "research_question": "Which venue ranks highest by compromise ranking?",
       "family": "decision",
       "method": "vikor",
       "roles": {
@@ -248,7 +248,7 @@
     },
     {
       "id": "RQ6",
-      "research_question": "And by ratio analysis?",
+      "research_question": "Which venue ranks highest by ratio analysis?",
       "family": "decision",
       "method": "moora",
       "roles": {
@@ -318,7 +318,7 @@
     },
     {
       "id": "RQ7",
-      "research_question": "And by simple multi-attribute rating?",
+      "research_question": "Which venue ranks highest by simple multi-attribute rating?",
       "family": "decision",
       "method": "smart",
       "roles": {
@@ -388,7 +388,7 @@
     },
     {
       "id": "RQ8",
-      "research_question": "And by weighted aggregated sum product?",
+      "research_question": "Which venue ranks highest by weighted aggregated sum product?",
       "family": "decision",
       "method": "waspas",
       "roles": {
@@ -458,7 +458,7 @@
     },
     {
       "id": "RQ9",
-      "research_question": "And by outranking flows?",
+      "research_question": "Which venue ranks highest by outranking flows?",
       "family": "decision",
       "method": "promethee",
       "roles": {
@@ -528,7 +528,7 @@
     },
     {
       "id": "RQ10",
-      "research_question": "And by outranking with thresholds?",
+      "research_question": "Which venue ranks highest by outranking with thresholds?",
       "family": "decision",
       "method": "electre",
       "roles": {
@@ -611,7 +611,7 @@
     }
   },
   "study": {
-    "problem": "The organising committee must choose a venue on several criteria at once, and needs a defensible ranking rather than a vote.",
+    "problem": "The organising committee must choose a venue on 4 criteria at once and needs a defensible ranking in place of a vote.",
     "objectives": [
       {
         "id": "O1",

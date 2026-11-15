@@ -28,7 +28,7 @@ sframe_term_context(d$responses$what_worked, "session")
 | Research question | Method | What the report gives |
 |---|---|---|
 | Which words come up most often? | Word frequencies | The APA 7 sentence and a table, with a chart where the method has one |
-| And which pairs of words? | Phrase frequencies | The APA 7 sentence and a table, with a chart where the method has one |
+| Which pairs of words appear most often? | Phrase frequencies | The APA 7 sentence and a table, with a chart where the method has one |
 | How is a key word actually used? | Words in context | The APA 7 sentence and a table, with a chart where the method has one |
 | Which words appear together? | Word co-occurrence | The APA 7 sentence and a table, with a chart where the method has one |
 | Do in-person and online attendees say different things? | Word frequencies | The APA 7 sentence and a table, with a chart where the method has one |
@@ -36,7 +36,7 @@ sframe_term_context(d$responses$what_worked, "session")
 | Is the tone positive or negative? | Sentiment analysis | The APA 7 sentence and a table, with a chart where the method has one |
 | What does a document-feature matrix show? | Document-feature matrix | The APA 7 sentence and a table, with a chart where the method has one |
 | What topics are people writing about? | Topic model (LDA) | The APA 7 sentence and a table, with a chart where the method has one |
-| The same question with a structural topic model. | Structural topic model | The APA 7 sentence and a table, with a chart where the method has one |
+| What topics appear according to a structural topic model? | Structural topic model | The APA 7 sentence and a table, with a chart where the method has one |
 
 Run the example in SurveyStudio or R to see the results, each marked as demonstration data.
 

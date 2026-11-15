@@ -2056,6 +2056,9 @@ arithmetic.
 
 ## Demos
 
+* **Demo research questions now stand alone.** Each question names its method,
+  outcome or comparison where the earlier wording depended on the question above it.
+
 * **The `factor_structure` demo is an employee engagement study
   throughout**, "Employee engagement at work", with the scales "How my work
   is organised" and "The content of my work", where its title and scale

@@ -248,7 +248,7 @@ demo_stories <- list(
   mcdm_choice = list(
     description = "A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods.",
     study = list(
-      problem = "The organising committee must choose a venue on several criteria at once, and needs a defensible ranking rather than a vote.",
+      problem = "The organising committee must choose a venue on 4 criteria at once and needs a defensible ranking in place of a vote.",
       objectives = obj(O1 = "Weight the decision criteria.",
                        O2 = "Rank the venues, and check whether the methods agree."),
       sampling = list(population = "Members of the organising committee", method = "purposive", planned_n = 10L)),

@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "6790bf18453af62d4a1b724e1d2400472d6472107ccd3fed1c520f088e65ad9f",
+    "value": "89ee1adcc8d494049485dd766bbc1049e160d60dec9f295c74fa50158e5e7ce4",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -92,7 +92,7 @@
     },
     {
       "id": "RQ2",
-      "research_question": "The same question without assuming normality.",
+      "research_question": "Do the 3 attendee roles differ in sessions attended according to a Kruskal-Wallis test?",
       "family": "group_comparison",
       "method": "kruskal_wallis",
       "roles": {
