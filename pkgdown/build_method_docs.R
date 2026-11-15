@@ -11,7 +11,7 @@
 # Run from the repository root, after build_docs.R:  Rscript pkgdown/build_method_docs.R
 
 pkg_root <- normalizePath(".")
-devtools::load_all(pkg_root, quiet = TRUE)
+pkgload::load_all(pkg_root, quiet = TRUE)
 stopifnot(requireNamespace("chromote", quietly = TRUE))
 
 families <- list(

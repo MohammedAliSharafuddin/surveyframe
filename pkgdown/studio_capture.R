@@ -34,7 +34,7 @@ studio_wait <- function(b, cond, secs = 240, frame = FALSE) {
 studio_open <- function(pkg_root, demo, height = STUDIO_H) {
   port <- httpuv::randomPort()
   proc <- callr::r_bg(function(root, demo, port) {
-    devtools::load_all(root, quiet = TRUE)
+    pkgload::load_all(root, quiet = TRUE)
     launch_studio(demo = demo, screen = "design", port = port, launch.browser = FALSE)
   }, args = list(root = pkg_root, demo = demo, port = port))
   b <- chromote::ChromoteSession$new(width = STUDIO_W, height = height)

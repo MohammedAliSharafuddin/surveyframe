@@ -15,7 +15,7 @@
 #
 # Run from the repository root:  Rscript pkgdown/build_study_pages.R
 
-devtools::load_all(quiet = TRUE)
+pkgload::load_all(quiet = TRUE)
 
 studies <- list(
   list(slug = "likert-scale-questionnaire", demo = "likert_scale", audience = "psychology",
