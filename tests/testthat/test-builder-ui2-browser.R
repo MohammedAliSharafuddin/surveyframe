@@ -244,12 +244,31 @@ test_that("the centre has a desktop and a mobile width, and closes with the edit
 
 # -- Welcome and thank-you pages ----------------------------------------------
 
+welcome_list_state <- function(s, timeout = 20) {
+  code <- paste0(
+    "(function(){var x=document.querySelectorAll('#itemList .ic');",
+    "return JSON.stringify({exists:x.length>0,first:x.length?x[0].getAttribute('data-id'):null,",
+    "last:x.length?x[x.length-1].getAttribute('data-id'):null,count:x.length});})()")
+  last <- ""
+  state <- NULL
+  for (i in seq_len(timeout * 2)) {
+    raw <- js(s, code)
+    state <- jsonlite::fromJSON(raw)
+    if (isTRUE(state$exists) && identical(raw, last)) return(state)
+    last <- if (isTRUE(state$exists)) raw else ""
+    Sys.sleep(0.5)
+  }
+  state
+}
+
 test_that("the welcome page is the first list entry, edited on the right and shown in the centre", {
   ins <- centre_instrument()
   ins$render$welcome <- list(intro_text = "This study asks about your trip.")
   s <- ui2_builder(ins)
-  expect_identical(js(s, "document.querySelector('#itemList .ic').getAttribute('data-id')"), "__welcome")
-  expect_identical(js(s, "Array.prototype.slice.call(document.querySelectorAll('#itemList .ic')).pop().getAttribute('data-id')"), "__thankyou")
+  pages <- welcome_list_state(s)
+  expect_true(pages$exists)
+  expect_identical(pages$first, "__welcome")
+  expect_identical(pages$last, "__thankyou")
   js(s, "document.querySelector('#itemList .ic').click();1")
   expect_identical(js(s, "document.getElementById('inspTypeLbl').textContent"), "Welcome page")
   expect_true(js(s, "document.querySelector('.insp-foot').hidden"))
