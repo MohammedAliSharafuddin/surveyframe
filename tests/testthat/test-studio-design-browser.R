@@ -123,6 +123,9 @@ test_that("the Design screen opens the instrument and a save becomes the open in
   expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
   js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait(paste0(status, ".indexOf('Renamed in Design') >= 0")))
+  expect_true(wait("studioDesignText && JSON.parse(studioDesignText).meta.title === 'Renamed in Design'"))
+  open_after_save <- read_sframe(text = js("studioDesignText"))
+  expect_identical(open_after_save$meta$title, "Renamed in Design")
   expect_true(wait(paste0(frame, ".document.getElementById('saveSt').textContent.indexOf('Saved') >= 0")))
 })
 
