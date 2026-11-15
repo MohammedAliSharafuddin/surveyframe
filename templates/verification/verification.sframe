@@ -1,0 +1,184 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "3db2149ca3c347d2f503c525ee9704fcb302fcf5887585e6cd211c9a0b8c9a12",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Event feedback",
+    "version": "1.0.0",
+    "description": "A short feedback survey for a one-day professional event, run to describe who attended and to check the quality of the answers before the programme is planned again.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:39Z"
+  },
+  "items": [
+    {
+      "id": "attendee_type",
+      "label": "Have you attended this event before?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "attendee",
+      "reverse": false
+    },
+    {
+      "id": "age",
+      "label": "How old are you?",
+      "type": "numeric",
+      "required": false,
+      "reverse": false
+    },
+    {
+      "id": "attended_on",
+      "label": "Which day did you attend?",
+      "type": "date",
+      "required": false,
+      "reverse": false,
+      "date_min": "2026-06-01",
+      "date_max": "2026-06-03"
+    },
+    {
+      "id": "optional_intro",
+      "label": "A few optional questions",
+      "type": "section_break",
+      "required": false,
+      "reverse": false,
+      "section_intro": "These help us plan next year. Skip any you prefer to."
+    },
+    {
+      "id": "why_ask",
+      "label": "We ask so we can improve the programme.",
+      "type": "text_block",
+      "required": false,
+      "reverse": false
+    },
+    {
+      "id": "suggestion",
+      "label": "What should we do differently next year?",
+      "type": "text",
+      "required": false,
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "attendee",
+      "values": ["first_time", "returning"],
+      "labels": ["This is my first time", "I have attended before"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "Who came to the event?",
+      "family": "descriptive",
+      "method": "frequency",
+      "roles": {
+        "variables": "attendee_type"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "frequency",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "How old are attendees?",
+      "family": "descriptive",
+      "method": "descriptives",
+      "roles": {
+        "variables": "age"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "descriptives",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "How complete is the data?",
+      "family": "data_quality",
+      "method": "missing_data",
+      "roles": {
+        "variables": [
+          "age",
+          "suggestion"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "Treat a question with more than 10% missing answers as a problem to report.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "missing_data",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ4",
+      "research_question": "Are there inattentive responses?",
+      "family": "data_quality",
+      "method": "quality",
+      "roles": [],
+      "objective": "O2",
+      "decision_rule": "Flag a response as inattentive when it fails the quality checks, and report the count.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "quality",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Event feedback",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "The organisers plan next year's programme without knowing who attends or whether feedback forms are completed with care.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe who attended and how old they are."
+      },
+      {
+        "id": "O2",
+        "text": "Check how complete and attentive the responses are."
+      }
+    ],
+    "sampling": {
+      "population": "Registered attendees of the 2025 event",
+      "method": "census",
+      "planned_n": 50
+    }
+  }
+}

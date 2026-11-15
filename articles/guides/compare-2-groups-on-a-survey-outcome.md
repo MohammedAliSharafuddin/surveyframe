@@ -1,0 +1,42 @@
+# How to compare 2 groups on a survey outcome
+
+Compare a numeric outcome between 2 independent groups of respondents.
+
+The example in this guide is *In person or online?* A comparison of
+engagement between people who attended an event in person and those who
+attended online, measured by the number of sessions each attended.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `two_group`.
+2.  On **Design**, choose **Plan** and open RQ1. The outcome is the
+    number of sessions and the group is the attendance format.
+3.  Compare RQ1 with RQ2: the t-test compares means, and the
+    Mann-Whitney test compares ranks for an outcome far from normal.
+4.  On **Analyse**, run both and check the assumption notes before
+    choosing which to report.
+
+## In R
+
+``` r
+
+d <- sframe_demo("two_group")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Do in-person and online attendees reach a different number of sessions? | Independent samples t-test | The APA 7 sentence and a table, with a chart where the method has one |
+| Do in-person and online attendees differ in sessions attended, without assuming normality? | Mann-Whitney U test | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

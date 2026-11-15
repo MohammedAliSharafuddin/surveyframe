@@ -79,16 +79,16 @@ alternative at the same rank, which no perturbation can move.
 
 ## See also
 
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md)
 
 Other Decision analysis functions:
-[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
-[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
-[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md)
+[`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md),
+[`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md)
 
 ## Examples
 
@@ -104,13 +104,5 @@ sa <- sframe_sensitivity_analysis(
   criteria       = c("service", "location", "price")
 )
 sa$stable
-#> [1] TRUE
 as.data.frame(sa)
-#>   criterion direction weight rho rank_changed top_changed
-#> 1   service        up 0.4118   1        FALSE       FALSE
-#> 2   service      down 0.3878   1        FALSE       FALSE
-#> 3  location        up 0.3103   1        FALSE       FALSE
-#> 4  location      down 0.2893   1        FALSE       FALSE
-#> 5     price        up 0.3103   1        FALSE       FALSE
-#> 6     price      down 0.2893   1        FALSE       FALSE
 ```

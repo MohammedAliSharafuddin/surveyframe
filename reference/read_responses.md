@@ -28,7 +28,7 @@ read_responses(
 - instrument:
 
   An `sframe` object created by
-  [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md).
+  [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md).
 
 - respondent_id:
 
@@ -76,11 +76,11 @@ select the columns you need before reading.
 
 ## Columns
 
-A single-answer item has one column named by its ID. A matrix, ranking,
-multiple-choice or decision item has one column per row, option, pair or
+A single-answer item has 1 column named by its ID. A matrix, ranking,
+multiple-choice or decision item has 1 column per row, option, pair or
 criterion, named `item__sub`, and each is checked: a battery with some
-of its columns absent is reported by name. Two columns with the same
-name are refused, since one would otherwise be lost.
+of its columns absent is reported by name. 2 columns with the same name
+are refused, since one would otherwise be lost.
 
 A choice set with `allow_other` ("Other, please specify") adds
 `<id>__other_text` to a single choice item, whose own column then holds
@@ -115,15 +115,15 @@ file and a data frame holding the same responses read the same.
 
 ## See also
 
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 
 Other Responses functions:
-[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
-[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
 
 ## Examples
 
@@ -140,11 +140,4 @@ responses <- read_responses(
   meta_cols = "started_at"
 )
 head(responses[, c("respondent_id", "visit_type", "dm_1")])
-#>   respondent_id visit_type dm_1
-#> 1          R001 first_time    2
-#> 2          R002 first_time    3
-#> 3          R003 first_time    4
-#> 4          R004     repeat    5
-#> 5          R005 first_time    3
-#> 6          R006     repeat    5
 ```

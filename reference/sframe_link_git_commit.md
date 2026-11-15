@@ -45,19 +45,19 @@ instrument or when, beyond what the commit itself records.
 
 Git is entirely optional. When `repo_path` is not inside a Git
 repository, or the `git` executable is not on the `PATH`, this returns a
-clear, non-error result with `linked = FALSE` rather than aborting – the
+clear, non-error result with `linked = FALSE` rather than aborting. The
 rest of surveyframe never requires Git.
 
 ## See also
 
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 Other Amendments functions:
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-[`sframe_drop_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_drop_items.md),
-[`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md),
-[`sframe_item_flags()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_flags.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+[`sframe_drop_items()`](https://surveyframe.org/reference/sframe_drop_items.md),
+[`sframe_get_amendments()`](https://surveyframe.org/reference/sframe_get_amendments.md),
+[`sframe_item_flags()`](https://surveyframe.org/reference/sframe_item_flags.md)
 
 ## Examples
 
@@ -65,10 +65,4 @@ Other Amendments functions:
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 instr <- sframe_instrument("Demo", components = list(item))
 sframe_link_git_commit(instr, repo_path = tempdir())
-#> $linked
-#> [1] FALSE
-#> 
-#> $reason
-#> [1] "not a git repository"
-#> 
 ```

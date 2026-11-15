@@ -1,7 +1,7 @@
 # Shiny module UI for an embedded survey
 
 Places a survey inside a larger Shiny application. Pair with
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md)
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md)
 in the server function. The module shows a welcome screen, the
 instrument's pages with branching and required-item checks, and a
 thank-you screen.
@@ -17,7 +17,7 @@ sframe_survey_ui(id, width = "100%")
 - id:
 
   A character string. The module namespace ID, passed identically to
-  [`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md).
+  [`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md).
 
 - width:
 
@@ -30,22 +30,22 @@ A `shiny.tag` object.
 ## Details
 
 Every item type is drawn with the same controls
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md)
-uses, so a response collected through the module has the same columns as
-one collected there.
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md)
+[`run_survey()`](https://surveyframe.org/reference/run_survey.md) uses,
+so a response collected through the module has the same columns as one
+collected there.
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md)
 describes what is returned.
 
 ## See also
 
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md),
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md),
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md),
+[`run_survey()`](https://surveyframe.org/reference/run_survey.md),
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md)
 
 Other Collect functions:
-[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md),
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md),
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md)
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md),
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md),
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md)
 
 ## Examples
 

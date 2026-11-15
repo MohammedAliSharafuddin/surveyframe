@@ -42,15 +42,15 @@ A list with `matrix` (alternatives x criteria, with dimnames), `n`,
 
 ## See also
 
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md)
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md)
 
 Other Decision analysis functions:
-[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
-[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
-[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+[`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md),
+[`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
 
 ## Examples
 
@@ -64,7 +64,4 @@ study <- sframe_instrument("Supplier selection", components = list(q5, price))
 responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 rm <- sframe_rated_matrix(responses, study, "rate_price")
 rm$matrix
-#>          rate_price
-#> Alpha           3.5
-#> Basilica        5.0
 ```

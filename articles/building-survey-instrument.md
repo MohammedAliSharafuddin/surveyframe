@@ -133,10 +133,10 @@ analysis_plan <- list(
 
 ## Assemble the instrument
 
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md)
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md)
 takes the questions through `components` and the research design through
 `analysis_plan` and `models`. The model is added with
-[`sframe_add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_model.md),
+[`sframe_add_model()`](https://surveyframe.org/reference/sframe_add_model.md),
 which checks each indicator against the instrument items.
 
 ``` r
@@ -171,7 +171,7 @@ instr <- sframe_add_model(instr, ts_model)
 
 ## Validate the instrument
 
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
 returns a diagnostic. Print it to read the result, and use the accessors
 to get at the parts.
 
@@ -195,8 +195,8 @@ sframe_problems(validation)
 
 In production, strict validation stops with a structured error when
 anything is wrong. When it passes,
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md)
-recovers the instrument with its validated stamp set.
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md) recovers
+the instrument with its validated stamp set.
 
 ``` r
 
@@ -209,7 +209,7 @@ sframe_meta(instr)$validated
 
 An instrument rests on published work: the source of each scale, and the
 method behind each plan block.
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 records a work as CSL-JSON, the format Zotero, Mendeley and pandoc
 share, and `cited_by` says where the instrument cites it: `"instrument"`
 as a whole, or `"item:<id>"`, `"scale:<id>"`, `"plan:<block id>"` or
@@ -228,7 +228,7 @@ cronbach <- sframe_reference(
 
 A reference copied from Google Scholar, Zotero or a journal page arrives
 as BibTeX, and
-[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
+[`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md)
 reads it with base R alone.
 
 ``` r
@@ -247,22 +247,22 @@ names(sframe_get_references(instr, cited_by = "plan:M1"))
 #> [1] "cronbach_1951"
 ```
 
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
 checks that every key is unique and that each `cited_by` target exists.
 The references travel inside the `.sframe` file. Citing a source is
 disclosure, outside the design, so the content hash that
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 records leaves `references` out, and a source can be added to a
 published instrument directly.
 
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 cites each work in text, as author and year, and lists every work once,
 in a References section at the end. That list holds the instrument’s own
 references and the references of every method the plan ran, formatted by
 pandoc in APA 7th edition, which ships with the package, or in any
 Citation Style Language file given as `csl =`. A written interpretation
 can cite a work as `[@key]`, and `references =` adds works cited there.
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md)
 lists its references once at the end in the same way. In SurveyBuilder,
 the References tab of Survey settings takes pasted BibTeX or a typed
 reference, and SurveyStudio has a References screen that does the same.

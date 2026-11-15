@@ -56,10 +56,10 @@ extracted later can cite a respondent.
 ## See also
 
 Other Text analysis functions:
-[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md),
-[`sframe_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_ngram_frequency.md),
-[`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md),
-[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md),
+[`sframe_ngram_frequency()`](https://surveyframe.org/reference/sframe_ngram_frequency.md),
+[`sframe_term_context()`](https://surveyframe.org/reference/sframe_term_context.md),
+[`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
 
 ## Examples
 
@@ -67,12 +67,5 @@ Other Text analysis functions:
 demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(cleaned)
-#> [1] "useful service information"            
-#> [2] "useful service information"            
-#> [3] "would like more sustainability details"
-#> [4] "useful service information"            
-#> [5] "would like more sustainability details"
-#> [6] "clear online content"                  
 attr(cleaned, "respondent")[1:5]
-#> [1] 2 3 5 7 8
 ```

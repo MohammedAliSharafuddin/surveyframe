@@ -4,7 +4,7 @@ Generates a Google Apps Script file that, when run in a Google Sheet,
 creates a response collection endpoint for a survey instrument. The
 builder can store the deployed Apps Script URL in survey metadata, and
 the same sheet can be read back with
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md).
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md).
 
 ## Usage
 
@@ -69,20 +69,20 @@ and would let them alter or delete it. Before surveyframe 0.4.2 this
 help advised exactly that. If you followed it, review the sharing
 settings on any sheet you collected into.
 
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 reads through `googlesheets4`, which authenticates as you, so a private
 sheet is readable with no sharing change.
 
 ## See also
 
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 Other Collect functions:
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md),
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md),
-[`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md)
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md),
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md),
+[`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md)
 
 ## Examples
 
@@ -96,8 +96,5 @@ script <- export_google_sheet(
   sheet_url = "https://docs.google.com/spreadsheets/d/demo",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpEPGRzn/surveyframe_collector.gs
-#> Follow the setup instructions inside the file to deploy it.
-file.exists(script)
-#> [1] TRUE
+sframe_show(script)
 ```

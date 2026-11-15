@@ -6,9 +6,9 @@ source and a ready reason, such as "org_4: loading .21 in RQ3, below
 .40". A flag is a prompt to review the item, not a rule to drop it: its
 content, wording, reverse keying and the purpose of the model still
 decide. Drop an item with
-[`sframe_drop_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_drop_items.md)
+[`sframe_drop_items()`](https://surveyframe.org/reference/sframe_drop_items.md)
 and record it with
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md).
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md).
 
 ## Usage
 
@@ -48,32 +48,32 @@ factor, construct or construct pair), `item`, `statistic`, `value`,
 The results read, and the rule applied to each:
 
 - a reliability result
-  ([`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)):
+  ([`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)):
   alpha if the item is deleted above the scale's alpha. Alpha can rise
   when a scale narrows, so the reason asks for the item-total
   correlation and the wording to be checked too.
 
 - an item result
-  ([`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md)):
+  ([`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md)):
   corrected item-total correlation below .30 (Nunnally and Bernstein,
   1994).
 
 - an EFA readiness result
-  ([`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md)):
+  ([`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)):
   item sampling adequacy (MSA) below .50 (Kaiser, 1974).
 
 - an EFA solution
-  ([`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md)):
+  ([`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md)):
   primary loading below .40 (Hair et al., 2019), and, with 2 or more
   factors, the 2 largest loadings less than .20 apart (Howard, 2016), as
   2 separate reasons.
 
 - a CFA fitted with lavaan, as from the syntax
-  [`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md)
+  [`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md)
   writes: standardised loading below .50 (Hair et al., 2019).
 
 - a validity result
-  ([`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)):
+  ([`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)):
   AVE below .50 (Fornell and Larcker, 1981), and HTMT above `htmt`
   (Henseler et al., 2015).
 
@@ -83,7 +83,7 @@ The results read, and the rule applied to each:
   reliability before removing it.
 
 A result from
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 for one of these methods is read the same way, and its reasons name the
 block.
 
@@ -125,10 +125,10 @@ and personality research* (R package). Northwestern University.
 ## See also
 
 Other Amendments functions:
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-[`sframe_drop_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_drop_items.md),
-[`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md),
-[`sframe_link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_link_git_commit.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+[`sframe_drop_items()`](https://surveyframe.org/reference/sframe_drop_items.md),
+[`sframe_get_amendments()`](https://surveyframe.org/reference/sframe_get_amendments.md),
+[`sframe_link_git_commit()`](https://surveyframe.org/reference/sframe_link_git_commit.md)
 
 ## Examples
 
@@ -137,14 +137,4 @@ d <- sframe_demo("likert_scale")
 if (requireNamespace("psych", quietly = TRUE)) {
   sframe_item_flags(sframe_item_results(d$responses, d$instrument), all = TRUE)
 }
-#>     result_type block        group  item              statistic     value
-#> 1 item_analysis       organisation org_1 corrected_item_total_r 0.6992661
-#> 2 item_analysis       organisation org_2 corrected_item_total_r 0.6934233
-#> 3 item_analysis       organisation org_3 corrected_item_total_r 0.7429740
-#> 4 item_analysis       organisation org_4 corrected_item_total_r 0.6107987
-#>   cutoff direction flagged reason                        source
-#> 1    0.3     below   FALSE        Nunnally and Bernstein (1994)
-#> 2    0.3     below   FALSE        Nunnally and Bernstein (1994)
-#> 3    0.3     below   FALSE        Nunnally and Bernstein (1994)
-#> 4    0.3     below   FALSE        Nunnally and Bernstein (1994)
 ```

@@ -45,8 +45,18 @@ render_report(
 
 - data:
 
-  A `tibble` or `data.frame` of responses, or NULL to generate a
-  codebook-only report.
+  A `tibble` or `data.frame` of responses, or `NULL` for the
+  pre-analysis plan: a document to submit to OSF, Zenodo or an ethics
+  committee before collecting data. It holds a title page with the
+  instrument's hash and how to verify it, the study, the participant
+  information, the questionnaire in order with its branching in words,
+  the scales and their scoring, each research question with its
+  hypotheses, method in words, reference, variables, significance level
+  and decision rule, the models and amendments, the references, and a
+  section, "To complete before submission", that prompts for what a
+  preregistration asks and the instrument does not hold. Quarto writes
+  it in every format, and the built-in engine writes a plain HTML
+  version.
 
 - output_file:
 
@@ -79,7 +89,7 @@ render_report(
   results record and `manifest.json`, and no `_quarto.yml`. Open
   `report.qmd` in RStudio or Positron and render it. It recomputes every
   number from the folder's files and checks them, through
-  [`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md).
+  [`sframe_report_source()`](https://surveyframe.org/reference/sframe_report_source.md).
   Writing the folder needs no Quarto.
 
 - include_quality:
@@ -138,20 +148,20 @@ render_report(
 
   Logical. Whether each result carries a folded "Show R code" block with
   the statistical call that produced it, built by
-  [`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md)
+  [`sframe_syntax_result()`](https://surveyframe.org/reference/sframe_syntax_result.md)
   from the same resolved specification the analysis ran. Defaults to
   `TRUE`. A method
-  [`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md)
+  [`sframe_syntax_result()`](https://surveyframe.org/reference/sframe_syntax_result.md)
   does not cover shows no block, rather than a guess at the call.
 
 - references:
 
   Optional further
-  [`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+  [`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
   records, for example the works a host cites in the written
   interpretations, which are cited in text as `[@id]`. The instrument's
   own references
-  ([`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md))
+  ([`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md))
   and the methods' references are always included.
 
 - csl:
@@ -191,7 +201,7 @@ render_report(
 
   Character or `NULL`. A directory to write each analysis plan chart
   into as its own file, through
-  [`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md),
+  [`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md),
   at the size, resolution and format in `figures`, where `format` may
   also be `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300
   dpi at 7 by 4.5 inches where `figures` names none.
@@ -249,7 +259,7 @@ surveyframe and R versions and the time. A report edited later, as a
 Word copy is meant to be, no longer matches its recorded hash, while the
 results record still does. The Provenance section at the top of the
 report gives the instrument hash and whether
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
 verified it, the number of amendments, the responses sha256 and the
 results record's sha256. The responses are hashed as JSON by column, so
 the hash belongs to the values, not to a file.
@@ -265,18 +275,19 @@ Quarto is unavailable, lists the methods' references the same way.
 
 ## See also
 
-[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
 
 Other Report functions:
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
-[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
-[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
-[`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
-[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md),
-[`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`sframe_analysis_qmd()`](https://surveyframe.org/reference/sframe_analysis_qmd.md),
+[`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md),
+[`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md),
+[`sframe_report_source()`](https://surveyframe.org/reference/sframe_report_source.md),
+[`sframe_reports`](https://surveyframe.org/reference/sframe_reports.md),
+[`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md),
+[`sframe_show()`](https://surveyframe.org/reference/sframe_show.md)
 
 ## Examples
 
@@ -305,8 +316,6 @@ out <- tryCatch(
   ),
   finally = options(old)
 )
-#> Report rendered with the built-in HTML engine: /tmp/RtmpEPGRzn/file1fca3998ade9.html
-file.exists(out)
-#> [1] TRUE
+sframe_show(out)
 # }
 ```

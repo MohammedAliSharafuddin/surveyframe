@@ -112,15 +112,13 @@ warnings.
 ## See also
 
 Other Plan functions:
-[`sframe_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plan.md),
-[`sframe_plan<-()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_plan-set.md)
+[`sframe_plan()`](https://surveyframe.org/reference/sframe_plan.md),
+[`sframe_plan<-()`](https://surveyframe.org/reference/sframe_plan-set.md)
 
 ## Examples
 
 ``` r
 plan <- sframe_sample_size_plan("t_test", d = 0.5, power = 0.80)
 plan$estimated_n
-#> [1] 128
 plan$method
-#> [1] "power"
 ```

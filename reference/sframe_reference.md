@@ -3,10 +3,10 @@
 Builds one bibliographic reference as a CSL-JSON record, the format that
 Zotero, Mendeley and pandoc share. Attach references to an instrument
 with
-[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md)
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md)
 or through `sframe_instrument(components = )`, cite them in text as
 `[@id]`, and
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 lists every cited reference once, at the end of the report.
 
 ## Usage
@@ -115,15 +115,15 @@ An object of class `sf_reference`.
 
 ## See also
 
-[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
-[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
-[`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md)
+[`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md),
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md),
+[`sframe_get_references()`](https://surveyframe.org/reference/sframe_get_references.md)
 
 Other References functions:
-[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
-[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
-[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md),
-[`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md)
+[`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md),
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md),
+[`sframe_bibliography()`](https://surveyframe.org/reference/sframe_bibliography.md),
+[`sframe_get_references()`](https://surveyframe.org/reference/sframe_get_references.md)
 
 ## Examples
 
@@ -136,5 +136,4 @@ ref <- sframe_reference(
   pages = "297-334", cited_by = "scale:satisfaction"
 )
 ref$id
-#> [1] "cronbach_1951"
 ```

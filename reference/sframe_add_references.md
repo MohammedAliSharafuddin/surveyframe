@@ -1,7 +1,7 @@
 # Add references to an instrument
 
 Attaches
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 records to an instrument. A reference whose id is already present
 replaces the old one when `replace = TRUE`, and is refused otherwise,
 which keeps a second source from silently taking over a citation key.
@@ -22,7 +22,7 @@ sframe_add_references(instrument, ..., replace = FALSE)
 - ...:
 
   `sf_reference` objects, or lists of them such as
-  [`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md)
+  [`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md)
   returns.
 
 - replace:
@@ -37,16 +37,16 @@ The instrument, with the references added.
 
 Adding references changes the file hash, as any edit does, and leaves
 the content hash that
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 records unchanged: citing a source is disclosure, outside the design.
 
 ## See also
 
 Other References functions:
-[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
-[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md),
-[`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md),
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md),
+[`sframe_bibliography()`](https://surveyframe.org/reference/sframe_bibliography.md),
+[`sframe_get_references()`](https://surveyframe.org/reference/sframe_get_references.md),
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 
 ## Examples
 
@@ -61,5 +61,4 @@ instr <- sframe_add_references(instr, sframe_reference(
   volume = "22", issue = "140", pages = "1-55", cited_by = "item:q1"
 ))
 length(sframe_get_references(instr))
-#> [1] 1
 ```

@@ -1,6 +1,6 @@
 # Contributing to surveyframe
 
-## Three rules that form the package contract
+## 3 rules that form the package contract
 
 These apply to every exported function, without exception.
 
@@ -43,24 +43,24 @@ field-by-field format is documented independently of the R source in
 second tool can validate a `.sframe` file without installing this
 package). Do not modify the payload’s top-level keys without updating,
 together: `sframe_serialization_payload()` and
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)’s
 reconstruction in `R/read_write_sframe.R`, the schema file, and this
 document.
 
 An `.sframe` file’s SHA-256 hash proves the file on disk is unchanged
 since
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 produced it. It proves nothing about the content’s methodological
 quality, and it cannot be a substitute for disclosed revision –
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 gives legitimate revision a structured, recorded path, but it is opt-in:
 nothing stops a contributor from reconstructing an instrument and
 writing it fresh instead of calling
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 first. Do not describe the hash, the amendment log, or
-[`link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/superseded.md)
+[`link_git_commit()`](https://surveyframe.org/reference/superseded.md)
 in documentation as detecting or preventing undisclosed change beyond
-what they actually do – the hash detects that a file changed; the
+what they actually do. The hash detects that a file changed, and the
 amendment log records a change the researcher chose to disclose. Neither
 compels disclosure.
 
@@ -69,12 +69,12 @@ compels disclosure.
 Exported functions are not removed or renamed without a deprecation
 cycle: mark the old name
 [`.Deprecated()`](https://rdrr.io/r/base/Deprecated.html), keep it
-working for at least one minor release, and record the change in
-`NEWS.md` under a “Deprecated” heading. Breaking changes to an exported
-function’s arguments or return type are also recorded in `NEWS.md`,
-explicitly labelled “Breaking,” whether or not the function’s name
-changed (see the 0.4.0 entry for
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)’s
+working for at least 1 minor release, and record the change in `NEWS.md`
+under a “Deprecated” heading. Breaking changes to an exported function’s
+arguments or return type are also recorded in `NEWS.md`, explicitly
+labelled “Breaking,” whether or not the function’s name changed (see the
+0.4.0 entry for
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)’s
 return-type change as the pattern to follow). The `.sframe` JSON Schema
 (`inst/schema/sframe_schema.json`) follows the same rule: a new required
 top-level key breaks every file written before it existed, so new keys

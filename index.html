@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Proactive Survey Research Workflows for R • surveyframe</title>
+<title>Plan, run and report survey research: surveyframe</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -17,12 +17,12 @@
 <link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Proactive Survey Research Workflows for R">
-<meta name="description" content="Survey instrument workflows for R. Define instruments, design them visually, deploy surveys, check data quality, score scales, run psychometric diagnostics, and generate reproducible reports from one source object.
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><script src="extra.js"></script><meta property="og:title" content="Plan, run and report survey research: surveyframe">
+<meta name="description" content="Design your questionnaire, plan your analysis and prepare an APA 7 report. Work visually in SurveyStudio or use R. For people conducting, supervising, reviewing or planning survey research.
 ">
-<meta property="og:description" content="Survey instrument workflows for R. Define instruments, design them visually, deploy surveys, check data quality, score scales, run psychometric diagnostics, and generate reproducible reports from one source object.
+<meta property="og:description" content="Design your questionnaire, plan your analysis and prepare an APA 7 report. Work visually in SurveyStudio or use R. For people conducting, supervising, reviewing or planning survey research.
 ">
-<meta property="og:image" content="https://mohammedalisharafuddin.github.io/surveyframe/reference/figures/pkgdown-wordmark-tagline.png">
+<meta property="og:image" content="https://surveyframe.org/reference/figures/pkgdown-wordmark-tagline.png">
 <meta property="og:image:alt" content="surveyframe: From research design to reporting">
 <script type="application/ld+json">
 {
@@ -44,6 +44,7 @@
   }
 }
 </script>
+<link rel="canonical" href="https://surveyframe.org/" />
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -62,12 +63,49 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="articles/surveyframe.html">Get started</a></li>
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-templates" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Templates</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-templates">
+<li><a class="dropdown-item" href="articles/templates.html#psychology">Psychology and measurement</a></li>
+    <li><a class="dropdown-item" href="articles/templates.html#education">Education</a></li>
+    <li><a class="dropdown-item" href="articles/templates.html#business">Business</a></li>
+    <li><a class="dropdown-item" href="articles/templates.html#events-tourism">Events and tourism</a></li>
+    <li><a class="dropdown-item" href="articles/templates.html#research-methods">Research methods</a></li>
+    <li><a class="dropdown-item" href="articles/templates.html">All questionnaire templates</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="articles/start.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-learn" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Learn</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-learn">
+<li><a class="dropdown-item" href="articles/learn/for-students.html">Guidance for survey students</a></li>
+    <li><a class="dropdown-item" href="articles/learn/for-supervisors.html">Guidance for supervisors</a></li>
+    <li><a class="dropdown-item" href="articles/learn/for-ethics-committees.html">Guidance for ethics committees</a></li>
+    <li><a class="dropdown-item" href="articles/learn/for-research-organisations.html">Guidance for NGOs and research organisations</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="articles/run-a-study-in-surveystudio.html">Run a study in SurveyStudio</a></li>
+    <li><a class="dropdown-item" href="articles/run-a-study-in-r.html">Run a study in R</a></li>
+    <li><a class="dropdown-item" href="articles/guides.html">How-to guides</a></li>
+    <li><a class="dropdown-item" href="articles/docs.html">Documentation</a></li>
+    <li><a class="dropdown-item" href="articles/learn/question-types.html">Choosing questions for your survey</a></li>
+    <li><a class="dropdown-item" href="articles/learn/analysis-plan.html">The analysis plan</a></li>
+    <li><a class="dropdown-item" href="articles/learn/register-on-osf.html">Register your plan on OSF</a></li>
+    <li><a class="dropdown-item" href="articles/learn/choosing-a-survey-tool.html">Choosing a survey tool</a></li>
+    <li><a class="dropdown-item" href="articles/learn/faq.html">Frequently asked questions</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-r-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">R reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-r-reference">
+<li><a class="dropdown-item" href="reference/index.html">Reference</a></li>
+    <li><a class="dropdown-item" href="articles/index.html">Articles</a></li>
+    <li><a class="dropdown-item" href="news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/cite.html">Cite</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -76,327 +114,94 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p><img src="reference/figures/readme-logo.png" align="right" width="220" alt="surveyframe" style="margin-top: 2rem;"></p>
-<div class="section level1">
+  <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.svg" class="logo" alt=""><h1 id="surveyframe">surveyframe<a class="anchor" aria-label="anchor" href="#surveyframe"></a>
+<img src="logo.svg" class="logo" alt=""><h1 id="plan-run-and-report-survey-research">Plan, run and report survey research<a class="anchor" aria-label="anchor" href="#plan-run-and-report-survey-research"></a>
 </h1>
 </div>
-<!-- badges: start -->
-
-<blockquote>
-<p><strong>Just here to verify a <code>.sframe</code> file’s integrity hash or read its amendment log?</strong> <strong><a href="https://mohammedalisharafuddin.github.io/surveyframe/verify/">Verify a file now</a></strong>. No R, no install. It runs entirely in your browser and nothing is uploaded.</p>
-</blockquote>
-<p><code>surveyframe</code> is a research-design-first survey package for R. Most survey tools collect answers and return counts. <code>surveyframe</code> begins at the research design and carries it through to a written results report.</p>
-<p>The unit of work is the instrument, a typed <code>sframe</code> object that stores three things together:</p>
+<p>Design your questionnaire, plan your analysis and prepare an APA 7 report. Work visually in SurveyStudio or use R.</p>
+<p>For people conducting, supervising, reviewing or planning survey research.</p>
+<p class="home-actions">
+<a class="btn btn-primary" href="articles/templates.html">Explore templates</a> <a class="btn btn-outline-primary" href="articles/start.html">Get started</a>
+</p>
+<p>SurveyStudio opens through R. The <a href="articles/start.html">setup guide</a> explains installing the required software and opening your first study.</p>
+<p><a href="https://CRAN.R-project.org/package=surveyframe" class="external-link"><img src="https://www.r-pkg.org/badges/version/surveyframe" alt="CRAN status"></a> <a href="https://CRAN.R-project.org/package=surveyframe" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/surveyframe" alt="CRAN downloads"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
+<div class="section level2">
+<h2 id="conducting-a-survey-for-your-studies">Conducting a survey for your studies?<a class="anchor" aria-label="anchor" href="#conducting-a-survey-for-your-studies"></a>
+</h2>
+<p>Plan your research, create your questionnaire, analyse responses and prepare your report. <a href="articles/learn/for-students.html">Guidance for survey students</a></p>
+</div>
+<div class="section level2">
+<h2 id="supervising-students-conducting-survey-research">Supervising students conducting survey research?<a class="anchor" aria-label="anchor" href="#supervising-students-conducting-survey-research"></a>
+</h2>
+<p>Review each student’s analysis plan, compare it with the completed report and follow recorded amendments and their reasons. <a href="articles/learn/for-supervisors.html">Guidance for supervisors</a></p>
+</div>
+<div class="section level2">
+<h2 id="reviewing-a-survey-study-as-an-ethics-committee">Reviewing a survey study as an ethics committee?<a class="anchor" aria-label="anchor" href="#reviewing-a-survey-study-as-an-ethics-committee"></a>
+</h2>
+<p>Examine the proposed study documentation, then review the completed study and its recorded changes. <a href="articles/learn/for-ethics-committees.html">Guidance for ethics committees</a></p>
+</div>
+<div class="section level2">
+<h2 id="planning-survey-research-for-an-ngo-or-research-organisation">Planning survey research for an NGO or research organisation?<a class="anchor" aria-label="anchor" href="#planning-survey-research-for-an-ngo-or-research-organisation"></a>
+</h2>
+<p>Prepare a pre-analysis plan and keep the questionnaire, analysis decisions and reporting connected. <a href="articles/learn/for-research-organisations.html">Guidance for NGOs and research organisations</a></p>
+</div>
+<div class="section level2">
+<h2 id="keep-your-questionnaire-and-analysis-plan-connected">Keep your questionnaire and analysis plan connected<a class="anchor" aria-label="anchor" href="#keep-your-questionnaire-and-analysis-plan-connected"></a>
+</h2>
+<p>Save your questions, scoring rules, analysis plan and references in a portable <code>.sframe</code> file. Collect responses using your chosen setup, check their quality and prepare a report that presents the planned analyses alongside the results and your interpretation.</p>
+<p>Record later changes with their reasons so readers can follow the study’s development.</p>
+<p><strong>Plan your study before collecting responses.</strong> Record your research questions, hypotheses and analysis choices alongside the questionnaire. <a href="articles/learn/analysis-plan.html">How to write the analysis plan</a>.</p>
+<p><strong>Move from responses to a research report.</strong> Check the collected responses, run the planned analyses and prepare APA 7 tables, figures and references for supported methods. <a href="articles/run-a-study-in-surveystudio.html#report">See the report stage</a>.</p>
+<p><strong>Keep a record of your research design.</strong> Preserve the questionnaire version, sources and disclosed amendments with the design file. <a href="https://surveyframe.org/verify/">Verify a <code>.sframe</code> file</a> to check that it matches the hash recorded when it was saved.</p>
+<p>For example, start with the <a href="articles/templates/course-evaluation-survey.html">course evaluation survey</a>, plan how you will summarise the ratings, collect responses and prepare a report for the teaching team. It is an example to adapt to your own course and questions.</p>
+</div>
+<div class="section level2">
+<h2 id="start-from-a-template">Start from a template<a class="anchor" aria-label="anchor" href="#start-from-a-template"></a>
+</h2>
+<p>Each template holds a questionnaire and an example analysis plan to adapt to your own study.</p>
+<p><strong>Psychology and measurement.</strong> <a href="articles/templates/likert-scale-questionnaire.html">Likert scale questionnaire</a>, <a href="articles/templates/measurement-model-questionnaire.html">Measurement model questionnaire (CFA and SEM)</a>.</p>
+<p><strong>Education.</strong> <a href="articles/templates/course-evaluation-survey.html">Course evaluation survey</a>, <a href="articles/templates/training-evaluation-before-and-after.html">Training evaluation before and after</a>.</p>
+<p><strong>Business.</strong> <a href="articles/templates/customer-satisfaction-survey.html">Customer satisfaction survey</a>, <a href="articles/templates/employee-engagement-survey.html">Employee engagement survey</a>, <a href="articles/templates/supplier-and-venue-selection.html">Supplier and venue selection (decision making)</a>.</p>
+<p><strong>Events and tourism.</strong> <a href="articles/templates/open-ended-feedback-survey.html">Open-ended feedback survey</a>.</p>
+<p><strong>Research methods.</strong> <a href="articles/templates/pilot-survey-small-sample.html">Pilot survey with a small sample</a>, <a href="articles/templates/pre-registered-survey-sealed-and-amended.html">Preparing a survey study for preregistration</a>.</p>
+<p><a href="articles/templates.html">All questionnaire templates</a></p>
+</div>
+<div class="section level2">
+<h2 id="how-a-study-runs">How a study runs<a class="anchor" aria-label="anchor" href="#how-a-study-runs"></a>
+</h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>The questions.</strong> Items, choice sets, scales, branching rules, and attention checks.</li>
+<strong>Design</strong> the questionnaire and write the analysis plan, with hypotheses and decision rules, before collecting responses.</li>
 <li>
-<strong>The analysis plan.</strong> A list of research questions, where each question is bound to a named statistical technique and to the variables that fill each role in that technique. The plan is written during design, before any data arrive.</li>
+<strong>Collect</strong> responses with a survey web page, stored where you choose, such as a Google Sheet you own.</li>
 <li>
-<strong>The measurement or structural model.</strong> Constructs, indicators, and paths for EFA, CFA, CB-SEM, and PLS-SEM.</li>
+<strong>Check</strong> responses for failed attention checks, speeding, identical answers across a scale and missing answers.</li>
+<li>
+<strong>Analyse</strong> the responses with the plan as written. A later change is recorded as an amendment with its reason.</li>
+<li>
+<strong>Report</strong> in APA 7, as HTML, Word, PDF or OpenDocument.</li>
 </ol>
-<p>Because the plan and the model live inside the instrument, you never have to go back and match up questions, variables, and tests by hand. Say you’re comparing satisfaction between first-time and repeat visitors: write that comparison into the plan once, alongside the questions, and it stays linked to the right variables from then on. When responses arrive, running the plan is a single step: each result comes back ready to write up, with a plot, a table, an APA statistic, an effect size where it applies, a writing prompt, and the reference that supports it. Plots switch between a colour palette for on-screen use and a black-and-white palette for print, both checked against WCAG contrast rules, so the same run produces a journal-ready figure with no separate step.</p>
-<p>The package works offline during examples, tests, vignettes, and checks. Browser and Shiny entry points use <code>open = FALSE</code> or explicit launch functions, so automated checks do not open a browser.</p>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<blockquote>
-<p><strong>0.4.3 is on GitHub, ahead of CRAN.</strong> CRAN carries 0.4.2. The GitHub release, 0.4.3, adds fixes found while teaching with it: a frequency table for 2 or more variables, choice labels in frequency tables, counts and percentages for choice items, and fixes to SurveyBuilder and SurveyStudio. Install it with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MohammedAliSharafuddin/surveyframe"</span><span class="op">)</span></span></code></pre></div>
-<p><code>NEWS.md</code> lists every fix.</p>
-</blockquote>
-<p>Install from CRAN:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
-<p>To get changes not yet released to CRAN:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"MohammedAliSharafuddin/surveyframe"</span><span class="op">)</span></span></code></pre></div>
-<p>In an interactive session, <code><a href="https://mohammedalisharafuddin.github.io/surveyframe/">library(surveyframe)</a></code> prints a short start-up note with a demo to try, the commands to start with, and how to cite the package. <code>suppressPackageStartupMessages(library(surveyframe))</code> loads it quietly, and scripts and rendered documents never show it.</p>
-<p>Optional packages are only needed for selected features:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shiny"</span>, <span class="st">"psych"</span>, <span class="st">"googlesheets4"</span>, <span class="st">"digest"</span>, <span class="st">"MASS"</span>, <span class="st">"nnet"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Syntax generation works without installing <code>lavaan</code> or <code>seminr</code>. Install those packages when you want to fit the generated CFA, CB-SEM, or PLS-SEM models.</p>
-</div>
-<div class="section level2">
-<h2 id="already-have-data">Already have data?<a class="anchor" aria-label="anchor" href="#already-have-data"></a>
-</h2>
-<p><code>surveyframe</code> is not a replacement for whatever collection tool your institution already has approved: Qualtrics, REDCap, Google Forms, or a paper form typed up afterward. It reads response data as a plain CSV or <code>data.frame</code> from any of them: export from your collection tool, rename columns to match your instrument’s item IDs (or build the instrument to match the export), and load it. If you have collected responses in a CSV or Google Sheet and want to start from the analysis step, build a minimal instrument that matches your column names and load the data directly:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 1. Describe the items you already collected</span></span>
-<span><span class="va">cs</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span><span class="st">"agree5"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neutral"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">i1</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"Item 1"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
-<span><span class="va">i2</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"q2"</span>, <span class="st">"Item 2"</span>, type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"S"</span><span class="op">)</span></span>
-<span><span class="va">sc</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"S"</span>, <span class="st">"My scale"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"q1"</span>, <span class="st">"q2"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span><span class="st">"My study"</span>, components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">cs</span>, <span class="va">i1</span>, <span class="va">i2</span>, <span class="va">sc</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 2. Load your CSV</span></span>
-<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_responses.html">read_responses</a></span><span class="op">(</span><span class="st">"my_data.csv"</span>, <span class="va">instr</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 3. Score and analyse</span></span>
-<span><span class="va">scored</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="documentation-workflow">Documentation workflow<a class="anchor" aria-label="anchor" href="#documentation-workflow"></a>
-</h2>
-<p>Choose the route that matches what you need:</p>
-<ul>
-<li>
-<strong>Try it in five minutes:</strong> Learn by example: 22 small surveys.</li>
-<li>
-<strong>Prefer a visual interface:</strong> SurveyBuilder, SurveyStudio, and the dashboard.</li>
-<li>
-<strong>Build and collect:</strong> Building a survey instrument, then Deploying and collecting.</li>
-<li>
-<strong>Already have responses:</strong> Analysing survey responses.</li>
-<li>
-<strong>Read the complete case study:</strong> Digital marketing and tourism services.</li>
-</ul>
-<p>Continue as needed with these:</p>
-<ul>
-<li>Scale reliability and validity</li>
-<li>EFA, CFA, CB-SEM, and PLS-SEM syntax</li>
-<li>Multi-criteria decision analysis</li>
-<li>Small-sample inference</li>
-<li>Text and open-ended response analysis</li>
-</ul>
-<p>Read all eleven vignettes inside R with:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="an-instrument-is-the-research-design">An instrument is the research design<a class="anchor" aria-label="anchor" href="#an-instrument-is-the-research-design"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mohammedalisharafuddin.github.io/surveyframe/">surveyframe</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">agree5</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
-<span>  <span class="st">"agree5"</span>,</span>
-<span>  values <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
-<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Strongly disagree"</span>, <span class="st">"Disagree"</span>, <span class="st">"Neutral"</span>, <span class="st">"Agree"</span>, <span class="st">"Strongly agree"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">visitor_type_choices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
-<span>  <span class="st">"visitor_type"</span>,</span>
-<span>  values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_time"</span>, <span class="st">"repeat"</span><span class="op">)</span>,</span>
-<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"First-time visitor"</span>, <span class="st">"Repeat visitor"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sat_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"The service was reliable."</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
-<span><span class="va">sat_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_2"</span>, <span class="st">"The service was responsive."</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
-<span><span class="va">sat_3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"sat_3"</span>, <span class="st">"I would recommend the service."</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"likert"</span>, choice_set <span class="op">=</span> <span class="st">"agree5"</span>, scale_id <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">visitor_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_item.html">sframe_item</a></span><span class="op">(</span><span class="st">"visitor_type"</span>, <span class="st">"Visitor type"</span>, type <span class="op">=</span> <span class="st">"single_choice"</span>,</span>
-<span>  choice_set <span class="op">=</span> <span class="st">"visitor_type"</span><span class="op">)</span></span>
-<span><span class="va">sat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_scale.html">sframe_scale</a></span><span class="op">(</span><span class="st">"sat"</span>, <span class="st">"Satisfaction"</span>, items <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_instrument.html">sframe_instrument</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Service Survey"</span>,</span>
-<span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="va">agree5</span>, <span class="va">visitor_type_choices</span>, <span class="va">sat_1</span>, <span class="va">sat_2</span>, <span class="va">sat_3</span>, <span class="va">visitor_type</span>, <span class="va">sat</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  analysis_plan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      id                <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
-<span>      research_question <span class="op">=</span> <span class="st">"Do first-time and repeat visitors differ in satisfaction?"</span>,</span>
-<span>      family            <span class="op">=</span> <span class="st">"group_comparison"</span>,</span>
-<span>      method            <span class="op">=</span> <span class="st">"mann_whitney"</span>,</span>
-<span>      roles             <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>group <span class="op">=</span> <span class="st">"visitor_type"</span>, outcome <span class="op">=</span> <span class="st">"sat"</span><span class="op">)</span>,</span>
-<span>      options           <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">instr</span>, <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".sframe"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># See the instrument as a survey a respondent would fill in:</span></span>
-<span><span class="fu"><a href="reference/export_survey.html">export_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/write_sframe.html">write_sframe()</a></code> validates the instrument and writes the validated object, including the validation flag, the analysis plan, and any saved model specifications. <code><a href="reference/export_survey.html">export_survey()</a></code> renders it as a self-contained HTML survey, the same function covered in “Visual tools” below.</p>
-</div>
-<div class="section level2">
-<h2 id="import-and-score">Import and score<a class="anchor" aria-label="anchor" href="#import-and-score"></a>
-</h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  respondent_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"R"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,</span>
-<span>  sat_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>  sat_2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">4</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  sat_3 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span>,</span>
-<span>  visitor_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_time"</span>, <span class="st">"repeat"</span>, <span class="st">"first_time"</span>, <span class="st">"repeat"</span>, <span class="st">"first_time"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">resp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_responses.html">read_responses</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, respondent_id <span class="op">=</span> <span class="st">"respondent_id"</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sframe_missing_data_results.html">sframe_missing_data_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="run-the-analysis-plan">Run the analysis plan<a class="anchor" aria-label="anchor" href="#run-the-analysis-plan"></a>
-</h2>
-<p>Each block binds a research question to a technique and to the variables that fill each role. <code><a href="reference/run_analysis_plan.html">run_analysis_plan()</a></code> runs every block and returns one result per question. Earlier <code>.sframe</code> files using <code>variables</code> and <code>test</code> fields remain compatible.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="va">results</span></span></code></pre></div>
-<p>Supported method IDs include descriptives, missing data, quality checks, reliability, EFA readiness and solutions, CFA, CB-SEM, and PLS-SEM syntax, chi-square, Fisher’s exact test, McNemar, Cochran’s Q, t-tests, Mann-Whitney, Wilcoxon, one- and two-way ANOVA, ANCOVA, repeated-measures ANOVA, Kruskal-Wallis, Friedman, Pearson, Spearman, and Kendall correlations, partial correlations, linear and logistic regression, mediation, and moderation. Each technique reports an APA statistic, an effect size where it applies, a writing prompt, and the reference that supports it.</p>
-</div>
-<div class="section level2">
-<h2 id="render-the-results-report">Render the results report<a class="anchor" aria-label="anchor" href="#render-the-results-report"></a>
-</h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/render_results.html">render_results</a></span><span class="op">(</span><span class="va">results</span>, <span class="va">instr</span>, output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".html"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>The report holds one section per research question, with the APA result, the writing prompt, a space for the interpretation, and a reference list compiled from the techniques used.</p>
-</div>
-<div class="section level2">
-<h2 id="reliability-efa-and-cfa">Reliability, EFA, and CFA<a class="anchor" aria-label="anchor" href="#reliability-efa-and-cfa"></a>
-</h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="reference/sframe_reliability_results.html">sframe_reliability_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span>, omega <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="reference/sframe_efa_readiness_results.html">sframe_efa_readiness_results</a></span><span class="op">(</span><span class="va">resp</span>, <span class="va">instr</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/sframe_syntax_cfa.html">sframe_syntax_cfa</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sframe_syntax_cfa.html">sframe_syntax_cfa</a></span><span class="op">(</span><span class="va">instr</span>, ordered <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="model-layer">Model layer<a class="anchor" aria-label="anchor" href="#model-layer"></a>
-</h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_model_spec.html">sframe_model_spec</a></span><span class="op">(</span></span>
-<span>  <span class="st">"model_1"</span>,</span>
-<span>  <span class="st">"Satisfaction model"</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"cb_sem"</span>,</span>
-<span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span>, <span class="st">"sat_3"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">instr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_add_model.html">sframe_add_model</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sframe_model_json.html">sframe_model_json</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/sframe_syntax_sem.html">sframe_syntax_sem</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">instr</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="pls-sem-syntax">PLS-SEM syntax<a class="anchor" aria-label="anchor" href="#pls-sem-syntax"></a>
-</h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_model_spec.html">sframe_model_spec</a></span><span class="op">(</span></span>
-<span>  <span class="st">"pls_1"</span>,</span>
-<span>  <span class="st">"Satisfaction and loyalty PLS model"</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"pls_sem"</span>,</span>
-<span>  constructs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"Satisfaction"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sat_1"</span>, <span class="st">"sat_2"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"composite"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="reference/sframe_construct.html">sframe_construct</a></span><span class="op">(</span><span class="st">"LOY"</span>, <span class="st">"Loyalty"</span>, <span class="st">"sat_3"</span>, mode <span class="op">=</span> <span class="st">"single_item"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/sframe_path.html">sframe_path</a></span><span class="op">(</span><span class="st">"SAT"</span>, <span class="st">"LOY"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bootstrap <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/sframe_syntax_pls.html">sframe_syntax_pls</a></span><span class="op">(</span><span class="va">pls_model</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="a-full-study-report">A full study report<a class="anchor" aria-label="anchor" href="#a-full-study-report"></a>
-</h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/render_report.html">render_report</a></span><span class="op">(</span></span>
-<span>  <span class="va">instr</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">resp</span>,</span>
-<span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".html"</span><span class="op">)</span>,</span>
-<span>  include_codebook <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_quality <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_missing <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_descriptives <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_analysis <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  include_models <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>The built-in HTML fallback does not require Quarto. If the Quarto CLI is available locally, <code><a href="reference/render_report.html">render_report()</a></code> can use the bundled template.</p>
-</div>
-<div class="section level2">
-<h2 id="visual-tools">Visual tools<a class="anchor" aria-label="anchor" href="#visual-tools"></a>
-</h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/export_survey.html">export_survey</a></span><span class="op">(</span><span class="va">instr</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Use <code><a href="reference/launch_builder.html">launch_builder()</a></code> to author the questionnaire, the plan, and the model and to export the <code>.sframe</code> file and model syntax. It runs no statistics. <code><a href="reference/launch_studio.html">launch_studio()</a></code> uploads responses, runs the plan on its Analysis Plan screen, and renders the report on its Export screen. Its Dashboard screen explores responses with filters. Demo launchers are available for training:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_builder.html">launch_builder</a></span><span class="op">(</span>demo <span class="op">=</span> <span class="st">"input_types"</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co"># launch_studio(demo = "input_types", screen = "preview")</span></span>
-<span><span class="co"># launch_studio(demo = "input_types", screen = "dashboard")</span></span></code></pre></div>
-<p>Interactive functions such as <code>launch_builder(open = TRUE)</code>, <code><a href="reference/launch_studio.html">launch_studio()</a></code>, and <code><a href="reference/run_survey.html">run_survey()</a></code> are available for manual use. Tests and examples avoid opening browsers.</p>
-</div>
-<div class="section level2">
-<h2 id="roadmap">Roadmap<a class="anchor" aria-label="anchor" href="#roadmap"></a>
-</h2>
-<p>0.4.0 (CRAN, 2026-08-20) added three capability themes:</p>
-<ul>
-<li>
-<strong>Small-sample survey helpers</strong>, validated by a simulation study: Hodges-Lehmann and paired-Wilcoxon pseudomedian estimators, exact Fisher odds-ratio intervals, and Firth logistic regression.</li>
-<li>
-<strong>10 multi-criteria decision methods</strong> (TOPSIS, AHP, ANP, DEMATEL, VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE), with 2 new question types for collecting judgements, weight-sensitivity analysis, and declared conjoint designs.</li>
-<li>
-<strong>Text and open-ended response analysis</strong>, 9 methods: term and n-gram frequency, keyword in context, co-occurrence networks, sentiment, document-feature matrices, and topic modelling via LDA or a structural topic model.</li>
-</ul>
-<p>A disclosed-amendment and Git-linked provenance mechanism shipped alongside, on top of the existing <code>.sframe</code> integrity hash. Full detail in <code>NEWS.md</code>.</p>
-<p>0.4.1 focuses on stability: fixes found by using surveyframe on real instruments, no new capability theme.</p>
-<p>0.4.2 is a defect-fix release, correcting what an external review of 0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17 deferred with a stated reason. The ones that matter most to a live study are in collection, where a participant’s answer could be altered or lost with no signal, and in scoring, where the report path recomputed scale scores by a second method that ignored reverse coding and the declared minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and <code>NEWS.md</code> says which, under “What you need to change”. Reports also gained a folded “Show R code” block, and <code><a href="reference/sframe_syntax_result.html">sframe_syntax_result()</a></code> returns the statistical call behind a result with its variables and options resolved, so a reader can copy the code and reproduce the number.</p>
-<p>0.4.3, a GitHub release, fixes what a teaching session found in 0.4.2: frequency and descriptives blocks now handle choice items as categories, and SurveyBuilder reads a plan written in R as R does.</p>
-</div>
-<div class="section level2">
-<h2 id="when-to-use-surveyframe-and-when-not-to">When to use surveyframe, and when not to<a class="anchor" aria-label="anchor" href="#when-to-use-surveyframe-and-when-not-to"></a>
-</h2>
-<p>surveyframe is a fit when a study’s analysis has to be decided before data collection: a scale to validate, a pre-registered hypothesis test, a measurement model to fit, or an audit trail showing the plan wasn’t changed after seeing results. Its core strength is a pre-declared, integrity-checked analysis plan bound to the instrument itself. It also interoperates with <a href="https://cran.r-project.org/package=survey" class="external-link">survey</a> and <a href="https://cran.r-project.org/package=srvyr" class="external-link">srvyr</a>, the standard tools for weighting and variance estimation on data from a complex probability sample.</p>
-<p>Haven’t decided the analysis yet? Collect first with any web-form tool, Google Forms, Qualtrics, REDCap, or the R package <a href="https://github.com/surveydown-dev/surveydown" class="external-link">surveydown</a>, and add the plan when you’re ready: surveyframe reads exported CSV data from any of them (see “Already have data?” above).</p>
-<p><strong>If this package is ever archived by CRAN</strong>, the GitHub repository remains the canonical source: <code>remotes::install_github("MohammedAliSharafuddin/surveyframe")</code>. Each CRAN release is also deposited to Zenodo with its own DOI, so a specific version stays citable and retrievable independently of both CRAN’s and GitHub’s continued availability.</p>
-</div>
-<div class="section level2">
-<h2 id="faq">FAQ<a class="anchor" aria-label="anchor" href="#faq"></a>
-</h2>
-<p><strong>Is surveyframe a replacement for Qualtrics, Google Forms, or REDCap?</strong> No. Those collect responses with no plan required up front. surveyframe declares the analysis plan before collection, and reads exported CSV data from any of them once the plan is added (see “Already have data?” above).</p>
-<p><strong>Does surveyframe do survey weighting or complex-sample variance estimation?</strong> No. <a href="https://cran.r-project.org/package=survey" class="external-link">survey</a> and <a href="https://cran.r-project.org/package=srvyr" class="external-link">srvyr</a> are the standard R tools for stratified, clustered, or weighted samples. surveyframe’s instruments interoperate with that workflow instead of duplicating it.</p>
-<p><strong>Can I use surveyframe with data I’ve already collected?</strong> Yes. Build a minimal instrument that matches your column names, then load your CSV or <code>data.frame</code> directly with <code><a href="reference/read_responses.html">read_responses()</a></code>. See “Already have data?” above for a worked example.</p>
-<p><strong>What is a pre-declared analysis plan, and why does it matter?</strong> A list of research questions written into the instrument at design time, each bound to a technique and to the variables that fill its roles, before any response arrives. It removes matching questions, variables, and tests up by hand, and it’s the basis for the audit trail showing the plan wasn’t changed after seeing results.</p>
-<p><strong>What happens if surveyframe is ever archived by CRAN?</strong> The GitHub repository stays the canonical source (<code>remotes::install_github("MohammedAliSharafuddin/surveyframe")</code>), and every CRAN release is separately deposited to Zenodo with its own DOI.</p>
-</div>
-<div class="section level2">
-<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
-</h2>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="related-resources">Related resources<a class="anchor" aria-label="anchor" href="#related-resources"></a>
-</h2>
-<ul>
-<li>Sharafuddin, M. A., Jaleel, A. A., and Madhavan, M. (2026). <em>Quantitative Analysis with Small Samples: A Practical Guide for Students and Early-Career Researchers</em> (Version 0.1.0) [Book]. Zenodo. <a href="https://doi.org/10.5281/zenodo.20221929" class="external-link uri">https://doi.org/10.5281/zenodo.20221929</a>. A companion textbook on statistical inference when sample sizes are small, also available at <a href="https://flairmi.com/textbooks/smallsamplelab.html" class="external-link uri">https://flairmi.com/textbooks/smallsamplelab.html</a>. It describes the small-sample methods that surveyframe added in 0.4.0 and when to prefer each one.</li>
-<li>Sharafuddin, M. A. (2026). <em>surveyframe: A Pre-Declared, Reproducible Framework for Multi-Criteria Decision Analysis in Survey Research</em>. Manuscript in preparation for Computo. Describes the 10 MCDM methods surveyframe added in 0.4.0.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
-</h2>
-<p>MIT. See <code>LICENSE</code>.</p>
+<p><a href="articles/run-a-study-in-surveystudio.html">Run a study in SurveyStudio</a> shows each stage by point and click, and <a href="articles/run-a-study-in-r.html">Run a study in R</a> shows the same stages in R.</p>
+<details><summary>
+Already use R? Open a first study from the Console
+</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://surveyframe.org">surveyframe</a></span><span class="op">)</span></span>
+<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sframe_demo.html">sframe_demo</a></span><span class="op">(</span><span class="st">"first_survey"</span><span class="op">)</span></span></code></pre></div>
+<p>Then read the <a href="reference/index.html">R reference</a>, the <a href="articles/learn-by-example.html">worked examples</a> and the <a href="news/index.html">changelog</a>.</p>
+</details>
 </div>
 </div>
-
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=surveyframe" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/issues" class="external-link">Report a bug</a></li>
-<li><a href="verify/">Verify a .sframe file</a></li>
-<li><a href="reference/launch_builder.html">SurveyBuilder</a></li>
-<li><a href="articles/surveyframe.html">SurveyStudio interface</a></li>
-<li><a href="https://github.com/MohammedAliSharafuddin/surveyframe" class="external-link">GitHub repository</a></li>
-<li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/issues" class="external-link">Report a bug</a></li>
+<li><a href="verify/">Verify a file</a></li>
+<li><a href="articles/start.html">Get started</a></li>
+<li><a href="articles/cite.html">Cite surveyframe</a></li>
 </ul>
 </div>
 
@@ -430,14 +235,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://CRAN.R-project.org/package=surveyframe" class="external-link"><img src="https://www.r-pkg.org/badges/version/surveyframe" alt="CRAN status"></a></li>
-<li><a href="https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>

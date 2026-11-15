@@ -64,7 +64,7 @@ sframe_efa_solution(
 ## Value
 
 An object of class `sframe_efa_solution`. Alongside the psych objects it
-carries three tidy data frames ready for plotting and reporting:
+carries 3 tidy data frames ready for plotting and reporting:
 `loadings_long` (item_id, factor, loading), `communalities_table`
 (item_id, communality, uniqueness), and `variance_table` (factor,
 ss_loadings, proportion_var, cumulative_var).
@@ -72,15 +72,15 @@ ss_loadings, proportion_var, cumulative_var).
 ## See also
 
 Other Analyse functions:
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 
 ## Examples
 
@@ -92,9 +92,5 @@ if (requireNamespace("psych", quietly = TRUE)) {
                        scales = "service_quality", nfactors = 1)
   fit$loadings
 }
-#>      item_id       MR1
-#> sq_1    sq_1 0.7661667
-#> sq_2    sq_2 0.8354284
-#> sq_3    sq_3 0.8063057
 # }
 ```

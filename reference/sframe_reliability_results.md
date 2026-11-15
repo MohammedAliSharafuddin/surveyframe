@@ -45,19 +45,19 @@ per scale. Each element is a list of statistics and a summary tibble.
 
 ## See also
 
-[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md)
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md)
 
 Other Analyse functions:
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 
 ## Examples
 
@@ -68,27 +68,5 @@ if (requireNamespace("psych", quietly = TRUE)) {
   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   print(rr)
 }
-#> Reliability Report
-#> 
-#> Scale: digital_marketing (Digital marketing effectiveness)
-#>   Items: 3   N: 120
-#>   Alpha:   0.837
-#> 
-#> Scale: service_quality (Service quality)
-#>   Items: 3   N: 120
-#>   Alpha:   0.844
-#> 
-#> Scale: sustainability (Sustainability perception)
-#>   Items: 2   N: 120
-#>   Alpha:   0.772
-#> 
-#> Scale: satisfaction (Tourist satisfaction)
-#>   Items: 2   N: 120
-#>   Alpha:   0.816
-#> 
-#> Scale: behavioural_intention (Behavioural intention)
-#>   Items: 2   N: 120
-#>   Alpha:   0.844
-#> 
 # }
 ```

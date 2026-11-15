@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Text and open-ended response analysis • surveyframe</title>
+<title>Text and open-ended response analysis: surveyframe</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Text and open-ended response analysis">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Text and open-ended response analysis: surveyframe">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,6 +38,7 @@
   }
 }
 </script>
+<link rel="canonical" href="https://surveyframe.org/articles/text-analysis.html" />
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -56,12 +57,49 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-templates" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Templates</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-templates">
+<li><a class="dropdown-item" href="../articles/templates.html#psychology">Psychology and measurement</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#education">Education</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#business">Business</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#events-tourism">Events and tourism</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#research-methods">Research methods</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html">All questionnaire templates</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="../articles/start.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-learn" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Learn</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-learn">
+<li><a class="dropdown-item" href="../articles/learn/for-students.html">Guidance for survey students</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-supervisors.html">Guidance for supervisors</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-ethics-committees.html">Guidance for ethics committees</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-research-organisations.html">Guidance for NGOs and research organisations</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-surveystudio.html">Run a study in SurveyStudio</a></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-r.html">Run a study in R</a></li>
+    <li><a class="dropdown-item" href="../articles/guides.html">How-to guides</a></li>
+    <li><a class="dropdown-item" href="../articles/docs.html">Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/question-types.html">Choosing questions for your survey</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/analysis-plan.html">The analysis plan</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/register-on-osf.html">Register your plan on OSF</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/choosing-a-survey-tool.html">Choosing a survey tool</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/faq.html">Frequently asked questions</a></li>
+  </ul>
+</li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-r-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">R reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-r-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/index.html">Articles</a></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/cite.html">Cite</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -112,17 +150,17 @@ pre.sourceCode a:empty { display: none; }
 <div class="section level2">
 <h2 id="what-this-vignette-covers">What this vignette covers<a class="anchor" aria-label="anchor" href="#what-this-vignette-covers"></a>
 </h2>
-<p>Text and textarea items collect open-ended responses that a Likert
-scale cannot: the reason behind a rating, a complaint a closed question
-never anticipated, a suggestion nobody thought to ask for directly.
-surveyframe treats analysing that text the same way it treats every
-other analysis: a research question, a technique, and the roles that
-fill it, declared in the instrument’s analysis plan before the numbers
-exist.</p>
-<p>Nine methods are available, from plain term counting through to topic
+<p>Text and textarea items collect open-ended responses, beyond what a
+Likert scale records: the reason behind a rating, a complaint a closed
+question never anticipated, a suggestion nobody thought to ask for
+directly. surveyframe treats analysing that text the same way it treats
+every other analysis: a research question, a technique, and the roles
+that fill it, declared in the instrument’s analysis plan before the
+numbers exist.</p>
+<p>9 methods are available, from plain term counting through to topic
 modelling. The base path (<code>term_freq</code>,
 <code>ngram_freq</code>, <code>term_context</code>,
-<code>co_occurrence</code>) runs on the package alone. Five more
+<code>co_occurrence</code>) runs on the package alone. 5 more
 (<code>co_occurrence_network</code>, <code>tidy_sentiment</code>,
 <code>quanteda_dfm</code>, <code>topic_model_lda</code>,
 <code>stm_topics</code>) need one or more Suggests-only packages,
@@ -215,44 +253,6 @@ only a coincidence.</p>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">responses</span>, <span class="fl">4</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"The first 4 simulated responses."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The first 4 simulated responses.</caption>
-<colgroup>
-<col width="18%">
-<col width="9%">
-<col width="72%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">satisfaction</th>
-<th align="left">branch</th>
-<th align="left">comments</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">4</td>
-<td align="left">north</td>
-<td align="left">The wait for a table was far too long.</td>
-</tr>
-<tr class="even">
-<td align="right">5</td>
-<td align="left">north</td>
-<td align="left">The staff were helpful whenever we needed
-anything.</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="left">north</td>
-<td align="left">The staff were helpful whenever we needed
-anything.</td>
-</tr>
-<tr class="even">
-<td align="right">5</td>
-<td align="left">south</td>
-<td align="left">Our server was attentive and the food arrived
-fast.</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level2">
 <h2 id="cleaning-a-text-item">Cleaning a text item<a class="anchor" aria-label="anchor" href="#cleaning-a-text-item"></a>
@@ -266,9 +266,7 @@ response came from.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cleaned</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_clean_text.html">sframe_clean_text</a></span><span class="op">(</span><span class="va">responses</span>, <span class="st">"comments"</span>, instrument <span class="op">=</span> <span class="va">instr</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cleaned</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 60</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cleaned</span>, <span class="st">"respondent"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1 2 3 4 5 6</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">cleaned</span>, <span class="st">"respondent"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="term-and-n-gram-frequency">Term and n-gram frequency<a class="anchor" aria-label="anchor" href="#term-and-n-gram-frequency"></a>
@@ -282,119 +280,9 @@ single-word counts would split apart.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_term_frequency.html">sframe_term_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, top_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">terms</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">"The 10 most frequent terms."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The 10 most frequent terms.</caption>
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">n</th>
-<th align="right">pct</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">staff</td>
-<td align="right">33</td>
-<td align="right">7.4</td>
-</tr>
-<tr class="even">
-<td align="left">room</td>
-<td align="right">22</td>
-<td align="right">5.0</td>
-</tr>
-<tr class="odd">
-<td align="left">friendly</td>
-<td align="right">18</td>
-<td align="right">4.1</td>
-</tr>
-<tr class="even">
-<td align="left">long</td>
-<td align="right">16</td>
-<td align="right">3.6</td>
-</tr>
-<tr class="odd">
-<td align="left">service</td>
-<td align="right">16</td>
-<td align="right">3.6</td>
-</tr>
-<tr class="even">
-<td align="left">wait</td>
-<td align="right">15</td>
-<td align="right">3.4</td>
-</tr>
-<tr class="odd">
-<td align="left">helpful</td>
-<td align="right">13</td>
-<td align="right">2.9</td>
-</tr>
-<tr class="even">
-<td align="left">slow</td>
-<td align="right">13</td>
-<td align="right">2.9</td>
-</tr>
-<tr class="odd">
-<td align="left">help</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-<tr class="even">
-<td align="left">quick</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-</tbody>
-</table>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bigrams</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_ngram_frequency.html">sframe_ngram_frequency</a></span><span class="op">(</span><span class="va">cleaned</span>, n <span class="op">=</span> <span class="fl">2</span>, top_n <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">bigrams</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">"The 8 most frequent bigrams."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The 8 most frequent bigrams.</caption>
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">n</th>
-<th align="right">pct</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">help us</td>
-<td align="right">12</td>
-<td align="right">7.6</td>
-</tr>
-<tr class="even">
-<td align="left">arrived fast</td>
-<td align="right">9</td>
-<td align="right">5.7</td>
-</tr>
-<tr class="odd">
-<td align="left">food arrived</td>
-<td align="right">9</td>
-<td align="right">5.7</td>
-</tr>
-<tr class="even">
-<td align="left">helpful whenever</td>
-<td align="right">8</td>
-<td align="right">5.1</td>
-</tr>
-<tr class="odd">
-<td align="left">needed anything</td>
-<td align="right">8</td>
-<td align="right">5.1</td>
-</tr>
-<tr class="even">
-<td align="left">comfortable throughout</td>
-<td align="right">7</td>
-<td align="right">4.4</td>
-</tr>
-<tr class="odd">
-<td align="left">friendly staff</td>
-<td align="right">7</td>
-<td align="right">4.4</td>
-</tr>
-<tr class="even">
-<td align="left">staff made</td>
-<td align="right">7</td>
-<td align="right">4.4</td>
-</tr>
-</tbody>
-</table>
 <p>Both run through the analysis plan the same way any other method
 does. Here, <code>term_freq</code> also takes an optional
 <code>group</code> role (covered below), which splits the table and
@@ -416,169 +304,8 @@ facets the chart by a nominal or ordinal covariate.</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, plots <span class="op">=</span> <span class="va">has_ggplot</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ1"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Term frequency across all branches."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Term frequency across all branches.</caption>
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">n</th>
-<th align="right">pct</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">staff</td>
-<td align="right">33</td>
-<td align="right">7.4</td>
-</tr>
-<tr class="even">
-<td align="left">room</td>
-<td align="right">22</td>
-<td align="right">5.0</td>
-</tr>
-<tr class="odd">
-<td align="left">friendly</td>
-<td align="right">18</td>
-<td align="right">4.1</td>
-</tr>
-<tr class="even">
-<td align="left">long</td>
-<td align="right">16</td>
-<td align="right">3.6</td>
-</tr>
-<tr class="odd">
-<td align="left">service</td>
-<td align="right">16</td>
-<td align="right">3.6</td>
-</tr>
-<tr class="even">
-<td align="left">wait</td>
-<td align="right">15</td>
-<td align="right">3.4</td>
-</tr>
-<tr class="odd">
-<td align="left">helpful</td>
-<td align="right">13</td>
-<td align="right">2.9</td>
-</tr>
-<tr class="even">
-<td align="left">slow</td>
-<td align="right">13</td>
-<td align="right">2.9</td>
-</tr>
-<tr class="odd">
-<td align="left">help</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-<tr class="even">
-<td align="left">quick</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-<tr class="odd">
-<td align="left">us</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-<tr class="even">
-<td align="left">visit</td>
-<td align="right">12</td>
-<td align="right">2.7</td>
-</tr>
-<tr class="odd">
-<td align="left">arrived</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="even">
-<td align="left">attentive</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="odd">
-<td align="left">fast</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="even">
-<td align="left">food</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="odd">
-<td align="left">server</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="even">
-<td align="left">whole</td>
-<td align="right">9</td>
-<td align="right">2.0</td>
-</tr>
-<tr class="odd">
-<td align="left">anything</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="even">
-<td align="left">check</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="odd">
-<td align="left">needed</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="even">
-<td align="left">spotless</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="odd">
-<td align="left">time</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="even">
-<td align="left">whenever</td>
-<td align="right">8</td>
-<td align="right">1.8</td>
-</tr>
-<tr class="odd">
-<td align="left">clean</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-<tr class="even">
-<td align="left">comfortable</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-<tr class="odd">
-<td align="left">dirty</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-<tr class="even">
-<td align="left">made</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-<tr class="odd">
-<td align="left">pleasant</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-<tr class="even">
-<td align="left">seemed</td>
-<td align="right">7</td>
-<td align="right">1.6</td>
-</tr>
-</tbody>
-</table>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ1"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/plan-term-plot-1.png" class="r-plt" alt="Horizontal bar chart of the most frequent terms across all responses." width="672"></p>
 <p>A word cloud is available as an opt-in alternative to the bar chart
 (<code>options$wordcloud = TRUE</code>), useful in a slide deck where a
 bar chart’s axis would be redundant.</p>
@@ -587,7 +314,6 @@ bar chart’s axis would be redundant.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>test <span class="op">=</span> <span class="st">"term_freq"</span>, variable <span class="op">=</span> <span class="st">"comments"</span>, table <span class="op">=</span> <span class="va">terms</span>,</span>
 <span>       options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>wordcloud <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/wordcloud-1.png" class="r-plt" alt="A circular word cloud of the most frequent terms, sized and shaded (dark for frequent, light for rare) by frequency." width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="the-group-role-comparing-branches">The group role: comparing branches<a class="anchor" aria-label="anchor" href="#the-group-role-comparing-branches"></a>
@@ -599,441 +325,8 @@ drawing a single panel.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ2"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"Term frequency split by branch."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Term frequency split by branch.</caption>
-<thead><tr class="header">
-<th align="left">group</th>
-<th align="left">term</th>
-<th align="right">n</th>
-<th align="right">pct</th>
-<th align="left">note</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">staff</td>
-<td align="right">16</td>
-<td align="right">8.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">room</td>
-<td align="right">11</td>
-<td align="right">5.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">helpful</td>
-<td align="right">9</td>
-<td align="right">4.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">friendly</td>
-<td align="right">8</td>
-<td align="right">4.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">anything</td>
-<td align="right">7</td>
-<td align="right">3.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">needed</td>
-<td align="right">7</td>
-<td align="right">3.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">quick</td>
-<td align="right">7</td>
-<td align="right">3.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">whenever</td>
-<td align="right">7</td>
-<td align="right">3.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">arrived</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">attentive</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">check</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">fast</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">food</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">made</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">pleasant</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">server</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">service</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">spotless</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">visit</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">whole</td>
-<td align="right">5</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">clean</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">comfortable</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">help</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">long</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">stay</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">throughout</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">us</td>
-<td align="right">4</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">slow</td>
-<td align="right">3</td>
-<td align="right">1.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">team</td>
-<td align="right">3</td>
-<td align="right">1.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">wait</td>
-<td align="right">3</td>
-<td align="right">1.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">staff</td>
-<td align="right">17</td>
-<td align="right">7.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">long</td>
-<td align="right">12</td>
-<td align="right">4.9</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">wait</td>
-<td align="right">12</td>
-<td align="right">4.9</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">room</td>
-<td align="right">11</td>
-<td align="right">4.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">service</td>
-<td align="right">11</td>
-<td align="right">4.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">friendly</td>
-<td align="right">10</td>
-<td align="right">4.1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">slow</td>
-<td align="right">10</td>
-<td align="right">4.1</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">help</td>
-<td align="right">8</td>
-<td align="right">3.3</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">us</td>
-<td align="right">8</td>
-<td align="right">3.3</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">visit</td>
-<td align="right">7</td>
-<td align="right">2.9</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">seemed</td>
-<td align="right">6</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">time</td>
-<td align="right">6</td>
-<td align="right">2.5</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">average</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">dirty</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">otherwise</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">quick</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">respond</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">ruined</td>
-<td align="right">5</td>
-<td align="right">2.0</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">arrived</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">attentive</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">fast</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">food</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">helpful</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">poor</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">server</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">someone</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">team</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">uninterested</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">way</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">went</td>
-<td align="right">4</td>
-<td align="right">1.6</td>
-<td align="left">NA</td>
-</tr>
-</tbody>
-</table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ2"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/group-plot-1.png" class="r-plt" alt="Two side-by-side bar charts of the most frequent terms, one for the north branch and one for the south branch." width="672"></p>
 <p>North’s simulated comments lean toward “friendly”, “helpful”, and
 “clean”. South’s lean toward “wait”, “slow”, and “staff” in a different
 sense, the complaint sense of the word, where the North uses the
@@ -1055,113 +348,6 @@ throughout.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">kwic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_term_context.html">sframe_term_context</a></span><span class="op">(</span><span class="va">cleaned</span>, term <span class="op">=</span> <span class="st">"wait"</span>, window <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">kwic</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, caption <span class="op">=</span> <span class="st">'Every occurrence of "wait" in context.'</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Every occurrence of “wait” in context.</caption>
-<colgroup>
-<col width="12%">
-<col width="41%">
-<col width="6%">
-<col width="39%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">respondent</th>
-<th align="left">before</th>
-<th align="left">match</th>
-<th align="left">after</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">the</td>
-<td align="left">wait</td>
-<td align="left">for a table was far</td>
-</tr>
-<tr class="even">
-<td align="right">9</td>
-<td align="left">to help us the long</td>
-<td align="left">wait</td>
-<td align="left">ruined an otherwise average visit</td>
-</tr>
-<tr class="odd">
-<td align="right">13</td>
-<td align="left">and helpful we had to</td>
-<td align="left">wait</td>
-<td align="left">a long time for someone</td>
-</tr>
-<tr class="even">
-<td align="right">14</td>
-<td align="left">incredibly friendly and helpful the</td>
-<td align="left">wait</td>
-<td align="left">for a table was far</td>
-</tr>
-<tr class="odd">
-<td align="right">23</td>
-<td align="left">we had to</td>
-<td align="left">wait</td>
-<td align="left">a long time for someone</td>
-</tr>
-<tr class="even">
-<td align="right">24</td>
-<td align="left">we had to</td>
-<td align="left">wait</td>
-<td align="left">a long time for someone</td>
-</tr>
-<tr class="odd">
-<td align="right">25</td>
-<td align="left">the service was slow the</td>
-<td align="left">wait</td>
-<td align="left">for a table was far</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="left">the</td>
-<td align="left">wait</td>
-<td align="left">for a table was far</td>
-</tr>
-<tr class="odd">
-<td align="right">31</td>
-<td align="left">comfortable throughout our stay the</td>
-<td align="left">wait</td>
-<td align="left">for a table was far</td>
-</tr>
-<tr class="even">
-<td align="right">38</td>
-<td align="left">we had to</td>
-<td align="left">wait</td>
-<td align="left">a long time for someone</td>
-</tr>
-<tr class="odd">
-<td align="right">40</td>
-<td align="left">the long</td>
-<td align="left">wait</td>
-<td align="left">ruined an otherwise average visit</td>
-</tr>
-<tr class="even">
-<td align="right">42</td>
-<td align="left">the long</td>
-<td align="left">wait</td>
-<td align="left">ruined an otherwise average visit</td>
-</tr>
-<tr class="odd">
-<td align="right">45</td>
-<td align="left">the long</td>
-<td align="left">wait</td>
-<td align="left">ruined an otherwise average visit</td>
-</tr>
-<tr class="even">
-<td align="right">49</td>
-<td align="left">the long</td>
-<td align="left">wait</td>
-<td align="left">ruined an otherwise average visit</td>
-</tr>
-<tr class="odd">
-<td align="right">52</td>
-<td align="left">we had to</td>
-<td align="left">wait</td>
-<td align="left">a long time for someone</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level2">
 <h2 id="co-occurrence">Co-occurrence<a class="anchor" aria-label="anchor" href="#co-occurrence"></a>
@@ -1181,59 +367,8 @@ renders as a heatmap.</p>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ3"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, <span class="fl">8</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"The strongest co-occurring term pairs."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The strongest co-occurring term pairs.</caption>
-<thead><tr class="header">
-<th align="left">term_a</th>
-<th align="left">term_b</th>
-<th align="right">n</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">friendly</td>
-<td align="left">staff</td>
-<td align="right">18</td>
-</tr>
-<tr class="even">
-<td align="left">long</td>
-<td align="left">wait</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">help</td>
-<td align="left">us</td>
-<td align="right">12</td>
-</tr>
-<tr class="even">
-<td align="left">helpful</td>
-<td align="left">staff</td>
-<td align="right">11</td>
-</tr>
-<tr class="odd">
-<td align="left">arrived</td>
-<td align="left">attentive</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="left">arrived</td>
-<td align="left">fast</td>
-<td align="right">9</td>
-</tr>
-<tr class="odd">
-<td align="left">arrived</td>
-<td align="left">food</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="left">arrived</td>
-<td align="left">server</td>
-<td align="right">9</td>
-</tr>
-</tbody>
-</table>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ3"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/cooccurrence-plot-1.png" class="r-plt" alt="Heatmap of pairwise term co-occurrence counts." width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="co-occurrence-network">Co-occurrence network<a class="anchor" aria-label="anchor" href="#co-occurrence-network"></a>
@@ -1256,165 +391,10 @@ layout.</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, plots <span class="op">=</span> <span class="va">has_ggplot</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ4"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Term co-occurrence network: one row per node."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Term co-occurrence network: one row per node.</caption>
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">frequency</th>
-<th align="right">cluster</th>
-<th align="right">x</th>
-<th align="right">y</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">anything</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">2.1917953</td>
-<td align="right">-2.0822495</td>
-</tr>
-<tr class="even">
-<td align="left">arrived</td>
-<td align="right">9</td>
-<td align="right">2</td>
-<td align="right">1.4615771</td>
-<td align="right">-2.4772383</td>
-</tr>
-<tr class="odd">
-<td align="left">attentive</td>
-<td align="right">9</td>
-<td align="right">2</td>
-<td align="right">1.1790744</td>
-<td align="right">-2.3735285</td>
-</tr>
-<tr class="even">
-<td align="left">check</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0.8338025</td>
-<td align="right">-1.5728367</td>
-</tr>
-<tr class="odd">
-<td align="left">fast</td>
-<td align="right">9</td>
-<td align="right">2</td>
-<td align="right">1.5732010</td>
-<td align="right">-2.2020125</td>
-</tr>
-<tr class="even">
-<td align="left">food</td>
-<td align="right">9</td>
-<td align="right">2</td>
-<td align="right">1.2773098</td>
-<td align="right">-2.1426404</td>
-</tr>
-<tr class="odd">
-<td align="left">friendly</td>
-<td align="right">18</td>
-<td align="right">1</td>
-<td align="right">1.7338476</td>
-<td align="right">-1.3154823</td>
-</tr>
-<tr class="even">
-<td align="left">help</td>
-<td align="right">12</td>
-<td align="right">3</td>
-<td align="right">1.9855295</td>
-<td align="right">-0.4521643</td>
-</tr>
-<tr class="odd">
-<td align="left">helpful</td>
-<td align="right">13</td>
-<td align="right">1</td>
-<td align="right">2.0621875</td>
-<td align="right">-1.6578872</td>
-</tr>
-<tr class="even">
-<td align="left">long</td>
-<td align="right">16</td>
-<td align="right">3</td>
-<td align="right">1.7459138</td>
-<td align="right">-0.7139174</td>
-</tr>
-<tr class="odd">
-<td align="left">quick</td>
-<td align="right">12</td>
-<td align="right">1</td>
-<td align="right">1.0257875</td>
-<td align="right">-1.8167177</td>
-</tr>
-<tr class="even">
-<td align="left">room</td>
-<td align="right">22</td>
-<td align="right">1</td>
-<td align="right">1.3475179</td>
-<td align="right">-1.3365107</td>
-</tr>
-<tr class="odd">
-<td align="left">server</td>
-<td align="right">9</td>
-<td align="right">2</td>
-<td align="right">1.7501704</td>
-<td align="right">-2.3902528</td>
-</tr>
-<tr class="even">
-<td align="left">service</td>
-<td align="right">16</td>
-<td align="right">1</td>
-<td align="right">1.1083102</td>
-<td align="right">-1.1910460</td>
-</tr>
-<tr class="odd">
-<td align="left">slow</td>
-<td align="right">13</td>
-<td align="right">1</td>
-<td align="right">1.3980863</td>
-<td align="right">-0.8642853</td>
-</tr>
-<tr class="even">
-<td align="left">staff</td>
-<td align="right">33</td>
-<td align="right">1</td>
-<td align="right">1.6138444</td>
-<td align="right">-1.5004346</td>
-</tr>
-<tr class="odd">
-<td align="left">us</td>
-<td align="right">12</td>
-<td align="right">3</td>
-<td align="right">2.2861250</td>
-<td align="right">-0.6484429</td>
-</tr>
-<tr class="even">
-<td align="left">visit</td>
-<td align="right">12</td>
-<td align="right">3</td>
-<td align="right">2.0451459</td>
-<td align="right">-1.3590922</td>
-</tr>
-<tr class="odd">
-<td align="left">wait</td>
-<td align="right">15</td>
-<td align="right">3</td>
-<td align="right">2.0105057</td>
-<td align="right">-0.8718816</td>
-</tr>
-<tr class="even">
-<td align="left">whole</td>
-<td align="right">9</td>
-<td align="right">1</td>
-<td align="right">1.7365352</td>
-<td align="right">-1.6985350</td>
-</tr>
-</tbody>
-</table>
+<span>      caption <span class="op">=</span> <span class="st">"Term co-occurrence network: one row per node."</span><span class="op">)</span></span>
+<span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ4"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ4"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span>
-<span><span class="co">#&gt; [1] "Term co-occurrence network for \"What stood out about your visit, good or bad?\" (N = 60 responses, 20 terms, 145 edges, 3 clusters, modularity = 0.30)."</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ4"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/network-plot-1.png" class="r-plt" alt="Force-directed network of co-occurring terms, coloured by Louvain cluster and sized by frequency." width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="sentiment">Sentiment<a class="anchor" aria-label="anchor" href="#sentiment"></a>
@@ -1424,7 +404,7 @@ package. It uses the bundled <code>"bing"</code> positive/negative
 lexicon, which arrives with tidytext itself. Like
 <code>term_freq</code>, it accepts an optional <code>group</code>
 role.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ5"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"Is sentiment in the comments more positive or negative, and does it differ by branch?"</span>,</span>
@@ -1435,67 +415,10 @@ role.</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, plots <span class="op">=</span> <span class="va">has_ggplot</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Sentiment counts, split by branch."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Sentiment counts, split by branch.</caption>
-<thead><tr class="header">
-<th align="left">group</th>
-<th align="left">sentiment</th>
-<th align="right">n</th>
-<th align="right">prop</th>
-<th align="left">note</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">positive</td>
-<td align="right">20</td>
-<td align="right">0.690</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">North branch</td>
-<td align="left">negative</td>
-<td align="right">2</td>
-<td align="right">0.069</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">North branch</td>
-<td align="left">neutral</td>
-<td align="right">7</td>
-<td align="right">0.241</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">positive</td>
-<td align="right">14</td>
-<td align="right">0.452</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">South branch</td>
-<td align="left">negative</td>
-<td align="right">12</td>
-<td align="right">0.387</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">South branch</td>
-<td align="left">neutral</td>
-<td align="right">5</td>
-<td align="right">0.161</td>
-<td align="left">NA</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span>
-<span><span class="co">#&gt; [1] "Sentiment for \"What stood out about your visit, good or bad?\" by \"Which branch did you visit?\" (N = 60 responses, 2 groups)."</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<span>      caption <span class="op">=</span> <span class="st">"Sentiment counts, split by branch."</span><span class="op">)</span></span>
+<span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/sentiment-plot-1.png" class="r-plt" alt="Diverging bar chart of positive and negative sentiment counts, faceted by branch." width="672"></p>
 <p>The diverging bar answers “how many responses leaned positive.” A
 different question, “which <em>words</em> drove that,” has its own
 opt-in view: a comparison cloud (<code>options$wordcloud = TRUE</code>,
@@ -1504,7 +427,7 @@ negative-sentiment words to the left of centre and positive-sentiment
 words to the right, matching the diverging bar’s own
 left-negative/right-positive convention, each sized and shaded (dark for
 frequent, light for rare) by how often it occurred.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">instr_cloud</span> <span class="op">&lt;-</span> <span class="va">instr</span></span>
 <span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr_cloud</span><span class="op">)</span></span>
 <span><span class="va">plan</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">plan</span>, <span class="va">`[[`</span>, <span class="st">""</span>, <span class="st">"id"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"RQ5"</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">options</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>wordcloud <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -1512,7 +435,6 @@ frequent, light for rare) by how often it occurred.</p>
 <span></span>
 <span><span class="va">result_cloud</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr_cloud</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">result_cloud</span><span class="op">[[</span><span class="st">"RQ5"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/sentiment-cloud-1.png" class="r-plt" alt="Comparison word cloud: negative-sentiment terms to the left of centre in red, positive-sentiment terms to the right in teal, each sized and shaded by frequency." width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="document-feature-matrix">Document-feature matrix<a class="anchor" aria-label="anchor" href="#document-feature-matrix"></a>
@@ -1521,7 +443,7 @@ frequent, light for rare) by how often it occurred.</p>
 package. It is a descriptive summary ahead of an analysis: feature
 count, sparsity, and the leading features provide a sanity check before
 a heavier method.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ6"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What does the document-feature matrix of the comments look like?"</span>,</span>
@@ -1532,64 +454,9 @@ a heavier method.</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ6"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Document-feature matrix summary."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Document-feature matrix summary.</caption>
-<thead><tr class="header">
-<th align="right">n_responses</th>
-<th align="right">n_features</th>
-<th align="right">sparsity</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td align="right">60</td>
-<td align="right">72</td>
-<td align="right">0.8354</td>
-</tr></tbody>
-</table>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ6"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">top_features</span>, <span class="fl">8</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>      caption <span class="op">=</span> <span class="st">"Document-feature matrix summary."</span><span class="op">)</span></span>
+<span><span class="fu">kable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ6"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">top_features</span>, <span class="fl">8</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"The leading features."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The leading features.</caption>
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">n</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">the</td>
-<td align="right">77</td>
-</tr>
-<tr class="even">
-<td align="left">was</td>
-<td align="right">56</td>
-</tr>
-<tr class="odd">
-<td align="left">and</td>
-<td align="right">54</td>
-</tr>
-<tr class="even">
-<td align="left">staff</td>
-<td align="right">33</td>
-</tr>
-<tr class="odd">
-<td align="left">our</td>
-<td align="right">23</td>
-</tr>
-<tr class="even">
-<td align="left">to</td>
-<td align="right">23</td>
-</tr>
-<tr class="odd">
-<td align="left">room</td>
-<td align="right">22</td>
-</tr>
-<tr class="even">
-<td align="left">were</td>
-<td align="right">19</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level2">
 <h2 id="topic-modelling-and-representative-quotes">Topic modelling and representative quotes<a class="anchor" aria-label="anchor" href="#topic-modelling-and-representative-quotes"></a>
@@ -1597,7 +464,7 @@ a heavier method.</p>
 <p><code>stm_topics</code> fits a structural topic model via the
 optional <code>stm</code> package (tokenising uses
 <code>tidytext</code>, so both are needed). A small <code>k</code> keeps
-this example fast. A real study would try three to six values of
+this example fast. A real study would try 3 to 6 values of
 <code>k</code> and compare fit. <code>k = 3</code> (or
 <code>topic_model_lda</code>’s default <code>k = 4</code>) is a
 demonstration value chosen to keep the example fast, with a fit
@@ -1611,7 +478,7 @@ same <code>documents</code>/<code>vocab</code>
 same purpose for <code>topic_model_lda</code>. Both stay in their own
 packages. <code>k</code> selection is a modelling decision for the
 researcher to make and report, not a default to trust unexamined.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">instr</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  id <span class="op">=</span> <span class="st">"RQ7"</span>,</span>
 <span>  research_question <span class="op">=</span> <span class="st">"What topics organise the open-ended comments?"</span>,</span>
@@ -1622,302 +489,19 @@ researcher to make and report, not a default to trust unexamined.</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">instr</span>, plots <span class="op">=</span> <span class="va">has_ggplot</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">table</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Top terms per topic."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Top terms per topic.</caption>
-<thead><tr class="header">
-<th align="right">topic</th>
-<th align="right">proportion</th>
-<th align="left">term</th>
-<th align="right">beta</th>
-<th align="right">rank</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">long</td>
-<td align="right">0.1185254</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">wait</td>
-<td align="right">0.1111175</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">help</td>
-<td align="right">0.0888936</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">us</td>
-<td align="right">0.0888936</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">helpful</td>
-<td align="right">0.0825053</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">staff</td>
-<td align="right">0.0812188</td>
-<td align="right">6</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">time</td>
-<td align="right">0.0592627</td>
-<td align="right">7</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">anything</td>
-<td align="right">0.0592627</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">needed</td>
-<td align="right">0.0592627</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">0.3056</td>
-<td align="left">whenever</td>
-<td align="right">0.0592627</td>
-<td align="right">10</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">room</td>
-<td align="right">0.1594378</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">check</td>
-<td align="right">0.0700360</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">spotless</td>
-<td align="right">0.0700360</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">quick</td>
-<td align="right">0.0643212</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">clean</td>
-<td align="right">0.0612815</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">comfortable</td>
-<td align="right">0.0612815</td>
-<td align="right">6</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">stay</td>
-<td align="right">0.0612815</td>
-<td align="right">7</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">throughout</td>
-<td align="right">0.0612815</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">team</td>
-<td align="right">0.0611922</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">0.2766</td>
-<td align="left">way</td>
-<td align="right">0.0611922</td>
-<td align="right">10</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">staff</td>
-<td align="right">0.1062715</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">service</td>
-<td align="right">0.0838659</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">slow</td>
-<td align="right">0.0681410</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">friendly</td>
-<td align="right">0.0677522</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">arrived</td>
-<td align="right">0.0471746</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">attentive</td>
-<td align="right">0.0471746</td>
-<td align="right">6</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">fast</td>
-<td align="right">0.0471746</td>
-<td align="right">7</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">food</td>
-<td align="right">0.0471746</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">server</td>
-<td align="right">0.0471746</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">0.4178</td>
-<td align="left">whole</td>
-<td align="right">0.0471746</td>
-<td align="right">10</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span>
-<span><span class="co">#&gt; [1] "STM topic model (k = 3, N = 60 documents)."</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<span>      caption <span class="op">=</span> <span class="st">"Top terms per topic."</span><span class="op">)</span></span>
+<span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">apa</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="text-analysis_files/figure-html/stm-plot-1.png" class="r-plt" alt="Faceted bar chart of the top terms for each of the 3 topics." width="672"></p>
 <p><code><a href="../reference/sframe_extract_quotes.html">sframe_extract_quotes()</a></code> reads the fitted model back off
 the result and returns the most representative response for each topic,
 with the <strong>original</strong> respondent index (not a document or
 matrix row number), so a quote can be traced back to the response that
 produced it.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_extract_quotes.html">sframe_extract_quotes</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="st">"RQ7"</span><span class="op">]</span><span class="op">]</span>, text <span class="op">=</span> <span class="va">cleaned</span>, n_quotes <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">quotes</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      caption <span class="op">=</span> <span class="st">"The 2 most representative comments per topic."</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>The 2 most representative comments per topic.</caption>
-<colgroup>
-<col width="4%">
-<col width="4%">
-<col width="8%">
-<col width="82%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">topic</th>
-<th align="right">rank</th>
-<th align="right">respondent</th>
-<th align="left">quote</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">56</td>
-<td align="left">the staff were helpful whenever we needed anything the
-staff were helpful whenever we needed anything</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">23</td>
-<td align="left">we had to wait a long time for someone to help us</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">30</td>
-<td align="left">the room was clean and comfortable throughout our
-stay</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">46</td>
-<td align="left">the room was clean and comfortable throughout our
-stay</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">18</td>
-<td align="left">friendly staff made the whole visit pleasant our server
-was attentive and the food arrived fast</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="right">2</td>
-<td align="right">39</td>
-<td align="left">friendly staff made the whole visit pleasant our server
-was attentive and the food arrived fast</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level2">
 <h2 id="the-rendered-report">The rendered report<a class="anchor" aria-label="anchor" href="#the-rendered-report"></a>
@@ -1929,7 +513,7 @@ representative quotes attach to its result as <code>$quotes</code> and
 render as their own table beneath the topic terms, using the same
 generic table renderer every other result’s <code>$table</code>
 uses.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_report.html">render_report</a></span><span class="op">(</span><span class="va">instr</span>, <span class="va">responses</span>, output_file <span class="op">=</span> <span class="st">"hospitality-feedback.html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

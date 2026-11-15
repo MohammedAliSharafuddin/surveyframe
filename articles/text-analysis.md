@@ -2,17 +2,17 @@
 
 ## What this vignette covers
 
-Text and textarea items collect open-ended responses that a Likert scale
-cannot: the reason behind a rating, a complaint a closed question never
-anticipated, a suggestion nobody thought to ask for directly.
-surveyframe treats analysing that text the same way it treats every
-other analysis: a research question, a technique, and the roles that
-fill it, declared in the instrument’s analysis plan before the numbers
-exist.
+Text and textarea items collect open-ended responses, beyond what a
+Likert scale records: the reason behind a rating, a complaint a closed
+question never anticipated, a suggestion nobody thought to ask for
+directly. surveyframe treats analysing that text the same way it treats
+every other analysis: a research question, a technique, and the roles
+that fill it, declared in the instrument’s analysis plan before the
+numbers exist.
 
-Nine methods are available, from plain term counting through to topic
+9 methods are available, from plain term counting through to topic
 modelling. The base path (`term_freq`, `ngram_freq`, `term_context`,
-`co_occurrence`) runs on the package alone. Five more
+`co_occurrence`) runs on the package alone. 5 more
 (`co_occurrence_network`, `tidy_sentiment`, `quanteda_dfm`,
 `topic_model_lda`, `stm_topics`) need one or more Suggests-only
 packages, guarded with
@@ -110,18 +110,9 @@ kable(head(responses, 4), row.names = FALSE,
       caption = "The first 4 simulated responses.")
 ```
 
-| satisfaction | branch | comments                                            |
-|-------------:|:-------|:----------------------------------------------------|
-|            4 | north  | The wait for a table was far too long.              |
-|            5 | north  | The staff were helpful whenever we needed anything. |
-|            3 | north  | The staff were helpful whenever we needed anything. |
-|            5 | south  | Our server was attentive and the food arrived fast. |
-
-The first 4 simulated responses. {.table}
-
 ## Cleaning a text item
 
-[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
+[`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)
 pulls one item’s responses out of the data, drops blank and missing
 entries, and applies light, configurable cleaning. It keeps a
 `respondent` attribute mapping each cleaned entry back to its original
@@ -132,18 +123,16 @@ can still cite where a response came from.
 
 cleaned <- sframe_clean_text(responses, "comments", instrument = instr)
 length(cleaned)
-#> [1] 60
 head(attr(cleaned, "respondent"))
-#> [1] 1 2 3 4 5 6
 ```
 
 ## Term and n-gram frequency
 
-[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
+[`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
 tokenises, lower-cases, strips punctuation, removes stop words (a
 built-in English list ships with the package, so this stage runs on base
 surveyframe), and counts.
-[`sframe_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_ngram_frequency.md)
+[`sframe_ngram_frequency()`](https://surveyframe.org/reference/sframe_ngram_frequency.md)
 does the same for 2-word and 3-word phrases, which surface a complaint
 like “long wait” that single-word counts would split apart.
 
@@ -153,39 +142,11 @@ terms <- sframe_term_frequency(cleaned, top_n = 10)
 kable(terms, row.names = FALSE, caption = "The 10 most frequent terms.")
 ```
 
-| term     |   n | pct |
-|:---------|----:|----:|
-| staff    |  33 | 7.4 |
-| room     |  22 | 5.0 |
-| friendly |  18 | 4.1 |
-| long     |  16 | 3.6 |
-| service  |  16 | 3.6 |
-| wait     |  15 | 3.4 |
-| helpful  |  13 | 2.9 |
-| slow     |  13 | 2.9 |
-| help     |  12 | 2.7 |
-| quick    |  12 | 2.7 |
-
-The 10 most frequent terms. {.table}
-
 ``` r
 
 bigrams <- sframe_ngram_frequency(cleaned, n = 2, top_n = 8)
 kable(bigrams, row.names = FALSE, caption = "The 8 most frequent bigrams.")
 ```
-
-| term                   |   n | pct |
-|:-----------------------|----:|----:|
-| help us                |  12 | 7.6 |
-| arrived fast           |   9 | 5.7 |
-| food arrived           |   9 | 5.7 |
-| helpful whenever       |   8 | 5.1 |
-| needed anything        |   8 | 5.1 |
-| comfortable throughout |   7 | 4.4 |
-| friendly staff         |   7 | 4.4 |
-| staff made             |   7 | 4.4 |
-
-The 8 most frequent bigrams. {.table}
 
 Both run through the analysis plan the same way any other method does.
 Here, `term_freq` also takes an optional `group` role (covered below),
@@ -212,48 +173,10 @@ kable(results[["RQ1"]]$table, row.names = FALSE,
       caption = "Term frequency across all branches.")
 ```
 
-| term        |   n | pct |
-|:------------|----:|----:|
-| staff       |  33 | 7.4 |
-| room        |  22 | 5.0 |
-| friendly    |  18 | 4.1 |
-| long        |  16 | 3.6 |
-| service     |  16 | 3.6 |
-| wait        |  15 | 3.4 |
-| helpful     |  13 | 2.9 |
-| slow        |  13 | 2.9 |
-| help        |  12 | 2.7 |
-| quick       |  12 | 2.7 |
-| us          |  12 | 2.7 |
-| visit       |  12 | 2.7 |
-| arrived     |   9 | 2.0 |
-| attentive   |   9 | 2.0 |
-| fast        |   9 | 2.0 |
-| food        |   9 | 2.0 |
-| server      |   9 | 2.0 |
-| whole       |   9 | 2.0 |
-| anything    |   8 | 1.8 |
-| check       |   8 | 1.8 |
-| needed      |   8 | 1.8 |
-| spotless    |   8 | 1.8 |
-| time        |   8 | 1.8 |
-| whenever    |   8 | 1.8 |
-| clean       |   7 | 1.6 |
-| comfortable |   7 | 1.6 |
-| dirty       |   7 | 1.6 |
-| made        |   7 | 1.6 |
-| pleasant    |   7 | 1.6 |
-| seemed      |   7 | 1.6 |
-
-Term frequency across all branches. {.table}
-
 ``` r
 
 results[["RQ1"]]$plot
 ```
-
-![Horizontal bar chart of the most frequent terms across all
-responses.](text-analysis_files/figure-html/plan-term-plot-1.png)
 
 A word cloud is available as an opt-in alternative to the bar chart
 (`options$wordcloud = TRUE`), useful in a slide deck where a bar chart’s
@@ -267,10 +190,6 @@ sframe_plot_term_frequency(
 )
 ```
 
-![A circular word cloud of the most frequent terms, sized and shaded
-(dark for frequent, light for rare) by
-frequency.](text-analysis_files/figure-html/wordcloud-1.png)
-
 ## The group role: comparing branches
 
 `RQ2` above declared the same method with a `group` role added. The
@@ -283,79 +202,10 @@ kable(results[["RQ2"]]$table, row.names = FALSE,
       caption = "Term frequency split by branch.")
 ```
 
-| group        | term         |   n | pct | note |
-|:-------------|:-------------|----:|----:|:-----|
-| North branch | staff        |  16 | 8.0 | NA   |
-| North branch | room         |  11 | 5.5 | NA   |
-| North branch | helpful      |   9 | 4.5 | NA   |
-| North branch | friendly     |   8 | 4.0 | NA   |
-| North branch | anything     |   7 | 3.5 | NA   |
-| North branch | needed       |   7 | 3.5 | NA   |
-| North branch | quick        |   7 | 3.5 | NA   |
-| North branch | whenever     |   7 | 3.5 | NA   |
-| North branch | arrived      |   5 | 2.5 | NA   |
-| North branch | attentive    |   5 | 2.5 | NA   |
-| North branch | check        |   5 | 2.5 | NA   |
-| North branch | fast         |   5 | 2.5 | NA   |
-| North branch | food         |   5 | 2.5 | NA   |
-| North branch | made         |   5 | 2.5 | NA   |
-| North branch | pleasant     |   5 | 2.5 | NA   |
-| North branch | server       |   5 | 2.5 | NA   |
-| North branch | service      |   5 | 2.5 | NA   |
-| North branch | spotless     |   5 | 2.5 | NA   |
-| North branch | visit        |   5 | 2.5 | NA   |
-| North branch | whole        |   5 | 2.5 | NA   |
-| North branch | clean        |   4 | 2.0 | NA   |
-| North branch | comfortable  |   4 | 2.0 | NA   |
-| North branch | help         |   4 | 2.0 | NA   |
-| North branch | long         |   4 | 2.0 | NA   |
-| North branch | stay         |   4 | 2.0 | NA   |
-| North branch | throughout   |   4 | 2.0 | NA   |
-| North branch | us           |   4 | 2.0 | NA   |
-| North branch | slow         |   3 | 1.5 | NA   |
-| North branch | team         |   3 | 1.5 | NA   |
-| North branch | wait         |   3 | 1.5 | NA   |
-| South branch | staff        |  17 | 7.0 | NA   |
-| South branch | long         |  12 | 4.9 | NA   |
-| South branch | wait         |  12 | 4.9 | NA   |
-| South branch | room         |  11 | 4.5 | NA   |
-| South branch | service      |  11 | 4.5 | NA   |
-| South branch | friendly     |  10 | 4.1 | NA   |
-| South branch | slow         |  10 | 4.1 | NA   |
-| South branch | help         |   8 | 3.3 | NA   |
-| South branch | us           |   8 | 3.3 | NA   |
-| South branch | visit        |   7 | 2.9 | NA   |
-| South branch | seemed       |   6 | 2.5 | NA   |
-| South branch | time         |   6 | 2.5 | NA   |
-| South branch | average      |   5 | 2.0 | NA   |
-| South branch | dirty        |   5 | 2.0 | NA   |
-| South branch | otherwise    |   5 | 2.0 | NA   |
-| South branch | quick        |   5 | 2.0 | NA   |
-| South branch | respond      |   5 | 2.0 | NA   |
-| South branch | ruined       |   5 | 2.0 | NA   |
-| South branch | arrived      |   4 | 1.6 | NA   |
-| South branch | attentive    |   4 | 1.6 | NA   |
-| South branch | fast         |   4 | 1.6 | NA   |
-| South branch | food         |   4 | 1.6 | NA   |
-| South branch | helpful      |   4 | 1.6 | NA   |
-| South branch | poor         |   4 | 1.6 | NA   |
-| South branch | server       |   4 | 1.6 | NA   |
-| South branch | someone      |   4 | 1.6 | NA   |
-| South branch | team         |   4 | 1.6 | NA   |
-| South branch | uninterested |   4 | 1.6 | NA   |
-| South branch | way          |   4 | 1.6 | NA   |
-| South branch | went         |   4 | 1.6 | NA   |
-
-Term frequency split by branch. {.table}
-
 ``` r
 
 results[["RQ2"]]$plot
 ```
-
-![Two side-by-side bar charts of the most frequent terms, one for the
-north branch and one for the south
-branch.](text-analysis_files/figure-html/group-plot-1.png)
 
 North’s simulated comments lean toward “friendly”, “helpful”, and
 “clean”. South’s lean toward “wait”, “slow”, and “staff” in a different
@@ -370,7 +220,7 @@ a trend.
 
 ## Keyword in context
 
-[`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md)
+[`sframe_term_context()`](https://surveyframe.org/reference/sframe_term_context.md)
 builds a concordance for one keyword: every place it appears, with a
 window of surrounding words on each side. It is the fastest way to read
 what a keyword actually means in context, and it settles whether a
@@ -381,26 +231,6 @@ frequent term keeps one sense throughout.
 kwic <- sframe_term_context(cleaned, term = "wait", window = 5)
 kable(kwic, row.names = FALSE, caption = 'Every occurrence of "wait" in context.')
 ```
-
-| respondent | before | match | after |
-|---:|:---|:---|:---|
-| 1 | the | wait | for a table was far |
-| 9 | to help us the long | wait | ruined an otherwise average visit |
-| 13 | and helpful we had to | wait | a long time for someone |
-| 14 | incredibly friendly and helpful the | wait | for a table was far |
-| 23 | we had to | wait | a long time for someone |
-| 24 | we had to | wait | a long time for someone |
-| 25 | the service was slow the | wait | for a table was far |
-| 28 | the | wait | for a table was far |
-| 31 | comfortable throughout our stay the | wait | for a table was far |
-| 38 | we had to | wait | a long time for someone |
-| 40 | the long | wait | ruined an otherwise average visit |
-| 42 | the long | wait | ruined an otherwise average visit |
-| 45 | the long | wait | ruined an otherwise average visit |
-| 49 | the long | wait | ruined an otherwise average visit |
-| 52 | we had to | wait | a long time for someone |
-
-Every occurrence of “wait” in context. {.table}
 
 ## Co-occurrence
 
@@ -423,26 +253,10 @@ kable(head(results[["RQ3"]]$table, 8), row.names = FALSE,
       caption = "The strongest co-occurring term pairs.")
 ```
 
-| term_a   | term_b    |   n |
-|:---------|:----------|----:|
-| friendly | staff     |  18 |
-| long     | wait      |  15 |
-| help     | us        |  12 |
-| helpful  | staff     |  11 |
-| arrived  | attentive |   9 |
-| arrived  | fast      |   9 |
-| arrived  | food      |   9 |
-| arrived  | server    |   9 |
-
-The strongest co-occurring term pairs. {.table}
-
 ``` r
 
 results[["RQ3"]]$plot
 ```
-
-![Heatmap of pairwise term co-occurrence
-counts.](text-analysis_files/figure-html/cooccurrence-plot-1.png)
 
 ## Co-occurrence network
 
@@ -468,47 +282,13 @@ results <- run_analysis_plan(responses, instr, plots = has_ggplot)
 
 kable(results[["RQ4"]]$table, row.names = FALSE,
       caption = "Term co-occurrence network: one row per node.")
-```
-
-| term      | frequency | cluster |         x |          y |
-|:----------|----------:|--------:|----------:|-----------:|
-| anything  |         8 |       1 | 2.1917953 | -2.0822495 |
-| arrived   |         9 |       2 | 1.4615771 | -2.4772383 |
-| attentive |         9 |       2 | 1.1790744 | -2.3735285 |
-| check     |         8 |       1 | 0.8338025 | -1.5728367 |
-| fast      |         9 |       2 | 1.5732010 | -2.2020125 |
-| food      |         9 |       2 | 1.2773098 | -2.1426404 |
-| friendly  |        18 |       1 | 1.7338476 | -1.3154823 |
-| help      |        12 |       3 | 1.9855295 | -0.4521643 |
-| helpful   |        13 |       1 | 2.0621875 | -1.6578872 |
-| long      |        16 |       3 | 1.7459138 | -0.7139174 |
-| quick     |        12 |       1 | 1.0257875 | -1.8167177 |
-| room      |        22 |       1 | 1.3475179 | -1.3365107 |
-| server    |         9 |       2 | 1.7501704 | -2.3902528 |
-| service   |        16 |       1 | 1.1083102 | -1.1910460 |
-| slow      |        13 |       1 | 1.3980863 | -0.8642853 |
-| staff     |        33 |       1 | 1.6138444 | -1.5004346 |
-| us        |        12 |       3 | 2.2861250 | -0.6484429 |
-| visit     |        12 |       3 | 2.0451459 | -1.3590922 |
-| wait      |        15 |       3 | 2.0105057 | -0.8718816 |
-| whole     |         9 |       1 | 1.7365352 | -1.6985350 |
-
-Term co-occurrence network: one row per node. {.table}
-
-``` r
-
 results[["RQ4"]]$apa
-#> [1] "Term co-occurrence network for \"What stood out about your visit, good or bad?\" (N = 60 responses, 20 terms, 145 edges, 3 clusters, modularity = 0.30)."
 ```
 
 ``` r
 
 results[["RQ4"]]$plot
 ```
-
-![Force-directed network of co-occurring terms, coloured by Louvain
-cluster and sized by
-frequency.](text-analysis_files/figure-html/network-plot-1.png)
 
 ## Sentiment
 
@@ -529,32 +309,13 @@ results <- run_analysis_plan(responses, instr, plots = has_ggplot)
 
 kable(results[["RQ5"]]$table, row.names = FALSE,
       caption = "Sentiment counts, split by branch.")
-```
-
-| group        | sentiment |   n |  prop | note |
-|:-------------|:----------|----:|------:|:-----|
-| North branch | positive  |  20 | 0.690 | NA   |
-| North branch | negative  |   2 | 0.069 | NA   |
-| North branch | neutral   |   7 | 0.241 | NA   |
-| South branch | positive  |  14 | 0.452 | NA   |
-| South branch | negative  |  12 | 0.387 | NA   |
-| South branch | neutral   |   5 | 0.161 | NA   |
-
-Sentiment counts, split by branch. {.table}
-
-``` r
-
 results[["RQ5"]]$apa
-#> [1] "Sentiment for \"What stood out about your visit, good or bad?\" by \"Which branch did you visit?\" (N = 60 responses, 2 groups)."
 ```
 
 ``` r
 
 results[["RQ5"]]$plot
 ```
-
-![Diverging bar chart of positive and negative sentiment counts, faceted
-by branch.](text-analysis_files/figure-html/sentiment-plot-1.png)
 
 The diverging bar answers “how many responses leaned positive.” A
 different question, “which *words* drove that,” has its own opt-in view:
@@ -575,11 +336,6 @@ result_cloud <- run_analysis_plan(responses, instr_cloud, plots = TRUE)
 result_cloud[["RQ5"]]$plot
 ```
 
-![Comparison word cloud: negative-sentiment terms to the left of centre
-in red, positive-sentiment terms to the right in teal, each sized and
-shaded by
-frequency.](text-analysis_files/figure-html/sentiment-cloud-1.png)
-
 ## Document-feature matrix
 
 `quanteda_dfm` needs the optional `quanteda` package. It is a
@@ -599,40 +355,17 @@ results <- run_analysis_plan(responses, instr)
 
 kable(results[["RQ6"]]$table, row.names = FALSE,
       caption = "Document-feature matrix summary.")
-```
-
-| n_responses | n_features | sparsity |
-|------------:|-----------:|---------:|
-|          60 |         72 |   0.8354 |
-
-Document-feature matrix summary. {.table}
-
-``` r
-
 kable(head(results[["RQ6"]]$top_features, 8), row.names = FALSE,
       caption = "The leading features.")
 ```
-
-| term  |   n |
-|:------|----:|
-| the   |  77 |
-| was   |  56 |
-| and   |  54 |
-| staff |  33 |
-| our   |  23 |
-| to    |  23 |
-| room  |  22 |
-| were  |  19 |
-
-The leading features. {.table}
 
 ## Topic modelling and representative quotes
 
 `stm_topics` fits a structural topic model via the optional `stm`
 package (tokenising uses `tidytext`, so both are needed). A small `k`
-keeps this example fast. A real study would try three to six values of
-`k` and compare fit. `k = 3` (or `topic_model_lda`’s default `k = 4`) is
-a demonstration value chosen to keep the example fast, with a fit
+keeps this example fast. A real study would try 3 to 6 values of `k` and
+compare fit. `k = 3` (or `topic_model_lda`’s default `k = 4`) is a
+demonstration value chosen to keep the example fast, with a fit
 criterion left out of it. The accepted way to choose `k` is to fit a
 range of candidate values and compare them on held-out likelihood or a
 coherence metric:
@@ -659,47 +392,7 @@ results <- run_analysis_plan(responses, instr, plots = has_ggplot)
 
 kable(results[["RQ7"]]$table, row.names = FALSE,
       caption = "Top terms per topic.")
-```
-
-| topic | proportion | term        |      beta | rank |
-|------:|-----------:|:------------|----------:|-----:|
-|     1 |     0.3056 | long        | 0.1185254 |    1 |
-|     1 |     0.3056 | wait        | 0.1111175 |    2 |
-|     1 |     0.3056 | help        | 0.0888936 |    3 |
-|     1 |     0.3056 | us          | 0.0888936 |    4 |
-|     1 |     0.3056 | helpful     | 0.0825053 |    5 |
-|     1 |     0.3056 | staff       | 0.0812188 |    6 |
-|     1 |     0.3056 | time        | 0.0592627 |    7 |
-|     1 |     0.3056 | anything    | 0.0592627 |    8 |
-|     1 |     0.3056 | needed      | 0.0592627 |    9 |
-|     1 |     0.3056 | whenever    | 0.0592627 |   10 |
-|     2 |     0.2766 | room        | 0.1594378 |    1 |
-|     2 |     0.2766 | check       | 0.0700360 |    2 |
-|     2 |     0.2766 | spotless    | 0.0700360 |    3 |
-|     2 |     0.2766 | quick       | 0.0643212 |    4 |
-|     2 |     0.2766 | clean       | 0.0612815 |    5 |
-|     2 |     0.2766 | comfortable | 0.0612815 |    6 |
-|     2 |     0.2766 | stay        | 0.0612815 |    7 |
-|     2 |     0.2766 | throughout  | 0.0612815 |    8 |
-|     2 |     0.2766 | team        | 0.0611922 |    9 |
-|     2 |     0.2766 | way         | 0.0611922 |   10 |
-|     3 |     0.4178 | staff       | 0.1062715 |    1 |
-|     3 |     0.4178 | service     | 0.0838659 |    2 |
-|     3 |     0.4178 | slow        | 0.0681410 |    3 |
-|     3 |     0.4178 | friendly    | 0.0677522 |    4 |
-|     3 |     0.4178 | arrived     | 0.0471746 |    5 |
-|     3 |     0.4178 | attentive   | 0.0471746 |    6 |
-|     3 |     0.4178 | fast        | 0.0471746 |    7 |
-|     3 |     0.4178 | food        | 0.0471746 |    8 |
-|     3 |     0.4178 | server      | 0.0471746 |    9 |
-|     3 |     0.4178 | whole       | 0.0471746 |   10 |
-
-Top terms per topic. {.table}
-
-``` r
-
 results[["RQ7"]]$apa
-#> [1] "STM topic model (k = 3, N = 60 documents)."
 ```
 
 ``` r
@@ -707,10 +400,7 @@ results[["RQ7"]]$apa
 results[["RQ7"]]$plot
 ```
 
-![Faceted bar chart of the top terms for each of the 3
-topics.](text-analysis_files/figure-html/stm-plot-1.png)
-
-[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md)
 reads the fitted model back off the result and returns the most
 representative response for each topic, with the **original** respondent
 index (not a document or matrix row number), so a quote can be traced
@@ -722,17 +412,6 @@ quotes <- sframe_extract_quotes(results[["RQ7"]], text = cleaned, n_quotes = 2)
 kable(quotes, row.names = FALSE,
       caption = "The 2 most representative comments per topic.")
 ```
-
-| topic | rank | respondent | quote |
-|---:|---:|---:|:---|
-| 1 | 1 | 56 | the staff were helpful whenever we needed anything the staff were helpful whenever we needed anything |
-| 1 | 2 | 23 | we had to wait a long time for someone to help us |
-| 2 | 1 | 30 | the room was clean and comfortable throughout our stay |
-| 2 | 2 | 46 | the room was clean and comfortable throughout our stay |
-| 3 | 1 | 18 | friendly staff made the whole visit pleasant our server was attentive and the food arrived fast |
-| 3 | 2 | 39 | friendly staff made the whole visit pleasant our server was attentive and the food arrived fast |
-
-The 2 most representative comments per topic. {.table}
 
 ## The rendered report
 
@@ -760,7 +439,7 @@ inductive coding (code-and-retrieve, memos, a hierarchical code scheme,
 the qcoder or RQDA style of analysis) is a different paradigm from the
 algorithmic methods here, resting on human interpretation where these
 methods count and cluster, and is out of scope by design.
-[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)’s
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md)’s
 output is deliberately a plain data frame, clean enough to export and
 take into a dedicated qualitative coding tool for that next step, which
 surveyframe leaves to the tools built for it.

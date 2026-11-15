@@ -1,7 +1,7 @@
 # N-gram frequency for open-ended text
 
 Tokenises `text` via the same tokeniser as
-[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
+[`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
 (whitespace splitting, lower-casing, punctuation stripping, and
 stop-word removal), then slides a window of `n` tokens across each
 response's token vector and counts how often each resulting n-gram
@@ -18,7 +18,7 @@ sframe_ngram_frequency(text, n = 2L, stop_words = NULL, top_n = 30L)
 - text:
 
   Character vector of responses (raw or already cleaned by
-  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)).
+  [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)).
 
 - n:
 
@@ -49,10 +49,10 @@ makes the output phrases respondents actually wrote.
 ## See also
 
 Other Text analysis functions:
-[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md),
-[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md),
-[`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md),
-[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
+[`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md),
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md),
+[`sframe_term_context()`](https://surveyframe.org/reference/sframe_term_context.md),
+[`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
 
 ## Examples
 
@@ -60,10 +60,4 @@ Other Text analysis functions:
 demo <- sframe_demo("tourism_services")
 cleaned <- sframe_clean_text(demo$responses, "comments")
 head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
-#>                     term  n  pct
-#> 1 sustainability details 35 24.1
-#> 2           clear online 31 21.4
-#> 3         online content 31 21.4
-#> 4    service information 24 16.6
-#> 5         useful service 24 16.6
 ```

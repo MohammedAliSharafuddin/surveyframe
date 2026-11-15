@@ -1,7 +1,7 @@
 # Save the charts from an analysis plan as files
 
 Writes each chart
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 drew with `plots = TRUE` to its own file, at the size, resolution and
 format a journal asks for. The charts the exported `sframe_plot_*()`
 functions return are `ggplot` objects, so any one of them can also be
@@ -26,7 +26,7 @@ sframe_save_figures(
 - results:
 
   The list
-  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
   returns, run with `plots = TRUE`.
 
 - dir:
@@ -48,21 +48,24 @@ sframe_save_figures(
 ## Value
 
 The paths written, named by block id, invisibly. Only blocks that drew a
-chart write a file.
+chart write a file. A block with a second chart, a linear regression's
+standardised coefficients or a mediation's path diagram, writes it as
+`<id>_2`.
 
 ## See also
 
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
+[`render_report()`](https://surveyframe.org/reference/render_report.md),
 which takes the same settings as `figures`.
 
 Other Report functions:
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
-[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
-[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
-[`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
-[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md),
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`sframe_analysis_qmd()`](https://surveyframe.org/reference/sframe_analysis_qmd.md),
+[`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md),
+[`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md),
+[`sframe_report_source()`](https://surveyframe.org/reference/sframe_report_source.md),
+[`sframe_reports`](https://surveyframe.org/reference/sframe_reports.md),
+[`sframe_show()`](https://surveyframe.org/reference/sframe_show.md)
 
 ## Examples
 
@@ -74,7 +77,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   paths <- sframe_save_figures(res, file.path(tempdir(), "figures"),
                                width = 6, height = 4, dpi = 300)
   basename(paths)
+  sframe_show(paths[1])
 }
-#> [1] "RQ1.png" "RQ2.png"
 # }
 ```

@@ -2,18 +2,17 @@
 
 The model is the third part of the research design. surveyframe stores
 the measurement and structural specification and writes the syntax for
-the modelling stage. It does not fit the models. This vignette builds
-the three models from the published Thailand study (Sharafuddin,
-Madhavan, and Wangtueai 2024). The syntax steps need no raw data, so
-every chunk below runs as written.
+the modelling stage, and you fit the models with lavaan or seminr. This
+vignette builds the 3 models from the published Thailand study
+(Sharafuddin, Madhavan, and Wangtueai 2024). The syntax steps need no
+raw data, so every chunk below runs as written.
 
-There are five constructs. Digital marketing effectiveness (DME) is
-built from relevance and engagement (DMRE), accessibility and usefulness
+There are 5 constructs. Digital marketing effectiveness (DME) is built
+from relevance and engagement (DMRE), accessibility and usefulness
 (DMAU), ease of use (DMEU), and perceived value (DMPV). Destination
 service quality (DSQ) is built from accommodation (DSQA) and local
-transport (DSQT). The remaining three are destination sustainability
-quality (DSUQ), tourist satisfaction (TS), and behavioural intention
-(BI).
+transport (DSQT). The remaining 3 are destination sustainability quality
+(DSUQ), tourist satisfaction (TS), and behavioural intention (BI).
 
 ``` r
 
@@ -25,7 +24,7 @@ dsuq <- paste0("dsuq_", 1:5); ts <- paste0("ts_", 1:3); bi <- paste0("bi_", 1:3)
 
 ## EFA planning syntax
 
-[`sframe_syntax_efa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_efa.md)
+[`sframe_syntax_efa()`](https://surveyframe.org/reference/sframe_syntax_efa.md)
 writes a short R block that estimates an exploratory factor solution
 with the optional `psych` package. This screens the digital marketing
 items before the confirmatory model.
@@ -42,9 +41,9 @@ cat(sframe_syntax_efa(items = c(dmre, dmau, dmeu, dmpv), nfactors = 4,
 
 ## CFA syntax: the lower-order measurement model
 
-The confirmatory measurement model has the nine lower-order constructs
-as reflective factors.
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md)
+The confirmatory measurement model has the 9 lower-order constructs as
+reflective factors.
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md)
 writes lavaan syntax from a model object, with no need for lavaan at
 this stage.
 
@@ -99,10 +98,10 @@ cat(sframe_syntax_cfa(model = cfa_model))
 
 ## CB-SEM syntax: the structural model
 
-The covariance-based reading treats the five constructs as first-order
-reflective factors over their full item sets, with the nine direct paths
-and the four indirect effects from the hypotheses.
-[`sframe_syntax_sem()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_sem.md)
+The covariance-based reading treats the 5 constructs as first-order
+reflective factors over their full item sets, with the 9 direct paths
+and the 4 indirect effects from the hypotheses.
+[`sframe_syntax_sem()`](https://surveyframe.org/reference/sframe_syntax_sem.md)
 writes the measurement, structural, and indirect-effect lines.
 
 ``` r
@@ -169,11 +168,11 @@ cat(sframe_syntax_sem(sem_model))
 
 ## PLS-SEM syntax: the two-stage higher-order model
 
-The published study used PLS-SEM with a two-stage treatment of the
+The published study used PLS-SEM with a 2-stage treatment of the
 higher-order constructs. The second stage models digital marketing
 effectiveness and service quality as composites of their lower-order
 construct scores, then estimates the structural paths.
-[`sframe_syntax_pls()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_pls.md)
+[`sframe_syntax_pls()`](https://surveyframe.org/reference/sframe_syntax_pls.md)
 writes the seminr code, including the bootstrap, reliability, AVE, and
 HTMT calls.
 
@@ -264,7 +263,7 @@ above.
 ## Model JSON and a reporting template
 
 A model serialises to JSON for storage in a `.sframe` file, and
-[`sframe_model_outline()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_outline.md)
+[`sframe_model_outline()`](https://surveyframe.org/reference/sframe_model_outline.md)
 writes a short reporting outline.
 
 ``` r
@@ -315,5 +314,5 @@ The generated lavaan syntax is copied into
 choosing the estimator, ordered-item handling, and missing-data
 treatment. The generated seminr syntax is copied into a script where
 seminr is installed and the bootstrap settings and construct modes are
-set. The published study fitted the two-stage PLS model in seminr with
+set. The published study fitted the 2-stage PLS model in seminr with
 1000 bootstrap resamples.

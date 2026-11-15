@@ -1,0 +1,46 @@
+# How to find what goes with an outcome, and how much it explains
+
+Find which measures go together with an outcome, and how much of it they
+explain together.
+
+The example in this guide is *What goes with getting value from the
+event?* A customer satisfaction study of what goes with the value
+customers get from a service, by correlation and regression.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `correlation_regression`.
+2.  On **Design**, choose **Plan**. RQ1 to RQ3 measure how 2 variables
+    go together, by Pearson, Spearman and Kendall. RQ4 holds age
+    constant.
+3.  RQ5 is a linear regression: how much of perceived value sessions and
+    networking explain together.
+4.  On **Analyse**, run the plan and check the regression diagnostics.
+
+## In R
+
+``` r
+
+d <- sframe_demo("correlation_regression")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Do use of the service and perceived value go together? | Pearson correlation | The APA 7 sentence and a table, with a chart where the method has one |
+| Do use and perceived value go together on ranks? | Spearman rank correlation | The APA 7 sentence and a table, with a chart where the method has one |
+| Do use and perceived value go together, by Kendall’s tau? | Kendall rank correlation | The APA 7 sentence and a table, with a chart where the method has one |
+| Does the relationship hold once age is held constant? | Partial correlation | The APA 7 sentence and a table, with a chart where the method has one |
+| How much value do sessions and networking together explain? | Linear regression | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

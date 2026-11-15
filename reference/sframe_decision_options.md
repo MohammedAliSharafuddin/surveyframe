@@ -31,12 +31,12 @@ A PROMETHEE block takes `options$preference_function`, one of `"usual"`,
 them. The default is `"usual"`, Brans and Vincke's type I step function,
 which needs no thresholds and so adds no researcher degrees of freedom.
 
-This default differs from several other MCDM implementations, which
-default to the linear (V-shape) function and derive its thresholds from
-the range of the supplied data. Deriving thresholds that way makes the
-result depend on choices the researcher never declared, which is what
-this package exists to prevent, so surveyframe requires a
-threshold-bearing preference function to be asked for explicitly.
+This default differs from other MCDM implementations, which default to
+the linear (V-shape) function and derive its thresholds from the range
+of the supplied data. Deriving thresholds that way makes the result
+depend on choices the researcher never declared, which is what this
+package exists to prevent, so surveyframe requires a threshold-bearing
+preference function to be asked for explicitly.
 
 The choice changes the answer. Net flows always differ between the 2
 functions, and the ranking itself changed in 226 of 400 randomly drawn
@@ -50,15 +50,15 @@ scores every non-zero difference identically.
 
 ## See also
 
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 
 Other Decision analysis functions:
-[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
-[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
-[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md),
-[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+[`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md),
+[`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md),
+[`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md),
+[`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
 
 ## Examples
 
@@ -69,7 +69,4 @@ sframe_decision_options(list(
   criteria = c("service", "price"),
   criteria_types = c("benefit", "cost")
 ))$matrix
-#>          service price
-#> Alpha          4   210
-#> Basilica       3   180
 ```

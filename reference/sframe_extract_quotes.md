@@ -1,12 +1,12 @@
 # Extract representative quotes for each STM topic
 
 Takes the result of
-[`sframe_run_stm_topics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_stm_topics.md)
+[`sframe_run_stm_topics()`](https://surveyframe.org/reference/sframe_run_stm_topics.md)
 (not a raw `stm` model object) and, for each topic, pulls the top
 `n_quotes` documents by topic-document probability using
 [`stm::findThoughts()`](https://rdrr.io/pkg/stm/man/findThoughts.html),
 then maps each one back to its original respondent row via the mapping
-[`sframe_run_stm_topics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_stm_topics.md)
+[`sframe_run_stm_topics()`](https://surveyframe.org/reference/sframe_run_stm_topics.md)
 stored on `result$fit`.
 
 ## Usage
@@ -20,20 +20,20 @@ sframe_extract_quotes(model, text, n_quotes = 3L)
 - model:
 
   A `stm_topics` result list from
-  [`sframe_run_stm_topics()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_run_stm_topics.md)
+  [`sframe_run_stm_topics()`](https://surveyframe.org/reference/sframe_run_stm_topics.md)
   (i.e. `result`, not `result$fit` and not the raw `stm` object).
 
 - text:
 
   The response vector the topic model was fit on: either the raw vector
   (one entry per original data row, indexed 1:1 by row number) or the
-  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)-cleaned
+  [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)-cleaned
   vector, which drops blank/missing rows and is therefore *shorter*, its
   positions no longer equal original row numbers once any earlier row
   was dropped. Both forms work correctly: when `text` carries the
   `respondent` attribute
-  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
-  sets, that mapping is used to find each quote's real position;
+  [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)
+  sets, that mapping is used to find each quote's real position, and
   otherwise `text` is assumed to be the raw, 1:1-indexed vector.
 
 - n_quotes:
@@ -49,10 +49,10 @@ document-matrix or corpus row index), and `quote`.
 ## See also
 
 Other Text analysis functions:
-[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md),
-[`sframe_ngram_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_ngram_frequency.md),
-[`sframe_term_context()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_context.md),
-[`sframe_term_frequency()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_term_frequency.md)
+[`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md),
+[`sframe_ngram_frequency()`](https://surveyframe.org/reference/sframe_ngram_frequency.md),
+[`sframe_term_context()`](https://surveyframe.org/reference/sframe_term_context.md),
+[`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
 
 ## Examples
 
@@ -70,12 +70,5 @@ if (requireNamespace("stm", quietly = TRUE) &&
   quotes <- sframe_extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
   quotes
 }
-#>   topic rank respondent                                   quote
-#> 1     1    1         11                   Clear online content.
-#> 2     1    2         12                   Clear online content.
-#> 3     2    1          5 Would like more sustainability details.
-#> 4     2    2          8 Would like more sustainability details.
-#> 5     3    1          2             Useful service information.
-#> 6     3    2          3             Useful service information.
 # }
 ```

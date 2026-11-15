@@ -10,7 +10,7 @@ paper reported, which is all it needs.
 
 ## Reliability from the instrument
 
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
 reads the scale definitions and reports Cronbach’s alpha and, with the
 optional `psych` package, McDonald’s omega. The published study reported
 strong reliability for every construct. At the higher-order level the
@@ -42,16 +42,6 @@ kable(rel_df, row.names = FALSE,
       caption = "Scale reliability statistics")
 ```
 
-| Scale | Items | N | Alpha | Omega h | Omega total |
-|:---|:--:|:--:|---:|---:|---:|
-| Digital marketing effectiveness (digital_marketing) | 3 | 120 | 0.84 | 0.84 | 0.84 |
-| Service quality (service_quality) | 3 | 120 | 0.84 | 0.84 | 0.84 |
-| Sustainability perception (sustainability) | 2 | 120 | 0.77 | n/a | n/a |
-| Tourist satisfaction (satisfaction) | 2 | 120 | 0.82 | n/a | n/a |
-| Behavioural intention (behavioural_intention) | 2 | 120 | 0.84 | n/a | n/a |
-
-Scale reliability statistics {.table style="width:100%;"}
-
 ## Item diagnostics
 
 Item diagnostics identify sparse items, weak item-total relationships,
@@ -70,40 +60,21 @@ kable(first$diagnostics, digits = 2,
       caption = paste0("Item diagnostics: ", first$label, " (", first$scale_id, ")"))
 ```
 
-| item_id | mean | sd | item_rest_r | floor_prop | ceiling_prop | n_missing | floor_pct | ceiling_pct |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| dm_1 | 3.14 | 1.00 | 0.69 | 0.05 | 0.10 | 0 | 0.05 | 0.10 |
-| dm_2 | 3.12 | 0.97 | 0.71 | 0.05 | 0.07 | 0 | 0.05 | 0.07 |
-| dm_3 | 3.19 | 1.00 | 0.70 | 0.06 | 0.08 | 0 | 0.06 | 0.08 |
-
-Item diagnostics: Digital marketing effectiveness (digital_marketing)
-{.table}
-
 ## EFA readiness
 
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md)
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)
 reports the Kaiser-Meyer-Olkin measure and Bartlett’s test as a
 screening step before a confirmatory model.
 
 ``` r
 
 sframe_efa_readiness_results(responses, instr)
-#> EFA Readiness Diagnostics
-#> 
-#>   Items:          12
-#>   Complete cases: 120
-#>   KMO overall:    0.761
-#>   Bartlett chi-sq: 665.84  df: 66  p: 0.0000
-#>   Suggested factors (parallel analysis): 4
-#>   Planned rotation: oblimin
-#> 
-#> Note: estimate the EFA solution with a dedicated modelling package.
 ```
 
 ## Convergent validity from the published loadings
 
 This step runs on the loadings alone.
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 computes composite reliability and average variance extracted from
 standardised loadings. Feeding the outer loadings reported in the paper
 reproduces its convergent validity, which is a direct check of the
@@ -128,39 +99,25 @@ kable(as.data.frame(validity), digits = 2,
       caption = "Composite reliability and average variance extracted")
 ```
 
-|      | construct | composite_reliability |  AVE | n_items |
-|:-----|:----------|----------------------:|-----:|--------:|
-| BI   | BI        |                  0.95 | 0.86 |       3 |
-| DMAU | DMAU      |                  0.92 | 0.80 |       3 |
-| DMEU | DMEU      |                  0.94 | 0.85 |       3 |
-| DMPV | DMPV      |                  0.93 | 0.77 |       4 |
-| DMRE | DMRE      |                  0.88 | 0.66 |       4 |
-| DSQA | DSQA      |                  0.93 | 0.81 |       3 |
-| DSQT | DSQT      |                  0.91 | 0.66 |       5 |
-| DSUQ | DSUQ      |                  0.84 | 0.53 |       5 |
-| TS   | TS        |                  0.94 | 0.83 |       3 |
-
-Composite reliability and average variance extracted {.table}
-
 The average variance extracted exceeds 0.5 for every construct, and the
 composite reliability exceeds 0.7, so each construct explains more than
 half the variance in its items. The sustainability construct sits
-lowest, in line with the two weaker items the paper flagged (DSUQ4 and
+lowest, in line with the 2 weaker items the paper flagged (DSUQ4 and
 DSUQ5).
 
 ## Discriminant validity
 
-The study assessed discriminant validity in two ways. The
-Fornell-Larcker criterion compares the square root of a construct’s AVE
-with its correlations with the others. The square roots, 0.810 for
-digital marketing effectiveness, 0.910 for service quality, 0.726 for
+The study assessed discriminant validity in 2 ways. The Fornell-Larcker
+criterion compares the square root of a construct’s AVE with its
+correlations with the others. The square roots, 0.810 for digital
+marketing effectiveness, 0.910 for service quality, 0.726 for
 sustainability quality, 0.911 for satisfaction, and 0.930 for
 behavioural intention, each exceeded the off-diagonal correlations. The
 Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
 highest being 0.766 between ease of use and accessibility. Both results
 support discriminant validity.
 
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 computes both, and which one you get depends on what you give it.
 Construct scores give the Fornell-Larcker matrix, and the `htmt` element
 then holds the absolute inter-construct correlations, which is a
@@ -183,7 +140,6 @@ names(loadings) <- scale_ids
 
 from_scores <- sframe_validity_results(loadings, construct_scores = construct_scores)
 from_scores$htmt_method
-#> [1] "correlation_fallback"
 ```
 
 Passing the items themselves is what asks for the Henseler ratio:
@@ -198,7 +154,6 @@ names(items_by_construct) <- scale_ids
 real_htmt <- sframe_validity_results(loadings, construct_scores = construct_scores,
                              items_by_construct = items_by_construct)
 real_htmt$htmt_method
-#> [1] "henseler"
 ```
 
 A construct with a single item has no monotrait correlations, so its
@@ -208,7 +163,7 @@ HTMT entries come back `NA`.
 
 The study reported variance inflation factors below 5 for every
 indicator, which indicates multicollinearity mild enough to proceed.
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
 returns variance inflation factors when a regression is specified, which
 is shown in the “Analysing survey responses” vignette.
 

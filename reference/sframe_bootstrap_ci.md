@@ -51,34 +51,18 @@ than 3 finite values.
 
 ## See also
 
-[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md),
-[`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md),
-[`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md)
+[`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md),
+[`sframe_cramers_v_ci()`](https://surveyframe.org/reference/sframe_cramers_v_ci.md),
+[`sframe_eta_sq_ci()`](https://surveyframe.org/reference/sframe_eta_sq_ci.md)
 
 Other Confidence interval functions:
-[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md),
-[`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md),
-[`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md)
+[`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md),
+[`sframe_cramers_v_ci()`](https://surveyframe.org/reference/sframe_cramers_v_ci.md),
+[`sframe_eta_sq_ci()`](https://surveyframe.org/reference/sframe_eta_sq_ci.md)
 
 ## Examples
 
 ``` r
 sframe_bootstrap_ci(mtcars$mpg, seed = 42)
-#> estimate    lower    upper 
-#>    19.20    16.85    21.40 
-#> attr(,"level")
-#> [1] 0.95
-#> attr(,"resamples")
-#> [1] 2000
-#> attr(,"valid_resamples")
-#> [1] 2000
 sframe_bootstrap_ci(mtcars$mpg, FUN = mean, conf.level = 0.90, seed = 42)
-#> estimate    lower    upper 
-#> 20.09062 18.41875 21.80031 
-#> attr(,"level")
-#> [1] 0.9
-#> attr(,"resamples")
-#> [1] 2000
-#> attr(,"valid_resamples")
-#> [1] 2000
 ```

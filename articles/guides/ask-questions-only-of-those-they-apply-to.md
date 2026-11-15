@@ -1,0 +1,45 @@
+# How to ask questions only of those they apply to
+
+Show a question only to respondents whose earlier answer makes it apply
+to them.
+
+The example in this guide is *Questions that depend on who you are*. A
+survey with skip logic, asking about sessions only of those who attended
+them, to separate a skipped question from a missing answer.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `branching`.
+2.  On **Design**, select the question that depends on an earlier answer
+    and open **Add Branching Rule**. Choose the controlling question,
+    the condition and whether the question is shown or hidden.
+3.  On **Preview**, answer the first question in different ways to see
+    the dependent question appear.
+4.  In the data, a question skipped by a rule is left blank as
+    structural, separate from a missing answer.
+
+## In R
+
+``` r
+
+d <- sframe_demo("branching")
+sframe_get_branches(d$instrument)    # each rule, its condition and target
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Who attended, and in what proportions? | Frequencies and percentages | The APA 7 sentence and a table, with a chart where the method has one |
+| Among those asked, how many sessions did they attend? | Descriptive statistics | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

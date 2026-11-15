@@ -1,0 +1,50 @@
+# How to analyse a survey with fewer than 30 respondents
+
+Plan and review an analysis for a survey with a small sample, such as a
+pilot.
+
+The example in this guide is *A pilot with 18 attendees*. A pilot study
+with 18 participants, answering the main study’s questions with methods
+suited to a small sample.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `small_sample`.
+2.  On **Design**, choose **Plan**. The example plan uses methods often
+    considered for small samples: a rank test, an exact test and
+    logistic regression with Firth’s correction.
+3.  Choose methods that fit your own design, measurements and
+    assumptions, and record the reason in each research question.
+4.  On **Analyse**, run the plan and report the intervals beside each
+    estimate.
+
+![The Design screen with the A pilot with 18 attendees study
+open.](../../templates/small_sample/design.png)
+
+The Design screen with the A pilot with 18 attendees study open.
+
+## In R
+
+``` r
+
+d <- sframe_demo("small_sample")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Do the 2 formats differ, without assuming normality? | Mann-Whitney U test | The APA 7 sentence and a table, with a chart where the method has one |
+| Is format associated with returning, on an exact test? | Fisher’s exact test | The APA 7 sentence and a table, with a chart where the method has one |
+| Does attending more sessions predict returning, with a small-sample correction? | Firth logistic regression | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

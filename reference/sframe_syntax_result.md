@@ -5,7 +5,7 @@ can copy and run. This is what lets a report show
 [`t.test()`](https://rdrr.io/r/stats/t.test.html) or
 [`cor.test()`](https://rdrr.io/r/stats/cor.test.html) with the variables
 and options resolved, rather than only the
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 call that dispatched it.
 
 ## Usage
@@ -19,12 +19,12 @@ sframe_syntax_result(x, which = NULL, data_expr = "scored", header = FALSE)
 - x:
 
   An `sframe_analysis_results` object from
-  [`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
+  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
   or one block's result from it.
 
 - which:
 
-  Character or NULL. One block id, when `x` holds several.
+  Character or NULL. One block id, when `x` holds more than 1 block.
 
 - data_expr:
 
@@ -40,7 +40,7 @@ sframe_syntax_result(x, which = NULL, data_expr = "scored", header = FALSE)
 ## Value
 
 A character vector of R code lines, or `NULL` for a method this does not
-cover. For several blocks, a named list of such vectors.
+cover. For more than 1 block, a named list of such vectors.
 
 ## Details
 
@@ -56,30 +56,30 @@ The 2-group, paired, k-group, correlation, regression and categorical
 families, and descriptives. `sframe_syntax_methods` lists them. A method
 outside that list returns `NULL`: the model families carry their own
 syntax already, through
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md)
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md)
 and its neighbours, and for the rest the computation has no single
 base-R equivalent to show honestly.
 
 ## See also
 
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md),
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md),
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 
 Other Models and syntax functions:
-[`sframe_add_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_model.md),
-[`sframe_construct()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_construct.md),
-[`sframe_covariance()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_covariance.md),
-[`sframe_indirect_effect()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_indirect_effect.md),
-[`sframe_model_json()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_json.md),
-[`sframe_model_outline()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_outline.md),
-[`sframe_model_spec()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_model_spec.md),
-[`sframe_path()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_path.md),
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md),
-[`sframe_syntax_efa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_efa.md),
-[`sframe_syntax_pls()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_pls.md),
-[`sframe_syntax_sem()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_sem.md),
-[`sframe_validate_model()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validate_model.md)
+[`sframe_add_model()`](https://surveyframe.org/reference/sframe_add_model.md),
+[`sframe_construct()`](https://surveyframe.org/reference/sframe_construct.md),
+[`sframe_covariance()`](https://surveyframe.org/reference/sframe_covariance.md),
+[`sframe_indirect_effect()`](https://surveyframe.org/reference/sframe_indirect_effect.md),
+[`sframe_model_json()`](https://surveyframe.org/reference/sframe_model_json.md),
+[`sframe_model_outline()`](https://surveyframe.org/reference/sframe_model_outline.md),
+[`sframe_model_spec()`](https://surveyframe.org/reference/sframe_model_spec.md),
+[`sframe_path()`](https://surveyframe.org/reference/sframe_path.md),
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md),
+[`sframe_syntax_efa()`](https://surveyframe.org/reference/sframe_syntax_efa.md),
+[`sframe_syntax_pls()`](https://surveyframe.org/reference/sframe_syntax_pls.md),
+[`sframe_syntax_sem()`](https://surveyframe.org/reference/sframe_syntax_sem.md),
+[`sframe_validate_model()`](https://surveyframe.org/reference/sframe_validate_model.md)
 
 ## Examples
 
@@ -103,12 +103,4 @@ results <- run_analysis_plan(responses, instr)
 
 # the call behind the number, with the variables and options resolved
 cat(sframe_syntax_result(results, which = "RQ1"), sep = "\n")
-#> # Do the arms differ?
-#> # method: t_test_ind | n = 15 + 15
-#> group   <- as.character(scored[["arm"]])
-#> outcome <- as.numeric(as.character(scored[["score"]]))
-#> levels_seen <- c("control", "treatment")
-#> g1 <- outcome[group == levels_seen[1]]; g1 <- g1[!is.na(g1)]
-#> g2 <- outcome[group == levels_seen[2]]; g2 <- g2[!is.na(g2)]
-#> t.test(g1, g2, var.equal = FALSE)
 ```

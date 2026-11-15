@@ -14,7 +14,7 @@ sframe_survey_server(id, instrument, on_submit = NULL)
 - id:
 
   A character string matching the `id` passed to
-  [`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md).
+  [`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md).
 
 - instrument:
 
@@ -36,9 +36,9 @@ response list.
 ## Supported item types
 
 Every item type is supported, with the same controls
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md)
-uses: likert, single choice, multiple choice, numeric, text, text area,
-date, slider, rating, ranking, matrix, pairwise comparison and criteria
+[`run_survey()`](https://surveyframe.org/reference/run_survey.md) uses:
+likert, single choice, multiple choice, numeric, text, text area, date,
+slider, rating, ranking, matrix, pairwise comparison and criteria
 weight, plus section breaks and text blocks.
 
 ## What is submitted
@@ -46,7 +46,7 @@ weight, plus section breaks and text blocks.
 The response is a named list. It starts with `response_id`, `started_at`
 and `submitted_at`, followed by one element per response column, named
 as
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 expects. A multi-column item contributes one element per column:
 `item__row` for a matrix, `item__option` for ranking and multiple
 choice, and one element per pair or criterion for decision items. Values
@@ -76,14 +76,14 @@ new one.
 
 ## See also
 
-[`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md),
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md),
+[`run_survey()`](https://surveyframe.org/reference/run_survey.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 
 Other Collect functions:
-[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md),
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md),
-[`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md)
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md),
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md),
+[`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md)
 
 ## Examples
 

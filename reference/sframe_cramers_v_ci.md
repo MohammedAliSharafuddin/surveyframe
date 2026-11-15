@@ -46,22 +46,16 @@ than 2 rows or columns.
 
 ## See also
 
-[`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md),
-[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md)
+[`sframe_eta_sq_ci()`](https://surveyframe.org/reference/sframe_eta_sq_ci.md),
+[`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md)
 
 Other Confidence interval functions:
-[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md),
-[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md),
-[`sframe_eta_sq_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_eta_sq_ci.md)
+[`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md),
+[`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md),
+[`sframe_eta_sq_ci()`](https://surveyframe.org/reference/sframe_eta_sq_ci.md)
 
 ## Examples
 
 ``` r
 sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))
-#>  estimate     lower     upper 
-#> 0.5226355 0.1118233 0.8455313 
-#> attr(,"level")
-#> [1] 0.95
-#> attr(,"method")
-#> [1] "noncentral chi-square"
 ```

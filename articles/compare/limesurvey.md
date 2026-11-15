@@ -1,0 +1,62 @@
+# surveyframe and LimeSurvey
+
+LimeSurvey is an open-source survey platform, licensed under the GPL,
+which you can host yourself or use as LimeSurvey’s hosted service. Its
+response export can head each column with the question code and give
+each answer as its answer code.
+
+surveyframe is a free R package (MIT, on CRAN) for the whole research
+workflow around a survey: the questionnaire and its analysis plan, the
+collection, the checks, the planned analyses and the APA 7 report.
+
+## What the surveyframe workflow provides
+
+- An analysis plan written before the data, with hypotheses and decision
+  rules, saved in the questionnaire file.
+- A pre-analysis plan to submit to OSF, Zenodo or an ethics committee.
+- A hash anyone can check at
+  [surveyframe.org/verify](https://surveyframe.org/verify/), and
+  amendments recorded with their reasons.
+- Quality checks, scale reliability, the planned analyses and a report
+  in APA 7, in SurveyStudio or in R.
+
+## Using LimeSurvey with surveyframe
+
+You can collect responses with LimeSurvey and analyse them with
+surveyframe. Describe the questionnaire as a surveyframe instrument,
+then prepare the export so that
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
+can check it against the instrument:
+
+1.  In LimeSurvey, give each question the code of the matching
+    surveyframe item id, and each answer the code of its choice.
+2.  Export the responses as CSV, with the questions exported as
+    **Question code** and the answers as answer codes.
+3.  Declare any column outside the instrument, such as the response id,
+    in `meta_cols`.
+
+``` r
+
+raw <- read.csv("answers.csv", check.names = FALSE)
+names(raw) <- c("submitted", "visit_type", "satisfaction")  # each column named by its item id, in order
+raw$visit_type <- c("First visit" = "first", "Returning" = "returning")[raw$visit_type]  # answer text to choice codes, where needed
+responses <- read_responses(raw, instrument, meta_cols = "submitted")
+results <- run_analysis_plan(responses, instrument)
+```
+
+The planned analyses and the report then run on these responses.
+
+## Sources
+
+Checked on 15 November 2026 against LimeSurvey’s own documentation:
+
+- [Export responses (LimeSurvey
+  Manual)](https://www.limesurvey.org/manual/Export_responses)
+- [LimeSurvey on GitHub, licence and
+  hosting](https://github.com/LimeSurvey/LimeSurvey)
+
+## Related
+
+- [Choosing a survey tool for
+  research](https://surveyframe.org/articles/learn/choosing-a-survey-tool.md)
+- [Get started](https://surveyframe.org/articles/start.md)

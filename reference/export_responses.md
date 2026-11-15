@@ -18,7 +18,7 @@ export_responses(data, instrument, path)
 - data:
 
   A response data frame, as returned by
-  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md).
+  [`read_responses()`](https://surveyframe.org/reference/read_responses.md).
 
 - instrument:
 
@@ -43,7 +43,7 @@ coded with text, such as `"a"` and `"b"`, is written as 1, 2, 3 in the
 set's declared order, each carrying its label, so the file reads back in
 Stata with the labels intact. A `.sav` keeps the text codes, which SPSS
 labels directly. Codes such as `"01"` and `"02"` are text, as
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 reads them, since as numbers they would lose their leading zero and no
 longer match the instrument.
 
@@ -52,25 +52,25 @@ longer match the instrument.
 SPSS and Stata refuse column names with spaces or punctuation, names
 that do not start with a letter, and names over the format's length
 limit (64 bytes for SPSS, 32 characters for Stata). Matrix row columns
-such as `session__Opening keynote` are renamed to valid names, with
+such as `session__Reading materials` are renamed to valid names, with
 illegal characters turned into `_`, a leading `v` where the first
-character is not a letter, and a number added where two names would
+character is not a letter, and a number added where 2 names would
 otherwise match. Variable labels are cut at 256 bytes for SPSS and 80
 characters for Stata, and value labels at 120 bytes for SPSS and 80
-characters for Stata. Everything else keeps its full label. One message
+characters for Stata. Everything else keeps its full label. 1 message
 lists each change as old -\> new.
 
 ## See also
 
-[`sframe_demo()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`sframe_demo()`](https://surveyframe.org/reference/sframe_demo.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 
 Other Responses functions:
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
-[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
 
 ## Examples
 
@@ -80,6 +80,7 @@ demo <- sframe_demo("two_group")
 out <- file.path(tempdir(), "two_group.sav")
 if (requireNamespace("haven", quietly = TRUE)) {
   export_responses(demo$responses, demo$instrument, out)
+  sframe_show(out)
 }
 # }
 ```

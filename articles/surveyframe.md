@@ -8,11 +8,11 @@ survey with a Google Sheets backend, collect responses, clean and score
 them, run the analysis plan, and render a results report. The results
 section uses 60 simulated responses so the vignette builds offline.
 Replacing the simulated data with a call to
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 connects the same workflow to live responses that grow with each
 submission.
 
-Allow about 30 minutes for the complete case study. For a five-minute
+Allow about 30 minutes for the complete case study. For a 5-minute
 runnable introduction, begin with the “Learn by example” vignette and
 its `first_survey` demo. Return here for the full design-to-report
 workflow.
@@ -25,7 +25,7 @@ The questionnaire and concept are adopted from:
 > *Administrative Sciences*, *14*(11), 273.
 > <https://doi.org/10.3390/admsci14110273>
 
-The instrument covers five research areas applicable to any tourism
+The instrument covers 5 research areas applicable to any tourism
 services context: digital marketing effectiveness (relevance,
 accessibility, ease of use, and perceived value), destination service
 quality (accommodation and local transport), destination sustainability
@@ -40,7 +40,7 @@ their own context.
 
 ### Shared Likert scale
 
-All rated items use a five-point agreement scale.
+All rated items use a 5-point agreement scale.
 
 ``` r
 
@@ -57,7 +57,7 @@ likert5 <- sframe_choice_set(
 `stem_items()` builds items that share a common sentence stem. Each item
 is the stem followed by a unique completion. `solo_items()` builds
 standalone items. Neither function is exported, and both use only
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md).
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md).
 
 ``` r
 
@@ -356,34 +356,23 @@ study <- sframe_instrument(
 )
 
 study
-#> <sframe>
-#>   Title:      Digital Marketing Effectiveness of Tourism Services
-#>   Version:    1.0.0
-#>   Items:      55
-#>   Scales:     9
-#>   Analysis:   0 blocks
-#>   Status:     valid
 ```
 
 ------------------------------------------------------------------------
 
 ## Validate and serialise
 
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
 checks every item ID, choice set reference, and scale membership before
 any data is collected. It returns a diagnostic that prints what it
 found, so printing the call is enough to read the result.
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 saves the validated instrument with a SHA-256 hash so any
 post-collection edits are detectable.
 
 ``` r
 
 validate_sframe(study, strict = FALSE)
-#> <sframe validation>
-#>   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)
-#>   Status:      valid
-#>   Checks:      30 run, 0 with problems
 ```
 
 Read the parts of the diagnostic with the accessors, which saves
@@ -395,16 +384,8 @@ is how you tell a check that passed from a check that was never reached.
 
 v <- validate_sframe(study, strict = FALSE)
 sframe_is_valid(v)
-#> [1] TRUE
 sframe_problems(v)
-#> character(0)
 head(summary(v), 5)
-#>                  check status n_problems
-#> 1         field_shapes     ok          0
-#> 2   duplicate_item_ids     ok          0
-#> 3       item_id_format     ok          0
-#> 4 duplicate_choice_ids     ok          0
-#> 5  choice_set_contents     ok          0
 ```
 
 ``` r
@@ -416,17 +397,16 @@ sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sfr
 # Reload the instrument from disk at any time with:
 study2 <- read_sframe(sframe_path)
 identical(sframe_meta(study)$title, sframe_meta(study2)$title)
-#> [1] TRUE
 ```
 
 ### What the SHA-256 hash proves, and what it does not
 
 The hash
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 embeds confirms one thing: the instrument’s canonicalised content
 matches the digest stored in the `.sframe` file. Change a covered value,
 an item’s wording, a scale’s membership, or a plan’s variables, and
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
 detects the mismatch and refuses to load the file. Silent acceptance
 would leave a reader believing changed content was the original.
 
@@ -435,7 +415,7 @@ not prove the survey has good questions, an unbiased sample, or a sound
 analysis, and it says nothing about p-hacking or HARKing on its own. The
 package supports a separate safeguard: the `analysis_plan` slot can be
 bound to the instrument at design time, before data arrive, and
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 then executes that recorded plan in one pass. This makes prior decisions
 easier to audit, and it shows that a recorded plan predates a given run.
 Establishing when a researcher first considered an analysis, or
@@ -453,45 +433,35 @@ a JSON Schema a reviewer or a second tool can validate against, with R
 left out of the loop. It is a copy of the instrument profile published
 in the sframe-schema repository, kept identical by a test, so the
 package and the published format describe the same file.
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
-also reads files written before the `sframe_format` field existed.
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md) also
+reads files written before the `sframe_format` field existed.
 
 ``` r
 
 schema_path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
 jsonlite::fromJSON(schema_path, simplifyVector = FALSE)$required
-#> [[1]]
-#> [1] "sframe_format"
-#> 
-#> [[2]]
-#> [1] "hash"
-#> 
-#> [[3]]
-#> [1] "meta"
-#> 
-#> [[4]]
-#> [1] "items"
 ```
 
-Because the file is plain text, two versions of it diff the same way any
+Because the file is plain text, 2 versions of it diff the same way any
 source file does. If `tourism_services_v1.sframe` were committed to a
 Git repository, revising it and running `git diff` on the file would
 show exactly which lines, which item, which choice, which plan block,
 changed, alongside Git’s own commit history for who changed it and when.
-That diff is Git’s job, and the next section shows how the two connect.
+That diff is Git’s job, and the next section shows how the 2 connect.
 
 ### Disclosed revision: `amend_sframe()`
 
-A hash mismatch alone can’t distinguish a legitimate correction (fixing
-a data-entry error, removing bot responses, correcting a misspecified
-model) from an undisclosed change: both break the hash identically.
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+A hash mismatch shows that the content changed. A legitimate correction
+(fixing a data-entry error, removing bot responses, correcting a
+misspecified model) and an undisclosed change move the hash in the same
+way.
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 gives legitimate revision a structured, disclosed path instead: it
 compares the instrument before and after a change, and appends a record
 of what changed and why, directly inside the `.sframe` file next to the
 content it explains, never overwriting an earlier entry.
 
-Amendments come in two tiers, because not every change carries the same
+Amendments come in 2 tiers, because not every change carries the same
 risk to the plan’s design-time-binding logic:
 
 - **`"pipeline"`** amendments (`data_correction`, `bot_removal`) are
@@ -530,55 +500,43 @@ study_amended <- amend_sframe(
 #> `version = "1.1.0"`.
 
 sframe_get_amendments(study_amended)
-#>              timestamp         reason_code
-#> 1 2026-11-13T20:52:25Z instrument_revision
-#>                                    reason_text   tier author
-#> 1 Clarified item wording after pilot feedback. design   <NA>
-#>                                     deviation_report signoff
-#> 1 Wording only; the construct measured is unchanged.    none
-#>                                                      previous_hash
-#> 1 603d168a49a71266a4e024917c60d633e226b7d62a67e22b3e83796652b26012
-#>                                                           new_hash
-#> 1 425cb67f743644f375d9371fa910187b7675ae95a2c7b643d6c952254b40aecc
-#>   changed_fields
-#> 1          items
 ```
 
-[`sframe_get_amendments()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_amendments.md)
+[`sframe_get_amendments()`](https://surveyframe.org/reference/sframe_get_amendments.md)
 returns the full history as a data frame, one row per disclosed change,
 printable or exported with
 [`write.csv()`](https://rdrr.io/r/utils/write.table.html) for an
 external audit trail.
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
-on the amended instrument persists the log in the file. A reviewer who
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md) on
+the amended instrument persists the log in the file. A reviewer who
 later loads it with
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
-sees both the current content and every disclosed step that produced it,
-and the hash check keeps its full force: an edit made directly to the
-file, bypassing
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md) sees
+both the current content and every disclosed step that produced it, and
+the hash check keeps its full force: an edit made directly to the file,
+bypassing
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
 still fails
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)’s
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)’s
 integrity check exactly as before.
 
 Be clear about what this does and does not guarantee.
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 records a disclosed change. It cannot compel disclosure, the same way a
 preregistration deviation report can’t be forced. Nothing prevents a
 researcher from reconstructing an instrument from scratch and calling
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
-on it directly, skipping the amendment log entirely. What the mechanism
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md) on
+it directly, skipping the amendment log entirely. What the mechanism
 actually guarantees is narrower and still useful: *if* a change is
 disclosed through
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
 the record is structured, timestamped, and permanent inside the file. It
 does not guarantee that every change is disclosed in the first place.
 
 ### Linking a saved instrument to its Git commit
 
 A bare hash carries the file’s identity alone. A diff, an author and an
-explanation come from Git, which already provides all three.
-[`sframe_link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_link_git_commit.md)
+explanation come from Git, which already provides all 3.
+[`sframe_link_git_commit()`](https://surveyframe.org/reference/sframe_link_git_commit.md)
 points the instrument at Git and leaves the history there: it records
 the current commit’s SHA and subject line, so the SHA-256 hash’s role
 narrows to confirming that the file on disk matches what that specific,
@@ -589,11 +547,6 @@ optional, and the rest of the package runs on its own.
 ``` r
 
 sframe_link_git_commit(study_amended, repo_path = tempdir())
-#> $linked
-#> [1] FALSE
-#> 
-#> $reason
-#> [1] "not a git repository"
 ```
 
 ------------------------------------------------------------------------
@@ -603,7 +556,7 @@ sframe_link_git_commit(study_amended, repo_path = tempdir())
 ### Store the Google Sheets endpoint in the instrument
 
 When an endpoint URL is set on the instrument,
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md)
 reads it automatically. Set the URL once, and every later export reuses
 it.
 
@@ -616,7 +569,7 @@ study$render$google_sheets_endpoint <-
 
 ### Export the static HTML survey
 
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md)
 produces a single self-contained HTML file. Respondents open it in any
 browser and, if an endpoint is configured, the browser sends the
 submission to Google Sheets. The cross-origin request confirms only that
@@ -634,10 +587,9 @@ html_path <- export_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpNsy3KP/tourism_services_survey.html' (103.3
+#> Static survey written to '/tmp/RtmpMEisdn/tourism_services_survey.html' (103.3
 #> KB).
 file.exists(html_path)
-#> [1] TRUE
 ```
 
 ### What the respondent sees
@@ -655,7 +607,7 @@ whole survey on its own.
 study$render$theme <- "#0f766e"
 ```
 
-Two things about the export matter for planning a real deployment.
+2 things about the export matter for planning a real deployment.
 
 - **It is designed for a phone first.** Option cards and touch targets
   meet a 44 pixel minimum, and a matrix question (see the input-types
@@ -669,16 +621,16 @@ Two things about the export matter for planning a real deployment.
 
 ### Generate the Google Sheets collector script
 
-[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md)
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
 writes a Google Apps Script file. Deploy it in a Google Sheet and it
 creates a response tab with the correct column headers. Matrix,
 multiple-choice, and ranking questions each need more than one column,
 so the collector expands them automatically: a matrix gets one column
 per row, a multiple-choice question gets one 0/1 column per option, and
 a ranking question gets one column per option holding its rank. A
-five-option multiple-choice item named `channels`, for example, becomes
-five columns, `channels__option1` through `channels__option5`, each
-holding `0` or `1`, ready for analysis, with the splitting already done.
+5-option multiple-choice item named `channels`, for example, becomes 5
+columns, `channels__option1` through `channels__option5`, each holding
+`0` or `1`, ready for analysis, with the splitting already done.
 
 ``` r
 
@@ -687,10 +639,9 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpNsy3KP/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpMEisdn/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
-#> [1] TRUE
 ```
 
 **To deploy the script:**
@@ -728,7 +679,7 @@ responses <- read_sheet_responses(
 The code block below generates 60 plausible responses so the remainder
 of this vignette runs without a network connection. Replace `responses`
 with the output of
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 and re-run from the quality section onward to use real data.
 
 ``` r
@@ -827,9 +778,7 @@ responses <- read_responses(sim_df, study,
                              strict        = FALSE)
 
 cat("Respondents:", nrow(responses), "\n")
-#> Respondents: 60
 cat("Columns:    ", ncol(responses), "\n")
-#> Columns:     58
 ```
 
 ------------------------------------------------------------------------
@@ -850,15 +799,6 @@ quality_summary <- data.frame(
 kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary")
 ```
 
-| Metric             | Value |
-|:-------------------|------:|
-| Respondents        |    60 |
-| Items              |    55 |
-| Flagged for review |    52 |
-| Flag rate          | 86.7% |
-
-Quality screening summary {.table}
-
 The flagged count reflects straight-lining detection on simulated data,
 where random responses often repeat values. With real survey responses
 the flagging rate is typically much lower. The flag marks respondents
@@ -874,84 +814,19 @@ mr_items$missing_prop <- 100 * mr_items$missing_prop
 kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
-```
-
-| Variable     | Missing (n) | Missing (%) | Valid (n) |
-|:-------------|------------:|------------:|----------:|
-| dmre_1       |           0 |           0 |        60 |
-| dmre_2       |           0 |           0 |        60 |
-| dmre_3       |           0 |           0 |        60 |
-| dmre_4       |           0 |           0 |        60 |
-| dmre_5       |           0 |           0 |        60 |
-| dmau_1       |           0 |           0 |        60 |
-| dmau_2       |           0 |           0 |        60 |
-| dmau_3       |           0 |           0 |        60 |
-| dmau_4       |           0 |           0 |        60 |
-| dmau_5       |           0 |           0 |        60 |
-| dmeu_1       |           0 |           0 |        60 |
-| dmeu_2       |           0 |           0 |        60 |
-| dmeu_3       |           0 |           0 |        60 |
-| dmeu_4       |           0 |           0 |        60 |
-| dmeu_5       |           0 |           0 |        60 |
-| dmpv_1       |           0 |           0 |        60 |
-| dmpv_2       |           0 |           0 |        60 |
-| dmpv_3       |           0 |           0 |        60 |
-| dmpv_4       |           0 |           0 |        60 |
-| dmpv_5       |           0 |           0 |        60 |
-| dsqa_1       |           0 |           0 |        60 |
-| dsqa_2       |           0 |           0 |        60 |
-| dsqa_3       |           0 |           0 |        60 |
-| dsqa_4       |           0 |           0 |        60 |
-| dsqt_1       |           0 |           0 |        60 |
-| dsqt_2       |           0 |           0 |        60 |
-| dsqt_3       |           0 |           0 |        60 |
-| dsqt_4       |           0 |           0 |        60 |
-| dsqt_5       |           0 |           0 |        60 |
-| dsuq_1       |           0 |           0 |        60 |
-| dsuq_2       |           0 |           0 |        60 |
-| dsuq_3       |           0 |           0 |        60 |
-| dsuq_4       |           0 |           0 |        60 |
-| dsuq_5       |           0 |           0 |        60 |
-| dsuq_6       |           0 |           0 |        60 |
-| dsuq_7       |           0 |           0 |        60 |
-| dsuq_8       |           0 |           0 |        60 |
-| dsuq_9       |           0 |           0 |        60 |
-| dsuq_10      |           0 |           0 |        60 |
-| dsuq_11      |           0 |           0 |        60 |
-| ts_1         |           0 |           0 |        60 |
-| ts_2         |           0 |           0 |        60 |
-| ts_3         |           0 |           0 |        60 |
-| bi_1         |           0 |           0 |        60 |
-| bi_2         |           0 |           0 |        60 |
-| bi_3         |           0 |           0 |        60 |
-| gender       |           0 |           0 |        60 |
-| age_band     |           0 |           0 |        60 |
-| visitor_type |           0 |           0 |        60 |
-| freq_visit   |           0 |           0 |        60 |
-| nationality  |           0 |           0 |        60 |
-| education    |           0 |           0 |        60 |
-| profession   |           0 |           0 |        60 |
-| companion    |           0 |           0 |        60 |
-| group_size   |           0 |           0 |        60 |
-
-Item-level missingness {.table}
-
-``` r
-
 # sframe_apa() gives a plain-language summary suitable for a methods section.
 cat(sframe_apa(mr), "\n")
-#> Missing-data diagnostics were computed for 55 variables.
 ```
 
 ------------------------------------------------------------------------
 
 ## Score and describe
 
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 appends one column per scale to the data frame, using the scoring rules
 stored in the instrument. If a column with the same name as a scale
 already exists in the data frame,
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 skips that scale so pre-scored data survives intact.
 
 ``` r
@@ -971,20 +846,6 @@ scale_summary <- data.frame(
 kable(scale_summary, digits = 2, caption = "Scale score summary")
 ```
 
-| Scale | Mean |   SD |
-|:------|-----:|-----:|
-| DMRE  | 3.79 | 0.63 |
-| DMAU  | 3.84 | 0.57 |
-| DMEU  | 3.76 | 0.58 |
-| DMPV  | 3.62 | 0.58 |
-| DSQA  | 3.63 | 0.63 |
-| DSQT  | 3.52 | 0.74 |
-| DSUQ  | 3.59 | 0.68 |
-| TS    | 4.32 | 0.61 |
-| BI    | 3.79 | 0.71 |
-
-Scale score summary {.table}
-
 ``` r
 
 op <- par(mfrow = c(3, 3), mar = c(4, 3, 2, 1))
@@ -992,13 +853,6 @@ for (s in scale_cols) {
   v <- scored[[s]]; v <- v[is.finite(v)]
   hist(v, col = "#16B3B1", border = "white", main = s, xlab = "Score", ylab = "")
 }
-```
-
-![Histograms of the scored scale distributions, one panel per
-scale](surveyframe_files/figure-html/score-distributions-1.png)
-
-``` r
-
 par(op)
 ```
 
@@ -1024,20 +878,6 @@ if (requireNamespace("psych", quietly = TRUE)) {
 }
 ```
 
-| Scale                                                  | Items |  N  | Alpha |
-|:-------------------------------------------------------|:-----:|:---:|------:|
-| Digital marketing: relevance and engagement (DMRE)     |   5   | 60  |  0.87 |
-| Digital marketing: accessibility and usefulness (DMAU) |   5   | 60  |  0.86 |
-| Digital marketing: ease of use (DMEU)                  |   5   | 60  |  0.87 |
-| Digital marketing: perceived value (DMPV)              |   5   | 60  |  0.85 |
-| Destination service quality: accommodation (DSQA)      |   4   | 60  |  0.86 |
-| Destination service quality: transport (DSQT)          |   5   | 60  |  0.90 |
-| Destination sustainability quality (DSUQ)              |  11   | 60  |  0.95 |
-| Tourist satisfaction (TS)                              |   3   | 60  |  0.86 |
-| Behavioural intention (BI)                             |   3   | 60  |  0.82 |
-
-Scale reliability {.table}
-
 A value near 0.70 is sometimes used as a rough convention, but
 reliability must be interpreted against the construct, intended use,
 item count, uncertainty, and model assumptions. Alpha and the omega
@@ -1046,14 +886,14 @@ treat them as distinct estimates. Decide which quantity answers the
 study’s question, and report that one on its own merits. Pass
 `omega = TRUE` to report the available omega estimates alongside alpha,
 and name the estimate and assumptions in the write-up. See
-[`?sframe_reliability_results`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`?sframe_reliability_results`](https://surveyframe.org/reference/sframe_reliability_results.md)
 for details.
 
 ## EFA readiness
 
 Before a confirmatory factor analysis, it is useful to screen whether
 the item correlations appear suitable for exploratory factoring.
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md)
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)
 runs the KMO measure of sampling adequacy and Bartlett’s test of
 sphericity, and uses parallel analysis to suggest the number of factors.
 
@@ -1066,14 +906,14 @@ if (requireNamespace("psych", quietly = TRUE)) {
 ```
 
 A KMO value and Bartlett’s test provide preliminary screening evidence,
-one input among several toward judging whether a particular factor model
+one input among a few toward judging whether a particular factor model
 is appropriate. Treat 0.60 as a rough, informal KMO convention. The
 factor count from parallel analysis is also a guide to interpret with
 theory, design, loadings, residuals, and model fit.
 
 ## Construct validity
 
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 computes composite reliability (CR) and average variance extracted (AVE)
 from supplied factor loadings. Discriminant validity is assessed via the
 Fornell-Larcker criterion and HTMT when construct scores are supplied.
@@ -1100,7 +940,7 @@ any other construct.
 
 The plan binds each research question to a statistical technique and the
 variable roles it needs.
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 executes every block and returns one result per question.
 
 ``` r
@@ -1150,7 +990,6 @@ sframe_plan(study) <- list(
 )
 
 length(sframe_plan(study))
-#> [1] 5
 ```
 
 ------------------------------------------------------------------------
@@ -1159,7 +998,7 @@ length(sframe_plan(study))
 
 Before running the analysis plan, check statistical assumptions for the
 variables involved.
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
 tests normality (Shapiro-Wilk for samples below 5,000), homogeneity of
 variance (Levene) for grouped tests, and linearity for regression pairs.
 
@@ -1169,19 +1008,6 @@ if (requireNamespace("psych", quietly = TRUE)) {
   ar <- sframe_assumption_results(scored, variables = scale_cols)
   print(ar)
 }
-#> Assumption Report
-#> 
-#> Normality:
-#>  variable  n shapiro_w    shapiro_p    skewness   kurtosis
-#>      DMRE 60 0.9507082 1.681885e-02 -0.01764237 -0.8595994
-#>      DMAU 60 0.9400575 5.447373e-03 -0.27466443 -0.3742255
-#>      DMEU 60 0.9202802 7.870891e-04 -0.13995250 -0.9009628
-#>      DMPV 60 0.9236779 1.081931e-03 -0.16121971 -1.3529371
-#>      DSQA 60 0.9431484 7.509031e-03 -0.68528436  0.2173799
-#>      DSQT 60 0.9590129 4.211033e-02 -0.37357996 -0.1216330
-#>      DSUQ 60 0.9488769 1.379674e-02  0.04178933 -0.6397338
-#>        TS 60 0.8780098 2.274819e-05 -0.74469442  0.1776129
-#>        BI 60 0.9527818 2.108952e-02 -0.33102932 -0.4335865
 ```
 
 Review the `$normality` and `$homogeneity` slots to decide whether
@@ -1209,21 +1035,12 @@ chosen test.
 results_table(results)
 ```
 
-| RQ | Research question | Method | Result (APA) | Effect |
-|:---|:---|:---|---:|:---|
-| RQ1 | Are digital marketing perceptions associated with tourist satisfaction? | pearson | r(58) = .19, 95% CI \[-.07, .42\], p = .153 | small |
-| RQ2 | Is service quality associated with tourist satisfaction? | pearson | r(58) = -.04, 95% CI \[-.29, .22\], p = .778 | negligible |
-| RQ3 | Do service quality and sustainability quality predict satisfaction? |  | R² = .210, F(3, 56) = 4.97, p = .004 |  |
-| RQ4 | Do first-time and repeat visitors differ in satisfaction? |  | U = 140, z = -4.63, p \< .001, r = -.60, 95% CI \[-.77, -.41\], Hodges-Lehmann shift = -0.67, 95% CI \[-1.00, -0.67\], higher in Repeated visitor | large |
-| RQ5 | Does satisfaction predict behavioural intention? |  | R² = .291, F(1, 58) = 23.83, p \< .001 |  |
-
 The full writing prompt for each result is available in `r$prompt`. The
 first one reads:
 
 ``` r
 
 cat(results[[1]]$prompt)
-#> There was a positive, small non-significant correlation between "Digital marketing: relevance and engagement" and "Tourist satisfaction", r(58) = .19, 95% CI [-.07, .42], p = .153. Explain what this means for your research question.
 ```
 
 The `prompt` field is a sentence template for the methods or results
@@ -1249,9 +1066,6 @@ first_plot <- Filter(function(r) !is.null(r$plot), results_p)[[1]]
 first_plot$plot
 ```
 
-![Chart attached to the first analysis-plan result by run_analysis_plan
-with plots enabled](surveyframe_files/figure-html/run-plan-plots-1.png)
-
 Inferential blocks also return a `$table` data frame ready for
 [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html), and the
 HTML report picks both up automatically.
@@ -1260,9 +1074,9 @@ HTML report picks both up automatically.
 
 ## Results report
 
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md)
 writes one section per research question.
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 adds a codebook, quality summary, and descriptives alongside the
 analysis results.
 
@@ -1274,9 +1088,7 @@ results_path <- render_results(
   output_file = file.path(tempdir(), "tourism_results.html")
 )
 cat("Results report written:", results_path, "\n")
-#> Results report written: /tmp/RtmpNsy3KP/tourism_results.html
 cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
-#> Size: 13.2 KB
 ```
 
 The results report contains one section per research question, with the
@@ -1305,7 +1117,7 @@ render_report(
 #> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
 #> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/RtmpNsy3KP/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpMEisdn/tourism_report.html
 ```
 
 ------------------------------------------------------------------------
@@ -1314,7 +1126,7 @@ render_report(
 
 The section below shows the full sequence from a live Google Sheet.
 Every step from
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 onward is identical to the simulated workflow. Re-run this block each
 time you want updated results.
 
@@ -1351,7 +1163,7 @@ render_report(
 ```
 
 As more respondents complete the survey, re-running from the
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 call above refreshes every result, table, and figure in the report,
 leaving the analysis code as it stands.
 

@@ -1,0 +1,153 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "a734607031472c4c69ef59d847796ce3bc89cf9f06bd73acbff447ff6ab16f77",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Rate each session",
+    "version": "1.0.0",
+    "description": "A course evaluation in which students rate each part of a course on one grid, compared across students who attended in person and online.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:41Z"
+  },
+  "items": [
+    {
+      "id": "session",
+      "label": "How would you rate each part of the course?",
+      "type": "matrix",
+      "required": true,
+      "choice_set": "rate5",
+      "reverse": false,
+      "matrix_items": ["Lectures", "Seminars", "Assessment", "Reading materials"]
+    },
+    {
+      "id": "format",
+      "label": "How did you take the course?",
+      "type": "single_choice",
+      "required": false,
+      "choice_set": "fmt",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "rate5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["Poor", "Fair", "Good", "Very good", "Excellent"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "fmt",
+      "values": ["in_person", "online"],
+      "labels": ["In person", "Online"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "How was each part of the course rated?",
+      "family": "descriptive",
+      "method": "descriptives",
+      "roles": {
+        "variables": [
+          "session__Lectures",
+          "session__Seminars",
+          "session__Assessment",
+          "session__Reading materials"
+        ]
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "descriptives",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "How were ratings of the lectures distributed?",
+      "family": "descriptive",
+      "method": "frequency",
+      "roles": {
+        "variable": "session__Lectures"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "frequency",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "Did in-person and online students rate the lectures differently?",
+      "family": "categorical",
+      "method": "crosstab",
+      "roles": {
+        "row": "format",
+        "column": "session__Lectures"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "The rating of the lectures does not depend on how the course was taken.",
+        "alternative": "The rating of the lectures depends on how the course was taken."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "crosstab",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Rate each session",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A teaching team wants each part of a course rated, and to know whether students who took it online judged it differently.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe how each part of the course was rated."
+      },
+      {
+        "id": "O2",
+        "text": "Compare ratings between in-person and online students."
+      }
+    ],
+    "sampling": {
+      "population": "Students enrolled on the course this term",
+      "method": "census",
+      "planned_n": 60
+    }
+  }
+}

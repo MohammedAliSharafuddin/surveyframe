@@ -52,7 +52,7 @@ launch_studio(
 - strict:
 
   Logical. Passed to
-  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
   when `responses` is a CSV path.
 
 - screen:
@@ -82,7 +82,7 @@ launch_studio(
 - demo:
 
   Optional. A demo name from
-  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md).
+  [`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md).
   Studio then opens with that demo's instrument and responses loaded, in
   place of `instrument` and `responses`, which must be left out.
   `"input_types"` uses every input type Studio supports.
@@ -95,17 +95,17 @@ Called for its side effect.
 
 The Design screen holds the SurveyBuilder, and a save there becomes the
 instrument Studio has open.
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md)
 opens the builder on its own.
 
 ## See also
 
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 
 Other entry points:
-[`surveyframe-package`](https://mohammedalisharafuddin.github.io/surveyframe/reference/surveyframe-package.md)
+[`surveyframe-package`](https://surveyframe.org/reference/surveyframe-package.md)
 
 ## Examples
 

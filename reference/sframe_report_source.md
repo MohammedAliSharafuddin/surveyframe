@@ -5,7 +5,7 @@ writes calls this function. It reads the folder's `.sframe` and
 responses, recomputes the analysis plan, and compares what it finds with
 the folder's `manifest.json`. The report's Provenance section then
 states the instrument hash and whether
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md)
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
 verified it, the amendments, whether the responses file is the one
 exported, whether the analysis plan results match the recorded results
 ("The analysis plan results match the recorded results", or "differ"
@@ -37,7 +37,7 @@ sframe_report_source(dir = ".", include_analysis = TRUE, plot_palette = "web")
 - plot_palette:
 
   `"web"` or `"print"`, as in
-  [`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md).
+  [`render_report()`](https://surveyframe.org/reference/render_report.md).
 
 ## Value
 
@@ -56,16 +56,17 @@ responses hash and the results record, all checkable without the report.
 
 ## See also
 
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 
 Other Report functions:
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
-[`sframe_codebook()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_codebook.md),
-[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
-[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md),
-[`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md),
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`sframe_analysis_qmd()`](https://surveyframe.org/reference/sframe_analysis_qmd.md),
+[`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md),
+[`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md),
+[`sframe_reports`](https://surveyframe.org/reference/sframe_reports.md),
+[`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md),
+[`sframe_show()`](https://surveyframe.org/reference/sframe_show.md)
 
 ## Examples
 
@@ -75,12 +76,9 @@ d <- sframe_demo("likert_scale")
 dir <- file.path(tempdir(), "report-source-example")
 render_report(d$instrument, d$responses, output_file = dir, format = "qmd",
               open = FALSE)
-#> Report source written to /tmp/RtmpEPGRzn/report-source-example. Open report.qmd in RStudio or Positron and render it.
 src <- sframe_report_source(dir)
 src$check$numbers_match
-#> [1] TRUE
 src$check$source_edited
-#> [1] FALSE
 unlink(dir, recursive = TRUE)
 # }
 ```

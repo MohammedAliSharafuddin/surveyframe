@@ -1,7 +1,7 @@
 # Load one bundled demo
 
-One of the 22-item teaching library: 17 analysis examples, 3
-presentation examples, and 2 provenance examples. Or 1 of the 2
+One of the 25-item teaching library: 19 analysis examples, 3
+presentation examples, and 3 provenance examples. Or 1 of the 2
 reference datasets: `"tourism_services"`, a realistic multi-scale
 instrument, and `"input_types"`, which uses every input type
 SurveyBuilder and SurveyStudio support in a single instrument.
@@ -9,7 +9,7 @@ SurveyBuilder and SurveyStudio support in a single instrument.
 ## Usage
 
 ``` r
-sframe_demo(name, branded = FALSE)
+sframe_demo(name, branded = FALSE, preview = interactive())
 ```
 
 ## Arguments
@@ -17,7 +17,7 @@ sframe_demo(name, branded = FALSE)
 - name:
 
   Character. A demo name, as listed by
-  [`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md).
+  [`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md).
 
 - branded:
 
@@ -26,50 +26,56 @@ sframe_demo(name, branded = FALSE)
   `render` block. The bundled file on disk is left unchanged, so the
   same branding can be shown on whichever demo matches your own survey.
 
+- preview:
+
+  Logical. When `TRUE`, in an interactive session, the survey opens as a
+  respondent sees it, in the viewer of RStudio, Positron or VS Code,
+  else the browser, through
+  [`sframe_show()`](https://surveyframe.org/reference/sframe_show.md).
+  It is a preview, so answers go nowhere. Nothing opens in a script, a
+  knitr or Quarto render, or with
+  `options(surveyframe.demo_preview = FALSE)`.
+
 ## Value
 
-A list with `instrument`, `responses`, and the paths behind them:
-`instrument_path`, `responses_path`, `codebook_path` and `results_path`.
-The codebook carries variable and value labels, so the data means
-something outside R. The results table is what surveyframe reports for
-this demo, which is the reference to compare against when you run the
-same data through another package. The 2 reference datasets have no
-codebook or results table, so those 2 paths are `NA`.
+A list of class `sframe_demo` with `instrument`, `responses`, and the
+paths behind them. Printed, it shows a short card: what the demo
+teaches, its size, its files and the commands to try next. The parts are
+`instrument`, `responses`, `instrument_path`, `responses_path`,
+`codebook_path` and `results_path`. The codebook carries variable and
+value labels, so the data means something outside R. The results table
+is what surveyframe reports for this demo, which is the reference to
+compare against when you run the same data through another package. The
+2 reference datasets have no codebook or results table, so those 2 paths
+are `NA`.
+
+## How the demos may be used
+
+The demos' responses are simulated, not collected from participants.
+Each respondent id starts with `DEMO-`, and a `data_status` column says
+"Demonstration data, not collected from participants". Every output made
+from data that carries it says so too: each APA sentence from
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
+ends with "(demonstration data)", and a report's title, its opening line
+and each table and figure title carry the same, also after the data is
+copied into another project. Use the demos to learn, teach and test a
+method or an instrument. Presenting their results as findings, or
+editing the data to hide where it came from, is fabrication, which no
+check can stop: the stamp makes a copy visible.
 
 ## See also
 
-[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md),
-[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md)
+[`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md),
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md)
 
 Other Demo functions:
-[`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md),
-[`sframe_list_demos()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_list_demos.md)
+[`sframe_demo_qmd()`](https://surveyframe.org/reference/sframe_demo_qmd.md),
+[`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md)
 
 ## Examples
 
 ``` r
 demo <- sframe_demo("two_group")
-demo$instrument
-#> <sframe>
-#>   Title:      In person or online?
-#>   Version:    1.0.0
-#>   Items:      2
-#>   Scales:     0
-#>   Analysis:   2 blocks
-#>   Status:     valid
+demo
 head(demo$responses)
-#>   respondent_id           started_at         submitted_at    format
-#> 1          R001 2026-06-01T09:04:00Z 2026-06-01T09:08:00Z in_person
-#> 2          R002 2026-06-01T09:04:37Z 2026-06-01T09:08:37Z in_person
-#> 3          R003 2026-06-01T09:05:14Z 2026-06-01T09:09:14Z in_person
-#> 4          R004 2026-06-01T09:05:51Z 2026-06-01T09:09:51Z in_person
-#> 5          R005 2026-06-01T09:06:28Z 2026-06-01T09:10:28Z in_person
-#> 6          R006 2026-06-01T09:07:05Z 2026-06-01T09:11:05Z in_person
-#>   sessions_attended
-#> 1                10
-#> 2                 4
-#> 3                 6
-#> 4                 5
-#> 5                12
-#> 6                 6
 ```

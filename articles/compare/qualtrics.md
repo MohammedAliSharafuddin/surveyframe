@@ -1,0 +1,66 @@
+# surveyframe and Qualtrics
+
+Qualtrics is a commercial survey platform with free and paid options.
+Its data export gives each answer as a numeric value, the default, or as
+the choice text.
+
+surveyframe is a free R package (MIT, on CRAN) for the whole research
+workflow around a survey: the questionnaire and its analysis plan, the
+collection, the checks, the planned analyses and the APA 7 report.
+
+## What the surveyframe workflow provides
+
+- An analysis plan written before the data, with hypotheses and decision
+  rules, saved in the questionnaire file.
+- A pre-analysis plan to submit to OSF, Zenodo or an ethics committee.
+- A hash anyone can check at
+  [surveyframe.org/verify](https://surveyframe.org/verify/), and
+  amendments recorded with their reasons.
+- Quality checks, scale reliability, the planned analyses and a report
+  in APA 7, in SurveyStudio or in R.
+
+## Using Qualtrics with surveyframe
+
+You can collect responses with Qualtrics and analyse them with
+surveyframe. Describe the questionnaire as a surveyframe instrument,
+then prepare the export so that
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
+can check it against the instrument:
+
+1.  Export the responses as a CSV file. Use numeric values, and give
+    each choice the value of its code in the instrument, or change the
+    values after export.
+2.  Keep the header row and remove the descriptive rows below it, such
+    as the row of full question text, so the first data row is the first
+    respondent.
+3.  Name each column by the matching item id.
+4.  Declare any column outside the instrument, such as the response id
+    or the time of submission, in `meta_cols`.
+
+``` r
+
+raw <- read.csv("answers.csv", check.names = FALSE)
+raw <- raw[-(1:2), ]  # the descriptive rows below the header: count them in your own export
+names(raw) <- c("submitted", "visit_type", "satisfaction")  # each column named by its item id, in order
+raw$visit_type <- c("First visit" = "first", "Returning" = "returning")[raw$visit_type]  # answer text to choice codes, where needed
+responses <- read_responses(raw, instrument, meta_cols = c("submitted"))
+results <- run_analysis_plan(responses, instrument)
+```
+
+The planned analyses and the report then run on these responses.
+
+## Sources
+
+Checked on 15 November 2026 against Qualtrics’s own documentation:
+
+- [Data export
+  options](https://www.qualtrics.com/support/survey-platform/data-and-analysis-module/data/download-data/export-options/)
+- [Data export
+  formats](https://www.qualtrics.com/support/survey-platform/data-and-analysis-module/data/download-data/export-formats/)
+- [Free and paid options](https://www.qualtrics.com/free-account/)
+
+## Related
+
+- [Choosing a survey tool for
+  research](https://surveyframe.org/articles/learn/choosing-a-survey-tool.md)
+- [Get started](https://surveyframe.org/articles/start.md)

@@ -1,0 +1,179 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "eba433d9f51f994355a2ce09516270cb152bd4e848de02386c465ccb0d12c9e4",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Will they come back?",
+    "version": "1.0.0",
+    "description": "A customer return-intention study: whether more use of a service predicts that customers return, how satisfied they are and which offer they prefer.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:48Z"
+  },
+  "items": [
+    {
+      "id": "sessions_attended",
+      "label": "How many times did you use the service this year?",
+      "type": "numeric",
+      "required": true,
+      "reverse": false
+    },
+    {
+      "id": "will_return",
+      "label": "Will you use the service again next year?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "yn",
+      "reverse": false
+    },
+    {
+      "id": "satisfaction",
+      "label": "I was satisfied with the service.",
+      "type": "likert",
+      "required": true,
+      "choice_set": "agree5",
+      "reverse": false
+    },
+    {
+      "id": "preferred_session_type",
+      "label": "Which of our offers do you value most?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "pref",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "yn",
+      "values": ["no", "yes"],
+      "labels": ["No", "Yes"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "agree5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+      "allow_other": false,
+      "randomise": false
+    },
+    {
+      "id": "pref",
+      "values": ["workshop", "keynote", "panel"],
+      "labels": ["Workshops", "Keynotes", "Panel discussions"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "Does using the service more predict returning?",
+      "family": "regression",
+      "method": "regression_logistic_binary",
+      "roles": {
+        "predictors": "sessions_attended",
+        "dependent": "will_return"
+      },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Use does not change the odds of returning.",
+        "alternative": "Use changes the odds of returning."
+      },
+      "decision_rule": "Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "regression_logistic_binary",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "And does it predict how satisfied they were?",
+      "family": "regression",
+      "method": "regression_logistic_ordinal",
+      "roles": {
+        "predictors": "sessions_attended",
+        "dependent": "satisfaction"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Use does not change the odds of a higher satisfaction rating.",
+        "alternative": "Use changes the odds of a higher satisfaction rating."
+      },
+      "decision_rule": "Reject H0 if p < .05 for the use coefficient, and report its odds ratio with a 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "regression_logistic_ordinal",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "And which session type they prefer?",
+      "family": "regression",
+      "method": "regression_logistic_multinomial",
+      "roles": {
+        "predictors": "sessions_attended",
+        "dependent": "preferred_session_type"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "Use does not change which offer is preferred.",
+        "alternative": "Use changes which offer is preferred."
+      },
+      "decision_rule": "Reject H0 if the likelihood-ratio test of use has p < .05.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "regression_logistic_multinomial",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Will they come back?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A provider wants to know whether customers who use a service more are the ones who come back.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Test whether use predicts returning."
+      },
+      {
+        "id": "O2",
+        "text": "Test whether use predicts satisfaction and the offer preferred."
+      }
+    ],
+    "sampling": {
+      "population": "Customers who used the service in the last year",
+      "method": "simple_random",
+      "planned_n": 150
+    }
+  }
+}

@@ -1,8 +1,8 @@
 # Read an instrument's amendment log
 
 Returns the disclosed-amendment history recorded by
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
-as a data frame, one row per amendment in the order they were recorded.
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md) as
+a data frame, one row per amendment in the order they were recorded.
 
 ## Usage
 
@@ -27,13 +27,13 @@ external audit trail.
 
 ## See also
 
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 
 Other Amendments functions:
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
-[`sframe_drop_items()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_drop_items.md),
-[`sframe_item_flags()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_flags.md),
-[`sframe_link_git_commit()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_link_git_commit.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+[`sframe_drop_items()`](https://surveyframe.org/reference/sframe_drop_items.md),
+[`sframe_item_flags()`](https://surveyframe.org/reference/sframe_item_flags.md),
+[`sframe_link_git_commit()`](https://surveyframe.org/reference/sframe_link_git_commit.md)
 
 ## Examples
 
@@ -41,8 +41,4 @@ Other Amendments functions:
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")
 instr <- sframe_instrument("Demo", components = list(item))
 sframe_get_amendments(instr)
-#>  [1] timestamp        reason_code      reason_text      tier            
-#>  [5] author           deviation_report signoff          previous_hash   
-#>  [9] new_hash         changed_fields  
-#> <0 rows> (or 0-length row.names)
 ```

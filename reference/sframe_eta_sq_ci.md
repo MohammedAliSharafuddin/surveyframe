@@ -48,22 +48,16 @@ variation within the groups.
 
 ## See also
 
-[`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md),
-[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md)
+[`sframe_cramers_v_ci()`](https://surveyframe.org/reference/sframe_cramers_v_ci.md),
+[`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md)
 
 Other Confidence interval functions:
-[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md),
-[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md),
-[`sframe_cramers_v_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cramers_v_ci.md)
+[`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md),
+[`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md),
+[`sframe_cramers_v_ci()`](https://surveyframe.org/reference/sframe_cramers_v_ci.md)
 
 ## Examples
 
 ``` r
 sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl)
-#>  estimate     lower     upper 
-#> 0.7324601 0.5362175 0.8285950 
-#> attr(,"level")
-#> [1] 0.95
-#> attr(,"method")
-#> [1] "noncentral F"
 ```

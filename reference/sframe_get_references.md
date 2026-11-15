@@ -26,15 +26,14 @@ A list of `sf_reference` objects, named by id.
 ## See also
 
 Other References functions:
-[`read_bibtex()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_bibtex.md),
-[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
-[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md),
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md),
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md),
+[`sframe_bibliography()`](https://surveyframe.org/reference/sframe_bibliography.md),
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 
 ## Examples
 
 ``` r
 instr <- sframe_demo("likert_scale")$instrument
 sframe_get_references(instr)
-#> named list()
 ```

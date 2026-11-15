@@ -2,7 +2,7 @@
 
 Parses BibTeX, the format Google Scholar, Zotero, Mendeley and most
 journal pages export, into
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 records. Covers the common entry types (`@article`, `@book`,
 `@incollection`, `@inbook`, `@inproceedings`, `@techreport`,
 `@phdthesis`, `@mastersthesis`, `@misc`, `@online`, `@software`,
@@ -29,7 +29,7 @@ read_bibtex(file = NULL, text = NULL, cited_by = NULL)
 - cited_by:
 
   Optional `cited_by` targets given to every entry read, see
-  [`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md).
+  [`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md).
 
 ## Value
 
@@ -41,10 +41,10 @@ written `@article{key, ...}` or `@article(key, ...)`.
 ## See also
 
 Other References functions:
-[`sframe_add_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_add_references.md),
-[`sframe_bibliography()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bibliography.md),
-[`sframe_get_references()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_references.md),
-[`sframe_reference()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reference.md)
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md),
+[`sframe_bibliography()`](https://surveyframe.org/reference/sframe_bibliography.md),
+[`sframe_get_references()`](https://surveyframe.org/reference/sframe_get_references.md),
+[`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
 
 ## Examples
 
@@ -59,5 +59,4 @@ refs <- read_bibtex(text = "@article{cronbach_1951,
   pages   = {297--334}
 }")
 names(refs)
-#> [1] "cronbach_1951"
 ```

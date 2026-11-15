@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Survey design and live results: a tourism services example • surveyframe</title>
+<title>Survey design and live results: a tourism services example: surveyframe</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Survey design and live results: a tourism services example">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Survey design and live results: a tourism services example: surveyframe">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,6 +38,7 @@
   }
 }
 </script>
+<link rel="canonical" href="https://surveyframe.org/articles/surveyframe.html" />
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -56,12 +57,49 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="active nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-templates" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Templates</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-templates">
+<li><a class="dropdown-item" href="../articles/templates.html#psychology">Psychology and measurement</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#education">Education</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#business">Business</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#events-tourism">Events and tourism</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#research-methods">Research methods</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html">All questionnaire templates</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="../articles/start.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-learn" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Learn</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-learn">
+<li><a class="dropdown-item" href="../articles/learn/for-students.html">Guidance for survey students</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-supervisors.html">Guidance for supervisors</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-ethics-committees.html">Guidance for ethics committees</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-research-organisations.html">Guidance for NGOs and research organisations</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-surveystudio.html">Run a study in SurveyStudio</a></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-r.html">Run a study in R</a></li>
+    <li><a class="dropdown-item" href="../articles/guides.html">How-to guides</a></li>
+    <li><a class="dropdown-item" href="../articles/docs.html">Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/question-types.html">Choosing questions for your survey</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/analysis-plan.html">The analysis plan</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/register-on-osf.html">Register your plan on OSF</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/choosing-a-survey-tool.html">Choosing a survey tool</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/faq.html">Frequently asked questions</a></li>
+  </ul>
+</li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-r-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">R reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-r-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/index.html">Articles</a></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/cite.html">Cite</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -120,7 +158,7 @@ section uses 60 simulated responses so the vignette builds offline.
 Replacing the simulated data with a call to
 <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code> connects the same workflow to live
 responses that grow with each submission.</p>
-<p>Allow about 30 minutes for the complete case study. For a five-minute
+<p>Allow about 30 minutes for the complete case study. For a 5-minute
 runnable introduction, begin with the “Learn by example” vignette and
 its <code>first_survey</code> demo. Return here for the full
 design-to-report workflow.</p>
@@ -131,7 +169,7 @@ Assessing the Effectiveness of Digital Marketing in Enhancing Tourist
 Experiences and Satisfaction: A Study of Thailand’s Tourism Services.
 <em>Administrative Sciences</em>, <em>14</em>(11), 273. <a href="https://doi.org/10.3390/admsci14110273" class="external-link uri">https://doi.org/10.3390/admsci14110273</a></p>
 </blockquote>
-<p>The instrument covers five research areas applicable to any tourism
+<p>The instrument covers 5 research areas applicable to any tourism
 services context: digital marketing effectiveness (relevance,
 accessibility, ease of use, and perceived value), destination service
 quality (accommodation and local transport), destination sustainability
@@ -147,7 +185,7 @@ their own context.</p>
 <div class="section level3">
 <h3 id="shared-likert-scale">Shared Likert scale<a class="anchor" aria-label="anchor" href="#shared-likert-scale"></a>
 </h3>
-<p>All rated items use a five-point agreement scale.</p>
+<p>All rated items use a 5-point agreement scale.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">likert5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_choice_set.html">sframe_choice_set</a></span><span class="op">(</span></span>
 <span>  <span class="st">"likert5"</span>,</span>
@@ -434,14 +472,7 @@ items)<a class="anchor" aria-label="anchor" href="#tourist-satisfaction-ts-3-ite
 <span>  components <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">choice_sets</span>, <span class="va">rated_items</span>, <span class="va">demo_items</span>, <span class="va">scales</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">study</span></span>
-<span><span class="co">#&gt; &lt;sframe&gt;</span></span>
-<span><span class="co">#&gt;   Title:      Digital Marketing Effectiveness of Tourism Services</span></span>
-<span><span class="co">#&gt;   Version:    1.0.0</span></span>
-<span><span class="co">#&gt;   Items:      55</span></span>
-<span><span class="co">#&gt;   Scales:     9</span></span>
-<span><span class="co">#&gt;   Analysis:   0 blocks</span></span>
-<span><span class="co">#&gt;   Status:     valid</span></span></code></pre></div>
+<span><span class="va">study</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -455,11 +486,7 @@ to read the result. <code><a href="../reference/write_sframe.html">write_sframe(
 instrument with a SHA-256 hash so any post-collection edits are
 detectable.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">study</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;sframe validation&gt;</span></span>
-<span><span class="co">#&gt;   Instrument:  Digital Marketing Effectiveness of Tourism Services (1.0.0)</span></span>
-<span><span class="co">#&gt;   Status:      valid</span></span>
-<span><span class="co">#&gt;   Checks:      30 run, 0 with problems</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">study</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Read the parts of the diagnostic with the accessors, which saves
 reaching into it. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> shows every check that ran,
 including the ones that found nothing, which is how you tell a check
@@ -467,16 +494,8 @@ that passed from a check that was never reached.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/validate_sframe.html">validate_sframe</a></span><span class="op">(</span><span class="va">study</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/sframe_is_valid.html">sframe_is_valid</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="../reference/sframe_problems.html">sframe_problems</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
-<span><span class="co">#&gt; character(0)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                  check status n_problems</span></span>
-<span><span class="co">#&gt; 1         field_shapes     ok          0</span></span>
-<span><span class="co">#&gt; 2   duplicate_item_ids     ok          0</span></span>
-<span><span class="co">#&gt; 3       item_id_format     ok          0</span></span>
-<span><span class="co">#&gt; 4 duplicate_choice_ids     ok          0</span></span>
-<span><span class="co">#&gt; 5  choice_set_contents     ok          0</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save the instrument. Keep this file alongside your analysis script.</span></span>
 <span><span class="va">sframe_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write_sframe.html">write_sframe</a></span><span class="op">(</span><span class="va">study</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_v1.sframe"</span><span class="op">)</span>,</span>
@@ -484,8 +503,7 @@ that passed from a check that was never reached.</p>
 <span></span>
 <span><span class="co"># Reload the instrument from disk at any time with:</span></span>
 <span><span class="va">study2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sframe.html">read_sframe</a></span><span class="op">(</span><span class="va">sframe_path</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">$</span><span class="va">title</span>, <span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">study2</span><span class="op">)</span><span class="op">$</span><span class="va">title</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">$</span><span class="va">title</span>, <span class="fu"><a href="../reference/sframe_meta.html">sframe_meta</a></span><span class="op">(</span><span class="va">study2</span><span class="op">)</span><span class="op">$</span><span class="va">title</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="what-the-sha-256-hash-proves-and-what-it-does-not">What the SHA-256 hash proves, and what it does not<a class="anchor" aria-label="anchor" href="#what-the-sha-256-hash-proves-and-what-it-does-not"></a>
 </h3>
@@ -525,39 +543,28 @@ package and the published format describe the same file.
 <code>sframe_format</code> field existed.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">schema_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"schema"</span>, <span class="st">"sframe_schema.json"</span>, package <span class="op">=</span> <span class="st">"surveyframe"</span><span class="op">)</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">schema_path</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">required</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; [1] "sframe_format"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; [1] "hash"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; [1] "meta"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; [1] "items"</span></span></code></pre></div>
-<p>Because the file is plain text, two versions of it diff the same way
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">schema_path</span>, simplifyVector <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">required</span></span></code></pre></div>
+<p>Because the file is plain text, 2 versions of it diff the same way
 any source file does. If <code>tourism_services_v1.sframe</code> were
 committed to a Git repository, revising it and running
 <code>git diff</code> on the file would show exactly which lines, which
 item, which choice, which plan block, changed, alongside Git’s own
 commit history for who changed it and when. That diff is Git’s job, and
-the next section shows how the two connect.</p>
+the next section shows how the 2 connect.</p>
 </div>
 <div class="section level3">
 <h3 id="disclosed-revision-amend_sframe">Disclosed revision: <code>amend_sframe()</code><a class="anchor" aria-label="anchor" href="#disclosed-revision-amend_sframe"></a>
 </h3>
-<p>A hash mismatch alone can’t distinguish a legitimate correction
-(fixing a data-entry error, removing bot responses, correcting a
-misspecified model) from an undisclosed change: both break the hash
-identically. <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> gives legitimate revision a
+<p>A hash mismatch shows that the content changed. A legitimate
+correction (fixing a data-entry error, removing bot responses,
+correcting a misspecified model) and an undisclosed change move the hash
+in the same way. <code><a href="../reference/amend_sframe.html">amend_sframe()</a></code> gives legitimate revision a
 structured, disclosed path instead: it compares the instrument before
 and after a change, and appends a record of what changed and why,
 directly inside the <code>.sframe</code> file next to the content it
 explains, never overwriting an earlier entry.</p>
-<p>Amendments come in two tiers, because not every change carries the
-same risk to the plan’s design-time-binding logic:</p>
+<p>Amendments come in 2 tiers, because not every change carries the same
+risk to the plan’s design-time-binding logic:</p>
 <ul>
 <li>
 <strong><code>"pipeline"</code></strong> amendments
@@ -597,19 +604,7 @@ empty field would read as a sign-off.</li>
 <span><span class="co">#&gt; changes what is measured or analysed, so the minor number moves. Set it with</span></span>
 <span><span class="co">#&gt; `version = "1.1.0"`.</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/sframe_get_amendments.html">sframe_get_amendments</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span>
-<span><span class="co">#&gt;              timestamp         reason_code</span></span>
-<span><span class="co">#&gt; 1 2026-11-13T20:52:25Z instrument_revision</span></span>
-<span><span class="co">#&gt;                                    reason_text   tier author</span></span>
-<span><span class="co">#&gt; 1 Clarified item wording after pilot feedback. design   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt;                                     deviation_report signoff</span></span>
-<span><span class="co">#&gt; 1 Wording only; the construct measured is unchanged.    none</span></span>
-<span><span class="co">#&gt;                                                      previous_hash</span></span>
-<span><span class="co">#&gt; 1 603d168a49a71266a4e024917c60d633e226b7d62a67e22b3e83796652b26012</span></span>
-<span><span class="co">#&gt;                                                           new_hash</span></span>
-<span><span class="co">#&gt; 1 425cb67f743644f375d9371fa910187b7675ae95a2c7b643d6c952254b40aecc</span></span>
-<span><span class="co">#&gt;   changed_fields</span></span>
-<span><span class="co">#&gt; 1          items</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/sframe_get_amendments.html">sframe_get_amendments</a></span><span class="op">(</span><span class="va">study_amended</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/sframe_get_amendments.html">sframe_get_amendments()</a></code> returns the full history as a
 data frame, one row per disclosed change, printable or exported with
 <code><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv()</a></code> for an external audit trail.
@@ -635,7 +630,7 @@ every change is disclosed in the first place.</p>
 <h3 id="linking-a-saved-instrument-to-its-git-commit">Linking a saved instrument to its Git commit<a class="anchor" aria-label="anchor" href="#linking-a-saved-instrument-to-its-git-commit"></a>
 </h3>
 <p>A bare hash carries the file’s identity alone. A diff, an author and
-an explanation come from Git, which already provides all three.
+an explanation come from Git, which already provides all 3.
 <code><a href="../reference/sframe_link_git_commit.html">sframe_link_git_commit()</a></code> points the instrument at Git and
 leaves the history there: it records the current commit’s SHA and
 subject line, so the SHA-256 hash’s role narrows to confirming that the
@@ -644,12 +639,7 @@ produced. It degrades gracefully with no error when Git isn’t installed
 or the path isn’t a repository. Git stays optional, and the rest of the
 package runs on its own.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_link_git_commit.html">sframe_link_git_commit</a></span><span class="op">(</span><span class="va">study_amended</span>, repo_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $linked</span></span>
-<span><span class="co">#&gt; [1] FALSE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $reason</span></span>
-<span><span class="co">#&gt; [1] "not a git repository"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_link_git_commit.html">sframe_link_git_commit</a></span><span class="op">(</span><span class="va">study_amended</span>, repo_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -685,10 +675,9 @@ shared by email, or opened directly from disk.</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_services_survey.html"</span><span class="op">)</span>,</span>
 <span>  open        <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Static survey written to '/tmp/RtmpNsy3KP/tourism_services_survey.html' (103.3</span></span>
+<span><span class="co">#&gt; Static survey written to '/tmp/RtmpMEisdn/tourism_services_survey.html' (103.3</span></span>
 <span><span class="co">#&gt; KB).</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">html_path</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="what-the-respondent-sees">What the respondent sees<a class="anchor" aria-label="anchor" href="#what-the-respondent-sees"></a>
@@ -702,8 +691,7 @@ the instrument’s single theme colour, so the line below re-skins the
 whole survey on its own.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">study</span><span class="op">$</span><span class="va">render</span><span class="op">$</span><span class="va">theme</span> <span class="op">&lt;-</span> <span class="st">"#0f766e"</span></span></code></pre></div>
-<p>Two things about the export matter for planning a real
-deployment.</p>
+<p>2 things about the export matter for planning a real deployment.</p>
 <ul>
 <li>
 <strong>It is designed for a phone first.</strong> Option cards and
@@ -727,8 +715,8 @@ correct column headers. Matrix, multiple-choice, and ranking questions
 each need more than one column, so the collector expands them
 automatically: a matrix gets one column per row, a multiple-choice
 question gets one 0/1 column per option, and a ranking question gets one
-column per option holding its rank. A five-option multiple-choice item
-named <code>channels</code>, for example, becomes five columns,
+column per option holding its rank. A 5-option multiple-choice item
+named <code>channels</code>, for example, becomes 5 columns,
 <code>channels__option1</code> through <code>channels__option5</code>,
 each holding <code>0</code> or <code>1</code>, ready for analysis, with
 the splitting already done.</p>
@@ -738,10 +726,9 @@ the splitting already done.</p>
 <span>  sheet_url  <span class="op">=</span> <span class="st">"https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID"</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpNsy3KP/surveyframe_collector.gs</span></span>
+<span><span class="co">#&gt; Apps Script written to: /tmp/RtmpMEisdn/surveyframe_collector.gs</span></span>
 <span><span class="co">#&gt; Follow the setup instructions inside the file to deploy it.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">script_path</span><span class="op">)</span></span></code></pre></div>
 <p><strong>To deploy the script:</strong></p>
 <ol style="list-style-type: decimal">
 <li>Open or create a Google Sheet.</li>
@@ -875,9 +862,7 @@ onward to use real data.</p>
 <span>                             strict        <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Respondents:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">responses</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Respondents: 60</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Columns:    "</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">responses</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Columns:     58</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Columns:    "</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">responses</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -894,31 +879,6 @@ onward to use real data.</p>
 <span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">quality_summary</span>, align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"l"</span>, <span class="st">"r"</span><span class="op">)</span>, caption <span class="op">=</span> <span class="st">"Quality screening summary"</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Quality screening summary</caption>
-<thead><tr class="header">
-<th align="left">Metric</th>
-<th align="right">Value</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Respondents</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">Items</td>
-<td align="right">55</td>
-</tr>
-<tr class="odd">
-<td align="left">Flagged for review</td>
-<td align="right">52</td>
-</tr>
-<tr class="even">
-<td align="left">Flag rate</td>
-<td align="right">86.7%</td>
-</tr>
-</tbody>
-</table>
 <p>The flagged count reflects straight-lining detection on simulated
 data, where random responses often repeat values. With real survey
 responses the flagging rate is typically much lower. The flag marks
@@ -931,352 +891,9 @@ respondents for researcher review, not automatic exclusion.</p>
 <span><span class="va">mr_items</span><span class="op">$</span><span class="va">missing_prop</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="op">*</span> <span class="va">mr_items</span><span class="op">$</span><span class="va">missing_prop</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">mr_items</span>, digits <span class="op">=</span> <span class="fl">1</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Variable"</span>, <span class="st">"Missing (n)"</span>, <span class="st">"Missing (%)"</span>, <span class="st">"Valid (n)"</span><span class="op">)</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Item-level missingness"</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Item-level missingness</caption>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="right">Missing (n)</th>
-<th align="right">Missing (%)</th>
-<th align="right">Valid (n)</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">dmre_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmre_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmre_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmre_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmre_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmau_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmau_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmau_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmau_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmau_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmeu_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmeu_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmeu_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmeu_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmeu_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmpv_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmpv_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmpv_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dmpv_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dmpv_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsqa_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsqa_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsqa_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsqa_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsqt_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsqt_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsqt_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsqt_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsqt_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsuq_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsuq_4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_5</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsuq_6</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_7</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsuq_8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_9</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">dsuq_10</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">dsuq_11</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">ts_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">ts_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">ts_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">bi_1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">bi_2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">bi_3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">gender</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">age_band</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">visitor_type</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">freq_visit</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">nationality</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">education</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">profession</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">companion</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-<tr class="odd">
-<td align="left">group_size</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">60</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># sframe_apa() gives a plain-language summary suitable for a methods section.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_apa.html">sframe_apa</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Missing-data diagnostics were computed for 55 variables.</span></span></code></pre></div>
+<span>      caption <span class="op">=</span> <span class="st">"Item-level missingness"</span><span class="op">)</span></span>
+<span><span class="co"># sframe_apa() gives a plain-language summary suitable for a methods section.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_apa.html">sframe_apa</a></span><span class="op">(</span><span class="va">mr</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -1287,7 +904,7 @@ frame, using the scoring rules stored in the instrument. If a column
 with the same name as a scale already exists in the data frame,
 <code><a href="../reference/score_scales.html">score_scales()</a></code> skips that scale so pre-scored data survives
 intact.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scored</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score_scales.html">score_scales</a></span><span class="op">(</span><span class="va">responses</span>, <span class="va">study</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">scale_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DMRE"</span>, <span class="st">"DMAU"</span>, <span class="st">"DMEU"</span>, <span class="st">"DMPV"</span>,</span>
@@ -1301,76 +918,19 @@ intact.</p>
 <span>  row.names <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu">kable</span><span class="op">(</span><span class="va">scale_summary</span>, digits <span class="op">=</span> <span class="fl">2</span>, caption <span class="op">=</span> <span class="st">"Scale score summary"</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Scale score summary</caption>
-<thead><tr class="header">
-<th align="left">Scale</th>
-<th align="right">Mean</th>
-<th align="right">SD</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">DMRE</td>
-<td align="right">3.79</td>
-<td align="right">0.63</td>
-</tr>
-<tr class="even">
-<td align="left">DMAU</td>
-<td align="right">3.84</td>
-<td align="right">0.57</td>
-</tr>
-<tr class="odd">
-<td align="left">DMEU</td>
-<td align="right">3.76</td>
-<td align="right">0.58</td>
-</tr>
-<tr class="even">
-<td align="left">DMPV</td>
-<td align="right">3.62</td>
-<td align="right">0.58</td>
-</tr>
-<tr class="odd">
-<td align="left">DSQA</td>
-<td align="right">3.63</td>
-<td align="right">0.63</td>
-</tr>
-<tr class="even">
-<td align="left">DSQT</td>
-<td align="right">3.52</td>
-<td align="right">0.74</td>
-</tr>
-<tr class="odd">
-<td align="left">DSUQ</td>
-<td align="right">3.59</td>
-<td align="right">0.68</td>
-</tr>
-<tr class="even">
-<td align="left">TS</td>
-<td align="right">4.32</td>
-<td align="right">0.61</td>
-</tr>
-<tr class="odd">
-<td align="left">BI</td>
-<td align="right">3.79</td>
-<td align="right">0.71</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">s</span> <span class="kw">in</span> <span class="va">scale_cols</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">scored</span><span class="op">[[</span><span class="va">s</span><span class="op">]</span><span class="op">]</span>; <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">v</span>, col <span class="op">=</span> <span class="st">"#16B3B1"</span>, border <span class="op">=</span> <span class="st">"white"</span>, main <span class="op">=</span> <span class="va">s</span>, xlab <span class="op">=</span> <span class="st">"Score"</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><img src="surveyframe_files/figure-html/score-distributions-1.png" class="r-plt" alt="Histograms of the scored scale distributions, one panel per scale" width="672" style="display: block; margin: auto auto auto 0;"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="reliability">Reliability<a class="anchor" aria-label="anchor" href="#reliability"></a>
 </h2>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_reliability_results.html">sframe_reliability_results</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span>, omega <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="co"># One row per scale, with NA where a statistic could not be computed.</span></span>
@@ -1385,78 +945,6 @@ intact.</p>
 <span>  <span class="fu">kable</span><span class="op">(</span><span class="va">rel_df</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"l"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"r"</span><span class="op">)</span>,</span>
 <span>        caption <span class="op">=</span> <span class="st">"Scale reliability"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<table class="table">
-<caption>Scale reliability</caption>
-<colgroup>
-<col width="76%">
-<col width="9%">
-<col width="5%">
-<col width="8%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Scale</th>
-<th align="center">Items</th>
-<th align="center">N</th>
-<th align="right">Alpha</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Digital marketing: relevance and engagement (DMRE)</td>
-<td align="center">5</td>
-<td align="center">60</td>
-<td align="right">0.87</td>
-</tr>
-<tr class="even">
-<td align="left">Digital marketing: accessibility and usefulness
-(DMAU)</td>
-<td align="center">5</td>
-<td align="center">60</td>
-<td align="right">0.86</td>
-</tr>
-<tr class="odd">
-<td align="left">Digital marketing: ease of use (DMEU)</td>
-<td align="center">5</td>
-<td align="center">60</td>
-<td align="right">0.87</td>
-</tr>
-<tr class="even">
-<td align="left">Digital marketing: perceived value (DMPV)</td>
-<td align="center">5</td>
-<td align="center">60</td>
-<td align="right">0.85</td>
-</tr>
-<tr class="odd">
-<td align="left">Destination service quality: accommodation (DSQA)</td>
-<td align="center">4</td>
-<td align="center">60</td>
-<td align="right">0.86</td>
-</tr>
-<tr class="even">
-<td align="left">Destination service quality: transport (DSQT)</td>
-<td align="center">5</td>
-<td align="center">60</td>
-<td align="right">0.90</td>
-</tr>
-<tr class="odd">
-<td align="left">Destination sustainability quality (DSUQ)</td>
-<td align="center">11</td>
-<td align="center">60</td>
-<td align="right">0.95</td>
-</tr>
-<tr class="even">
-<td align="left">Tourist satisfaction (TS)</td>
-<td align="center">3</td>
-<td align="center">60</td>
-<td align="right">0.86</td>
-</tr>
-<tr class="odd">
-<td align="left">Behavioural intention (BI)</td>
-<td align="center">3</td>
-<td align="center">60</td>
-<td align="right">0.82</td>
-</tr>
-</tbody>
-</table>
 <p>A value near 0.70 is sometimes used as a rough convention, but
 reliability must be interpreted against the construct, intended use,
 item count, uncertainty, and model assumptions. Alpha and the omega
@@ -1475,13 +963,13 @@ the item correlations appear suitable for exploratory factoring.
 <code><a href="../reference/sframe_efa_readiness_results.html">sframe_efa_readiness_results()</a></code> runs the KMO measure of
 sampling adequacy and Bartlett’s test of sphericity, and uses parallel
 analysis to suggest the number of factors.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">er</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_efa_readiness_results.html">sframe_efa_readiness_results</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">er</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>A KMO value and Bartlett’s test provide preliminary screening
-evidence, one input among several toward judging whether a particular
+evidence, one input among a few toward judging whether a particular
 factor model is appropriate. Treat 0.60 as a rough, informal KMO
 convention. The factor count from parallel analysis is also a guide to
 interpret with theory, design, loadings, residuals, and model fit.</p>
@@ -1493,7 +981,7 @@ interpret with theory, design, loadings, residuals, and model fit.</p>
 (CR) and average variance extracted (AVE) from supplied factor loadings.
 Discriminant validity is assessed via the Fornell-Larcker criterion and
 HTMT when construct scores are supplied.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Supply a named list of loadings (construct -&gt; item loadings vector)</span></span>
 <span><span class="va">loadings_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  DMRE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dm_1 <span class="op">=</span> <span class="fl">0.78</span>, dm_2 <span class="op">=</span> <span class="fl">0.82</span>, dm_3 <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span>,</span>
@@ -1513,7 +1001,7 @@ any other construct.</p>
 <p>The plan binds each research question to a statistical technique and
 the variable roles it needs. <code><a href="../reference/run_analysis_plan.html">run_analysis_plan()</a></code> executes
 every block and returns one result per question.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    id               <span class="op">=</span> <span class="st">"RQ1"</span>,</span>
@@ -1558,8 +1046,7 @@ every block and returns one result per question.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="../reference/sframe_plan.html">sframe_plan</a></span><span class="op">(</span><span class="va">study</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -1570,24 +1057,11 @@ the variables involved. <code><a href="../reference/sframe_assumption_results.ht
 normality (Shapiro-Wilk for samples below 5,000), homogeneity of
 variance (Levene) for grouped tests, and linearity for regression
 pairs.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"psych"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">ar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sframe_assumption_results.html">sframe_assumption_results</a></span><span class="op">(</span><span class="va">scored</span>, variables <span class="op">=</span> <span class="va">scale_cols</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ar</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co">#&gt; Assumption Report</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Normality:</span></span>
-<span><span class="co">#&gt;  variable  n shapiro_w    shapiro_p    skewness   kurtosis</span></span>
-<span><span class="co">#&gt;      DMRE 60 0.9507082 1.681885e-02 -0.01764237 -0.8595994</span></span>
-<span><span class="co">#&gt;      DMAU 60 0.9400575 5.447373e-03 -0.27466443 -0.3742255</span></span>
-<span><span class="co">#&gt;      DMEU 60 0.9202802 7.870891e-04 -0.13995250 -0.9009628</span></span>
-<span><span class="co">#&gt;      DMPV 60 0.9236779 1.081931e-03 -0.16121971 -1.3529371</span></span>
-<span><span class="co">#&gt;      DSQA 60 0.9431484 7.509031e-03 -0.68528436  0.2173799</span></span>
-<span><span class="co">#&gt;      DSQT 60 0.9590129 4.211033e-02 -0.37357996 -0.1216330</span></span>
-<span><span class="co">#&gt;      DSUQ 60 0.9488769 1.379674e-02  0.04178933 -0.6397338</span></span>
-<span><span class="co">#&gt;        TS 60 0.8780098 2.274819e-05 -0.74469442  0.1776129</span></span>
-<span><span class="co">#&gt;        BI 60 0.9527818 2.108952e-02 -0.33102932 -0.4335865</span></span></code></pre></div>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Review the <code>$normality</code> and <code>$homogeneity</code>
 slots to decide whether parametric or non-parametric alternatives are
 appropriate. The analysis plan can override the test method per block
@@ -1597,79 +1071,19 @@ wherever the default fits the data poorly.</p>
 <div class="section level2">
 <h2 id="run-the-analysis-plan">Run the analysis plan<a class="anchor" aria-label="anchor" href="#run-the-analysis-plan"></a>
 </h2>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span></code></pre></div>
 <p>Each result carries an APA-formatted statistic, an effect size, a
 writing prompt, and the methodological reference that supports the
 chosen test.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">results_table</span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="1%">
-<col width="30%">
-<col width="3%">
-<col width="59%">
-<col width="4%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">RQ</th>
-<th align="left">Research question</th>
-<th align="left">Method</th>
-<th align="right">Result (APA)</th>
-<th align="left">Effect</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">RQ1</td>
-<td align="left">Are digital marketing perceptions associated with
-tourist satisfaction?</td>
-<td align="left">pearson</td>
-<td align="right">r(58) = .19, 95% CI [-.07, .42], p = .153</td>
-<td align="left">small</td>
-</tr>
-<tr class="even">
-<td align="left">RQ2</td>
-<td align="left">Is service quality associated with tourist
-satisfaction?</td>
-<td align="left">pearson</td>
-<td align="right">r(58) = -.04, 95% CI [-.29, .22], p = .778</td>
-<td align="left">negligible</td>
-</tr>
-<tr class="odd">
-<td align="left">RQ3</td>
-<td align="left">Do service quality and sustainability quality predict
-satisfaction?</td>
-<td align="left"></td>
-<td align="right">R² = .210, F(3, 56) = 4.97, p = .004</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">RQ4</td>
-<td align="left">Do first-time and repeat visitors differ in
-satisfaction?</td>
-<td align="left"></td>
-<td align="right">U = 140, z = -4.63, p &lt; .001, r = -.60, 95% CI
-[-.77, -.41], Hodges-Lehmann shift = -0.67, 95% CI [-1.00, -0.67],
-higher in Repeated visitor</td>
-<td align="left">large</td>
-</tr>
-<tr class="odd">
-<td align="left">RQ5</td>
-<td align="left">Does satisfaction predict behavioural intention?</td>
-<td align="left"></td>
-<td align="right">R² = .291, F(1, 58) = 23.83, p &lt; .001</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
 <p>The full writing prompt for each result is available in
 <code>r$prompt</code>. The first one reads:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">prompt</span><span class="op">)</span></span>
-<span><span class="co">#&gt; There was a positive, small non-significant correlation between "Digital marketing: relevance and engagement" and "Tourist satisfaction", r(58) = .19, 95% CI [-.07, .42], p = .153. Explain what this means for your research question.</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">results</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">prompt</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>prompt</code> field is a sentence template for the methods
 or results section. The researcher fills in the substantive
 interpretation. The package supplies the statistic and the label. This
@@ -1683,13 +1097,12 @@ brand-styled chart to every supported block: bar charts for frequency
 and chi-square blocks, and scatter plots with a regression overlay for
 correlation and regression blocks. Plotting stays opt-in, so an
 installation that skips ggplot2 keeps working as before.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_analysis_plan.html">run_analysis_plan</a></span><span class="op">(</span><span class="va">scored</span>, <span class="va">study</span>, plots <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span>
 <span><span class="va">first_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Filter</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">plot</span><span class="op">)</span>, <span class="va">results_p</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">first_plot</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="surveyframe_files/figure-html/run-plan-plots-1.png" class="r-plt" alt="Chart attached to the first analysis-plan result by run_analysis_plan with plots enabled" width="672"></p>
 <p>Inferential blocks also return a <code>$table</code> data frame ready
 for <code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>, and the HTML report picks both up
 automatically.</p>
@@ -1702,16 +1115,14 @@ automatically.</p>
 <p><code><a href="../reference/render_results.html">render_results()</a></code> writes one section per research
 question. <code><a href="../reference/render_report.html">render_report()</a></code> adds a codebook, quality summary,
 and descriptives alongside the analysis results.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/render_results.html">render_results</a></span><span class="op">(</span></span>
 <span>  <span class="va">results</span>,</span>
 <span>  <span class="va">study</span>,</span>
 <span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"tourism_results.html"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Results report written:"</span>, <span class="va">results_path</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Results report written: /tmp/RtmpNsy3KP/tourism_results.html</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Size: 13.2 KB</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Size:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.size</a></span><span class="op">(</span><span class="va">results_path</span><span class="op">)</span> <span class="op">/</span> <span class="fl">1024</span>, <span class="fl">1</span><span class="op">)</span>, <span class="st">"KB\n"</span><span class="op">)</span></span></code></pre></div>
 <p>The results report contains one section per research question, with
 the APA statistic, effect size, writing prompt, and the reference for
 the chosen method, each paired with its own chart drawn directly beneath
@@ -1720,7 +1131,7 @@ bar, with agreement and disagreement categories running away from a
 shared zero line and any neutral category split evenly across it, so the
 balance of opinion is readable at a glance, where a plain frequency bar
 leaves it to be inferred.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/render_report.html">render_report</a></span><span class="op">(</span></span>
 <span>  <span class="va">study</span>,</span>
 <span>  data             <span class="op">=</span> <span class="va">scored</span>,</span>
@@ -1736,7 +1147,7 @@ leaves it to be inferred.</p>
 <span><span class="co">#&gt; Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.</span></span>
 <span><span class="co">#&gt; Rendering the report with Quarto. This usually takes under a minute.</span></span>
-<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpNsy3KP/tourism_report.html</span></span></code></pre></div>
+<span><span class="co">#&gt; Report rendered with the Quarto engine: /tmp/RtmpMEisdn/tourism_report.html</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -1746,7 +1157,7 @@ leaves it to be inferred.</p>
 Every step from <code><a href="../reference/read_sheet_responses.html">read_sheet_responses()</a></code> onward is identical
 to the simulated workflow. Re-run this block each time you want updated
 results.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Pull the latest responses from the Google Sheet.</span></span>
 <span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sheet_responses.html">read_sheet_responses</a></span><span class="op">(</span></span>
 <span>  sheet_id   <span class="op">=</span> <span class="st">"YOUR_SHEET_ID"</span>,</span>
@@ -1790,7 +1201,7 @@ HTML file. The Google Sheets script connects online submissions to R
 through a single function call. Because the questionnaire, the scales,
 and the analysis plan are stored together in the sframe, the design and
 the analysis travel as one object.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"surveyframe"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

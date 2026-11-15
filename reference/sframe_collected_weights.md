@@ -31,7 +31,7 @@ sframe_collected_weights(data, instrument, item_id, cr_filter = FALSE)
 - cr_filter:
 
   Logical. Passed to
-  [`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md)
+  [`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md)
   for a pairwise item. Ignored otherwise.
 
 ## Value
@@ -42,15 +42,15 @@ A list with `weights` (a named numeric vector summing to 1), `criteria`,
 
 ## See also
 
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md)
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md)
 
 Other Decision analysis functions:
-[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
-[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
-[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md),
-[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+[`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md),
+[`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md),
+[`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
 
 ## Examples
 
@@ -64,6 +64,4 @@ study <- sframe_instrument(
 sframe_collected_weights(
   data.frame(pts__price = c(60, 40), pts__speed = c(40, 60)), study, "pts"
 )$weights
-#> price speed 
-#>   0.5   0.5 
 ```

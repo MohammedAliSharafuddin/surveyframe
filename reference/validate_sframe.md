@@ -2,10 +2,10 @@
 
 Checks the internal consistency of an `sframe` instrument object and
 returns a diagnostic result. Validation is performed automatically by
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 and optionally by
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md).
-It can also be run independently at any point during instrument
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md). It
+can also be run independently at any point during instrument
 construction.
 
 ## Usage
@@ -19,7 +19,7 @@ validate_sframe(instrument, strict = TRUE)
 - instrument:
 
   An `sframe` object created by
-  [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md).
+  [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md).
 
 - strict:
 
@@ -30,10 +30,10 @@ validate_sframe(instrument, strict = TRUE)
 ## Value
 
 An
-[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+[sframe_validation](https://surveyframe.org/reference/sframe_validation.md)
 object. When the instrument is valid, the instrument carried inside it
 has `meta$validated` set to `TRUE` and can be recovered with
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md).
 
 ## Details
 
@@ -84,14 +84,14 @@ The following checks are performed:
   and 1
 
 These are reported as notes, which
-[`sframe_notes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_notes.md)
+[`sframe_notes()`](https://surveyframe.org/reference/sframe_notes.md)
 returns and which leave the instrument valid, since SurveyBuilder saved
 them before 0.4.3: branching rules that depend on each other in a cycle,
 a check whose pass values are not codes of its item's choice set, an
 item whose `scale_id` names a scale that does not list it, and a scale
 item's choice set with numeric codes outside 1 evenly spaced run (1 to 5
 and 99 for "do not know"), which
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 reads as missing.
 
 - Analysis plan roles referencing missing variables or models
@@ -100,41 +100,41 @@ reads as missing.
 
 ## Changed in 0.4.0
 
-Earlier versions returned two different things depending on `strict`:
-the instrument itself, invisibly, when `strict = TRUE`, and a bare
-unclassed list when `strict = FALSE`. A validator should report a
-diagnostic, so both paths now return an
-[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md)
+Earlier versions returned 2 different things depending on `strict`: the
+instrument itself, invisibly, when `strict = TRUE`, and a bare unclassed
+list when `strict = FALSE`. A validator should report a diagnostic, so
+both paths now return an
+[sframe_validation](https://surveyframe.org/reference/sframe_validation.md)
 object, and they return it visibly, so `validate_sframe(instrument)`
 typed at the console shows the result. Code that read `$valid` and
 `$problems` keeps working. Code that used the `strict = TRUE` return as
 an instrument should now wrap the call in
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md).
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md).
 
 ## See also
 
-[sframe_validation](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`sframe_problems()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_problems.md),
-[`sframe_is_valid()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_is_valid.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[sframe_validation](https://surveyframe.org/reference/sframe_validation.md),
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`sframe_problems()`](https://surveyframe.org/reference/sframe_problems.md),
+[`sframe_is_valid()`](https://surveyframe.org/reference/sframe_is_valid.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 Other Design functions:
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
-[`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md),
-[`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md),
-[`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md),
-[`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md),
-[`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
-[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
-[`sframe_validation`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md),
+[`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md),
+[`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md),
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 ## Examples
 
@@ -150,52 +150,14 @@ instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 
 # The result prints its own diagnostic
 validate_sframe(instr, strict = FALSE)
-#> <sframe validation>
-#>   Instrument:  Demo Survey (0.1.0)
-#>   Status:      valid
-#>   Checks:      30 run, 0 with problems
 
 # Explore it with dedicated methods rather than reaching in with `$`
 v <- validate_sframe(instr, strict = FALSE)
 sframe_is_valid(v)
-#> [1] TRUE
 sframe_problems(v)
-#> character(0)
 summary(v)
-#>                           check status n_problems
-#> 1                  field_shapes     ok          0
-#> 2            duplicate_item_ids     ok          0
-#> 3                item_id_format     ok          0
-#> 4          duplicate_choice_ids     ok          0
-#> 5           choice_set_contents     ok          0
-#> 6           duplicate_scale_ids     ok          0
-#> 7                  id_namespace     ok          0
-#> 8                   item_config     ok          0
-#> 9                   item_labels     ok          0
-#> 10         item_choice_set_refs     ok          0
-#> 11              item_scale_refs     ok          0
-#> 12        reverse_without_scale     ok          0
-#> 13          decision_item_shape     ok          0
-#> 14             comparison_scale     ok          0
-#> 15             scale_membership     ok          0
-#> 16             scale_parameters     ok          0
-#> 17      reverse_item_membership     ok          0
-#> 18               branching_refs     ok          0
-#> 19             branching_values     ok          0
-#> 20                   check_refs     ok          0
-#> 21          duplicate_check_ids     ok          0
-#> 22               branch_targets     ok          0
-#> 23         analysis_plan_blocks     ok          0
-#> 24         analysis_plan_models     ok          0
-#> 25      analysis_plan_variables     ok          0
-#> 26 decision_scale_compatibility     ok          0
-#> 27                    model_ids     ok          0
-#> 28                  model_specs     ok          0
-#> 29                   references     ok          0
-#> 30                        study     ok          0
 
 # Recover the validated instrument
 validated <- as_sframe(validate_sframe(instr, strict = TRUE))
 isTRUE(sframe_meta(validated)$validated)
-#> [1] TRUE
 ```

@@ -1,0 +1,37 @@
+# Reviewing survey studies for an ethics committee
+
+This page is for an ethics committee reviewing a survey study prepared
+with surveyframe. You review the proposed documents before any responses
+are collected, and the completed report with its recorded changes
+afterwards.
+
+## Before collection: the proposed study
+
+1.  **Ask for the pre-analysis plan and the `.sframe` file.** The plan
+    sets out the study, the participant information, the questionnaire
+    and the planned analyses.
+2.  **Review the questionnaire.** The plan lists every question and the
+    participant information. The researcher can also send the survey web
+    page as a preview, so you see it as respondents will.
+3.  **Identify the submitted version.** The plan names the `.sframe`
+    file’s hash. Keep the file and the plan you approved with your
+    decision.
+
+## After the study: the completed report
+
+1.  **Check the version analysed.** The report’s Provenance section
+    names the questionnaire’s hash. [Verify a `.sframe`
+    file](https://surveyframe.org/verify/) to see whether it matches the
+    version you approved.
+2.  **Review the recorded changes.** The Reproducibility section lists
+    each amendment the researcher recorded, with its reason and date.
+    Compare it with the version you approved to see what was disclosed.
+
+## Further guidance
+
+- [Prove a questionnaire file is the one you
+  planned](https://surveyframe.org/articles/guides/prove-a-questionnaire-file-is-the-one-you-planned.md)
+- [Change a questionnaire mid-study, on the
+  record](https://surveyframe.org/articles/guides/change-a-questionnaire-mid-study-on-the-record.md)
+- [Frequently asked
+  questions](https://surveyframe.org/articles/learn/faq.md)

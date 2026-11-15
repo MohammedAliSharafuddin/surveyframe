@@ -1,9 +1,9 @@
 # Format a result table's cells as an APA 7 report prints them
 
 The cells of a table from
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 as both report engines and
-[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md)
+[`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md)
 print them, so a table shows the same numbers wherever it appears. A p
 value column shows 3 decimals with no leading zero, or `<.001`. A column
 that cannot exceed 1, such as `r`, `tau` or `alpha`, drops its leading
@@ -58,13 +58,11 @@ confidence level in an interval heading ("95% CI lower").
 
 ## See also
 
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 
 ## Examples
 
 ``` r
 sframe_apa_cells(data.frame(t = 2.345, p = 0.004, r = 0.53, n = 40L))
-#>      t    p   r  n
-#> 1 2.35 .004 .53 40
 ```

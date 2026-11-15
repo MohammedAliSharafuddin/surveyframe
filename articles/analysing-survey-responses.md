@@ -2,7 +2,7 @@
 
 The analysis in surveyframe is driven by the plan stored in the
 instrument. Once responses are imported, scored, and checked,
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 runs every research question in one pass and returns results formatted
 for reporting.
 
@@ -20,7 +20,6 @@ instr     <- demo$instrument
 responses <- demo$responses
 
 dim(responses)
-#> [1] 120  18
 ```
 
 ## Import responses
@@ -43,7 +42,6 @@ responses <- read_responses(
 )
 
 dim(responses)
-#> [1] 120  18
 ```
 
 ## Missing data and quality
@@ -56,30 +54,6 @@ mr_items$missing_prop <- 100 * mr_items$missing_prop
 kable(mr_items, digits = 1, row.names = FALSE,
       col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
       caption = "Item-level missingness")
-```
-
-| Variable   | Missing (n) | Missing (%) | Valid (n) |
-|:-----------|------------:|------------:|----------:|
-| visit_type |           0 |           0 |       120 |
-| dm_1       |           0 |           0 |       120 |
-| dm_2       |           0 |           0 |       120 |
-| dm_3       |           0 |           0 |       120 |
-| sq_1       |           0 |           0 |       120 |
-| sq_2       |           0 |           0 |       120 |
-| sq_3       |           0 |           0 |       120 |
-| sus_1      |           0 |           0 |       120 |
-| sus_2      |           0 |           0 |       120 |
-| sat_1      |           0 |           0 |       120 |
-| sat_2      |           0 |           0 |       120 |
-| bi_1       |           0 |           0 |       120 |
-| bi_2       |           0 |           0 |       120 |
-| attention  |           0 |           0 |       120 |
-| comments   |          30 |          25 |        90 |
-
-Item-level missingness {.table}
-
-``` r
-
 
 qr <- sframe_quality_results(
   responses, instr,
@@ -98,18 +72,9 @@ quality_summary <- data.frame(
 kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary")
 ```
 
-| Metric             | Value |
-|:-------------------|------:|
-| Respondents        |   120 |
-| Items              |    15 |
-| Flagged for review |     6 |
-| Flag rate          |  5.0% |
-
-Quality screening summary {.table}
-
 ## Score scales
 
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
 scores the scales for you, but scoring once up front lets you inspect
 the construct scores and run the assumption checks below.
 
@@ -123,17 +88,6 @@ kable(head(scored[, score_cols, drop = FALSE]), digits = 2,
       caption = "Scale scores, first respondents")
 ```
 
-| digital_marketing | service_quality | sustainability | satisfaction | behavioural_intention |
-|---:|---:|---:|---:|---:|
-| 2.67 | 3.67 | 5.0 | 3.5 | 4.5 |
-| 3.00 | 2.67 | 3.0 | 1.5 | 2.5 |
-| 4.67 | 3.33 | 3.5 | 4.5 | 2.5 |
-| 4.33 | 4.00 | 5.0 | 4.5 | 5.0 |
-| 3.00 | 3.67 | 4.0 | 3.0 | 3.5 |
-| 3.67 | 3.67 | 2.5 | 3.5 | 3.0 |
-
-Scale scores, first respondents {.table}
-
 The scale-score distributions show the shape of each construct before
 the plan runs.
 
@@ -145,19 +99,12 @@ for (s in score_cols) {
   hist(v, col = "#16B3B1", border = "white", main = s,
        xlab = "Score", ylab = "")
 }
-```
-
-![Histograms of the scored scale distributions, one panel per
-scale](analysing-survey-responses_files/figure-html/score-distributions-1.png)
-
-``` r
-
 par(op)
 ```
 
 ## Check assumptions before the plan
 
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
 reports the checks a technique relies on, such as residual normality,
 variance inflation, and influence for a regression.
 
@@ -168,9 +115,6 @@ sframe_assumption_results(
   predictors = c("digital_marketing", "service_quality", "sustainability"),
   outcome    = "satisfaction"
 )
-#> Assumption Report
-#> 
-#> Regression residuals: n = 120, Shapiro-Wilk p = 0.898
 ```
 
 ## Define the plan
@@ -189,7 +133,7 @@ sframe_plan(instr) <- list(
        roles = list(x = "digital_marketing", y = "satisfaction"),
        options = list(alpha = 0.05)),
   list(id = "RQ2",
-       research_question = "Do the three perception scales predict satisfaction?",
+       research_question = "Do the 3 perception scales predict satisfaction?",
        family = "regression", method = "regression_linear",
        roles = list(predictors = c("digital_marketing", "service_quality", "sustainability"),
                     dependent = "satisfaction"),
@@ -210,12 +154,6 @@ results <- run_analysis_plan(responses, instr)
 results_table(results)
 ```
 
-| RQ | Research question | Method | Result (APA) | Effect |
-|:---|:---|:---|---:|:---|
-| RQ1 | Is digital marketing perception associated with satisfaction? | pearson | r(118) = .54, 95% CI \[.40, .65\], p \< .001 | large |
-| RQ2 | Do the three perception scales predict satisfaction? |  | R² = .383, F(3, 116) = 23.95, p \< .001 |  |
-| RQ3 | Do first-time and repeat visitors differ in behavioural intention? |  | U = 1576, z = -0.98, p = .326, r = -.09, 95% CI \[-.27, .09\], Hodges-Lehmann shift = 0.00, 95% CI \[-0.50, 0.00\], higher in Repeat visitor | negligible |
-
 Pass `plots = TRUE` to attach a brand-styled `ggplot2` chart to each
 result that supports one (descriptive, correlation, chi-square, and
 regression blocks). The chart sits in `$plot` alongside the existing
@@ -226,10 +164,6 @@ regression blocks). The chart sits in `$plot` alongside the existing
 results_plots <- run_analysis_plan(responses, instr, plots = TRUE)
 results_plots[[1]]$plot
 ```
-
-![Chart attached to the first analysis-plan result by run_analysis_plan
-with plots
-enabled](analysing-survey-responses_files/figure-html/run-plots-1.png)
 
 ## Read a single result
 
@@ -242,25 +176,14 @@ writing prompt, and the references that support the technique.
 rq1 <- results[[1]]
 
 rq1$apa
-#> [1] "r(118) = .54, 95% CI [.40, .65], p < .001"
 rq1$effect_label
-#> [1] "large"
 rq1$prompt
-#> [1] "There was a positive, large significant correlation between \"Digital marketing effectiveness\" and \"Tourist satisfaction\", r(118) = .54, 95% CI [.40, .65], p < .001. Explain what this means for your research question."
 unlist(rq1$citations)
-#>                                                                                                                                                         field_2018 
-#>                                                                            "Field, A. (2018). *Discovering statistics using IBM SPSS statistics* (5th ed.). SAGE." 
-#>                                                                                                                                                         cohen_1988 
-#>                                                          "Cohen, J. (1988). *Statistical power analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum." 
-#>                                                                                                                                                             r_core 
-#>                                          "R Core Team. (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing." 
-#>                                                                                                                                                        surveyframe 
-#> "Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows* (Version 0.4.3) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe"
 ```
 
 ## Render the results report
 
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md)
 writes a self-contained HTML report with one section per research
 question, each holding the APA result, the writing prompt, a space for
 the interpretation, and a reference list compiled from the techniques

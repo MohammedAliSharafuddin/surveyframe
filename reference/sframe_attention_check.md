@@ -3,9 +3,9 @@
 Specifies an attention, instructional, or trap check item at instrument
 design time. The check is stored in the instrument object and evaluated
 against collected response data by
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md).
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md).
 This function only defines the check. Evaluation happens later in
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md).
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md).
 
 ## Usage
 
@@ -31,7 +31,7 @@ sframe_attention_check(
 
   Character. The `id` of the item used as the check. The item must be
   defined separately with
-  [`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md)
+  [`sframe_item()`](https://surveyframe.org/reference/sframe_item.md)
   and included in the same instrument.
 
 - type:
@@ -57,7 +57,7 @@ sframe_attention_check(
 - fail_action:
 
   Character. What
-  [`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+  [`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
   does with respondents who fail this check. Either `"flag"` (mark in
   the report but retain) or `"exclude"` (mark for exclusion).
 
@@ -77,25 +77,25 @@ An object of class `sf_check` (a named list).
 
 ## See also
 
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
 
 Other Design functions:
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
-[`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md),
-[`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md),
-[`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md),
-[`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
-[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
-[`sframe_validation`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md),
+[`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md),
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 ## Examples
 
@@ -109,4 +109,5 @@ chk <- sframe_attention_check(
   fail_action = "flag",
   label       = "Attention check 1"
 )
+chk
 ```

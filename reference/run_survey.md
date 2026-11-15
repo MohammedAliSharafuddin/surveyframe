@@ -56,11 +56,11 @@ A `shiny.appobj`.
 
 ## See also
 
-[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+[`launch_studio()`](https://surveyframe.org/reference/launch_studio.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
 
 Other Preview functions:
-[`preview_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/preview_survey.md)
+[`preview_survey()`](https://surveyframe.org/reference/preview_survey.md)
 
 ## Examples
 

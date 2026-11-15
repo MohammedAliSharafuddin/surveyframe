@@ -1,487 +1,141 @@
-# surveyframe
+# Plan, run and report survey research
 
-![surveyframe](reference/figures/readme-logo.png)
+Design your questionnaire, plan your analysis and prepare an APA 7
+report. Work visually in SurveyStudio or use R.
 
-> **Just here to verify a `.sframe` file’s integrity hash or read its
-> amendment log?** **[Verify a file
-> now](https://mohammedalisharafuddin.github.io/surveyframe/verify/)**.
-> No R, no install. It runs entirely in your browser and nothing is
-> uploaded.
+For people conducting, supervising, reviewing or planning survey
+research.
 
-`surveyframe` is a research-design-first survey package for R. Most
-survey tools collect answers and return counts. `surveyframe` begins at
-the research design and carries it through to a written results report.
+[Explore templates](https://surveyframe.org/articles/templates.md) [Get
+started](https://surveyframe.org/articles/start.md)
 
-The unit of work is the instrument, a typed `sframe` object that stores
-three things together:
+SurveyStudio opens through R. The [setup
+guide](https://surveyframe.org/articles/start.md) explains installing
+the required software and opening your first study.
 
-1.  **The questions.** Items, choice sets, scales, branching rules, and
-    attention checks.
-2.  **The analysis plan.** A list of research questions, where each
-    question is bound to a named statistical technique and to the
-    variables that fill each role in that technique. The plan is written
-    during design, before any data arrive.
-3.  **The measurement or structural model.** Constructs, indicators, and
-    paths for EFA, CFA, CB-SEM, and PLS-SEM.
+[![CRAN
+status](https://www.r-pkg.org/badges/version/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Because the plan and the model live inside the instrument, you never
-have to go back and match up questions, variables, and tests by hand.
-Say you’re comparing satisfaction between first-time and repeat
-visitors: write that comparison into the plan once, alongside the
-questions, and it stays linked to the right variables from then on. When
-responses arrive, running the plan is a single step: each result comes
-back ready to write up, with a plot, a table, an APA statistic, an
-effect size where it applies, a writing prompt, and the reference that
-supports it. Plots switch between a colour palette for on-screen use and
-a black-and-white palette for print, both checked against WCAG contrast
-rules, so the same run produces a journal-ready figure with no separate
-step.
+## Conducting a survey for your studies?
 
-The package works offline during examples, tests, vignettes, and checks.
-Browser and Shiny entry points use `open = FALSE` or explicit launch
-functions, so automated checks do not open a browser.
+Plan your research, create your questionnaire, analyse responses and
+prepare your report. [Guidance for survey
+students](https://surveyframe.org/articles/learn/for-students.md)
 
-## Installation
+## Supervising students conducting survey research?
 
-> **0.4.3 is on GitHub, ahead of CRAN.** CRAN carries 0.4.2. The GitHub
-> release, 0.4.3, adds fixes found while teaching with it: a frequency
-> table for 2 or more variables, choice labels in frequency tables,
-> counts and percentages for choice items, and fixes to SurveyBuilder
-> and SurveyStudio. Install it with:
->
-> ``` r
->
-> remotes::install_github("MohammedAliSharafuddin/surveyframe")
-> ```
->
-> `NEWS.md` lists every fix.
+Review each student’s analysis plan, compare it with the completed
+report and follow recorded amendments and their reasons. [Guidance for
+supervisors](https://surveyframe.org/articles/learn/for-supervisors.md)
 
-Install from CRAN:
+## Reviewing a survey study as an ethics committee?
+
+Examine the proposed study documentation, then review the completed
+study and its recorded changes. [Guidance for ethics
+committees](https://surveyframe.org/articles/learn/for-ethics-committees.md)
+
+## Planning survey research for an NGO or research organisation?
+
+Prepare a pre-analysis plan and keep the questionnaire, analysis
+decisions and reporting connected. [Guidance for NGOs and research
+organisations](https://surveyframe.org/articles/learn/for-research-organisations.md)
+
+## Keep your questionnaire and analysis plan connected
+
+Save your questions, scoring rules, analysis plan and references in a
+portable `.sframe` file. Collect responses using your chosen setup,
+check their quality and prepare a report that presents the planned
+analyses alongside the results and your interpretation.
+
+Record later changes with their reasons so readers can follow the
+study’s development.
+
+**Plan your study before collecting responses.** Record your research
+questions, hypotheses and analysis choices alongside the questionnaire.
+[How to write the analysis
+plan](https://surveyframe.org/articles/learn/analysis-plan.md).
+
+**Move from responses to a research report.** Check the collected
+responses, run the planned analyses and prepare APA 7 tables, figures
+and references for supported methods. [See the report
+stage](https://surveyframe.org/articles/run-a-study-in-surveystudio.html#report).
+
+**Keep a record of your research design.** Preserve the questionnaire
+version, sources and disclosed amendments with the design file. [Verify
+a `.sframe` file](https://surveyframe.org/verify/) to check that it
+matches the hash recorded when it was saved.
+
+For example, start with the [course evaluation
+survey](https://surveyframe.org/articles/templates/course-evaluation-survey.md),
+plan how you will summarise the ratings, collect responses and prepare a
+report for the teaching team. It is an example to adapt to your own
+course and questions.
+
+## Start from a template
+
+Each template holds a questionnaire and an example analysis plan to
+adapt to your own study.
+
+**Psychology and measurement.** [Likert scale
+questionnaire](https://surveyframe.org/articles/templates/likert-scale-questionnaire.md),
+[Measurement model questionnaire (CFA and
+SEM)](https://surveyframe.org/articles/templates/measurement-model-questionnaire.md).
+
+**Education.** [Course evaluation
+survey](https://surveyframe.org/articles/templates/course-evaluation-survey.md),
+[Training evaluation before and
+after](https://surveyframe.org/articles/templates/training-evaluation-before-and-after.md).
+
+**Business.** [Customer satisfaction
+survey](https://surveyframe.org/articles/templates/customer-satisfaction-survey.md),
+[Employee engagement
+survey](https://surveyframe.org/articles/templates/employee-engagement-survey.md),
+[Supplier and venue selection (decision
+making)](https://surveyframe.org/articles/templates/supplier-and-venue-selection.md).
+
+**Events and tourism.** [Open-ended feedback
+survey](https://surveyframe.org/articles/templates/open-ended-feedback-survey.md).
+
+**Research methods.** [Pilot survey with a small
+sample](https://surveyframe.org/articles/templates/pilot-survey-small-sample.md),
+[Preparing a survey study for
+preregistration](https://surveyframe.org/articles/templates/pre-registered-survey-sealed-and-amended.md).
+
+[All questionnaire
+templates](https://surveyframe.org/articles/templates.md)
+
+## How a study runs
+
+1.  **Design** the questionnaire and write the analysis plan, with
+    hypotheses and decision rules, before collecting responses.
+2.  **Collect** responses with a survey web page, stored where you
+    choose, such as a Google Sheet you own.
+3.  **Check** responses for failed attention checks, speeding, identical
+    answers across a scale and missing answers.
+4.  **Analyse** the responses with the plan as written. A later change
+    is recorded as an amendment with its reason.
+5.  **Report** in APA 7, as HTML, Word, PDF or OpenDocument.
+
+[Run a study in
+SurveyStudio](https://surveyframe.org/articles/run-a-study-in-surveystudio.md)
+shows each stage by point and click, and [Run a study in
+R](https://surveyframe.org/articles/run-a-study-in-r.md) shows the same
+stages in R.
+
+Already use R? Open a first study from the Console
 
 ``` r
 
 install.packages("surveyframe")
-```
-
-To get changes not yet released to CRAN:
-
-``` r
-
-remotes::install_github("MohammedAliSharafuddin/surveyframe")
-```
-
-In an interactive session,
-[`library(surveyframe)`](https://mohammedalisharafuddin.github.io/surveyframe/)
-prints a short start-up note with a demo to try, the commands to start
-with, and how to cite the package.
-`suppressPackageStartupMessages(library(surveyframe))` loads it quietly,
-and scripts and rendered documents never show it.
-
-Optional packages are only needed for selected features:
-
-``` r
-
-install.packages(c("shiny", "psych", "googlesheets4", "digest", "MASS", "nnet"))
-```
-
-Syntax generation works without installing `lavaan` or `seminr`. Install
-those packages when you want to fit the generated CFA, CB-SEM, or
-PLS-SEM models.
-
-## Already have data?
-
-`surveyframe` is not a replacement for whatever collection tool your
-institution already has approved: Qualtrics, REDCap, Google Forms, or a
-paper form typed up afterward. It reads response data as a plain CSV or
-`data.frame` from any of them: export from your collection tool, rename
-columns to match your instrument’s item IDs (or build the instrument to
-match the export), and load it. If you have collected responses in a CSV
-or Google Sheet and want to start from the analysis step, build a
-minimal instrument that matches your column names and load the data
-directly:
-
-``` r
-
 library(surveyframe)
-
-# 1. Describe the items you already collected
-cs  <- sframe_choice_set("agree5", 1:5,
-        c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"))
-i1  <- sframe_item("q1", "Item 1", type = "likert", choice_set = "agree5", scale_id = "S")
-i2  <- sframe_item("q2", "Item 2", type = "likert", choice_set = "agree5", scale_id = "S")
-sc  <- sframe_scale("S", "My scale", items = c("q1", "q2"))
-instr <- sframe_instrument("My study", components = list(cs, i1, i2, sc))
-
-# 2. Load your CSV
-responses <- read_responses("my_data.csv", instr, strict = FALSE)
-
-# 3. Score and analyse
-scored  <- score_scales(responses, instr)
-results <- run_analysis_plan(scored, instr)
+d <- sframe_demo("first_survey")
 ```
 
-## Documentation workflow
-
-Choose the route that matches what you need:
-
-- **Try it in five minutes:** Learn by example: 22 small surveys.
-- **Prefer a visual interface:** SurveyBuilder, SurveyStudio, and the
-  dashboard.
-- **Build and collect:** Building a survey instrument, then Deploying
-  and collecting.
-- **Already have responses:** Analysing survey responses.
-- **Read the complete case study:** Digital marketing and tourism
-  services.
-
-Continue as needed with these:
-
-- Scale reliability and validity
-- EFA, CFA, CB-SEM, and PLS-SEM syntax
-- Multi-criteria decision analysis
-- Small-sample inference
-- Text and open-ended response analysis
-
-Read all eleven vignettes inside R with:
-
-``` r
-
-browseVignettes("surveyframe")
-```
-
-## An instrument is the research design
-
-``` r
-
-library(surveyframe)
-
-agree5 <- sframe_choice_set(
-  "agree5",
-  values = 1:5,
-  labels = c("Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree")
-)
-
-visitor_type_choices <- sframe_choice_set(
-  "visitor_type",
-  values = c("first_time", "repeat"),
-  labels = c("First-time visitor", "Repeat visitor")
-)
-
-sat_1 <- sframe_item("sat_1", "The service was reliable.",
-  type = "likert", choice_set = "agree5", scale_id = "sat")
-sat_2 <- sframe_item("sat_2", "The service was responsive.",
-  type = "likert", choice_set = "agree5", scale_id = "sat")
-sat_3 <- sframe_item("sat_3", "I would recommend the service.",
-  type = "likert", choice_set = "agree5", scale_id = "sat")
-
-visitor_type <- sframe_item("visitor_type", "Visitor type", type = "single_choice",
-  choice_set = "visitor_type")
-sat <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2", "sat_3"))
-
-instr <- sframe_instrument(
-  "Service Survey",
-  components = list(
-    agree5, visitor_type_choices, sat_1, sat_2, sat_3, visitor_type, sat
-  ),
-  analysis_plan = list(
-    list(
-      id                = "RQ1",
-      research_question = "Do first-time and repeat visitors differ in satisfaction?",
-      family            = "group_comparison",
-      method            = "mann_whitney",
-      roles             = list(group = "visitor_type", outcome = "sat"),
-      options           = list(alpha = 0.05)
-    )
-  )
-)
-
-write_sframe(instr, tempfile(fileext = ".sframe"))
-
-# See the instrument as a survey a respondent would fill in:
-export_survey(instr, open = FALSE)
-```
-
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
-validates the instrument and writes the validated object, including the
-validation flag, the analysis plan, and any saved model specifications.
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md)
-renders it as a self-contained HTML survey, the same function covered in
-“Visual tools” below.
-
-## Import and score
-
-``` r
-
-responses <- data.frame(
-  respondent_id = paste0("R", 1:5),
-  sat_1 = c(4, 5, 3, 4, NA),
-  sat_2 = c(5, 4, 3, 4, 5),
-  sat_3 = c(4, 5, 2, 4, 4),
-  visitor_type = c("first_time", "repeat", "first_time", "repeat", "first_time")
-)
-
-resp <- read_responses(responses, instr, respondent_id = "respondent_id", strict = FALSE)
-
-score_scales(resp, instr)
-sframe_missing_data_results(resp, instr)
-```
-
-## Run the analysis plan
-
-Each block binds a research question to a technique and to the variables
-that fill each role.
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md)
-runs every block and returns one result per question. Earlier `.sframe`
-files using `variables` and `test` fields remain compatible.
-
-``` r
-
-results <- run_analysis_plan(resp, instr)
-results
-```
-
-Supported method IDs include descriptives, missing data, quality checks,
-reliability, EFA readiness and solutions, CFA, CB-SEM, and PLS-SEM
-syntax, chi-square, Fisher’s exact test, McNemar, Cochran’s Q, t-tests,
-Mann-Whitney, Wilcoxon, one- and two-way ANOVA, ANCOVA,
-repeated-measures ANOVA, Kruskal-Wallis, Friedman, Pearson, Spearman,
-and Kendall correlations, partial correlations, linear and logistic
-regression, mediation, and moderation. Each technique reports an APA
-statistic, an effect size where it applies, a writing prompt, and the
-reference that supports it.
-
-## Render the results report
-
-``` r
-
-render_results(results, instr, output_file = tempfile(fileext = ".html"))
-```
-
-The report holds one section per research question, with the APA result,
-the writing prompt, a space for the interpretation, and a reference list
-compiled from the techniques used.
-
-## Reliability, EFA, and CFA
-
-``` r
-
-if (requireNamespace("psych", quietly = TRUE)) {
-  sframe_reliability_results(resp, instr, omega = FALSE)
-  sframe_efa_readiness_results(resp, instr)
-}
-
-sframe_syntax_cfa(instr)
-sframe_syntax_cfa(instr, ordered = TRUE)
-```
-
-## Model layer
-
-``` r
-
-model <- sframe_model_spec(
-  "model_1",
-  "Satisfaction model",
-  type = "cb_sem",
-  constructs = list(
-    sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2", "sat_3"))
-  )
-)
-
-instr <- sframe_add_model(instr, model)
-sframe_model_json(model)
-sframe_syntax_sem(model, instr)
-```
-
-## PLS-SEM syntax
-
-``` r
-
-pls_model <- sframe_model_spec(
-  "pls_1",
-  "Satisfaction and loyalty PLS model",
-  type = "pls_sem",
-  constructs = list(
-    sframe_construct("SAT", "Satisfaction", c("sat_1", "sat_2"), mode = "composite"),
-    sframe_construct("LOY", "Loyalty", "sat_3", mode = "single_item")
-  ),
-  paths = list(sframe_path("SAT", "LOY")),
-  options = list(bootstrap = 5000)
-)
-
-sframe_syntax_pls(pls_model)
-```
-
-## A full study report
-
-``` r
-
-render_report(
-  instr,
-  data = resp,
-  output_file = tempfile(fileext = ".html"),
-  include_codebook = TRUE,
-  include_quality = TRUE,
-  include_missing = TRUE,
-  include_descriptives = TRUE,
-  include_analysis = TRUE,
-  include_models = TRUE
-)
-```
-
-The built-in HTML fallback does not require Quarto. If the Quarto CLI is
-available locally,
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
-can use the bundled template.
-
-## Visual tools
-
-``` r
-
-launch_builder(open = FALSE)
-export_survey(instr, open = FALSE)
-```
-
-Use
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md)
-to author the questionnaire, the plan, and the model and to export the
-`.sframe` file and model syntax. It runs no statistics.
-[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md)
-uploads responses, runs the plan on its Analysis Plan screen, and
-renders the report on its Export screen. Its Dashboard screen explores
-responses with filters. Demo launchers are available for training:
-
-``` r
-
-launch_builder(demo = "input_types", open = FALSE)
-# launch_studio(demo = "input_types", screen = "preview")
-# launch_studio(demo = "input_types", screen = "dashboard")
-```
-
-Interactive functions such as `launch_builder(open = TRUE)`,
-[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-and
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md)
-are available for manual use. Tests and examples avoid opening browsers.
-
-## Roadmap
-
-0.4.0 (CRAN, 2026-08-20) added three capability themes:
-
-- **Small-sample survey helpers**, validated by a simulation study:
-  Hodges-Lehmann and paired-Wilcoxon pseudomedian estimators, exact
-  Fisher odds-ratio intervals, and Firth logistic regression.
-- **10 multi-criteria decision methods** (TOPSIS, AHP, ANP, DEMATEL,
-  VIKOR, MOORA, SMART, WASPAS, PROMETHEE, ELECTRE), with 2 new question
-  types for collecting judgements, weight-sensitivity analysis, and
-  declared conjoint designs.
-- **Text and open-ended response analysis**, 9 methods: term and n-gram
-  frequency, keyword in context, co-occurrence networks, sentiment,
-  document-feature matrices, and topic modelling via LDA or a structural
-  topic model.
-
-A disclosed-amendment and Git-linked provenance mechanism shipped
-alongside, on top of the existing `.sframe` integrity hash. Full detail
-in `NEWS.md`.
-
-0.4.1 focuses on stability: fixes found by using surveyframe on real
-instruments, no new capability theme.
-
-0.4.2 is a defect-fix release, correcting what an external review of
-0.4.1 found across 8 batches: 171 findings, 154 fixed here and 17
-deferred with a stated reason. The ones that matter most to a live study
-are in collection, where a participant’s answer could be altered or lost
-with no signal, and in scoring, where the report path recomputed scale
-scores by a second method that ignored reverse coding and the declared
-minimum. Some numbers therefore move between 0.4.1 and 0.4.2, and
-`NEWS.md` says which, under “What you need to change”. Reports also
-gained a folded “Show R code” block, and
-[`sframe_syntax_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_result.md)
-returns the statistical call behind a result with its variables and
-options resolved, so a reader can copy the code and reproduce the
-number.
-
-0.4.3, a GitHub release, fixes what a teaching session found in 0.4.2:
-frequency and descriptives blocks now handle choice items as categories,
-and SurveyBuilder reads a plan written in R as R does.
-
-## When to use surveyframe, and when not to
-
-surveyframe is a fit when a study’s analysis has to be decided before
-data collection: a scale to validate, a pre-registered hypothesis test,
-a measurement model to fit, or an audit trail showing the plan wasn’t
-changed after seeing results. Its core strength is a pre-declared,
-integrity-checked analysis plan bound to the instrument itself. It also
-interoperates with [survey](https://cran.r-project.org/package=survey)
-and [srvyr](https://cran.r-project.org/package=srvyr), the standard
-tools for weighting and variance estimation on data from a complex
-probability sample.
-
-Haven’t decided the analysis yet? Collect first with any web-form tool,
-Google Forms, Qualtrics, REDCap, or the R package
-[surveydown](https://github.com/surveydown-dev/surveydown), and add the
-plan when you’re ready: surveyframe reads exported CSV data from any of
-them (see “Already have data?” above).
-
-**If this package is ever archived by CRAN**, the GitHub repository
-remains the canonical source:
-`remotes::install_github("MohammedAliSharafuddin/surveyframe")`. Each
-CRAN release is also deposited to Zenodo with its own DOI, so a specific
-version stays citable and retrievable independently of both CRAN’s and
-GitHub’s continued availability.
-
-## FAQ
-
-**Is surveyframe a replacement for Qualtrics, Google Forms, or REDCap?**
-No. Those collect responses with no plan required up front. surveyframe
-declares the analysis plan before collection, and reads exported CSV
-data from any of them once the plan is added (see “Already have data?”
-above).
-
-**Does surveyframe do survey weighting or complex-sample variance
-estimation?** No. [survey](https://cran.r-project.org/package=survey)
-and [srvyr](https://cran.r-project.org/package=srvyr) are the standard R
-tools for stratified, clustered, or weighted samples. surveyframe’s
-instruments interoperate with that workflow instead of duplicating it.
-
-**Can I use surveyframe with data I’ve already collected?** Yes. Build a
-minimal instrument that matches your column names, then load your CSV or
-`data.frame` directly with
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md).
-See “Already have data?” above for a worked example.
-
-**What is a pre-declared analysis plan, and why does it matter?** A list
-of research questions written into the instrument at design time, each
-bound to a technique and to the variables that fill its roles, before
-any response arrives. It removes matching questions, variables, and
-tests up by hand, and it’s the basis for the audit trail showing the
-plan wasn’t changed after seeing results.
-
-**What happens if surveyframe is ever archived by CRAN?** The GitHub
-repository stays the canonical source
-(`remotes::install_github("MohammedAliSharafuddin/surveyframe")`), and
-every CRAN release is separately deposited to Zenodo with its own DOI.
-
-## Citation
-
-``` r
-
-citation("surveyframe")
-```
-
-## Related resources
-
-- Sharafuddin, M. A., Jaleel, A. A., and Madhavan, M. (2026).
-  *Quantitative Analysis with Small Samples: A Practical Guide for
-  Students and Early-Career Researchers* (Version 0.1.0) \[Book\].
-  Zenodo. <https://doi.org/10.5281/zenodo.20221929>. A companion
-  textbook on statistical inference when sample sizes are small, also
-  available at <https://flairmi.com/textbooks/smallsamplelab.html>. It
-  describes the small-sample methods that surveyframe added in 0.4.0 and
-  when to prefer each one.
-- Sharafuddin, M. A. (2026). *surveyframe: A Pre-Declared, Reproducible
-  Framework for Multi-Criteria Decision Analysis in Survey Research*.
-  Manuscript in preparation for Computo. Describes the 10 MCDM methods
-  surveyframe added in 0.4.0.
-
-## License
-
-MIT. See `LICENSE`.
+Then read the [R reference](https://surveyframe.org/reference/index.md),
+the [worked
+examples](https://surveyframe.org/articles/learn-by-example.md) and the
+[changelog](https://surveyframe.org/news/index.md).

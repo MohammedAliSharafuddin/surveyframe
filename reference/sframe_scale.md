@@ -2,12 +2,12 @@
 
 Creates a scale definition that groups items and specifies how composite
 scores are computed. The scale carries scoring rules used by
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 and measurement structure used by
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
 and
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md).
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md).
 
 ## Usage
 
@@ -29,7 +29,7 @@ sframe_scale(
 
   Character. A unique identifier for this scale. Referenced in the
   `scale_id` argument of
-  [`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md).
+  [`sframe_item()`](https://surveyframe.org/reference/sframe_item.md).
 
 - label:
 
@@ -42,7 +42,7 @@ sframe_scale(
   each listed once. Order controls presentation in reports, while
   scoring uses the same item IDs regardless of order. Items themselves
   are passed to
-  [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md)
+  [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md)
   as separate components.
 
 - method:
@@ -55,7 +55,7 @@ sframe_scale(
   compute a score for a respondent, a whole number from 1 to the number
   of items. When `NULL`, every item must be answered. An item whose
   column is absent from the data counts as unanswered. Used by
-  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md).
+  [`score_scales()`](https://surveyframe.org/reference/score_scales.md).
   With `method = "sum"`, a respondent who answered fewer than every item
   but at least `min_valid` gets a prorated sum: the mean of the answered
   items times the number of items (weighted, the weighted mean times the
@@ -68,7 +68,7 @@ sframe_scale(
   reverse-codes. Reversal applies within this scale only, so the same
   item can be reversed in one scale and scored as answered in another.
   An item can also be flagged with `reverse = TRUE` in
-  [`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
+  [`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
   which reverses it within the scale named by its `scale_id`. A reversed
   item needs declared response bounds, from a numeric choice set, slider
   limits or a rating maximum.
@@ -77,7 +77,7 @@ sframe_scale(
 
   Numeric vector or NULL. Item weights for weighted scoring, one
   positive finite number per item, in the order of `items`.
-  [`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+  [`score_scales()`](https://surveyframe.org/reference/score_scales.md)
   applies the weights to either `method = "mean"` or `method = "sum"`.
 
 ## Value
@@ -86,25 +86,25 @@ An object of class `sf_scale` (a named list).
 
 ## See also
 
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
 
 Other Design functions:
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`read_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sframe.md),
-[`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md),
-[`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md),
-[`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md),
-[`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md),
-[`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
-[`sframe_validation`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md),
+[`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md),
+[`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md),
+[`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 ## Examples
 
@@ -117,4 +117,5 @@ sat_scale <- sframe_scale(
   min_valid     = 2,
   reverse_items = NULL
 )
+sat_scale
 ```

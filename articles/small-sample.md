@@ -21,7 +21,7 @@ the study design and estimand, and report the limited precision.
 
 ## Planning a small-sample study
 
-[`sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sample_size_plan.md)
+[`sframe_sample_size_plan()`](https://surveyframe.org/reference/sframe_sample_size_plan.md)
 estimates a required sample size for a design and attaches the same
 small-sample advisory used elsewhere in the package when the estimate
 itself falls below 30.
@@ -29,18 +29,10 @@ itself falls below 30.
 ``` r
 
 sframe_sample_size_plan(type = "t_test", groups = 2)
-#> Sample-Size Plan
-#>   Target:      t_test
-#>   Estimated n: 128
-#>   Method:      power
-#>   Alpha:       0.050   Power: 0.80
-#>   Effect size: d = 0.5
-#> 
-#> Warning: Assumed a medium effect, d = 0.5. Supply d for the effect you expect.
 ```
 
 A worked instrument in this vignette targets n = 20 complete responses,
-well below that planning estimate. The instrument below has a two-level
+well below that planning estimate. The instrument below has a 2-level
 grouping question, a numeric outcome, and a binary outcome for the
 logistic example later in this vignette.
 
@@ -66,20 +58,13 @@ study <- sframe_instrument(
 )
 
 study
-#> <sframe>
-#>   Title:      Small-sample pilot
-#>   Version:    0.1.0
-#>   Items:      3
-#>   Scales:     0
-#>   Analysis:   0 blocks
-#>   Status:     valid
 ```
 
 ## Reading the advisory
 
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md)
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
 and
-[`sframe_sample_size_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sample_size_plan.md)
+[`sframe_sample_size_plan()`](https://surveyframe.org/reference/sframe_sample_size_plan.md)
 both attach an `advisory` element once a relevant n drops below 30. It
 prints automatically and is also available as a field for programmatic
 checks.
@@ -91,11 +76,9 @@ n50 <- data.frame(score = rnorm(50, mean = 50, sd = 10))
 
 ar_small <- sframe_assumption_results(n20, variables = "score")
 ar_small$advisory
-#> [1] "Small sample detected (n = 20). For these assumption checks, consider non-parametric alternatives. Asymptotic p-values may be unreliable. Bootstrap or exact confidence intervals are provided where available."
 
 ar_large <- sframe_assumption_results(n50, variables = "score")
 is.null(ar_large$advisory)
-#> [1] TRUE
 ```
 
 ## Mann-Whitney with the Hodges-Lehmann estimate
@@ -123,18 +106,8 @@ sframe_plan(study) <- list(
 
 mw_results <- run_analysis_plan(pilot, study)
 results_table(mw_results)
-```
-
-| RQ | Research question | Method | Result (APA) |
-|:---|:---|:---|---:|
-| RQ1 | Does the treatment arm score higher than control? |  | U = 34, z = -1.21, p = .226, r = -.27, 95% CI \[-.64, .15\], Hodges-Lehmann shift = -3.99, 95% CI \[-13.75, 4.58\], higher in Treatment |
-
-``` r
-
 mw_results[[1]]$hl_shift
-#> [1] -3.987846
 mw_results[[1]]$hl_conf_int
-#> [1] -13.750068   4.584132
 ```
 
 ## Paired Wilcoxon with the pseudomedian CI
@@ -157,28 +130,17 @@ sframe_plan(study) <- list(
 
 wp_results <- run_analysis_plan(data.frame(before = before, after = after), study)
 results_table(wp_results)
-```
-
-| RQ | Research question | Method | Result (APA) |
-|:---|:---|:---|---:|
-| RQ2 | Did scores change from before to after? |  | V = 0, z = -2.52, p = .012, r = -.89, 95% CI \[-.90, -.89\], pseudomedian = -6.46, 95% CI \[-11.70, -3.63\], higher in after |
-
-``` r
-
 wp_results[[1]]$pseudomedian
-#> [1] -6.45986
 wp_results[[1]]$pseudomedian_conf_int
-#> [1] -11.700678  -3.633836
 ```
 
 ## Fisher’s exact test with the exact odds-ratio CI
 
-For a 2x2 table, `fisher_exact` now attaches an exact odds-ratio
-confidence interval alongside the test’s p-value. The interval is only
-defined for a 2x2 table, and is dropped (not approximated) when
-`simulate_p_value` is requested, since base R’s
-[`fisher.test()`](https://rdrr.io/r/stats/fisher.test.html) cannot
-return both together.
+For a 2x2 table, `fisher_exact` reports an exact odds-ratio confidence
+interval beside the test’s p-value. With `simulate_p_value`, it reports
+the simulated p-value alone, as base R’s
+[`fisher.test()`](https://rdrr.io/r/stats/fisher.test.html) gives either
+the simulated p-value or the interval.
 
 ``` r
 
@@ -192,23 +154,13 @@ sframe_plan(study) <- list(
 
 fe_results <- run_analysis_plan(pilot, study)
 results_table(fe_results)
-```
-
-| RQ | Research question | Method | Result (APA) |
-|:---|:---|:---|---:|
-| RQ3 | Is conversion associated with study arm? |  | Fisher’s exact test, p \> .999, phi = .12 |
-
-``` r
-
 fe_results[[1]]$odds_ratio
-#> [1] 0.599308
 fe_results[[1]]$odds_ratio_conf_int
-#> [1] 0.0390558 6.9366524
 ```
 
 ## Bootstrap confidence interval on a median
 
-[`sframe_bootstrap_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_bootstrap_ci.md)
+[`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md)
 computes a bootstrap interval for an arbitrary statistic, useful when no
 exact interval exists for the estimator you need. It is already exported
 and used elsewhere in the package, applied here to the median of the
@@ -217,14 +169,6 @@ pilot outcome scores.
 ``` r
 
 sframe_bootstrap_ci(pilot$outcome, FUN = stats::median, R = 999)
-#> estimate    lower    upper 
-#> 52.82878 47.33676 56.66709 
-#> attr(,"level")
-#> [1] 0.95
-#> attr(,"resamples")
-#> [1] 999
-#> attr(,"valid_resamples")
-#> [1] 999
 ```
 
 ## Firth logistic regression for a rare or small binary outcome
@@ -247,26 +191,12 @@ sframe_plan(study) <- list(
 
 firth_results <- run_analysis_plan(pilot, study)
 results_table(firth_results)
-```
-
-| RQ | Research question | Method | Result (APA) |
-|:---|:---|:---|---:|
-| RQ4 | Does the covariate predict conversion? |  | Firth logistic regression (n = 20), likelihood ratio = 0.10. The odds are of “Converted (yes/no)” being Yes, against No. |
-
-``` r
-
 firth_results[[1]]$coefficients
-#>               Estimate     ci_low     ci_high         p odds_ratio or_ci_low
-#> (Intercept) -0.9722906 -1.9991045 -0.07984311 0.0321831  0.3782157 0.1354565
-#> covariate    0.1336834 -0.7614982  0.99469674 0.7555259  1.1430308 0.4669663
-#>             or_ci_high
-#> (Intercept)  0.9232612
-#> covariate    2.7039042
 ```
 
 ## Cohen’s d with a bootstrap interval
 
-[`sframe_cohens_d_ci()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_cohens_d_ci.md)
+[`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md)
 pairs Cohen’s d with a bootstrap interval, which is informative
 precisely where it matters most: interval width grows visibly as n
 falls, making the extra uncertainty at small n explicit, where a single
@@ -276,14 +206,6 @@ point estimate leaves it implicit.
 
 sframe_cohens_d_ci(pilot$outcome[pilot$group == "treatment"],
             pilot$outcome[pilot$group == "control"], R = 999)
-#>   estimate      lower      upper 
-#>  0.5420188 -0.3636638  1.5240611 
-#> attr(,"level")
-#> [1] 0.95
-#> attr(,"resamples")
-#> [1] 999
-#> attr(,"valid_resamples")
-#> [1] 999
 ```
 
 ## Citation

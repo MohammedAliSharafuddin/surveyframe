@@ -1,14 +1,14 @@
 # Fit a structural topic model (STM) on open-ended text
 
 Cleans the text item via
-[`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md),
+[`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md),
 tokenises with
 [`tidytext::unnest_tokens()`](https://juliasilge.github.io/tidytext/reference/unnest_tokens.html)
 (tidyeval column names via
 [`rlang::sym()`](https://rlang.r-lib.org/reference/sym.html) and `!!`,
-not bare symbols; see the source comment at the tokenising step for
-why), casts to a document-term matrix, converts it to `stm`'s corpus
-format with `stm::readCorpus(type = "slam")` and
+not bare symbols, as the source comment at the tokenising step
+explains), casts to a document-term matrix, converts it to `stm`'s
+corpus format with `stm::readCorpus(type = "slam")` and
 [`stm::prepDocuments()`](https://rdrr.io/pkg/stm/man/prepDocuments.html),
 and fits [`stm::stm()`](https://rdrr.io/pkg/stm/man/stm.html) after a
 fixed [`set.seed()`](https://rdrr.io/r/base/Random.html) (stm's own fit
@@ -32,9 +32,9 @@ sframe_run_stm_topics(data, roles, options, instrument)
 
 - options:
 
-  A list; `k` (topic count, default `4L` – a demonstration value, not a
-  recommendation; see
-  [`vignette("text-analysis")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/text-analysis.md)'s
+  A list with `k` (topic count, default `4L`, which is a demonstration
+  value and not a recommendation: see
+  [`vignette("text-analysis")`](https://surveyframe.org/articles/text-analysis.md)'s
   topic- modelling section for
   [`topicmodels::perplexity()`](https://rdrr.io/pkg/topicmodels/man/perplexity.html)-based
   selection), `seed` (default `42L`), `stop_words` (passed through to
@@ -43,16 +43,16 @@ sframe_run_stm_topics(data, roles, options, instrument)
 - instrument:
 
   Optional `sframe` instrument, passed to
-  [`sframe_clean_text()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_clean_text.md)
+  [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)
   for item-type validation.
 
 ## Value
 
 A runner-contract result list: `test = "stm_topics"`, `table`
-(topic/proportion/term/beta/rank; proportion is the topic's mean
+(topic/proportion/term/beta/rank, where proportion is the topic's mean
 document weight, beta its per-term probability, both from the fitted
 `stm` object), `fit` (a runtime-only list holding the `stm` model object
 and the document-to-respondent mapping needed by
-[`sframe_extract_quotes()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_extract_quotes.md)),
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md)),
 `apa`, `prompt`. On failure:
 `list(test = "stm_topics", error = <message>)`.

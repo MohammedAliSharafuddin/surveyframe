@@ -4,7 +4,7 @@ This guide takes a finished instrument to a live, public survey that
 writes responses into a Google Sheet. Every step is free, and the survey
 itself is a single HTML file that runs in any browser with no server.
 
-The deployment has three parts.
+The deployment has 3 parts.
 
 1.  A Google Apps Script collector turns a Google Sheet into a response
     endpoint.
@@ -12,14 +12,14 @@ The deployment has three parts.
     to it.
 3.  A free static host serves the HTML file to respondents.
 
-You can do all of this from the SurveyBuilder without writing R, or from
-R with two function calls. Both routes produce the same files.
+You can do all of this on SurveyStudio’s Collect screen without writing
+R, or from R with 2 function calls. Both routes produce the same files.
 
 ## What you need
 
 - A Google account, for the Sheet and the Apps Script collector.
-- A finished instrument, either an `.sframe` file from the SurveyBuilder
-  or an `sframe` object in R.
+- A finished instrument, either an `.sframe` file from SurveyStudio or
+  an `sframe` object in R.
 - A free static host. This guide covers GitHub Pages and Blogger.
   Netlify Drop and Google Sites work the same way.
 
@@ -29,10 +29,10 @@ Create an empty Google Sheet. The collector adds a `Responses` tab with
 the correct column headers on the first submission, so you do not
 prepare the sheet by hand.
 
-Generate the Apps Script collector. From the SurveyBuilder, open Survey
-settings, choose the Google Sheets tab, paste your Sheet URL, and click
-**Download collector (.gs)**. From R, call
-[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md).
+Generate the Apps Script collector. On SurveyStudio’s Collect screen,
+paste your Sheet URL under Google Sheet URL and click **Download Apps
+Script (.gs)**. From R, call
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md).
 
 ``` r
 
@@ -74,10 +74,10 @@ This URL is your collection endpoint. Keep it for the next step.
 The exported survey posts each response to whatever endpoint it carries.
 Set the endpoint before you export.
 
-From the SurveyBuilder, paste the Web App URL into the Apps Script Web
-App URL field on the Google Sheets settings tab, then click **Export
-survey**. From R, store the URL on the instrument and call
-[`export_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_survey.md).
+On SurveyStudio’s Collect screen, paste the Web App URL into Web app
+address that receives the responses, then click **Download survey
+(.html)**. From R, store the URL on the instrument and call
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md).
 
 ``` r
 
@@ -157,18 +157,18 @@ qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
 
 The returned data frame is validated against the instrument and is ready
 for
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
 and
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md).
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md).
 
 ## Updating a live survey
 
 Editing the instrument changes what respondents see and may change the
 column set. Keep one instrument version per study: record the change
 with
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md),
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
 retain the earlier instrument, and identify which version each
 respondent received. Prefer a new response tab or Sheet for a materially
 changed instrument. When you add, remove, or rename questions:
@@ -192,5 +192,5 @@ stored values before reopening it.
 - A test submission appears as a new row in the Sheet.
 - The stored test values match what was entered, including values
   beginning with `=`, `+`, `-`, or `@`.
-- [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+- [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
   returns that row in R.

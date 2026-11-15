@@ -43,9 +43,9 @@ substituted.
 ## See also
 
 Other Decision analysis functions:
-[`sframe_aggregate_judgements()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_aggregate_judgements.md),
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
-[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md),
-[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+[`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md),
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
+[`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md),
+[`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)

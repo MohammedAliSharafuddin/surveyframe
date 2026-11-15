@@ -22,7 +22,7 @@ sframe_aggregate_judgements(
 - matrices:
 
   Either a list of square numeric matrices or the object returned by
-  [`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md).
+  [`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md).
 
 - method:
 
@@ -42,15 +42,15 @@ distribution, or `NULL` for a non-reciprocal set).
 
 ## See also
 
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md)
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md)
 
 Other Decision analysis functions:
-[`sframe_assemble_pairwise()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assemble_pairwise.md),
-[`sframe_collected_weights()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_collected_weights.md),
-[`sframe_decision_options()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_decision_options.md),
-[`sframe_dematel_compute()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_dematel_compute.md),
-[`sframe_rated_matrix()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_rated_matrix.md),
-[`sframe_sensitivity_analysis()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sensitivity_analysis.md)
+[`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md),
+[`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md),
+[`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md),
+[`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md),
+[`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md),
+[`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
 
 ## Examples
 
@@ -58,7 +58,4 @@ Other Decision analysis functions:
 m1 <- matrix(c(1, 3, 1 / 3, 1), 2, 2)
 m2 <- matrix(c(1, 5, 1 / 5, 1), 2, 2)
 sframe_aggregate_judgements(list(m1, m2))$matrix
-#>          [,1]      [,2]
-#> [1,] 1.000000 0.2581989
-#> [2,] 3.872983 1.0000000
 ```

@@ -54,11 +54,11 @@ variables, a result table, flagged row numbers, and a reporting prompt.
 ## See also
 
 Other Responses functions:
-[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
 
 ## Examples
 
@@ -70,5 +70,4 @@ outliers <- sframe_outlier_results(
   method = "zscore"
 )
 outliers$flagged_rows
-#> integer(0)
 ```

@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Event feedback</title>
+<style>
+:root{
+  --cp:#2563eb;
+  /* Theme B: every tint and shade derives from the single theme colour, so
+     the builder's one colour selector re-skins the whole survey. */
+  --tint:color-mix(in srgb,var(--cp) 8%,#ffffff);
+  --tint-bd:color-mix(in srgb,var(--cp) 30%,#dbe3e6);
+  --deep:color-mix(in srgb,var(--cp) 78%,#0c1a1a);
+  /* Text on the theme colour, the theme colour as text, and its hover. A
+     light theme switches them at start (UX-21), so text keeps 4.5 to 1. */
+  --on-cp:#ffffff;--cp-ink:var(--cp);--cp-hover:var(--deep);
+  --cf:#ffffff;--cg:#fbfdfd;--cb:#dfe7ea;
+  --t1:#12212b;--t2:#51636f;--t3:#9ab0ba;
+  --cd:#dc2626;--cs:#16a34a;
+  --font:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:Georgia,'Times New Roman',serif;
+  --r:8px;--card-w:660px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--cg);font-family:var(--font);font-size:15px;color:var(--t1);line-height:1.6}
+button{font-family:inherit;cursor:pointer;border:none}
+input,textarea,select{font-family:inherit;font-size:15px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* Header (Fix A) */
+.sf-hdr{display:flex;align-items:center;gap:12px;max-width:var(--card-w);margin:18px auto 0;padding:0 18px 14px;border-bottom:1px solid var(--cb)}
+.sf-hdr-logo{height:44px;width:auto;min-width:44px;max-width:200px;object-fit:contain;object-position:left center}
+.sf-hdr-inst{font-size:13px;font-weight:650;color:var(--t2);letter-spacing:.5px;text-transform:uppercase}
+
+/* Progress */
+body[data-only] .prog-bar-wrap,body[data-only] .sf-hdr{display:none!important}
+.prog-bar-wrap{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--cg) 92%,transparent);backdrop-filter:blur(4px);border-bottom:1px solid var(--cb);padding:0}
+.prog-bar-inner{height:3px;background:var(--cp);transition:width .3s ease;min-width:0}
+.prog-hdr{display:flex;align-items:center;gap:10px;padding:9px 20px}
+.prog-title{font-size:13px;font-weight:600;color:var(--t1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-pct{font-size:12.5px;color:var(--t2);flex-shrink:0}
+
+/* Layout */
+.frame{max-width:var(--card-w);margin:0 auto;padding:30px 18px 60px}
+.card{background:transparent;border-radius:0;box-shadow:none;overflow:visible}
+.card-body{padding:14px 4px}
+
+/* Welcome / thankyou */
+.wl-title{font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:-.2px;margin-bottom:10px}
+.wl-intro{color:var(--t2);margin-bottom:22px;white-space:pre-wrap;font-size:16px}
+.consent-box{background:var(--tint);border:1px solid var(--tint-bd);border-radius:6px;padding:14px 16px;font-size:14px;color:var(--deep);margin-bottom:16px;white-space:pre-wrap}
+.consent-chk{display:flex;align-items:flex-start;gap:9px;font-size:14px;margin-bottom:20px;cursor:pointer}
+.consent-chk input{margin-top:3px;accent-color:var(--cp);width:17px;height:17px}
+.ty-ic{font-size:52px;text-align:center;margin-bottom:14px;color:var(--cp-ink)}
+.ty-title{font-family:var(--serif);font-size:27px;font-weight:500;text-align:center;margin-bottom:8px}
+.ty-msg{color:var(--t2);text-align:center;font-size:15px;margin-bottom:22px;white-space:pre-wrap}
+.ty-status{font-weight:600;margin-bottom:10px}
+.ty-note{background:var(--tint);border:1px solid var(--tint-bd);border-radius:6px;
+  padding:10px 14px;font-size:13px;color:var(--t2);text-align:center;margin-bottom:16px}
+.ty-acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 28px;min-height:48px;border-radius:6px;font-size:15px;font-weight:650;
+  transition:all .15s;border:1.5px solid transparent;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-p{background:var(--cp);color:var(--on-cp);border-color:var(--cp)}
+.btn-p:hover:not(:disabled){background:var(--cp-hover);border-color:var(--cp-hover)}
+.btn-s{background:var(--cf);color:var(--t2);border-color:var(--cb)}
+.btn-s:hover:not(:disabled){border-color:var(--tint-bd);background:var(--tint)}
+.btn-lg{padding:13px 30px;font-size:16px;width:100%;margin-top:24px}
+.nav-row{display:flex;gap:10px;margin-top:30px}
+.nav-row .sp{flex:1}
+
+/* Section / text block */
+.sec-div{margin:34px 0 22px;padding-top:20px;position:relative}
+.sec-div::before{content:"";position:absolute;top:0;left:0;width:44px;height:2px;background:var(--cp)}
+.sec-title{font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:-.2px}
+.sec-sub{color:var(--t2);font-size:14px;margin-top:5px;white-space:pre-wrap;font-style:italic}
+.txt-blk{background:var(--tint);border-left:3px solid var(--cp);border-radius:0 6px 6px 0;
+  padding:12px 16px;margin:14px 0;font-size:14px;color:var(--deep);white-space:pre-wrap}
+
+/* Items */
+.item{margin-bottom:32px}
+.item.hidden{display:none}
+.blk.hidden{display:none}
+.item-q{font-family:var(--serif);font-weight:500;margin-bottom:8px;display:flex;gap:7px;
+  font-size:19px;line-height:1.45;letter-spacing:-.1px}
+.mode-conversational .item-q{font-size:25px}
+.req-mk{color:var(--cp-ink);font-size:13px;margin-top:2px;flex-shrink:0}
+.item-help{font-size:14px;color:var(--t2);margin-bottom:10px;margin-top:-2px;font-style:italic}
+.item-err{font-size:13px;color:var(--cd);margin-top:6px;display:none}
+.item-err.show{display:block}
+.q-eyebrow{font-size:13px;color:var(--cp-ink);margin-bottom:10px;font-weight:600}
+
+/* Focus visibility: hidden native inputs surface focus on their card */
+.choice-opt:has(input:focus-visible),
+.likert-opt:has(input:focus-visible){outline:3px solid var(--deep);outline-offset:2px}
+.btn:focus-visible,.star-btn:focus-visible,.rank-mv:focus-visible,
+.inp-std:focus-visible,.slider-inp:focus-visible,
+.matrix-tbl input:focus-visible,.consent-chk input:focus-visible{
+  outline:3px solid var(--deep);outline-offset:2px}
+
+/* Likert: numbered square buttons with tiny labels, single-colour theme */
+/* Announced by a screen reader, off screen for everyone else. Carries the
+   page heading that focus moves to on a page change. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.likert-row{display:flex;gap:9px;overflow-x:auto;padding-bottom:2px}
+.likert-opt{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:10px 4px;min-height:58px;border:1px solid var(--cb);border-radius:6px;
+  background:var(--cf);cursor:pointer;transition:all .12s;text-align:center;
+  box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.likert-opt:hover{border-color:var(--cp);background:var(--tint)}
+.likert-opt:has(input:checked){background:var(--cp);border-color:var(--cp)}
+.likert-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.likert-num{font-size:18px;font-weight:600;color:var(--t2);line-height:1.2}
+.likert-opt:has(input:checked) .likert-num{color:var(--on-cp)}
+.likert-lbl{font-size:11px;color:var(--t2);line-height:1.25;max-width:76px}
+.likert-opt:has(input:checked) .likert-lbl{color:var(--on-cp)}
+
+/* Choice: bordered option cards with key chips and a tick */
+.choice-list{display:flex;flex-direction:column;gap:9px;counter-reset:opt}
+.choice-opt{display:flex;align-items:center;gap:12px;padding:12px 15px;min-height:50px;
+  border:1px solid var(--cb);border-radius:6px;background:var(--cf);cursor:pointer;
+  transition:all .12s;font-size:15.5px;box-shadow:0 1px 0 rgba(18,33,43,.03);counter-increment:opt}
+.choice-opt::before{content:counter(opt,upper-alpha);width:26px;height:26px;flex-shrink:0;
+  border:1px solid var(--cb);border-radius:4px;background:var(--cf);display:flex;
+  align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t2)}
+.choice-opt:hover{border-color:var(--cp);background:var(--tint)}
+.choice-opt:has(input:checked){border-color:var(--cp);background:var(--tint);
+  box-shadow:inset 0 0 0 1px var(--cp)}
+.choice-opt:has(input:checked)::before{background:var(--cp);border-color:var(--cp);color:var(--on-cp)}
+.choice-opt::after{content:"\2713";margin-left:auto;color:var(--cp-ink);font-weight:700;visibility:hidden}
+.choice-opt:has(input:checked)::after{visibility:visible}
+.other-txt{display:block;width:100%;box-sizing:border-box;margin:6px 0 0;padding:9px 12px;border:1.5px solid var(--cb);border-radius:8px;font:inherit}
+.choice-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* Short text / number / date: editorial underline inputs */
+.inp-std{width:100%;border:none;border-bottom:2px solid var(--cb);border-radius:0;
+  padding:8px 2px;font-size:18px;font-family:var(--serif);color:var(--t1);background:transparent;
+  transition:border-color .15s}
+.inp-std::placeholder{color:color-mix(in srgb,var(--t3) 72%,#ffffff)}
+.inp-std:focus{outline:none;border-bottom-color:var(--cp);box-shadow:none}
+textarea.inp-std{resize:vertical;min-height:88px;border:1px solid var(--cb);border-radius:6px;
+  padding:12px 14px;font-size:15.5px;background:var(--cf)}
+textarea.inp-std:focus{border-color:var(--cp);box-shadow:0 0 0 3px color-mix(in srgb,var(--cp) 13%,transparent)}
+.inp-narrow{max-width:220px}
+
+/* Slider */
+.slider-wrap{display:flex;flex-direction:column;gap:8px;border:1px solid var(--cb);
+  border-radius:6px;background:var(--cf);padding:16px 18px;
+  box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.slider-inp{width:100%;accent-color:var(--cp);height:24px;cursor:pointer}
+.slider-inp::-webkit-slider-thumb{width:24px;height:24px}
+.slider-inp::-moz-range-thumb{width:22px;height:22px}
+.slider-lbls{display:flex;justify-content:space-between;font-size:12.5px;color:var(--t2)}
+.slider-val{font-size:22px;font-weight:600;font-family:var(--serif);color:var(--cp-ink);text-align:center}
+
+/* Rating */
+.star-row{display:flex;gap:10px}
+.star-btn{font-size:36px;background:none;border:none;cursor:pointer;
+  color:color-mix(in srgb,var(--cb) 80%,#ffffff);transition:color .12s,transform .1s;line-height:1}
+.star-btn:hover{transform:scale(1.1)}
+.star-btn.active{color:var(--cp-ink)}
+
+/* Matrix: horizontal rules only, theme accents, no vertical grid */
+.matrix-wrap{overflow-x:auto;margin-top:8px;border:1px solid var(--cb);
+  border-radius:6px;background:var(--cf);box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.matrix-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.matrix-tbl th{background:var(--tint);padding:10px 12px;text-align:center;
+  border-bottom:1.5px solid var(--tint-bd);font-weight:650;color:var(--t2);
+  vertical-align:bottom;font-size:12px}
+.matrix-tbl td{padding:11px 12px;border-bottom:1px solid var(--cb);
+  text-align:center;vertical-align:middle}
+.matrix-tbl tr:last-child td{border-bottom:none}
+.matrix-tbl .rl{text-align:left;font-weight:500;color:var(--t1)}
+.matrix-tbl input{accent-color:var(--cp);width:24px;height:24px}
+.matrix-tbl tbody tr:hover td{background:var(--tint)}
+
+/* Ranking: option-card rows matching the choice cards */
+.rank-list{display:flex;flex-direction:column;gap:9px}
+.rank-item{display:flex;align-items:center;gap:12px;padding:12px 15px;min-height:50px;
+  background:var(--cf);border:1px solid var(--cb);border-radius:6px;cursor:grab;
+  user-select:none;transition:all .12s;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.rank-item:hover{border-color:var(--cp);background:var(--tint)}
+.rank-item.drag-over{border-top:2px solid var(--cp)}
+.rank-item.dragging{opacity:.4}
+.rank-num{width:26px;height:26px;border-radius:6px;background:var(--cp);
+  color:var(--on-cp);font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-handle{color:var(--t3);font-size:14px;flex-shrink:0;cursor:grab}
+.rank-lbl{flex:1;font-size:15px}
+.rank-kbd{display:flex;gap:4px;flex-shrink:0}
+.rank-mv{width:30px;height:30px;border-radius:6px;border:1px solid var(--cb);
+  background:var(--cf);color:var(--t2);font-size:11px;display:flex;
+  align-items:center;justify-content:center;cursor:pointer}
+.rank-mv:hover{border-color:var(--cp);color:var(--cp-ink);background:var(--tint)}
+.rank-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.rank-status{font-size:13px;color:var(--t2)}
+
+/* Pairwise comparison (AHP/ANP Saaty scale, DEMATEL influence scale) */
+.pw-wrap{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.pw-grouped{gap:28px}
+.pw-group{display:flex;flex-direction:column;gap:14px}
+.pw-group-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding-bottom:6px;border-bottom:2px solid var(--cp);position:sticky;top:0;
+  background:var(--cg);z-index:1}
+.pw-group-title{font-size:15px;font-weight:700;color:var(--t1)}
+.pw-group-tag{font-size:11.5px;font-weight:600;color:var(--t2);letter-spacing:.02em;
+  text-transform:uppercase;white-space:nowrap}
+.pw-row{background:var(--cf);border:1px solid var(--cb);border-radius:8px;
+  padding:14px 16px;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+.pw-heads{display:flex;justify-content:space-between;font-size:13px;
+  font-weight:600;color:var(--t1);margin-bottom:10px}
+.pw-strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px}
+.pw-opt{flex:1;min-width:30px;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:6px 2px;border-radius:6px;border:1.5px solid var(--cb);
+  cursor:pointer;transition:all .12s;background:var(--cf)}
+.pw-opt:hover{border-color:var(--cp);background:var(--tint)}
+.pw-opt:has(input:checked){background:var(--cp);border-color:var(--cp)}
+.pw-opt:has(input:focus-visible){outline:3px solid var(--deep);outline-offset:2px}
+.pw-opt input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.pw-num{font-size:11px;font-weight:700;color:var(--t2)}
+.pw-opt:has(input:checked) .pw-num{color:var(--on-cp)}
+.pw-opt.pw-equal{border-color:var(--t3)}
+.pw-influence{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.pw-influence .pw-opt{flex:0 0 auto;min-width:64px}
+.pw-influence .pw-lbl{font-size:10px;color:var(--t2);text-align:center}
+.pw-influence .pw-opt:has(input:checked) .pw-lbl{color:var(--on-cp)}
+/* Mobile-only dropdown, hidden on desktop where the button strip has room.
+   min-height 44px meets the WCAG 2.2 touch-target size the rest of the
+   survey already holds itself to (see the matrix reflow's own note). */
+.pw-select{display:none;width:100%;min-height:44px;padding:8px 12px;
+  font-size:15px;color:var(--t1);background:var(--cf);border:1.5px solid var(--cb);
+  border-radius:6px;font-family:inherit}
+.pw-select:focus-visible{outline:3px solid var(--deep);outline-offset:1px;border-color:var(--cp)}
+
+/* Constant-sum criteria weights */
+.cw-wrap{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.cw-row{display:flex;align-items:center;gap:12px}
+.cw-lbl{flex:1;font-size:14.5px;color:var(--t1)}
+.cw-input{width:76px;flex-shrink:0}
+.cw-total{margin-top:6px;font-size:13px;font-weight:600;color:var(--t2)}
+.cw-total.cw-ok{color:#166534}
+.cw-total.cw-bad{color:#991b1b}
+
+/* Error banner */
+.err-banner{background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;
+  padding:12px 16px;margin-bottom:18px;font-size:13px;color:#991b1b;display:none}
+.err-banner.show{display:block}
+
+/* Footer */
+.sf-footer{text-align:center;font-size:12px;color:var(--t2);padding:8px 16px 36px}
+.sf-footer a{color:var(--t2);font-weight:600;text-decoration:underline}
+.sf-footer a:hover{text-decoration:underline}
+
+/* Mobile */
+@media (max-width:600px){
+  .card-body{padding:10px 2px}
+  .frame{padding:20px 14px 48px}
+  .sf-hdr{margin-top:14px;padding-bottom:12px}
+  .wl-title{font-size:25px}
+  .item-q{font-size:17.5px}
+  .mode-conversational .item-q{font-size:22px}
+  .star-btn{font-size:31px}
+  .prog-hdr{padding:9px 14px}
+  .btn{padding:10px 20px}
+  /* The strip stacks below 600px. Even at a 50px minimum, 7 options need
+     350px and the builder's 11-point NPS preset needs 550px before gaps, so
+     the full range cannot fit a 390px viewport and a participant saw part of
+     the scale with both endpoints off screen. Each option becomes a labelled
+     row, the same adaptation the matrix already makes, so every point of the
+     scale is visible and reachable without horizontal scrolling. */
+  .likert-row{flex-direction:column;gap:8px;overflow-x:visible}
+  .likert-opt{flex:none;width:100%;min-width:0;flex-direction:row;
+    align-items:center;justify-content:flex-start;gap:12px;
+    padding:12px 14px;min-height:44px;text-align:left}
+  .likert-num{font-size:16px;min-width:22px;text-align:center}
+  .likert-lbl{font-size:14px;max-width:none;flex:1}
+
+  /* Matrix reflows into stacked row-cards below 600px: each matrix row
+     becomes its own card and each column becomes a labelled tap target
+     inside it, so completing a matrix never needs horizontal scrolling.
+     Accessible names already come from the per-radio aria-label set in
+     renderMatrix(), so hiding the visual header loses no information. */
+  .matrix-wrap{overflow-x:visible;border:none;background:transparent;box-shadow:none}
+  .matrix-tbl,.matrix-tbl tbody,.matrix-tbl tr{display:block;width:100%}
+  .matrix-tbl thead{display:none}
+  .matrix-tbl tr{margin-bottom:12px;border:1px solid var(--cb);border-radius:6px;
+    background:var(--cf);overflow:hidden;box-shadow:0 1px 0 rgba(18,33,43,.03)}
+  .matrix-tbl tr:last-child{margin-bottom:0}
+  .matrix-tbl td{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:12px 14px;min-height:44px;border-bottom:1px solid var(--cb);
+    text-align:left}
+  .matrix-tbl td:last-child{border-bottom:none}
+  .matrix-tbl td.rl{font-weight:600;background:var(--tint);border-bottom:1.5px solid var(--tint-bd)}
+  .matrix-tbl td:not(.rl)::before{content:attr(data-col);color:var(--t2);font-size:14px;flex:1}
+  .matrix-tbl td:not(.rl) input{margin:0;flex-shrink:0;width:22px;height:22px}
+
+  /* Below 600px the button strip (17 wide for Saaty, 5 for influence)
+     cannot fit without horizontal scrolling, which section 1b's design
+     rules rule out for a matrix-shaped control same as the desktop
+     button strip is rejected as an n x n grid: it invites a swipe-past
+     answer instead of a deliberate one. Swap it for the <select> of the
+     same verbal anchors instead of shrinking it further. */
+  .pw-heads{flex-direction:column;gap:2px}
+  .pw-strip,.pw-influence{display:none}
+  .pw-select{display:block}
+  .cw-row{flex-wrap:wrap}
+}
+</style>
+</head>
+<body data-endpoint="">
+
+<!-- Fix A: header region reads R.header for logo and institution -->
+<div id="sf-hdr" class="sf-hdr" style="display:none"></div>
+
+<div id="prog-bar-wrap" class="prog-bar-wrap" hidden>
+  <div class="prog-bar-inner" id="progBar" style="width:0%"></div>
+  <div class="prog-hdr">
+    <span class="prog-title" id="progTitle"></span>
+    <span class="prog-pct" id="progPct">0%</span>
+  </div>
+</div>
+
+<div class="frame" id="app"></div>
+<div class="sf-footer">Built with <a href="https://cran.r-project.org/package=surveyframe" target="_blank" rel="noopener">surveyframe</a></div>
+
+<script type="application/json" id="sf-data">{"meta":{"title":"Event feedback","description":"A short feedback survey for a one-day professional event, run to describe who attended and to check the quality of the answers before the programme is planned again."},"items":[{"id":"attendee_type","label":"Have you attended this event before?","type":"single_choice","required":true,"choice_set":"attendee"},{"id":"age","label":"How old are you?","type":"numeric","required":false},{"id":"attended_on","label":"Which day did you attend?","type":"date","required":false,"date_min":"2026-06-01","date_max":"2026-06-03"},{"id":"optional_intro","label":"A few optional questions","type":"section_break","required":false,"section_intro":"These help us plan next year. Skip any you prefer to."},{"id":"why_ask","label":"We ask so we can improve the programme.","type":"text_block","required":false},{"id":"suggestion","label":"What should we do differently next year?","type":"text","required":false}],"choices":[{"id":"attendee","values":["first_time","returning"],"labels":["This is my first time","I have attended before"],"allow_other":false,"randomise":false}],"branching":[],"checks":[],"render":{"welcome":{"title":"Event feedback","intro_text":"Thank you for taking part. This survey takes a few minutes.","consent_text":"I agree to take part, and for my answers to be used for this study.","consent_required":true,"start_label":"Start"},"thankyou":{"message":"Thank you for completing this survey."}}}</script>
+<script>
+'use strict';
+const SF       = JSON.parse(document.getElementById('sf-data').textContent);
+const R        = (SF.render||{});
+const THEME    = R.theme||'#2563eb'||'#2563eb';
+const ENDPOINT = document.body.dataset.endpoint||'';
+// A preview collects nothing. export_survey(preview = TRUE) writes
+// true here, and any other value, the unreplaced placeholder included, is a
+// live survey. The flag is checked before every delivery path, host sender
+// included, so a host's callback cannot receive a preview answer.
+const PREVIEW  = 'true'==='true';
+const MODE     = R.mode||'standard';
+const WL       = R.welcome||{};
+const TY       = R.thankyou||{};
+
+// Apply theme color
+document.documentElement.style.setProperty('--cp', THEME);
+// A light theme cannot carry white text, nor serve as text on white, at
+// 4.5 to 1 (UX-21). Then text on it is dark, and its text and hover
+// shades are mixed towards the dark ink. Other themes keep their colours.
+(function(){
+  var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(THEME).trim());if(!m)return;
+  var h=m[1].length===3?m[1].split('').map(function(d){return d+d;}).join(''):m[1];
+  var c=[0,2,4].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4);});
+  var L=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];
+  if(1.05/(L+0.05)>=4.5)return;
+  var s=document.documentElement.style;
+  s.setProperty('--on-cp','#0c1a1a');
+  s.setProperty('--cp-ink','color-mix(in srgb,var(--cp) 35%,#0c1a1a)');
+  s.setProperty('--cp-hover','color-mix(in srgb,var(--cp) 85%,#0c1a1a)');
+  s.setProperty('--deep','color-mix(in srgb,var(--cp) 30%,#0c1a1a)');
+})();
+document.body.classList.add('mode-'+MODE);
+
+// Fix A: render header (logo + institution) from R.header
+(function(){
+  var hdr=R.header||{};
+  var b64=hdr.logo_base64||'';
+  var inst=hdr.institution||'';
+  if(!b64&&!inst)return;
+  // Fix E/F: use stored media type; default to image/png for backward compat
+  var mtype=hdr.logo_media_type||'image/png';
+  var el=document.getElementById('sf-hdr');
+  if(!el)return;
+  var html='';
+  if(b64)html+='<img class="sf-hdr-logo" src="data:'+mtype+';base64,'+b64+'" alt="Logo">';
+  if(inst)html+='<span class="sf-hdr-inst">'+inst.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];})+'</span>';
+  el.innerHTML=html;
+  el.style.display='flex';
+})();
+
+// ── Lookups ────────────────────────────────────────────────────────────────
+const choiceMap={};
+(SF.choices||[]).forEach(function(cs){choiceMap[cs.id]=cs;});
+
+const branchMap={};
+(SF.branching||[]).forEach(function(rule){
+  (branchMap[rule.item_id]=branchMap[rule.item_id]||[]).push(rule);
+});
+
+// Items designated as quality checks render as Likert (inline radio) so
+// their choice layout matches regular scale items visually.
+const checkItemIds=new Set();
+(SF.checks||[]).forEach(function(ck){if(ck.item_id)checkItemIds.add(ck.item_id);});
+
+// ── Response state ─────────────────────────────────────────────────────────
+const responses={};
+const startedAt=new Date().toISOString();
+const respId='R'+Math.random().toString(36).slice(2,10).toUpperCase();
+let screen='welcome';
+let currentPage=1;
+let rankOrders={};
+// Display order (UX-11). A choice set with randomise shows a single choice,
+// multiple choice or ranking item's options in an order shuffled once per
+// respondent and item, kept for the visit and in a draft. Only the display
+// moves: each option submits its own value, so the codes are the set's
+// whatever the order. The builder's centre pane shows the set's own order.
+let displayOrders={};
+function choiceOrder(item,cs){
+  var n=cs.values.length,idx=[];for(var i=0;i<n;i++)idx.push(i);
+  if(!cs.randomise||ONLY_ID)return idx;
+  var o=displayOrders[item.id];
+  if(!o||o.length!==n||o.slice().sort(function(a,b){return a-b;}).join()!==idx.join()){
+    o=idx.slice();
+    for(var j=n-1;j>0;j--){var k=Math.floor(Math.random()*(j+1));var t=o[j];o[j]=o[k];o[k]=t;}
+    displayOrders[item.id]=o;
+  }
+  return o;
+}
+let starValues={};
+
+// ── Page builder ───────────────────────────────────────────────────────────
+function buildPages(){
+  if(MODE==='conversational'){
+    return SF.items.map(function(i){return[i];});
+  }
+  var pagesMap={};
+  SF.items.forEach(function(item){
+    var p=item.page||1;
+    if(!pagesMap[p])pagesMap[p]=[];
+    pagesMap[p].push(item);
+  });
+  var keys=Object.keys(pagesMap).map(Number).sort(function(a,b){return a-b;});
+  if(!keys.length)return[SF.items];
+  return keys.map(function(k){return pagesMap[k];});
+}
+const pages=buildPages();
+const maxPage=pages.length;
+
+// ── Branching ──────────────────────────────────────────────────────────────
+function evaluate(op,actual,value){
+  if(actual===null||actual===undefined||actual==='')return false;
+  var an=parseFloat(actual),vn=parseFloat(value);
+  switch(op){
+    case'==':return String(actual)===String(value);
+    case'!=':return String(actual)!==String(value);
+    // `value` is a JSON array whenever sframe_branch() was given a vector, which is
+    // the documented shape for %in%, and a comma-separated string when it came
+    // from a hand-written file or an older builder. Arrays have no .split, so
+    // assuming the string form threw and left the gated item hidden for good.
+    case'%in%':{
+      var vals=(Array.isArray(value)?value:String(value).split(',')).map(function(s){return String(s).trim();});
+      // A multi-select answer is stored comma-joined, so it is itself a set.
+      // Comparing the whole string meant selecting a and b matched no rule
+      // allowing either. Any selected value the rule allows satisfies it,
+      // which is what the Shiny evaluator does with the selected vector.
+      var given=String(actual).split(',').map(function(s){return s.trim();})
+        .filter(function(s){return s!=='';});
+      return given.some(function(g){return vals.includes(g);});
+    }
+    case'>': return !isNaN(an)&&!isNaN(vn)&&an>vn;
+    case'>=':return !isNaN(an)&&!isNaN(vn)&&an>=vn;
+    case'<': return !isNaN(an)&&!isNaN(vn)&&an<vn;
+    case'<=':return !isNaN(an)&&!isNaN(vn)&&an<=vn;
+    default:return false;
+  }
+}
+function isVisible(itemId,seen){
+  var rules=branchMap[itemId];
+  if(!rules||!rules.length)return true;
+  // Guard against rule cycles: a repeated item is treated as visible so the
+  // walk terminates instead of recursing forever.
+  seen=seen||{};
+  if(seen[itemId])return true;
+  seen[itemId]=true;
+  // Several rules on one item combine with AND. A hidden controlling item
+  // counts as unanswered so visibility cascades down the chain.
+  for(var k=0;k<rules.length;k++){
+    var rule=rules[k];
+    var actual=isVisible(rule.depends_on,seen)?responses[rule.depends_on]:'';
+    var cond=evaluate(rule.operator,actual,rule.value);
+    if(!(rule.action==='show'?cond:!cond))return false;
+  }
+  return true;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+// esc(0) must be "0". Coercing with s||'' turned an option coded 0 into
+// value="", so a real answer was stored and validated as no answer.
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function h(tag,attrs,inner){return'<'+tag+' '+(attrs||'')+'>'+inner+'</'+tag+'>';}
+function wrapItem(item,inner){
+  return'<div class="item'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'" data-id="'+esc(item.id)+'">'
+    +'<div class="item-q" id="q_'+esc(item.id)+'">'+esc(item.label)
+    +(item.required?'<span class="req-mk" aria-hidden="true">*</span><span class="sr">(required)</span>':'')+'</div>'
+    +(item.help?'<div class="item-help" id="help_'+esc(item.id)+'">'+esc(item.help)+'</div>':'')
+    +inner
+    +'<div class="item-err" id="err_'+esc(item.id)+'" role="alert">This question is required.</div>'
+    +'</div>';
+}
+// Accessible-name attributes for inputs that sit outside a label element:
+// the question text div carries id q_<item>, referenced from the control.
+function ariaFor(item){
+  return' aria-labelledby="q_'+esc(item.id)+'"'
+    +(item.help?' aria-describedby="help_'+esc(item.id)+'"':'')
+    +(item.required?' aria-required="true"':'');
+}
+
+// ── Renderers ──────────────────────────────────────────────────────────────
+function renderItem(item){
+  var t=item.type;
+  var cs=choiceMap[item.choice_set||'']||{values:[],labels:[]};
+  if(t==='section_break') return renderSection(item);
+  if(t==='text_block')    return renderTextBlock(item);
+  // Quality check items (attention / trap / instructional) that have a choice
+  // set render as Likert (inline radios) so their layout matches regular scale
+  // items. A check item with type single_choice would otherwise render stacked.
+  if(checkItemIds.has(item.id)&&item.choice_set)return wrapItem(item,renderLikert(item,cs));
+  if(t==='likert')        return wrapItem(item,renderLikert(item,cs));
+  if(t==='single_choice') return wrapItem(item,renderSingle(item,cs));
+  if(t==='multiple_choice')return wrapItem(item,renderMulti(item,cs));
+  if(t==='matrix')        return wrapItem(item,renderMatrix(item,cs));
+  if(t==='numeric')       return wrapItem(item,renderNumeric(item));
+  if(t==='text')          return wrapItem(item,renderText(item));
+  if(t==='textarea')      return wrapItem(item,renderTextarea(item));
+  if(t==='date')          return wrapItem(item,renderDate(item));
+  if(t==='slider')        return wrapItem(item,renderSlider(item));
+  if(t==='rating')        return wrapItem(item,renderRating(item));
+  if(t==='ranking')       return wrapItem(item,renderRanking(item,cs));
+  if(t==='pairwise_comparison') return wrapItem(item,renderPairwise(item));
+  if(t==='criteria_weight')    return wrapItem(item,renderCriteriaWeight(item));
+  return wrapItem(item,'<p style="color:var(--t3);font-size:12px">Unsupported item type: '+esc(t)+'</p>');
+}
+
+function renderSection(item){
+  // The item_<id> wrapper lets branching rules show and hide section breaks
+  return'<div class="blk'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'">'
+    +'<div class="sec-div"><h2 class="sec-title">'+esc(item.label)+'</h2>'
+    +(item.section_intro?'<div class="sec-sub">'+esc(item.section_intro)+'</div>':'')+'</div></div>';
+}
+function renderTextBlock(item){
+  // Branchable, so a text block can act as a screen-out or context message
+  return'<div class="blk'+(isVisible(item.id)?'':' hidden')+'" id="item_'+esc(item.id)+'">'
+    +'<div class="txt-blk">'+esc(item.label)+'</div></div>';
+}
+function renderLikert(item,cs){
+  var saved=responses[item.id];
+  return'<div class="likert-row" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+cs.values.map(function(v,i){
+    var checked=String(saved)===String(v);
+    return'<label class="likert-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'+(checked?' checked':'')
+      +(item.required?' aria-required="true"':'')
+      +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
+      +'<span class="likert-num">'+esc(v)+'</span>'
+      +'<span class="likert-lbl">'+esc(cs.labels[i]||v)+'</span></label>';
+  }).join('')+'</div>';
+}
+function renderSingle(item,cs){
+  var saved=responses[item.id];
+  // A named radiogroup, so an option is announced with its question. Without
+  // it a screen reader read "Low" with nothing to say what was being asked.
+  return'<div class="choice-list" role="radiogroup" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
+    var checked=String(saved)===String(v);
+    return'<label class="choice-opt"><input type="radio" name="'+esc(item.id)+'" value="'+esc(v)+'"'
+      +(checked?' checked':'')+(item.required?' aria-required="true"':'')
+      +' onchange="setResp(\''+esc(item.id)+'\',this.value)">'
+      +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
+  }).join('')+otherOption(item,cs,false)+'</div>';
+}
+function renderMulti(item,cs){
+  var saved=(responses[item.id]||'').split(',').filter(Boolean);
+  // A group, not a radiogroup: several answers are allowed here.
+  return'<div class="choice-list" role="group" aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+choiceOrder(item,cs).map(function(i){
+    var v=cs.values[i];
+    var chk=saved.includes(String(v));
+    return'<label class="choice-opt"><input type="checkbox" name="'+esc(item.id)+'" value="'+esc(v)+'"'
+      +(chk?' checked':'')+(item.required?' aria-required="true"':'')
+      +' onchange="toggleMulti(\''+esc(item.id)+'\',this)">'
+      +'<span class="opt-txt">'+esc(cs.labels[i]||v)+'</span></label>';
+  }).join('')+otherOption(item,cs,true)+'</div>';
+}
+function renderMatrix(item,cs){
+  var rows=item.matrix_items||[];
+  var hdr='<tr><th></th>'+cs.labels.map(function(l){return'<th>'+esc(l)+'</th>';}).join('')+'</tr>';
+  var body=rows.map(function(row){
+    var rowKey=item.id+'__'+row;
+    var saved=responses[rowKey];
+    return'<tr>'
+      +'<td class="rl">'+esc(row)+'</td>'
+      +cs.values.map(function(v){
+        var colLbl=cs.labels[cs.values.indexOf(v)]||v;
+        // data-col drives the CSS reflow below 600px: the table becomes a
+        // stack of row-cards with the column label printed beside each
+        // radio, so a matrix never needs horizontal scrolling on a phone.
+        return'<td data-col="'+esc(colLbl)+'"><input type="radio" name="'+esc(rowKey)+'" value="'+esc(v)+'"'
+          +(String(saved)===String(v)?' checked':'')
+          +' aria-label="'+esc(row)+': '+esc(colLbl)+'"'
+          +' onchange="setResp(\''+esc(rowKey)+'\',this.value)"></td>';
+      }).join('')
+      +'</tr>';
+  }).join('');
+  return'<div class="matrix-wrap"><table class="matrix-tbl"><thead>'+hdr+'</thead><tbody>'+body+'</tbody></table></div>';
+}
+// Saaty bipolar strip: 17 points, 9..2 (first side preferred) | 1 (equal) |
+// 2..9 (second side preferred). Left-to-right visual order matches the
+// signed-integer export column (R/read_responses.R, item__a__vs__b):
+// positive = first side, negative = second side, 1 = equal. Reciprocals are
+// never stored; they are reconstructed at assembly (sframe_assemble_pairwise()).
+var SAATY_STEPS=[9,8,7,6,5,4,3,2,1,-2,-3,-4,-5,-6,-7,-8,-9];
+// DEMATEL unipolar strip: 0 (no influence) to 4 (very high influence).
+var INFLUENCE_STEPS=[0,1,2,3,4];
+var INFLUENCE_LABELS=['None','Low','Medium','High','Very high'];
+// Each comparison renders a radio strip and a select of the same anchors, and
+// the CSS shows one or the other by viewport width. Writing the response alone
+// left the hidden control on its render-time state, so crossing the breakpoint
+// after answering showed a selection the participant had changed. Both are
+// written from the response, so whichever becomes visible agrees with it.
+function setPairwise(rowKey,value){
+  setResp(rowKey,value);
+  var radios=document.querySelectorAll('input[type="radio"][name="'+rowKey+'"]');
+  if(radios&&radios.forEach){
+    radios.forEach(function(r){r.checked=String(r.value)===String(value);});
+  }
+  var sel=document.querySelector('select.pw-select[data-key="'+rowKey+'"]');
+  if(sel)sel.value=String(value);
+}
+function renderPairwiseRow(rowKey,leftLbl,rightLbl,steps,saved,influence){
+  var names=steps.map(function(v,i){
+    return influence?(INFLUENCE_LABELS[i]||String(v)):(v===1?'Equal':(v>0?(v+' ('+leftLbl+')'):((-v)+' ('+rightLbl+')')));
+  });
+  var opts=steps.map(function(v,i){
+    var checked=String(saved)===String(v);
+    var isEqual=!influence&&v===1;
+    return'<label class="pw-opt'+(isEqual?' pw-equal':'')+'"><input type="radio" name="'+esc(rowKey)+'" value="'+v+'"'
+      +(checked?' checked':'')
+      +' aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+': '+esc(names[i])+'"'
+      +' onchange="setPairwise(\''+esc(rowKey)+'\','+v+')">'
+      +(influence?'<span class="pw-lbl">'+esc(INFLUENCE_LABELS[i])+'</span>':'<span class="pw-num">'+esc(Math.abs(v))+'</span>')
+      +'</label>';
+  }).join('');
+  // Mobile (<600px) swaps the button strip for this <select> of the same
+  // verbal anchors: a 17-wide (or 5-wide) button row cannot fit a phone
+  // screen without horizontal scrolling, which section 1b's design rules
+  // treat as unacceptable for a matrix-shaped control. The select is the
+  // only input actually submitted below that width; the CSS hides one or
+  // the other, it never shows both.
+  var selectOpts='<option value=""'+(saved==null||saved===''?' selected':'')+' disabled>Choose an answer&hellip;</option>'
+    +steps.map(function(v,i){
+      return'<option value="'+v+'"'+(String(saved)===String(v)?' selected':'')+'>'+esc(names[i])+'</option>';
+    }).join('');
+  var select='<select class="pw-select" data-key="'+esc(rowKey)+'"'
+    +' aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+'"'
+    +' onchange="setPairwise(\''+esc(rowKey)+'\',this.value)">'+selectOpts+'</select>';
+  return'<div class="pw-row"><div class="pw-heads"><span>'+esc(leftLbl)+'</span><span>'+esc(rightLbl)+'</span></div>'
+    +'<div class="'+(influence?'pw-influence':'pw-strip')+'" role="radiogroup" aria-label="'+esc(leftLbl)+' vs '+esc(rightLbl)+'">'
+    +opts+'</div>'+select+'</div>';
+}
+// Groups rows under a header per anchor criterion whenever there is more
+// than one group to show (3 items or more; below that a single "Comparing:
+// X" header would add noise without adding wayfinding, so 2 items stays
+// flat). This never becomes an n x n grid: each group is still one pair,
+// one strip, one judgement at a time, the exact property a grid would give
+// up (see the section 1b design note this mirrors: a grid invites
+// eyeballed, patterned answers instead of deliberate per-pair judgement,
+// which is what AHP's own consistency ratio exists to catch).
+function renderPairwise(item){
+  var items=item.comparison_items||[];
+  var scale=item.comparison_scale||'saaty';
+  var groups=[];
+  if(scale==='influence'){
+    for(var i=0;i<items.length;i++){
+      var rows=[];
+      for(var j=0;j<items.length;j++){
+        if(i===j)continue;
+        var a=items[i],b=items[j];
+        var rowKey=item.id+'__'+a+'__to__'+b;
+        rows.push(renderPairwiseRow(rowKey,'Does '+a+' influence '+b+'?','',INFLUENCE_STEPS,responses[rowKey],true));
+      }
+      groups.push({anchor:items[i],rows:rows});
+    }
+  }else{
+    for(var i=0;i<items.length-1;i++){
+      var rows=[];
+      for(var j=i+1;j<items.length;j++){
+        var a=items[i],b=items[j];
+        var rowKey=item.id+'__'+a+'__vs__'+b;
+        rows.push(renderPairwiseRow(rowKey,a,b,SAATY_STEPS,responses[rowKey],false));
+      }
+      groups.push({anchor:items[i],rows:rows});
+    }
+  }
+  if(groups.length<=1)return'<div class="pw-wrap">'+groups.map(function(g){return g.rows.join('');}).join('')+'</div>';
+  var out=groups.map(function(g,gi){
+    return'<div class="pw-group">'
+      +'<div class="pw-group-hdr"><span class="pw-group-title">Comparing: '+esc(g.anchor)+'</span>'
+      +'<span class="pw-group-tag">Group '+(gi+1)+' of '+groups.length+'</span></div>'
+      +g.rows.join('')
+      +'</div>';
+  }).join('');
+  return'<div class="pw-wrap pw-grouped">'+out+'</div>';
+}
+function renderCriteriaWeight(item){
+  var items=item.comparison_items||[];
+  var rows=items.map(function(crit){
+    var rowKey=item.id+'__'+crit;
+    var saved=responses[rowKey]!=null?responses[rowKey]:'';
+    return'<div class="cw-row"><span class="cw-lbl">'+esc(crit)+'</span>'
+      +'<input type="number" inputmode="numeric" class="inp-std cw-input" min="0" max="100" value="'+esc(saved)+'"'
+      +' aria-label="Points for '+esc(crit)+'"'
+      +' oninput="setResp(\''+esc(rowKey)+'\',this.value);updateCwTotal(\''+esc(item.id)+'\')"></div>';
+  }).join('');
+  return'<div class="cw-wrap" id="cw_'+esc(item.id)+'">'+rows
+    +'<div class="cw-total" id="cwtotal_'+esc(item.id)+'">'+cwTotalText(cwTotal(item))+'</div></div>';
+}
+// Constant-sum points are stored exactly as typed. Each entry must be a whole
+// number from 0 to 100 and the entries must total 100, and validatePage() says
+// so when they do not. Rewriting an entry on input turned 2.5 into 25, and
+// capping it against the other fields silently changed an allocation the
+// participant was part way through editing.
+function cwTotal(item){
+  var total=0,invalid=false,anyEntered=false;
+  (item.comparison_items||[]).forEach(function(crit){
+    var v=responses[item.id+'__'+crit];
+    var s=String(v==null?'':v).trim();
+    if(s==='')return;
+    anyEntered=true;
+    if(!/^[0-9]+$/.test(s)||parseInt(s,10)>100){invalid=true;return;}
+    total+=parseInt(s,10);
+  });
+  return{total:total,invalid:invalid,anyEntered:anyEntered};
+}
+function cwTotalText(t){
+  return t.invalid?'Use whole numbers from 0 to 100':'Total: '+t.total+' / 100';
+}
+function updateCwTotal(itemId){
+  var el=document.getElementById('cwtotal_'+itemId);
+  var item=SF.items.filter(function(i){return i.id===itemId;})[0];
+  if(!el||!item)return;
+  var t=cwTotal(item);
+  el.textContent=cwTotalText(t);
+  el.className='cw-total '+(!t.invalid&&t.total===100?'cw-ok':'cw-bad');
+}
+function renderNumeric(item){
+  var saved=responses[item.id]||'';
+  // slider_min/slider_max are the bounds for numeric entry. What the
+  // participant types is stored as typed, and validatePage() asks for a
+  // correction when it is outside the bounds. Clamping on change rewrote a
+  // cleared field to the minimum, an answer nobody gave.
+  var mn=item.slider_min!=null?' min="'+(+item.slider_min)+'"':'';
+  var mx=item.slider_max!=null?' max="'+(+item.slider_max)+'"':'';
+  return'<input type="number" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx+ariaFor(item)
+    +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
+}
+function renderText(item){
+  var saved=responses[item.id]||'';
+  return'<input type="text" class="inp-std" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+ariaFor(item)
+    +' placeholder="'+esc(item.placeholder||'')+'"'
+    +' oninput="setResp(\''+esc(item.id)+'\',this.value)">';
+}
+function renderTextarea(item){
+  var saved=responses[item.id]||'';
+  return'<textarea class="inp-std" id="inp_'+esc(item.id)+'"'+ariaFor(item)+' placeholder="'+esc(item.placeholder||'')+'"'
+    +' oninput="setResp(\''+esc(item.id)+'\',this.value)">'+esc(saved)+'</textarea>';
+}
+function renderDate(item){
+  var saved=responses[item.id]||'';
+  // date_min/date_max limit the native picker; typed dates are re-checked
+  // in validatePage since the picker bounds do not block manual entry.
+  var mn=item.date_min?' min="'+esc(item.date_min)+'"':'';
+  var mx=item.date_max?' max="'+esc(item.date_max)+'"':'';
+  return'<input type="date" class="inp-std inp-narrow" id="inp_'+esc(item.id)+'" value="'+esc(saved)+'"'+mn+mx+ariaFor(item)
+    +' onchange="setResp(\''+esc(item.id)+'\',this.value)">';
+}
+function renderSlider(item){
+  var mn=item.slider_min!=null?item.slider_min:0;
+  var mx=item.slider_max!=null?item.slider_max:100;
+  var st=item.slider_step||1;
+  var saved=responses[item.id]!=null?responses[item.id]:Math.round((mn+mx)/2);
+  return'<div class="slider-wrap">'
+    +'<div class="slider-val" id="slv_'+esc(item.id)+'">'+saved+'</div>'
+    +'<input type="range" class="slider-inp"'+ariaFor(item)+' min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+saved+'"'
+    +' oninput="setResp(\''+esc(item.id)+'\',this.value);document.getElementById(\'slv_'+esc(item.id)+'\').textContent=this.value">'
+    +'<div class="slider-lbls"><span>'+(+mn)+'</span><span>'+(+mx)+'</span></div>'
+    +'</div>';
+}
+function renderRating(item){
+  var mx=item.rating_max||5;
+  var icon=item.rating_icon==='heart'?'&#10084;':'&#9733;';
+  var saved=parseInt(responses[item.id])||0;
+  var stars='';
+  for(var i=1;i<=mx;i++){
+    // Each star is a radio that reports its own state, so a participant
+    // returning to the question hears what they chose. The buttons used to
+    // announce "3 of 5" with no question name and no selected state at all.
+    stars+='<button type="button" class="star-btn'+(i<=saved?' active':'')+'" data-id="'+esc(item.id)+'" data-v="'+i+'"'
+      +' role="radio" aria-checked="'+(i===saved?'true':'false')+'"'
+      +' onclick="setRating(\''+esc(item.id)+'\','+i+','+mx+')"'
+      +' aria-label="'+i+' of '+mx+'">'+icon+'</button>';
+  }
+  return'<div class="star-row" id="stars_'+esc(item.id)+'" role="radiogroup"'
+    +' aria-labelledby="q_'+esc(item.id)+'"'
+    +' aria-describedby="err_'+esc(item.id)+'">'+stars+'</div>';
+}
+function renderRanking(item,cs){
+  if(!rankOrders[item.id]){
+    rankOrders[item.id]=choiceOrder(item,cs).map(function(i){var v=cs.values[i];return{v:String(v),l:cs.labels[i]||String(v)};});
+  }
+  var order=rankOrders[item.id];
+  var confirmed=!!responses[item.id];
+  var status=confirmed
+    ?'<span class="rank-status" role="status">Your order is recorded.</span>'
+    :'<button type="button" class="btn btn-s rank-keep" onclick="rankConfirm(\''+esc(item.id)+'\')">Keep this order</button>'
+      +'<span class="rank-status" role="status">Drag the options or use the arrows, or keep the order shown.</span>';
+  return'<div class="rank-list" id="rank_'+esc(item.id)+'" ondragover="event.preventDefault()">'+order.map(function(opt,i){
+    return'<div class="rank-item" draggable="true" data-id="'+esc(item.id)+'" data-v="'+esc(opt.v)+'"'
+      +' ondragstart="rankDragStart(event)" ondragover="rankDragOver(event)" ondrop="rankDrop(event,\''+esc(item.id)+'\')" ondragleave="this.classList.remove(\'drag-over\')">'
+      +'<span class="rank-num">'+(i+1)+'</span>'
+      +'<span class="rank-handle" aria-hidden="true">&#8942;</span>'
+      +'<span class="rank-lbl">'+esc(opt.l)+'</span>'
+      +'<span class="rank-kbd">'
+      +'<button type="button" class="rank-mv" aria-label="Move '+esc(opt.l)+' up"'
+      +' onclick="rankMove(\''+esc(item.id)+'\',\''+esc(opt.v)+'\',-1)">&#9650;</button>'
+      +'<button type="button" class="rank-mv" aria-label="Move '+esc(opt.l)+' down"'
+      +' onclick="rankMove(\''+esc(item.id)+'\',\''+esc(opt.v)+'\',1)">&#9660;</button>'
+      +'</span>'
+      +'</div>';
+  }).join('')+'</div>'
+    +'<div class="rank-confirm">'+status+'</div>';
+}
+
+// ── Response handlers ──────────────────────────────────────────────────────
+function setResp(id,val){
+  responses[id]=val;
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// last, outside any shuffle. A single choice submits the code "other" in
+// <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
+// typed text in <id>__other_text. Typing in the box chooses Other.
+function otherOption(item,cs,multi){
+  if(!cs.allow_other)return '';
+  var id=esc(item.id),on=multi?(responses[item.id]||'').split(',').indexOf('other')>=0:String(responses[item.id])==='other';
+  return '<label class="choice-opt choice-other"><input type="'+(multi?'checkbox':'radio')+'" name="'+id+'" value="other"'
+    +(on?' checked':'')+(item.required?' aria-required="true"':'')
+    +' onchange="'+(multi?'toggleMulti(\''+id+'\',this)':'setResp(\''+id+'\',this.value)')+'">'
+    +'<span class="opt-txt">Other, please specify</span></label>'
+    +'<input type="text" class="other-txt" id="other_'+id+'" aria-label="Other, please specify"'
+    +' value="'+esc(responses[item.id+'__other_text']||'')+'" oninput="setOther(\''+id+'\',this.value,'+(multi?'true':'false')+')">';
+}
+function setOther(id,val,multi){
+  responses[id+'__other_text']=val;
+  if(String(val).trim()){
+    if(multi){var cur=(responses[id]||'').split(',').filter(Boolean);if(cur.indexOf('other')<0){cur.push('other');responses[id]=cur.join(',');}}
+    else responses[id]='other';
+    var box=document.querySelector('input[name="'+id+'"][value="other"]');if(box)box.checked=true;
+  }
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+function otherChosen(item){
+  var cs=choiceMap[item.choice_set||'']||{};
+  if(!cs.allow_other)return false;
+  if(item.type==='multiple_choice')return (responses[item.id]||'').split(',').indexOf('other')>=0;
+  return item.type==='single_choice'&&String(responses[item.id])==='other';
+}
+function toggleMulti(id,cb){
+  var current=(responses[id]||'').split(',').filter(Boolean);
+  if(cb.checked){if(!current.includes(cb.value))current.push(cb.value);}
+  else{current=current.filter(function(v){return v!==cb.value;});}
+  responses[id]=current.join(',');
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+function setRating(id,val,max){
+  responses[id]=String(val);
+  var err=document.getElementById('err_'+id);
+  if(err)err.classList.remove('show');
+  var btns=document.querySelectorAll('.star-btn[data-id="'+id+'"]');
+  btns.forEach(function(b){
+    var v=parseInt(b.dataset.v);
+    b.classList.toggle('active',v<=val);
+    // The visual fill runs up to the choice; the reported state names the one
+    // chosen, which is what a screen reader announces.
+    if(b.setAttribute)b.setAttribute('aria-checked',v===val?'true':'false');
+  });
+  // Every other answer handler refreshes branching. Leaving it out here kept a
+  // question a rating reveals hidden until some other control was touched,
+  // while validation, which reads the same rules, still demanded an answer.
+  updateBranching();
+}
+function updateBranching(){
+  SF.items.forEach(function(item){
+    var el=document.getElementById('item_'+item.id);
+    if(!el)return;
+    el.classList.toggle('hidden',!isVisible(item.id));
+  });
+  updateProgress();
+}
+
+// ── Ranking drag-and-drop ─────────────────────────────────────────────────
+var dragSrc=null;
+function rankDragStart(e){
+  dragSrc=e.currentTarget;
+  e.currentTarget.classList.add('dragging');
+}
+function rankDragOver(e){
+  e.preventDefault();
+  document.querySelectorAll('.rank-item.drag-over').forEach(function(el){el.classList.remove('drag-over');});
+  e.currentTarget.classList.add('drag-over');
+}
+function rankDrop(e,itemId){
+  e.preventDefault();
+  if(!dragSrc||dragSrc===e.currentTarget)return;
+  e.currentTarget.classList.remove('drag-over');
+  dragSrc.classList.remove('dragging');
+  var list=document.getElementById('rank_'+itemId);
+  var items=[].slice.call(list.querySelectorAll('.rank-item'));
+  var srcIdx=items.indexOf(dragSrc);
+  var tgtIdx=items.indexOf(e.currentTarget);
+  if(srcIdx>tgtIdx)list.insertBefore(dragSrc,e.currentTarget);
+  else list.insertBefore(dragSrc,e.currentTarget.nextSibling);
+  var newOrder=[].slice.call(list.querySelectorAll('.rank-item')).map(function(el){return el.dataset.v;});
+  dragSrc=null;
+  rankSetOrder(itemId,newOrder);
+  renderScreen();
+}
+// The one place a ranking changes. The displayed order (rankOrders) and the
+// recorded answer (responses) are written together. Writing only the answer
+// on a drag left the page showing one order while submitting another.
+function rankSetOrder(itemId,values){
+  var byV={};
+  (rankOrders[itemId]||[]).forEach(function(o){byV[o.v]=o;});
+  rankOrders[itemId]=values.map(function(v){return byV[String(v)];}).filter(Boolean);
+  responses[itemId]=rankOrders[itemId].map(function(o){return o.v;}).join(',');
+  var err=document.getElementById('err_'+itemId);
+  if(err)err.classList.remove('show');
+  updateBranching();
+}
+// Records the order on display as the participant's answer, for when the
+// order shown is already the one they would choose.
+function rankConfirm(itemId){
+  var order=rankOrders[itemId]; if(!order)return;
+  rankSetOrder(itemId,order.map(function(o){return o.v;}));
+  renderScreen();
+}
+// Keyboard alternative to drag: move an option one position up or down
+function rankMove(itemId,v,dir){
+  var order=rankOrders[itemId]; if(!order)return;
+  var i=order.findIndex(function(o){return o.v===String(v);});
+  var j=i+dir;
+  if(i<0||j<0||j>=order.length)return;
+  var moved=order.map(function(o){return o.v;});
+  var tmp=moved[i];moved[i]=moved[j];moved[j]=tmp;
+  rankSetOrder(itemId,moved);
+  renderScreen();
+  var btn=document.querySelector('#rank_'+itemId+' .rank-item[data-v="'+v+'"] .rank-mv'+(dir<0?'':' + .rank-mv'));
+  if(btn)btn.focus();
+}
+
+// ── Validation ─────────────────────────────────────────────────────────────
+function validatePage(items){
+  var ok=true;
+  // Other chosen with nothing typed says nothing, so it blocks the page.
+  items.forEach(function(item){
+    if(!isVisible(item.id)||!otherChosen(item))return;
+    if(String(responses[item.id+'__other_text']||'').trim())return;
+    var err=document.getElementById('err_'+item.id);
+    if(err){err.textContent='Please say what "Other" is.';err.classList.add('show');}
+    if(ok)focusProblem(item.id);
+    ok=false;
+  });
+  // An answered date outside its declared bounds is an error even on a
+  // non-required item, because manual typing bypasses the picker limits.
+  items.forEach(function(item){
+    if(item.type!=='date'||!isVisible(item.id))return;
+    var v=responses[item.id];
+    if(!v)return;
+    var msg='';
+    if(item.date_min&&v<item.date_min)msg='Please pick a date on or after '+item.date_min+'.';
+    if(item.date_max&&v>item.date_max)msg='Please pick a date on or before '+item.date_max+'.';
+    if(msg){
+      var err=document.getElementById('err_'+item.id);
+      if(err){err.textContent=msg;err.classList.add('show');}
+      if(ok){
+        focusProblem(item.id);
+      }
+      ok=false;
+    }
+  });
+  // A number typed outside a numeric item's bounds, or text that is not a
+  // number, is kept as typed and blocks the page until corrected, even on an
+  // optional item.
+  items.forEach(function(item){
+    if(item.type!=='numeric'||!isVisible(item.id))return;
+    var s=String(responses[item.id]==null?'':responses[item.id]).trim();
+    if(s==='')return;
+    var n=Number(s);
+    var hasMin=item.slider_min!=null,hasMax=item.slider_max!=null;
+    var msg='';
+    if(!isFinite(n))msg='Please enter a number.';
+    else if((hasMin&&n<+item.slider_min)||(hasMax&&n>+item.slider_max)){
+      msg=hasMin&&hasMax?'Please enter a number from '+(+item.slider_min)+' to '+(+item.slider_max)+'.'
+        :hasMin?'Please enter a number of '+(+item.slider_min)+' or more.'
+        :'Please enter a number of '+(+item.slider_max)+' or less.';
+    }
+    if(msg){
+      var err=document.getElementById('err_'+item.id);
+      if(err){err.textContent=msg;err.classList.add('show');}
+      if(ok){
+        focusProblem(item.id);
+      }
+      ok=false;
+    }
+  });
+  // A criteria_weight allocation must be whole numbers totalling exactly 100.
+  // Once any points are entered this applies even to an optional item.
+  items.forEach(function(item){
+    if(item.type!=='criteria_weight'||!isVisible(item.id))return;
+    var t=cwTotal(item);
+    if(t.invalid||((item.required||t.anyEntered)&&t.total!==100)){
+      var err=document.getElementById('err_'+item.id);
+      var cwMsg=t.invalid
+        ?'Enter a whole number from 0 to 100 for each option.'
+        :'The points must add up to exactly 100 (currently '+t.total+').';
+      if(err){err.textContent=cwMsg;err.classList.add('show');}
+      if(ok){
+        focusProblem(item.id);
+      }
+      ok=false;
+    }
+  });
+  items.forEach(function(item){
+    if(!item.required||!isVisible(item.id))return;
+    var t=item.type;
+    var missing=!itemAnswered(item);
+    if(missing){
+      var err=document.getElementById('err_'+item.id);
+      var reqMsg=t==='ranking'
+        ?'Please order the options, or choose Keep this order.'
+        :'This question is required.';
+      if(err){err.textContent=reqMsg;err.classList.add('show');}
+      if(ok){
+        focusProblem(item.id);
+      }
+      ok=false;
+    }
+  });
+  var banner=document.getElementById('survey-err');
+  if(banner)banner.classList.toggle('show',!ok);
+  return ok;
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function startSurvey(){
+  if(WL.consent_required){
+    var chk=document.getElementById('consent-chk');
+    if(!chk||!chk.checked){
+      var err=document.getElementById('consent-err');
+      if(err){err.textContent='Please confirm your consent before continuing.';err.classList.add('show');}
+      return;
+    }
+  }
+  consentGiven=true;
+  screen='survey';
+  currentPage=1;
+  renderScreen();
+}
+// Scrolling alone told a keyboard or screen-reader user that something was
+// wrong somewhere off screen. Focus moves to the question with the problem, so
+// the error, which each group names through aria-describedby, is announced
+// with the control that has it.
+function focusProblem(itemId){
+  var el=document.getElementById('item_'+itemId);
+  if(!el)return;
+  if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'center'});
+  var ctrl=el.querySelector?el.querySelector('input,select,textarea,button'):null;
+  var target=ctrl||el;
+  if(target.setAttribute&&!ctrl)target.setAttribute('tabindex','-1');
+  if(target.focus)target.focus();
+}
+// A page change replaces the whole card, so focus has to be placed again or it
+// sits on a button that no longer exists.
+function focusPageStart(){
+  var el=document.getElementById('page-heading');
+  if(!el)return;
+  if(el.setAttribute)el.setAttribute('tabindex','-1');
+  if(el.focus)el.focus();
+}
+function nextPage(){
+  var items=pages[currentPage-1]||[];
+  if(!validatePage(items))return;
+  if(currentPage>=maxPage){doSubmit();return;}
+  currentPage++;
+  renderScreen();
+  window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
+}
+function prevPage(){
+  if(currentPage<=1)return;
+  currentPage--;
+  renderScreen();
+  window.scrollTo({top:0,behavior:'smooth'});
+  focusPageStart();
+}
+
+// ── Submission ─────────────────────────────────────────────────────────────
+function doSubmit(){
+  var submittedAt=new Date().toISOString();
+  // Fix C: use respondent_id to match Apps Script header and read_responses()
+  var row={respondent_id:respId,started_at:startedAt,submitted_at:submittedAt};
+  SF.items.forEach(function(item){
+    if(item.type==='section_break'||item.type==='text_block')return;
+    if(!isVisible(item.id))return;
+    if(item.type==='matrix'){
+      (item.matrix_items||[]).forEach(function(r){
+        var key=item.id+'__'+r;
+        row[key]=responses[key]||'';
+      });
+    } else if(item.type==='ranking'){
+      // One column per option holding its rank (1 = top), so the data is
+      // directly analysable without reshaping.
+      var cs=choiceMap[item.choice_set]||{values:[]};
+      // An untouched ranking is unanswered, so its columns stay empty. The
+      // declared order is not a preference the participant expressed.
+      var order=(responses[item.id]||'').split(',').filter(Boolean);
+      (cs.values||[]).forEach(function(v){
+        var pos=order.indexOf(String(v));
+        row[item.id+'__'+String(v)]=pos>=0?String(pos+1):'';
+      });
+    } else if(item.type==='multiple_choice'){
+      // One 0/1 column per option, so multi-select analysis needs no
+      // string-splitting: item__option = 1 when selected, 0 otherwise.
+      var csM=choiceMap[item.choice_set]||{values:[]};
+      var sel=(responses[item.id]||'').split(',').filter(Boolean);
+      (csM.values||[]).forEach(function(v){
+        row[item.id+'__'+String(v)]=sel.includes(String(v))?'1':'0';
+      });
+      if(csM.allow_other){
+        row[item.id+'__other']=sel.includes('other')?'1':'0';
+        row[item.id+'__other_text']=sel.includes('other')?(responses[item.id+'__other_text']||''):'';
+      }
+    } else if(item.type==='pairwise_comparison'){
+      // Column conventions match R/read_responses.R's expansion whitelist:
+      // item__a__vs__b (signed Saaty degree) for unordered pairs, or
+      // item__a__to__b (0-4) for DEMATEL's ordered/directed pairs.
+      var comp=item.comparison_items||[];
+      var scale=item.comparison_scale||'saaty';
+      if(scale==='influence'){
+        for(var pi=0;pi<comp.length;pi++)for(var pj=0;pj<comp.length;pj++){
+          if(pi===pj)continue;
+          var infKey=item.id+'__'+comp[pi]+'__to__'+comp[pj];
+          row[infKey]=responses[infKey]!=null?responses[infKey]:'';
+        }
+      }else{
+        for(var pi=0;pi<comp.length;pi++)for(var pj=pi+1;pj<comp.length;pj++){
+          var saatyKey=item.id+'__'+comp[pi]+'__vs__'+comp[pj];
+          row[saatyKey]=responses[saatyKey]!=null?responses[saatyKey]:'';
+        }
+      }
+    } else if(item.type==='criteria_weight'){
+      // One item__criterion column, 0-100, matching read_responses.R.
+      (item.comparison_items||[]).forEach(function(crit){
+        var cwKey=item.id+'__'+crit;
+        row[cwKey]=responses[cwKey]!=null?responses[cwKey]:'';
+      });
+    } else {
+      row[item.id]=responses[item.id]!=null?responses[item.id]:'';
+      var csO=choiceMap[item.choice_set||'']||{};
+      if(item.type==='single_choice'&&csO.allow_other)
+        row[item.id+'__other_text']=String(responses[item.id])==='other'?(responses[item.id+'__other_text']||''):'';
+    }
+  });
+  var csvStr=toCsv([row]);
+  // The CSV is kept in memory for the optional thank-you download button.
+  // No automatic download on submit: when an endpoint collects the
+  // response, a forced file download is unwanted noise, and even without
+  // one the download is offered as a button, never forced.
+  window._lastCsv={csv:csvStr,name:(SF.meta.title||'survey')+'_response_'+respId+'.csv'};
+  window._lastRow=row;
+  screen='thankyou';
+  if(hasCollector()){
+    sendResponse(row);
+  }else{
+    deliveryState='local';
+    clearDraft();
+    renderScreen();
+  }
+  var wrap=document.getElementById('prog-bar-wrap');
+  if(wrap)wrap.hidden=true;
+}
+// What is known about delivery, and no more. 'local' is a survey with no
+// collector, where the download is the only copy. 'sending' is in flight.
+// 'sent' means the request left the browser without error: the POST is
+// no-cors, so the collector's answer is unreadable and acceptance can never
+// be confirmed from here. 'failed' means fetch itself rejected, which used to
+// be discarded by an empty .catch() while the screen said the response had
+// been recorded. 'confirmed' comes only from a host's own sender (below),
+// which can read its collector's answer, and is shown as recorded.
+var deliveryState=null;
+// A host that can confirm delivery defines window.sframeSendResponse(row)
+// before the page loads. It returns a Promise: resolving to true, or to
+// {confirmed: true}, marks the response recorded, resolving to anything else
+// marks it sent and unconfirmed, and a rejection marks it failed.
+function hostSender(){return typeof window.sframeSendResponse==='function';}
+function hasCollector(){return !PREVIEW&&(!!ENDPOINT||hostSender());}
+function sendResponse(row){
+  if(PREVIEW){deliveryState='local';renderScreen();return;}
+  deliveryState='sending';
+  renderScreen();
+  if(hostSender()){
+    var p;
+    try{p=Promise.resolve(window.sframeSendResponse(row));}catch(e){p=Promise.reject(e);}
+    p.then(function(res){
+      deliveryState=(res===true||(res&&res.confirmed===true))?'confirmed':'sent';
+      clearDraft();renderScreen();
+    },function(){deliveryState='failed';renderScreen();});
+    return;
+  }
+  // no-cors with a text/plain body: an application/json header triggers a
+  // CORS preflight that Google Apps Script never answers, so the POST is
+  // silently blocked in real deployments. Apps Script parses the body
+  // regardless of content type.
+  fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(row)})
+    .then(function(){deliveryState='sent';clearDraft();renderScreen();})
+    .catch(function(){deliveryState='failed';renderScreen();});
+}
+function retrySubmission(){
+  if(!window._lastRow)return;
+  sendResponse(window._lastRow);
+}
+function toCsv(rows){
+  if(!rows.length)return'';
+  var keys=Object.keys(rows[0]);
+  var lines=[keys.map(csvCell).join(',')];
+  rows.forEach(function(r){lines.push(keys.map(function(k){return csvCell(r[k]);}).join(','));});
+  return lines.join('\r\n');
+}
+function csvCell(v){
+  var s=String(v==null?'':v);
+  if(s.includes(',')||s.includes('"')||s.includes('\n'))return'"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function downloadCsv(csv,name){
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=name;a.click();
+}
+
+// ── Screen rendering ───────────────────────────────────────────────────────
+function renderScreen(){
+  updateProgress();
+  if(screen==='welcome')renderWelcome();
+  else if(screen==='survey'){renderSurvey();saveDraft();}
+  else renderThankyou();
+}
+// Drafts (render$save_draft = true). Answers are kept in this browser's
+// localStorage under a key from the instrument's content, so a respondent who
+// closes the tab can resume, and a revised instrument starts clean. Cleared
+// once the response is submitted, and kept when delivery fails.
+// The key covers the whole instrument as exported, less its hash, so any
+// change (a choice set, the consent text) starts drafts afresh. It used to
+// cover the title, version and items alone, and a draft resumed against
+// changed meaning.
+function draftKey(){
+  var c={};Object.keys(SF).forEach(function(k){if(k!=='hash')c[k]=SF[k];});
+  var s=JSON.stringify(c),h=5381;
+  for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0;}
+  return 'sframe_draft_'+(h>>>0).toString(36);
+}
+function draftStore(){
+  if(!R.save_draft)return null;
+  try{return window.localStorage||null;}catch(e){return null;}
+}
+function saveDraft(){
+  var st=draftStore();if(!st||screen!=='survey')return;
+  try{st.setItem(draftKey(),JSON.stringify({responses:responses,page:currentPage,consented:consentGiven,order:displayOrders,saved:Date.now()}));}catch(e){}
+}
+function loadDraft(){
+  var st=draftStore();if(!st)return null;
+  try{var d=JSON.parse(st.getItem(draftKey())||'null');return d&&d.responses?d:null;}catch(e){return null;}
+}
+function clearDraft(){
+  var st=draftStore();if(!st)return;
+  try{st.removeItem(draftKey());}catch(e){}
+}
+// Set once the welcome screen's consent check passes. A draft records it, and
+// resumes straight into the survey only when it says consent was given.
+// Otherwise the respondent confirms consent on the welcome screen first.
+var consentGiven=false;
+function resumeDraft(){
+  var d=loadDraft();if(!d)return false;
+  if(WL.consent_required&&d.consented!==true){
+    var chk=document.getElementById('consent-chk');
+    if(!chk||!chk.checked){
+      screen='welcome';
+      var err=document.getElementById('consent-err');
+      if(err){err.textContent='Please confirm your consent before continuing.';err.classList.add('show');}
+      return false;
+    }
+  }
+  consentGiven=true;
+  Object.keys(d.responses).forEach(function(k){responses[k]=d.responses[k];});
+  if(d.order&&typeof d.order==='object')displayOrders=d.order;
+  screen='survey';
+  currentPage=Math.min(Math.max(1,parseInt(d.page,10)||1),maxPage);
+  renderScreen();
+  return true;
+}
+document.addEventListener('change',saveDraft);
+document.addEventListener('input',saveDraft);
+function hasVal(key){
+  var v=responses[key];
+  return v!==undefined&&v!==null&&String(v).trim()!=='';
+}
+// Whether an item has been answered in full. Progress feedback and the
+// required-item walk both read this, so what a participant is told matches
+// what they are stopped for. Progress used to read the parent response key
+// for every type but matrix, and a pairwise or criteria-weight answer lives
+// in child keys, so a completed comparison counted as unanswered.
+function itemAnswered(item){
+  var t=item.type;
+  if(t==='matrix'){
+    var rows=item.matrix_items||[];
+    return rows.length>0&&rows.every(function(r){return hasVal(item.id+'__'+r);});
+  }
+  if(t==='criteria_weight'){
+    var crits=item.comparison_items||[];
+    return crits.length>0&&crits.every(function(c){return hasVal(item.id+'__'+c);});
+  }
+  if(t==='pairwise_comparison'){
+    var comp=item.comparison_items||[];
+    if(comp.length<2)return false;
+    var scale=item.comparison_scale||'saaty';
+    for(var i=0;i<comp.length;i++){
+      for(var j=0;j<comp.length;j++){
+        if(scale==='influence'){
+          if(i===j)continue;
+          if(!hasVal(item.id+'__'+comp[i]+'__to__'+comp[j]))return false;
+        }else if(j>i){
+          if(!hasVal(item.id+'__'+comp[i]+'__vs__'+comp[j]))return false;
+        }
+      }
+    }
+    return true;
+  }
+  return hasVal(item.id);
+}
+function updateProgress(){
+  var wrap=document.getElementById('prog-bar-wrap');
+  var bar=document.getElementById('progBar');
+  var pct=document.getElementById('progPct');
+  var title=document.getElementById('progTitle');
+  if(!wrap)return;
+  // Honour the show-progress toggle. Multi-page surveys report page
+  // position; single-page surveys report answered visible questions so a
+  // long mobile survey still gives progress feedback.
+  var showProg=!(R.header&&R.header.show_progress===false);
+  if(screen!=='survey'||!showProg){wrap.hidden=true;return;}
+  var p,label;
+  if(maxPage>1){
+    p=Math.round((currentPage/maxPage)*100);
+    label='Page '+currentPage+' of '+maxPage;
+  }else{
+    var total=0,done=0;
+    SF.items.forEach(function(item){
+      if(item.type==='section_break'||item.type==='text_block')return;
+      if(!isVisible(item.id))return;
+      total++;
+      if(itemAnswered(item))done++;
+    });
+    if(total===0){wrap.hidden=true;return;}
+    p=Math.round((done/total)*100);
+    label=done+' of '+total+' answered';
+  }
+  wrap.hidden=false;
+  if(bar)bar.style.width=p+'%';
+  if(pct)pct.textContent=p+'%';
+  // Conversational mode already shows a per-question eyebrow, so the sticky
+  // header carries the survey title instead of repeating the page counter.
+  if(title)title.textContent=MODE==='conversational'?(SF.meta.title||''):label;
+}
+function renderWelcome(){
+  var el=document.getElementById('app');
+  var draft=loadDraft();
+  if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description){
+    if(draft&&resumeDraft())return;
+    startSurvey();return;
+  }
+  // A draft offers to carry on. resumeDraft() asks for consent again when the
+  // draft does not record it.
+  var resume=draft
+    ?'<div class="ty-note" role="status">You have answers saved from an earlier visit.</div>'
+     +'<button type="button" class="btn btn-p btn-lg" onclick="resumeDraft()" style="margin-bottom:10px">Resume where you left off</button> '
+    :'';
+  el.innerHTML='<div class="card"><div class="card-body">'
+    +'<h1 class="wl-title">'+esc(WL.title||SF.meta.title)+'</h1>'
+    +(WL.intro_text?'<div class="wl-intro">'+esc(WL.intro_text)+'</div>':'')
+    +(WL.consent_text?'<div class="consent-box">'+esc(WL.consent_text)+'</div>':'')
+    +(WL.consent_required?'<label class="consent-chk"><input type="checkbox" id="consent-chk" style="accent-color:var(--cp)"><span>I have read and consent to participate.</span></label>':'')
+    +'<div class="item-err" id="consent-err" style="margin-bottom:12px"></div>'
+    +resume
+    +'<button type="button" class="btn '+(draft?'btn-s':'btn-p')+' btn-lg" onclick="startSurvey()">'+esc(WL.start_label||'Start Survey')+'</button>'
+    +'</div></div>';
+}
+function renderSurvey(){
+  var el=document.getElementById('app');
+  var items=pages[currentPage-1]||[];
+  var nav='<div class="nav-row">'
+    +(currentPage>1?'<button type="button" class="btn btn-s" onclick="prevPage()">&#8592; Back</button>':'')
+    +'<div class="sp"></div>'
+    +(currentPage<maxPage
+      ?'<button type="button" class="btn btn-p" onclick="nextPage()">Next &#8594;</button>'
+      :'<button type="button" class="btn btn-p" onclick="nextPage()">'+esc(R.submit_label||'Submit')+'</button>')
+    +'</div>';
+  // The sticky bar already reports page position in standard mode, so the
+  // in-card eyebrow appears only in conversational mode.
+  var paginationInfo=MODE==='conversational'
+    ?'<div class="q-eyebrow">Question '+currentPage+' of '+maxPage+'</div>'
+    :'';
+  el.innerHTML='<div class="card"><div class="card-body">'
+    +'<h2 id="page-heading" class="sr-only">'+esc(SF.meta.title)
+    +(maxPage>1?' \u2014 page '+currentPage+' of '+maxPage:'')+'</h2>'
+    +(currentPage===1?'<h1 class="wl-title" style="margin-bottom:6px">'+esc(SF.meta.title)+'</h1>'+(SF.meta.description?'<div style="color:var(--t2);font-size:14px;line-height:1.55;margin-bottom:22px">'+esc(SF.meta.description)+'</div>':''):'')
+    +paginationInfo
+    +'<div id="survey-err" class="err-banner">Please answer all required questions before continuing.</div>'
+    +items.map(renderItem).join('')
+    +nav
+    +'</div></div>';
+  // Restore multi-checkbox and slider states (already handled via re-render)
+}
+function renderThankyou(){
+  var el=document.getElementById('app');
+  // While the answers are in flight the page says so, and claims nothing
+  // about storage. It used to show the thank-you message, "recorded", here.
+  if(deliveryState==='sending'){
+    el.innerHTML='<div class="card"><div class="card-body" role="status" aria-live="polite">'
+      +'<div class="ty-title">Sending your answers</div>'
+      +'<div class="ty-msg">Keep this page open until it confirms they have gone.</div>'
+      +'</div></div>';
+    return;
+  }
+  // The download button appears when the designer enabled it, or whenever
+  // no collector endpoint exists (the downloaded CSV is then the only copy
+  // of the response, so it must stay reachable, as a choice, never forced).
+  var failed=deliveryState==='failed';
+  // A no-cors POST is opaque, so 'sent' means the request left and nothing more.
+  // The collector may have replied "unmapped", or "error", or refused the write
+  // because the Sheets API is not enabled, and none of that is readable here.
+  // Receipt is therefore unconfirmed whenever a collector is configured, and the
+  // page must not assert storage it cannot observe.
+  var unconfirmed=deliveryState==='sent'&&hasCollector();
+  // A failed or unconfirmed send makes the download the only copy anyone can
+  // prove exists, so it is offered whatever the designer chose.
+  var showDl=(TY.show_download||!hasCollector()||failed||unconfirmed)&&window._lastCsv;
+  var offlineNote=(!PREVIEW&&!hasCollector()&&window._lastCsv)
+    ?'<div class="ty-note">This survey has no online collector. Download your copy below and return the file to the researcher.</div>':'';
+  var failNote=failed
+    ?'<div class="ty-note" role="alert">Your answers are still held in this page. Try sending them again, or download the file below and return it to the researcher. Leaving or reloading this page loses them.</div>':'';
+  var dlBtn=showDl
+    ?'<button type="button" class="btn btn-p" onclick="downloadCsv(window._lastCsv.csv,window._lastCsv.name)">Download my response (CSV)</button>':'';
+  var retryBtn=failed
+    ?'<button type="button" class="btn btn-p" onclick="retrySubmission()">Try sending again</button>':'';
+  // Starting over reloads, which discards the page's copy of the response. On a
+  // failed or unconfirmed send that copy is the only proof the answers exist, so
+  // the button is withheld, as it already was on failure. A researcher fielding
+  // on one shared device reloads the browser themselves, which is a deliberate
+  // act on their own device rather than a button beside "Download my response".
+  // thankyou$show_restart = false hides it, for a host that serves one
+  // response per link.
+  var again=(failed||unconfirmed||TY.show_restart===false)?'':'<button type="button" class="btn btn-s" onclick="restartSurvey()">Submit another response</button>';
+  var cont=(TY.redirect_url&&!failed)
+    ?'<a class="btn btn-s" style="text-decoration:none" href="'+esc(TY.redirect_url)+'">Continue</a>':'';
+  var title=failed?'Almost done':'Thank You';
+  var icon=failed?'&#33;':'&#10004;';
+  // Two voices, kept apart. The status line is the package's own and says
+  // what happened to the answers, one line per delivery state, because only
+  // the package knows. The designer's message is written before anyone knows
+  // how delivery will go, so it never states delivery, and it is shown under
+  // the status in every state except a failed send. That keeps a debrief or
+  // contact details in front of a respondent whose send can never be confirmed.
+  var status=PREVIEW?'Preview only. Nothing was sent, and no response was recorded.'
+    :failed?'Your answers could not be sent.'
+    :unconfirmed?'Your answers were sent, and this page cannot confirm the researcher’s collector stored them.'
+    :!hasCollector()?'Your response has not been sent.'
+    :'Your response has been recorded.';
+  var msg=failed?'':(TY.message||'Thank you for participating.');
+  var unconfirmedNote=unconfirmed
+    ?'<div class="ty-note">Download the file below to keep a copy you can '
+     +'send on if you are asked for one.</div>':'';
+  el.innerHTML='<div class="card"><div class="card-body">'
+    +'<div class="ty-ic">'+icon+'</div>'
+    +'<div class="ty-title">'+title+'</div>'
+    +'<div class="ty-msg ty-status" role="status">'+esc(status)+'</div>'
+    +(msg?'<div class="ty-msg">'+esc(msg)+'</div>':'')
+    +failNote
+    +unconfirmedNote
+    +offlineNote
+    +'<div class="ty-acts">'+retryBtn+dlBtn+cont+again+'</div>'
+    +'</div></div>';
+  // Auto-redirect only when nothing on this screen needs the respondent's
+  // attention (no download offer, no failed delivery), so the file is never
+  // yanked away and a failure is never redirected past. An unconfirmed send
+  // always offers the download, so it never auto-redirects either: the Continue
+  // link is still there for a participant who chooses to go on.
+  if(TY.redirect_url&&!showDl&&!failed&&deliveryState!=='sending'){
+    setTimeout(function(){window.location.href=TY.redirect_url;},2500);
+  }
+}
+// Reloading is the only way to clear the form for the next participant, and it
+// drops window._lastCsv with it. Where that copy is the only one anyone can
+// prove exists, the participant is asked before it goes.
+function restartSurvey(){
+  var atRisk=window._lastCsv&&(deliveryState==='failed'||
+    (deliveryState==='sent'&&hasCollector())||!hasCollector());
+  if(atRisk&&!confirm('Starting a new response clears this one from the page. '
+    +'If you have not used Download my response, that copy is lost. Continue?')){
+    return;
+  }
+  window.location.reload();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+// Show only 1 item (owner 2026-11-01, UX-09). SurveyBuilder's centre pane
+// draws the selected question with this page's own renderer, so there is 1
+// renderer. The builder asks for it with data-only on the body of a preview
+// it writes, and a live survey never takes this mode. The item shows as on
+// its page, branching aside, and nothing in it can be answered.
+const ONLY_ID=PREVIEW?((document.body.dataset&&document.body.dataset.only)||''):'';
+function renderOnly(){
+  var el=document.getElementById('app');
+  if(ONLY_ID==='__welcome'){
+    if(!WL.intro_text&&!WL.consent_text&&!SF.meta.description)
+      el.innerHTML='<div class="card"><div class="card-body"><p class="wl-intro">No welcome page: the survey opens at its first question. Add an introduction or a consent statement to show one.</p></div></div>';
+    else renderWelcome();
+  }else if(ONLY_ID==='__thankyou'){
+    screen='thankyou';renderThankyou();
+  }else{
+    var item=(SF.items||[]).filter(function(i){return i.id===ONLY_ID;})[0];
+    el.innerHTML=item?'<div class="card"><div class="card-body">'+renderItem(item)+'</div></div>':'';
+    Array.prototype.forEach.call(el.querySelectorAll('.blk.hidden'),function(b){b.classList.remove('hidden');});
+  }
+  el.setAttribute('inert','');
+}
+document.addEventListener('DOMContentLoaded',function(){
+  if(ONLY_ID){renderOnly();return;}
+  renderScreen();
+});
+</script>
+</body>
+</html>

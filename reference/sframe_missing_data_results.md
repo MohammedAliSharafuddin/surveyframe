@@ -38,11 +38,11 @@ between 0 and 1.
 ## See also
 
 Other Responses functions:
-[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md),
-[`sframe_quality_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_quality_results.md)
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
 
 ## Examples
 
@@ -50,20 +50,4 @@ Other Responses functions:
 demo <- sframe_demo("tourism_services")
 mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 mr$item_missing
-#>              variable missing_n missing_prop valid_n missing_pct
-#> visit_type visit_type         0         0.00     120        0.00
-#> dm_1             dm_1         0         0.00     120        0.00
-#> dm_2             dm_2         0         0.00     120        0.00
-#> dm_3             dm_3         0         0.00     120        0.00
-#> sq_1             sq_1         0         0.00     120        0.00
-#> sq_2             sq_2         0         0.00     120        0.00
-#> sq_3             sq_3         0         0.00     120        0.00
-#> sus_1           sus_1         0         0.00     120        0.00
-#> sus_2           sus_2         0         0.00     120        0.00
-#> sat_1           sat_1         0         0.00     120        0.00
-#> sat_2           sat_2         0         0.00     120        0.00
-#> bi_1             bi_1         0         0.00     120        0.00
-#> bi_2             bi_2         0         0.00     120        0.00
-#> attention   attention         0         0.00     120        0.00
-#> comments     comments        30         0.25      90        0.25
 ```

@@ -1,24 +1,18 @@
-# Learn by example: 22 small surveys
+# Learn by example: 25 small surveys
 
 Every function in surveyframe is documented. That is a different thing
 from knowing which survey to build, so this article works the other way
 round: it starts from the survey you are trying to run and shows the
 whole path, from the questionnaire to the report.
 
-There are **22 demos**: 17 analysis examples, three presentation
-examples, and two provenance examples. Each has an instrument, response
-data, a codebook, and surveyframe’s expected results. Presentation and
+There are **25 demos**: 19 analysis examples, 3 presentation examples,
+and 3 provenance examples. Each has an instrument, response data, a
+codebook, and surveyframe’s expected results. Presentation and
 provenance demos reuse the matching analysis data where appropriate.
 
 ``` r
 
 head(sframe_list_demos()[, c("name", "teaches")], 5)
-#>            name                                       teaches
-#> 1  first_survey             Design, export, collect, describe
-#> 2  likert_scale         A scale and whether it holds together
-#> 3 matrix_likert A matrix item and the columns it expands into
-#> 4     two_group                     Two groups on one outcome
-#> 5        paired                The same people measured twice
 ```
 
 Try the shortest complete route first:
@@ -30,9 +24,9 @@ results <- run_analysis_plan(demo$responses, demo$instrument)
 sframe_demo_qmd("first_survey") # write an editable Quarto notebook
 ```
 
-The package stores the 22 compact instruments and datasets, and
+The package stores the 25 compact instruments and datasets, and
 generates a notebook only when you ask:
-[`sframe_demo_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_demo_qmd.md)
+[`sframe_demo_qmd()`](https://surveyframe.org/reference/sframe_demo_qmd.md)
 creates one for whichever demo you choose.
 
 ## Read this as your own field
@@ -61,24 +55,24 @@ it.
 | You have | Use | Demo |
 |----|----|----|
 | A few questions and no plan yet | Start here | `first_survey` |
-| Four items meant to measure one thing | A scale, and its reliability | `likert_scale` |
+| 4 items meant to measure one thing | A scale, and its reliability | `likert_scale` |
 | A grid of items rated on one scale | A matrix item | `matrix_likert` |
-| One number and two groups | A two-group comparison | `two_group` |
+| 1 number and 2 groups | A 2-group comparison | `two_group` |
 | The same people measured twice | A paired test | `paired` |
-| One number and three or more groups | ANOVA and its alternatives | `multi_group` |
-| The same people measured three times | Repeated measures | `repeated` |
-| Two categorical questions | A crosstab and a test of association | `categorical` |
-| Four numbers that may go together | Correlation and regression | `correlation_regression` |
+| 1 number and 3 or more groups | ANOVA and its alternatives | `multi_group` |
+| The same people measured 3 times | Repeated measures | `repeated` |
+| 2 categorical questions | A crosstab and a test of association | `categorical` |
+| 4 numbers that may go together | Correlation and regression | `correlation_regression` |
 | A yes/no, ordered, or multi-category outcome | Logistic regression | `logistic` |
 | Many items and a hunch about the structure | Factor analysis | `factor_structure` |
 | Constructs and a path model | SEM and PLS | `sem_pls` |
 | Questions only some people should see | Skip logic | `branching` |
 | Free-text answers | Text analysis | `open_text` |
-| A decision between options on four criteria | MCDA | `mcdm_choice` |
+| A decision between options on 4 criteria | MCDA | `mcdm_choice` |
 | Fewer than 30 respondents | Small-sample methods | `small_sample` |
 | Tick-all-that-apply, or a ranking | Items that expand | `multi_response` |
 
-The remaining five demos teach presentation and provenance, not a new
+The remaining 5 demos teach presentation and provenance, not a new
 statistical method:
 
 | You want to learn | Demo |
@@ -109,19 +103,15 @@ for something significant.
 
 demo <- sframe_demo("first_survey")
 demo$instrument
-#> <sframe>
-#>   Title:      Event feedback
-#>   Version:    1.0.0
-#>   Items:      6
-#>   Scales:     0
-#>   Analysis:   4 blocks
-#>   Status:     valid
 ```
 
-Four questions, a section break, and a plan with four blocks. This is
-what a respondent sees:
+4 questions, a section break, and a plan with 4 blocks. This is what a
+respondent sees:
 
-![](figures/survey-first-survey.png)
+![The Event feedback survey as a respondent sees it: a required question
+on whether they attended before, age, the day attended, then an optional
+section asking what to do differently next year, and a Submit
+button.](figures/survey-first-survey.png)
 
 The plan was written at design time:
 
@@ -130,11 +120,6 @@ The plan was written at design time:
 do.call(rbind, lapply(sframe_plan(demo$instrument), function(b) {
   data.frame(id = b$id, question = b$research_question, method = b$method)
 }))
-#>    id                         question       method
-#> 1 RQ1           Who came to the event?    frequency
-#> 2 RQ2           How old are attendees? descriptives
-#> 3 RQ3        How complete is the data? missing_data
-#> 4 RQ4 Are there inattentive responses?      quality
 ```
 
 And running it is one call:
@@ -143,7 +128,6 @@ And running it is one call:
 
 results <- run_analysis_plan(demo$responses, demo$instrument)
 results[[1]]$apa
-#> [1] "Frequency distribution for \"Have you attended this event before?\" (N = 50)."
 ```
 
 **Adapt this for your own survey.** Replace the items with your
@@ -153,17 +137,17 @@ questions, declare your own plan, and the rest is unchanged.
 
 ### Two groups on one outcome
 
-The commonest comparison there is: one number, and two groups of people.
+The commonest comparison there is: 1 number, and 2 groups of people.
 
-![](figures/survey-two-group.png)
+![The In person or online survey: a required question on how the
+respondent attended, with 2 options, and a number field for how many
+sessions they attended.](figures/survey-two-group.png)
 
 ``` r
 
 tg <- sframe_demo("two_group")
 res <- run_analysis_plan(tg$responses, tg$instrument)
 for (b in res) cat(b$test, ": ", b$apa, "\n", sep = "")
-#> t_test_ind: t(57.89) = 3.36, p = .001, d = 0.87, 95% CI [0.40, 1.35], higher in In person
-#> mann_whitney: U = 626, z = 2.63, p = .009, r = .34, 95% CI [.11, .54], Hodges-Lehmann shift = 2.00, 95% CI [0.00, 3.00], higher in In person
 ```
 
 Both tests are shown for teaching. In a real study, predeclare the
@@ -174,7 +158,9 @@ label it as such when reporting both.
 
 ### The same people, measured twice
 
-![](figures/survey-paired.png)
+![The Before and after the workshop survey: 2 sliders from 0 to 100 for
+confidence before today and now, then 2 yes or no questions on
+recommending the event before today and now.](figures/survey-paired.png)
 
 ``` r
 
@@ -182,14 +168,13 @@ pr <- sframe_demo("paired")
 for (b in run_analysis_plan(pr$responses, pr$instrument)) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
-#> t_test_pair: t(49) = -5.11, p < .001, d_z = -0.72, 95% CI [-1.00, -0.49], higher in "And now? (0 to 100)"
-#> wilcoxon_pair: V = 156, z = -4.31, p < .001, r = -.63, 95% CI [-.78, -.43], pseudomedian = -7.50, 95% CI [-12.00, -4.00], higher in "And now? (0 to 100)"
-#> mcnemar: McNemar's chi-square(1) = 11.08, p < .001
 ```
 
 ### Three groups, a second factor, and a covariate
 
-![](figures/survey-multi-group.png)
+![The Who attends the most survey: role with 3 options (student,
+practitioner, academic), how the respondent attended, age, and number of
+sessions attended.](figures/survey-multi-group.png)
 
 ``` r
 
@@ -197,8 +182,6 @@ mg <- sframe_demo("multi_group")
 for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
   cat(b$test, ": ", b$apa, "\n", sep = "")
 }
-#> anova_one: F(2, 72) = 7.27, p = .001, η² = .168, 95% CI [.03, .31]
-#> kruskal_wallis: H(2) = 12.01, p = .002, η² = .139, 95% CI [.03, .32]
 ```
 
 `repeated` and `categorical` follow the same shape. See
@@ -208,15 +191,15 @@ for (b in run_analysis_plan(mg$responses, mg$instrument)[1:2]) {
 
 ### A scale, and whether it holds together
 
-![](figures/survey-likert-scale.png)
+![The Was the event well organised survey: 4 statements, each rated on 5
+labelled buttons from 1, strongly disagree, to 5, strongly
+agree.](figures/survey-likert-scale.png)
 
 ``` r
 
 ls_demo <- sframe_demo("likert_scale")
 rel <- sframe_reliability_results(ls_demo$responses, ls_demo$instrument)
 as.data.frame(rel)[, c("scale_id", "n_items", "alpha")]
-#>       scale_id n_items     alpha
-#> 1 organisation       4 0.8473312
 ```
 
 One item is reverse worded and declared with `reverse = TRUE`, so
@@ -225,24 +208,24 @@ scoring handles it and remembers for you.
 ### Factor structure, and a path model
 
 `factor_structure` asks whether the data supports the factors you
-assumed. `sem_pls` declares three constructs and a path model, and
-generates the syntax for both lavaan and seminr. The model type decides
-which: asking for PLS syntax from a covariance-based model is refused,
-because it would estimate a different model from the one you declared.
+assumed. `sem_pls` declares 3 constructs and a path model, and generates
+the syntax for both lavaan and seminr. The model type decides which:
+asking for PLS syntax from a covariance-based model is refused, because
+it would estimate a different model from the one you declared.
 
 ``` r
 
 sem <- sframe_demo("sem_pls")
 vapply(sframe_get_models(sem$instrument), function(m) m$type, character(1))
-#>        m1        m2        m3 
-#>  "cb_sem" "pls_sem"     "cfa"
 ```
 
 ## Question types worth meeting
 
 ### A matrix item, and the columns it becomes
 
-![](figures/survey-matrix-likert.png)
+![The Rate each session survey: a grid with 4 sessions as rows and 5
+rating columns from poor to excellent, then a question on how the
+respondent attended.](figures/survey-matrix-likert.png)
 
 A matrix does not write one column named after the item. It **expands**,
 one column per row:
@@ -251,8 +234,6 @@ one column per row:
 
 ml <- sframe_demo("matrix_likert")
 grep("^session__", names(ml$responses), value = TRUE)
-#> [1] "session__Opening keynote" "session__Workshop A"     
-#> [3] "session__Workshop B"      "session__Closing panel"
 ```
 
 `multiple_choice` and `ranking` expand the same way, one column per
@@ -261,20 +242,20 @@ option. See `sframe_demo("multi_response")`.
 **A trap worth knowing.** When a matrix row label contains a space, the
 column does too, and
 [`read.csv()`](https://rdrr.io/r/utils/read.table.html) will quietly
-rewrite `session__Opening keynote` as `session__Opening.keynote`, which
-no longer matches the contract the instrument declares. Read with
+rewrite `session__Reading materials` as `session__Reading.materials`,
+which no longer matches the contract the instrument declares. Read with
 `check.names = FALSE`.
 
 ### Questions only some people see
 
-![](figures/survey-branching.png)
+![The Questions that depend on who you are survey: 1 required question,
+what brought you here, with 4 options. Later questions appear only for
+some answers.](figures/survey-branching.png)
 
 ``` r
 
 br <- sframe_demo("branching")
 sframe_get_branches(br$instrument)[[1]]
-#> <sf_branch: sessions_attended>
-#>   Rule: show when attendee_type %in% delegate, speaker
 ```
 
 A blank left by skip logic is **structural**, not missing data. The
@@ -290,12 +271,6 @@ tf <- run_analysis_plan(ot$responses, ot$instrument)[[1]]
 #> Warning in stm::stm(prepped$documents, prepped$vocab, K = k, verbose = FALSE):
 #> K=2 is equivalent to a unidimensional scaling model which you may prefer.
 head(tf$table, 5)
-#>        term  n  pct
-#> 1  sessions 28 10.6
-#> 2 excellent 22  8.3
-#> 3      well 21  8.0
-#> 4      good 19  7.2
-#> 5    useful 19  7.2
 ```
 
 ## Make it yours
@@ -308,52 +283,6 @@ instrument:
 ``` r
 
 sframe_demo("two_group", branded = TRUE)$instrument$render
-#> $mode
-#> [1] "standard"
-#> 
-#> $theme
-#> [1] "#2563eb"
-#> 
-#> $submit_label
-#> [1] "Send my feedback"
-#> 
-#> $welcome
-#> $welcome$title
-#> [1] "Thank you for coming"
-#> 
-#> $welcome$intro_text
-#> [1] "This takes about 3 minutes. Your answers help us plan next year's event."
-#> 
-#> $welcome$consent_text
-#> [1] "I am happy for my answers to be used in the event report."
-#> 
-#> $welcome$consent_required
-#> [1] TRUE
-#> 
-#> $welcome$start_label
-#> [1] "Start"
-#> 
-#> 
-#> $thankyou
-#> $thankyou$message
-#> [1] "Thank you for your feedback."
-#> 
-#> $thankyou$redirect_url
-#> [1] ""
-#> 
-#> $thankyou$show_download
-#> [1] TRUE
-#> 
-#> 
-#> $header
-#> $header$institution
-#> [1] "Riverside Conference Centre"
-#> 
-#> $header$logo_base64
-#> [1] ""
-#> 
-#> $header$show_progress
-#> [1] TRUE
 ```
 
 Applied to any demo with `branded = TRUE`, which leaves the files on
@@ -367,11 +296,16 @@ sframe_demo("two_group", branded = TRUE)
 Plain, then the welcome page a respondent meets first, then the
 questions:
 
-![](figures/presentation-plain.png)
+![The plain Event feedback survey: all 4 questions on 1 page with a
+Submit button and no branding.](figures/presentation-plain.png)
 
-![](figures/presentation-welcome.png)
+![A welcome page headed Thank you for coming, with the Riverside
+Conference Centre name, the expected time, a consent checkbox and a
+Start button.](figures/presentation-welcome.png)
 
-![](figures/presentation-branded.png)
+![The same 4 questions in the branded version: the conference centre
+name above the title and a Send my feedback
+button.](figures/presentation-branded.png)
 
 Consent is enforced: with `consent_required = TRUE`, pressing Start
 without ticking the box refuses to continue.
@@ -381,17 +315,21 @@ without ticking the box refuses to continue.
 `render$mode` takes `"standard"`, which is everything on one page, or
 `"conversational"`, which is one question at a time with a progress bar.
 
-![](figures/presentation-conversational.png)
+![Conversational mode: 1 question per screen, here question 1 of 6 with
+2 options, a progress bar at the top and a Next
+button.](figures/presentation-conversational.png)
 
 Conversational mode works with skip logic, which is the combination most
 likely to surprise: a hidden question is stepped over without leaving
 the respondent on a blank card.
 
-![](figures/presentation-conversational-branching.png)
+![Conversational mode with skip logic: question 1 of 3, what brought you
+here, with 4 options and a Next
+button.](figures/presentation-conversational-branching.png)
 
 ## Collect responses, and share the results
 
-Three routes, and the same instrument serves all three.
+3 routes, and the same instrument serves all 3.
 
 ``` r
 
@@ -412,7 +350,7 @@ Then the report:
 render_report(demo$instrument, demo$responses, output_path = "report.html")
 ```
 
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 prefers Quarto and falls back to a built-in HTML writer. **It tells you
 which one it used**, in a message, in an `engine` attribute on the path
 it returns, and in the report itself beside the instrument hash and the
@@ -434,10 +372,6 @@ leaves nobody able to tell which version a respondent saw.
 rev <- sframe_demo("instrument_revision")
 log <- as.data.frame(sframe_get_amendments(rev$instrument))
 log[, c("reason_code", "tier", "reason_text")]
-#>           reason_code   tier
-#> 1 instrument_revision design
-#>                                                                                                                              reason_text
-#> 1 Reworded the open question after a face-validity pass: readers were listing several changes at once, so the answers were hard to code.
 ```
 
 The amendment carries a reason code, a tier, an author and a deviation
@@ -455,7 +389,7 @@ v <- sframe_demo("verification")
 tampered <- file.path(dirname(v$instrument_path), "verification_tampered.sframe")
 read_sframe(tampered)
 #> Error in `sframe_abort_import()`:
-#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: 877b33e87b80d59a41ad05e2cddc248c0e8d5a37758b8cc726d7c230608f1aaa. Stored hash: 1d3995afbed68c4dd487204430f214cb98f9a792822064a5f2833fc2bde54d42.
+#> ! Integrity check failed for '/home/runner/work/_temp/Library/surveyframe/extdata/demos/verification_tampered.sframe'. The file may have been modified after it was written. Expected hash: 47782aa2fb0b2d2ad1f23fd31aac7f7d502f85b7669f2c6679b8fc1b9c6335a1. Stored hash: 3db2149ca3c347d2f503c525ee9704fcb302fcf5887585e6cd211c9a0b8c9a12.
 ```
 
 The altered file refuses to load because its content no longer matches
@@ -468,17 +402,14 @@ documentation site’s **Verify a file** page.
 
 Good. Please check us against the software you already trust.
 
-Every demo ships four things: the instrument, the response data, a
-codebook of variable and value labels, and the results surveyframe
-produced.
+Every demo ships 4 things: the instrument, the response data, a codebook
+of variable and value labels, and the results surveyframe produced.
 
 ``` r
 
 d <- sframe_demo("two_group")
 basename(unlist(d[c("instrument_path", "responses_path",
                     "codebook_path", "results_path")]))
-#> [1] "two_group.sframe"        "two_group_responses.csv"
-#> [3] "two_group_codebook.csv"  "two_group_results.csv"
 ```
 
 Take them into `psych`, SPSS, JASP, jamovi or Stata, run the same test,

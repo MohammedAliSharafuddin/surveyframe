@@ -1,0 +1,49 @@
+# How to compare the same people before and after
+
+Compare answers from the same respondents before and after an activity.
+
+The example in this guide is *Before and after the workshop*. A pre and
+post training evaluation: participants rate their confidence, and say
+whether they would recommend the training, before and after it.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `paired`.
+2.  On **Design**, see the 2 confidence sliders, before and now. Each
+    respondent answers both, so the pair stays in 1 row.
+3.  On **Design**, choose **Plan**: the paired t-test and the Wilcoxon
+    test compare the sliders, and McNemar’s test compares the 2 yes or
+    no answers.
+4.  On **Analyse**, run the plan and report the change with its effect
+    size.
+
+![The Design screen with the Before and after the workshop study
+open.](../../templates/paired/design.png)
+
+The Design screen with the Before and after the workshop study open.
+
+## In R
+
+``` r
+
+d <- sframe_demo("paired")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Did confidence change from before to after the training? | Paired samples t-test | The APA 7 sentence and a table, with a chart where the method has one |
+| Did confidence change, without assuming normality? | Wilcoxon signed-rank test | The APA 7 sentence and a table, with a chart where the method has one |
+| Did willingness to recommend change? | McNemar test | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

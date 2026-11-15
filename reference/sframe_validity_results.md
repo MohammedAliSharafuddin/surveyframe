@@ -29,8 +29,8 @@ sframe_validity_results(
   Optional named list, one element per construct, each a data.frame of
   that construct's item-level responses. When supplied, `htmt` is the
   Henseler heterotrait-monotrait ratio: the mean absolute
-  heterotrait-heteromethod correlation over the geometric mean of the
-  two constructs' mean absolute monotrait-heteromethod correlations.
+  heterotrait-heteromethod correlation over the geometric mean of the 2
+  constructs' mean absolute monotrait-heteromethod correlations.
   Constructs with a single item have no monotrait correlations, so their
   HTMT entries are `NA`. Without this argument, `htmt` falls back to the
   absolute inter-construct correlation matrix from `construct_scores`
@@ -44,15 +44,15 @@ An object of class `sframe_validity_report`.
 ## See also
 
 Other Analyse functions:
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
 
 ## Examples
 
@@ -63,7 +63,4 @@ loadings <- list(
 )
 vr <- sframe_validity_results(loadings)
 vr$reliability
-#>     construct composite_reliability       AVE n_items
-#> sat       sat             0.8217148 0.6974500       2
-#> sq         sq             0.8203234 0.6036333       3
 ```

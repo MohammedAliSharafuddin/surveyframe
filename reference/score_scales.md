@@ -54,25 +54,25 @@ a message naming it and how many answers held it, and a reversed item is
 reversed on the run's ends (1 + 5 - x). A set with 2 equally long runs,
 such as 1, 2, 4, 5, has no clear run, and its scale is refused with an
 error.
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
 notes such a choice set. Before 0.4.3 every numeric code was a score, so
 the reversal point moved to 1 + 99 and a 99 entered the mean.
 
 ## See also
 
-[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md)
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
 
 Other Analyse functions:
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 
 ## Examples
 
@@ -99,5 +99,4 @@ responses <- data.frame(
 
 scored <- score_scales(responses, instr)
 scored$sat
-#> [1] 4.000000 4.666667 3.000000
 ```

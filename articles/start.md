@@ -1,0 +1,92 @@
+# Get started with surveyframe
+
+SurveyStudio is surveyframe’s visual workspace. It opens from RStudio,
+so the setup has 3 parts: R, RStudio and the surveyframe package. All 3
+are free. Setup takes about 15 minutes the first time.
+
+## What you need
+
+- A computer running Windows, macOS or Linux, with permission to install
+  software.
+- An internet connection for the installation.
+
+## 1. Install R
+
+Download R for your system from [CRAN](https://cran.r-project.org/) and
+run the installer with its default settings.
+
+## 2. Install RStudio
+
+Download RStudio Desktop from
+[Posit](https://posit.co/download/rstudio-desktop/) and run the
+installer. Then open RStudio. Its window has a pane named **Console**,
+usually at the bottom left, with a `>` prompt.
+
+## 3. Install surveyframe
+
+Click in the Console beside the `>` prompt, paste this line and press
+Enter:
+
+``` r
+
+install.packages("surveyframe")
+```
+
+R downloads surveyframe and the packages it uses. This takes a few
+minutes. The installation has finished when the `>` prompt returns. The
+**Addins** menu in RStudio’s toolbar now lists the surveyframe commands.
+
+## 4. Open an example study
+
+In RStudio, open the **Addins** menu, choose **surveyframe: Try a demo**
+and pick a study. It opens in SurveyStudio on the Design screen, with
+its questionnaire, analysis plan and demonstration responses loaded, so
+every stage has something to show.
+
+![SurveyStudio’s Design screen with the training evaluation example
+open: the questionnaire’s questions are listed in the centre and the
+screens in the left menu.](../templates/paired/design.png)
+
+SurveyStudio’s Design screen with the training evaluation example open:
+the questionnaire’s questions are listed in the centre and the screens
+in the left menu.
+
+## 5. Start your own study from a template
+
+Each [questionnaire
+template](https://surveyframe.org/articles/templates.md) has a
+**download the instrument (.sframe)** link. To make it your own study:
+
+1.  Download the `.sframe` file from the template page and save it in
+    your project folder.
+2.  In RStudio, open the **Addins** menu and choose **surveyframe: Open
+    analysis workspace**.
+3.  In SurveyStudio’s left menu, choose **Open Instrument**, then
+    **Browse .sframe file**, and select the file.
+4.  On the Design screen, edit the title, the questions and the answer
+    options for your study. Choose **Plan** to adapt the research
+    questions, then press **Save to Studio**.
+5.  On the Report screen, press **Download copy** to save your study as
+    a new `.sframe` file. If SurveyStudio offers **Save as a new
+    instrument**, tick it, since your study starts a new record. This is
+    the file to keep, share with your supervisor and use to collect
+    responses.
+
+The downloaded template has no responses. Your own responses arrive once
+you collect them, as [Run a study in
+SurveyStudio](https://surveyframe.org/articles/run-a-study-in-surveystudio.md)
+shows.
+
+## What next
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md), grouped by
+  field.
+- [Run a study in
+  SurveyStudio](https://surveyframe.org/articles/run-a-study-in-surveystudio.md):
+  the 5 stages with screenshots, by point and click.
+- [Run a study in
+  R](https://surveyframe.org/articles/run-a-study-in-r.md): the same
+  stages in R code.
+- [Frequently asked
+  questions](https://surveyframe.org/articles/learn/faq.md).

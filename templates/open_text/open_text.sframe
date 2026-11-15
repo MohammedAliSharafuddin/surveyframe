@@ -1,0 +1,274 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "8b7793fd1757b614c2d6fdc9706e0766fd6feb9dc9692cf5c3c1da8e8605bb70",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "What worked, and what to change",
+    "version": "1.0.0",
+    "description": "An open-ended feedback study: what attendees say worked and what to change, analysed as text.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:51Z"
+  },
+  "items": [
+    {
+      "id": "format",
+      "label": "How did you attend?",
+      "type": "single_choice",
+      "required": true,
+      "choice_set": "fmt",
+      "reverse": false
+    },
+    {
+      "id": "what_worked",
+      "label": "What worked well?",
+      "type": "textarea",
+      "required": false,
+      "reverse": false
+    },
+    {
+      "id": "what_to_improve",
+      "label": "What should we change?",
+      "type": "textarea",
+      "required": false,
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "fmt",
+      "values": ["in_person", "online"],
+      "labels": ["In person", "Online"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "Which words come up most often?",
+      "family": "text",
+      "method": "term_freq",
+      "roles": {
+        "item": "what_worked"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "term_freq",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "And which pairs of words?",
+      "family": "text",
+      "method": "ngram_freq",
+      "roles": {
+        "item": "what_worked"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "ngram_freq",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "How is a key word actually used?",
+      "family": "text",
+      "method": "term_context",
+      "roles": {
+        "item": "what_worked"
+      },
+      "options": {
+        "term": "sessions"
+      },
+      "objective": "O1",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "term_context",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ4",
+      "research_question": "Which words appear together?",
+      "family": "text",
+      "method": "co_occurrence",
+      "roles": {
+        "item": "what_worked"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "co_occurrence",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ5",
+      "research_question": "Do in-person and online attendees say different things?",
+      "family": "text",
+      "method": "term_freq",
+      "roles": {
+        "item": "what_to_improve",
+        "group": "format"
+      },
+      "objective": "O2",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "term_freq",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ6",
+      "research_question": "Which words cluster together?",
+      "family": "text",
+      "method": "co_occurrence_network",
+      "roles": {
+        "item": "what_worked"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "co_occurrence_network",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ7",
+      "research_question": "Is the tone positive or negative?",
+      "family": "text",
+      "method": "tidy_sentiment",
+      "roles": {
+        "item": "what_to_improve"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "tidy_sentiment",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ8",
+      "research_question": "What does a document-feature matrix show?",
+      "family": "text",
+      "method": "quanteda_dfm",
+      "roles": {
+        "item": "what_worked"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "quanteda_dfm",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ9",
+      "research_question": "What topics are people writing about?",
+      "family": "text",
+      "method": "topic_model_lda",
+      "roles": {
+        "item": "what_to_improve"
+      },
+      "options": {
+        "k": 2
+      },
+      "objective": "O1",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "topic_model_lda",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ10",
+      "research_question": "The same question with a structural topic model.",
+      "family": "text",
+      "method": "stm_topics",
+      "roles": {
+        "item": "what_to_improve"
+      },
+      "options": {
+        "k": 2
+      },
+      "objective": "O1",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "stm_topics",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "What worked, and what to change",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "Rating questions tell organisers how much attendees liked the event, not why. The open answers hold the reasons.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe the words and topics in what worked and what to change."
+      },
+      {
+        "id": "O2",
+        "text": "Compare what in-person and online attendees write."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a hybrid conference",
+      "method": "convenience",
+      "planned_n": 80
+    }
+  }
+}

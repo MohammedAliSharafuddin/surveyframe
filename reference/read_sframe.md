@@ -24,7 +24,7 @@ read_sframe(path = NULL, validate = TRUE, text = NULL, verify = TRUE)
 - validate:
 
   Logical. Whether to validate the loaded instrument with
-  [`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md).
+  [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md).
   Defaults to `TRUE`. This controls structural validation only. `verify`
   controls the integrity hash.
 
@@ -56,8 +56,7 @@ again. A file naming any other form is refused, since it needs a newer
 surveyframe.
 
 The instrument remembers the content and amendment log it was read with,
-so
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+so [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 can refuse an undisclosed revision.
 
 ## Unverified reads
@@ -67,7 +66,7 @@ which it would otherwise rebuild by hand and lose fields doing so. The
 result carries the attribute `sframe_verified`, `FALSE` (it is `TRUE` on
 every verified read), and [`print()`](https://rdrr.io/r/base/print.html)
 says so.
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 refuses to write an unverified instrument unless `new_instrument = TRUE`
 declares it new, since nothing ties its content to a state anyone wrote.
 That holds with the amendment log it was read with too, since the log
@@ -75,29 +74,29 @@ was read unchecked: a sign-off, a tier or a timestamp edited as text
 would otherwise be written back and read verified. A new instrument
 starts a new log, so clear the old one first with
 `instrument$amendments <- list()`. No amendment can start from it:
-[`amend_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/amend_sframe.md)
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
 refuses it.
 
 ## See also
 
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md),
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md)
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
 
 Other Design functions:
-[`as_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/as_sframe.md),
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md),
-[`sframe_branch()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_branch.md),
-[`sframe_choice_set()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_choice_set.md),
-[`sframe_conjoint_design()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_conjoint_design.md),
-[`sframe_get_study()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_get_study.md),
-[`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md),
-[`sframe_item()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item.md),
-[`sframe_sampling_methods()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_sampling_methods.md),
-[`sframe_scale()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_scale.md),
-[`sframe_validation`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validation.md),
-[`validate_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/validate_sframe.md),
-[`write_sframe()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/write_sframe.md)
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md),
+[`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md),
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
 
 ## Examples
 
@@ -107,11 +106,4 @@ instr <- read_sframe(
               package = "surveyframe")
 )
 print(instr)
-#> <sframe>
-#>   Title:      Tourism Services Experience Demo
-#>   Version:    0.3.0
-#>   Items:      15
-#>   Scales:     5
-#>   Analysis:   34 blocks
-#>   Status:     valid
 ```

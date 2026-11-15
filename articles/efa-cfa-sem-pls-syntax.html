@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>EFA, CFA, CB-SEM, and PLS-SEM syntax generation • surveyframe</title>
+<title>EFA, CFA, CB-SEM, and PLS-SEM syntax generation: surveyframe</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="EFA, CFA, CB-SEM, and PLS-SEM syntax generation">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="EFA, CFA, CB-SEM, and PLS-SEM syntax generation: surveyframe">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,6 +38,7 @@
   }
 }
 </script>
+<link rel="canonical" href="https://surveyframe.org/articles/efa-cfa-sem-pls-syntax.html" />
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -56,12 +57,49 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../articles/surveyframe.html">Get started</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-templates" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Templates</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-templates">
+<li><a class="dropdown-item" href="../articles/templates.html#psychology">Psychology and measurement</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#education">Education</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#business">Business</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#events-tourism">Events and tourism</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html#research-methods">Research methods</a></li>
+    <li><a class="dropdown-item" href="../articles/templates.html">All questionnaire templates</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="../articles/start.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-learn" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Learn</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-learn">
+<li><a class="dropdown-item" href="../articles/learn/for-students.html">Guidance for survey students</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-supervisors.html">Guidance for supervisors</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-ethics-committees.html">Guidance for ethics committees</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/for-research-organisations.html">Guidance for NGOs and research organisations</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-surveystudio.html">Run a study in SurveyStudio</a></li>
+    <li><a class="dropdown-item" href="../articles/run-a-study-in-r.html">Run a study in R</a></li>
+    <li><a class="dropdown-item" href="../articles/guides.html">How-to guides</a></li>
+    <li><a class="dropdown-item" href="../articles/docs.html">Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/question-types.html">Choosing questions for your survey</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/analysis-plan.html">The analysis plan</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/register-on-osf.html">Register your plan on OSF</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/choosing-a-survey-tool.html">Choosing a survey tool</a></li>
+    <li><a class="dropdown-item" href="../articles/learn/faq.html">Frequently asked questions</a></li>
+  </ul>
+</li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-r-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">R reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-r-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/index.html">Articles</a></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../verify/" aria-label="Verify a .sframe file's integrity hash">Verify a file</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/cite.html">Cite</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/MohammedAliSharafuddin/surveyframe" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
@@ -104,17 +142,16 @@ pre.sourceCode a:empty { display: none; }
 </style>
 <p>The model is the third part of the research design. surveyframe
 stores the measurement and structural specification and writes the
-syntax for the modelling stage. It does not fit the models. This
-vignette builds the three models from the published Thailand study
-(Sharafuddin, Madhavan, and Wangtueai 2024). The syntax steps need no
-raw data, so every chunk below runs as written.</p>
-<p>There are five constructs. Digital marketing effectiveness (DME) is
+syntax for the modelling stage, and you fit the models with lavaan or
+seminr. This vignette builds the 3 models from the published Thailand
+study (Sharafuddin, Madhavan, and Wangtueai 2024). The syntax steps need
+no raw data, so every chunk below runs as written.</p>
+<p>There are 5 constructs. Digital marketing effectiveness (DME) is
 built from relevance and engagement (DMRE), accessibility and usefulness
 (DMAU), ease of use (DMEU), and perceived value (DMPV). Destination
 service quality (DSQ) is built from accommodation (DSQA) and local
-transport (DSQT). The remaining three are destination sustainability
-quality (DSUQ), tourist satisfaction (TS), and behavioural intention
-(BI).</p>
+transport (DSQT). The remaining 3 are destination sustainability quality
+(DSUQ), tourist satisfaction (TS), and behavioural intention (BI).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dmre</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmre_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span>; <span class="va">dmau</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmau_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">dmeu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmeu_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>; <span class="va">dmpv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"dmpv_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
@@ -138,10 +175,9 @@ before the confirmatory model.</p>
 <div class="section level2">
 <h2 id="cfa-syntax-the-lower-order-measurement-model">CFA syntax: the lower-order measurement model<a class="anchor" aria-label="anchor" href="#cfa-syntax-the-lower-order-measurement-model"></a>
 </h2>
-<p>The confirmatory measurement model has the nine lower-order
-constructs as reflective factors. <code><a href="../reference/sframe_syntax_cfa.html">sframe_syntax_cfa()</a></code>
-writes lavaan syntax from a model object, with no need for lavaan at
-this stage.</p>
+<p>The confirmatory measurement model has the 9 lower-order constructs
+as reflective factors. <code><a href="../reference/sframe_syntax_cfa.html">sframe_syntax_cfa()</a></code> writes lavaan
+syntax from a model object, with no need for lavaan at this stage.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">construct_def</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  DMRE <span class="op">=</span> <span class="va">dmre</span>, DMAU <span class="op">=</span> <span class="va">dmau</span>, DMEU <span class="op">=</span> <span class="va">dmeu</span>, DMPV <span class="op">=</span> <span class="va">dmpv</span>,</span>
@@ -192,9 +228,9 @@ this stage.</p>
 <div class="section level2">
 <h2 id="cb-sem-syntax-the-structural-model">CB-SEM syntax: the structural model<a class="anchor" aria-label="anchor" href="#cb-sem-syntax-the-structural-model"></a>
 </h2>
-<p>The covariance-based reading treats the five constructs as
-first-order reflective factors over their full item sets, with the nine
-direct paths and the four indirect effects from the hypotheses.
+<p>The covariance-based reading treats the 5 constructs as first-order
+reflective factors over their full item sets, with the 9 direct paths
+and the 4 indirect effects from the hypotheses.
 <code><a href="../reference/sframe_syntax_sem.html">sframe_syntax_sem()</a></code> writes the measurement, structural, and
 indirect-effect lines.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -260,7 +296,7 @@ indirect-effect lines.</p>
 <div class="section level2">
 <h2 id="pls-sem-syntax-the-two-stage-higher-order-model">PLS-SEM syntax: the two-stage higher-order model<a class="anchor" aria-label="anchor" href="#pls-sem-syntax-the-two-stage-higher-order-model"></a>
 </h2>
-<p>The published study used PLS-SEM with a two-stage treatment of the
+<p>The published study used PLS-SEM with a 2-stage treatment of the
 higher-order constructs. The second stage models digital marketing
 effectiveness and service quality as composites of their lower-order
 construct scores, then estimates the structural paths.
@@ -402,7 +438,7 @@ or <code><a href="https://rdrr.io/pkg/lavaan/man/sem.html" class="external-link"
 handling, and missing-data treatment. The generated seminr syntax is
 copied into a script where seminr is installed and the bootstrap
 settings and construct modes are set. The published study fitted the
-two-stage PLS model in seminr with 1000 bootstrap resamples.</p>
+2-stage PLS model in seminr with 1000 bootstrap resamples.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

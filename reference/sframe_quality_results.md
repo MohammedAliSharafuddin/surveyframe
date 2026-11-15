@@ -27,12 +27,12 @@ sframe_quality_results(
 - data:
 
   A `tibble` or `data.frame` of responses, typically produced by
-  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md).
+  [`read_responses()`](https://surveyframe.org/reference/read_responses.md).
 
 - instrument:
 
   An `sframe` object created by
-  [`sframe_instrument()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_instrument.md).
+  [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md).
 
 - respondent_id:
 
@@ -69,9 +69,9 @@ sframe_quality_results(
   exactly what a genuinely consistent respondent does, this is not
   evidence of inattention on its own, and checking scales that short
   flags a large share of honest respondents (see the worked example in
-  [`vignette("surveyframe")`](https://mohammedalisharafuddin.github.io/surveyframe/articles/surveyframe.md),
-  where 3 two-item scales alone drove a 91 percent flag rate before this
-  threshold existed). Set to `2` to restore the previous, more
+  [`vignette("surveyframe")`](https://surveyframe.org/articles/surveyframe.md),
+  where 3 scales of 2 items alone drove a 91 percent flag rate before
+  this threshold existed). Set to `2` to restore the previous, more
   permissive behaviour. Many published scales have 3 items, and the
   default leaves them unchecked. Set `3` to check them, and read a flag
   on a 3-item scale as a prompt to look at the respondent, since
@@ -101,16 +101,16 @@ the recognised defaults: `started_at`, `start_time`, `started`, or
 
 ## See also
 
-[`sframe_attention_check()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_attention_check.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md)
+[`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
 
 Other Responses functions:
-[`export_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_responses.md),
-[`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md),
-[`sframe_missing_data_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_missing_data_results.md),
-[`sframe_outlier_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_outlier_results.md)
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md),
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md)
 
 ## Examples
 
@@ -136,19 +136,4 @@ qr <- sframe_quality_results(
   straightline_scales = FALSE
 )
 print(qr)
-#> Survey Data Quality Report
-#>   Respondents:  120
-#>   Items:        15
-#>   Flagged:      6 (5.0%)
-#> 
-#> Attention checks:
-#>   attention_agree      pass 95%  fail 6
-#> 
-#> Timing:
-#>   Median completion time: 966.0 seconds
-#> 
-#> Missingness:  0.0% of respondents exceed 20% threshold
-#> 
-#> Duplicates:
-#>   0 duplicate response rows, 0 rows flagged
 ```

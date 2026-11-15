@@ -1,0 +1,120 @@
+# Measure how answers go together
+
+[Documentation](https://surveyframe.org/articles/docs.md) /
+[Methods](https://surveyframe.org/articles/docs.html#methods)
+
+These methods measure how strongly 2 numeric or ordered answers move
+together, and whether that holds with a third held constant.
+
+**Assumptions.** Pearson’s r assumes a straight-line relation, the rank
+correlations a steady direction. A correlation shows association, and a
+claim of cause needs a design that tests it.
+
+In SurveyStudio, open **Plan** on the Design screen, add a research
+question and choose the method. Set 2 numeric or ordered answers.
+Partial correlation takes a third answer to hold constant. Declare the
+hypotheses and the decision rule before collecting responses.
+
+## Pearson correlation
+
+![SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Pearson correlation research question, from the correlation_regression
+demo.](../../../docs/methods/correlation_pearson.png)
+
+SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Pearson correlation research question, from the `correlation_regression`
+demo.
+
+In the pre-analysis plan:
+
+> **RQ1.** Do use of the service and perceived value go together? **Null
+> hypothesis (H0):** Use and perceived value are not correlated.
+> **Alternative hypothesis (H1):** Use and perceived value are
+> correlated. **Planned decision rule:** Reject H0 if p \< .05, and
+> report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence and a table, with a chart where the
+method has one, each titled with the research question.
+
+References: Field, A. (2018). *Discovering statistics using IBM SPSS
+statistics* (5th ed.). SAGE. Cohen, J. (1988). *Statistical power
+analysis for the behavioral sciences* (2nd ed.). Lawrence Erlbaum.
+
+## Spearman rank correlation
+
+![SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Spearman rank correlation research question, from the
+correlation_regression
+demo.](../../../docs/methods/correlation_spearman.png)
+
+SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Spearman rank correlation research question, from the
+`correlation_regression` demo.
+
+In the pre-analysis plan:
+
+> **RQ2.** Do use and perceived value go together on ranks? **Null
+> hypothesis (H0):** Use and perceived value are not rank-correlated.
+> **Alternative hypothesis (H1):** Use and perceived value are
+> rank-correlated. **Planned decision rule:** Reject H0 if p \< .05 on
+> this rank-based test, and report the effect size with its 95%
+> confidence interval.
+
+In the report: the APA 7 sentence and a table, with a chart where the
+method has one, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the
+behavioral sciences* (2nd ed.). Lawrence Erlbaum. Spearman, C. (1904).
+The proof and measurement of association between two things. *The
+American Journal of Psychology*, *15*(1), 72-101.
+
+## Kendall rank correlation
+
+![SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Kendall rank correlation research question, from the
+correlation_regression
+demo.](../../../docs/methods/correlation_kendall.png)
+
+SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Kendall rank correlation research question, from the
+`correlation_regression` demo.
+
+In the pre-analysis plan:
+
+> **RQ3.** Do use and perceived value go together, by Kendall’s tau?
+> **Null hypothesis (H0):** Use and perceived value are not associated
+> by Kendall’s tau. **Alternative hypothesis (H1):** Use and perceived
+> value are associated by Kendall’s tau. **Planned decision rule:**
+> Reject H0 if p \< .05 on this rank-based test, and report the effect
+> size with its 95% confidence interval.
+
+In the report: the APA 7 sentence and a table, with a chart where the
+method has one, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the
+behavioral sciences* (2nd ed.). Lawrence Erlbaum. Kendall, M. G. (1938).
+A new measure of rank correlation. *Biometrika*, *30*(1/2), 81-93.
+
+## Partial correlation
+
+![SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Partial correlation research question, from the correlation_regression
+demo.](../../../docs/methods/partial_correlation.png)
+
+SurveyStudio’s Plan screen with the Edit Analysis Plan dialog for a
+Partial correlation research question, from the `correlation_regression`
+demo.
+
+In the pre-analysis plan:
+
+> **RQ4.** Does the relationship hold once age is held constant? **Null
+> hypothesis (H0):** Holding age constant, use and value are not
+> correlated. **Alternative hypothesis (H1):** Holding age constant, use
+> and value are correlated. **Planned decision rule:** Reject H0 if p \<
+> .05, and report the effect size with its 95% confidence interval.
+
+In the report: the APA 7 sentence and a table, with a chart where the
+method has one, each titled with the research question.
+
+References: Cohen, J. (1988). *Statistical power analysis for the
+behavioral sciences* (2nd ed.). Lawrence Erlbaum.

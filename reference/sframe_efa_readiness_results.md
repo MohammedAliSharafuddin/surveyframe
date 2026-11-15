@@ -52,27 +52,27 @@ An object of class `sframe_efa_report` with elements `kmo`, `bartlett`,
 
 This report says whether the data suit a factor analysis and how many
 factors to extract.
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md)
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md)
 then fits that solution and returns the loadings, so the whole route
 stays in surveyframe. Take the result to another package when you want a
 method surveyframe leaves out.
 
 ## See also
 
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_syntax_cfa()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_syntax_cfa.md)
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md)
 
 Other Analyse functions:
-[`run_analysis_plan()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_analysis_plan.md),
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 
 ## Examples
 
@@ -83,15 +83,5 @@ if (requireNamespace("psych", quietly = TRUE)) {
   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
   print(er)
 }
-#> EFA Readiness Diagnostics
-#> 
-#>   Items:          12
-#>   Complete cases: 120
-#>   KMO overall:    0.761
-#>   Bartlett chi-sq: 665.84  df: 66  p: 0.0000
-#>   Suggested factors (parallel analysis): 4
-#>   Planned rotation: oblimin
-#> 
-#> Note: estimate the EFA solution with a dedicated modelling package.
 # }
 ```

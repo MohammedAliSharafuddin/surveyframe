@@ -32,21 +32,22 @@ with a pipe table per component. Save it with
 `writeLines(cb$markdown, "codebook.md")`. With `"html"`,
 [`print()`](https://rdrr.io/r/base/print.html) shows a compact summary,
 and
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 includes the codebook in a full report.
 
 ## See also
 
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
 
 Other Report functions:
-[`render_report()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_report.md),
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`sframe_analysis_qmd()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_analysis_qmd.md),
-[`sframe_format_result()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_format_result.md),
-[`sframe_report_source()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_report_source.md),
-[`sframe_reports`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reports.md),
-[`sframe_save_figures()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_save_figures.md)
+[`render_report()`](https://surveyframe.org/reference/render_report.md),
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`sframe_analysis_qmd()`](https://surveyframe.org/reference/sframe_analysis_qmd.md),
+[`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md),
+[`sframe_report_source()`](https://surveyframe.org/reference/sframe_report_source.md),
+[`sframe_reports`](https://surveyframe.org/reference/sframe_reports.md),
+[`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md),
+[`sframe_show()`](https://surveyframe.org/reference/sframe_show.md)
 
 ## Examples
 
@@ -63,27 +64,8 @@ instr <- sframe_instrument("Demo Survey", components = list(cs, i1, i2, scale))
 
 cb <- sframe_codebook(instr)
 print(cb)
-#> Codebook: Demo Survey v0.1.0
-#>   2 items  |  1 choice sets  |  1 scales
-#> 
-#> Items:
-#>      id  label   type scale_id reverse
-#> 1 sat_1 Item 1 likert      sat   FALSE
-#> 2 sat_2 Item 2 likert      sat   FALSE
 md <- sframe_codebook(instr, format = "md")
 cat(substr(md$markdown, 1, 200))
-#> # Codebook: Demo Survey
-#> 
-#> - **Version:** 0.1.0
-#> - **Languages:** en
-#> 
-#> ## Items
-#> 
-#> | id | label | type | choice_set | scale_id | reverse | required |
-#> |---|---|---|---|---|---|---|
-#> | sat_1 | Item 1 | likert 
 nrow(sframe_get_items(cb))
-#> [1] 2
 nrow(sframe_get_scales(cb))
-#> [1] 1
 ```

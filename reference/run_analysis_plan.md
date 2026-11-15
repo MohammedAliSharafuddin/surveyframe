@@ -25,9 +25,9 @@ run_analysis_plan(
 - data:
 
   A `tibble` or `data.frame` of responses, typically produced by
-  [`read_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_responses.md)
+  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
   or
-  [`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md).
+  [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md).
 
 - instrument:
 
@@ -82,7 +82,7 @@ failed blocks, so check `attr(results, "status")$failed` or use
 interpretation prompt, and reporting-reference metadata. Inferential
 blocks also carry a `$table` data frame suitable for
 [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html). Pass to
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md)
 to generate a formatted report.
 
 ## Cross-tabulations
@@ -95,6 +95,18 @@ of row percentages is the column distribution, and the Total column of
 column percentages is the row distribution. The report then shows each
 count with its percentage beside it, and the chart draws the
 percentages.
+
+## Weights
+
+A frequency, descriptives, cross-tabulation or chi-square block may name
+a case-weight column in its `weights` role. A design weight is set by
+the researcher, not asked of respondents, so it may be a column that is
+not an item:
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
+notes it, and it must then be in the responses, read with
+`read_responses(meta_cols = )`. A block whose weight column is missing,
+or holds a negative, non-finite or non-numeric value, fails with a
+message saying so.
 
 ## How answers are coded
 
@@ -125,29 +137,29 @@ category nobody chose is dropped before a model is fitted.
 
 ## See also
 
-[`render_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/render_results.md),
-[`read_sheet_responses()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/read_sheet_responses.md)
+[`render_results()`](https://surveyframe.org/reference/render_results.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
 
 Other Analyse functions:
-[`score_scales()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/score_scales.md),
-[`sframe_assumption_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_assumption_results.md),
-[`sframe_descriptives_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_descriptives_results.md),
-[`sframe_efa_readiness_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_readiness_results.md),
-[`sframe_efa_solution()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_efa_solution.md),
-[`sframe_item_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_item_results.md),
-[`sframe_posthoc_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_posthoc_results.md),
-[`sframe_reliability_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_reliability_results.md),
-[`sframe_validity_results()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_validity_results.md)
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md),
+[`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md),
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md),
+[`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md),
+[`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md),
+[`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
 
 ## Examples
 
 ``` r
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 responses <- read_responses(
-  system.file("extdata", "tourism_services_responses.csv",
+  system.file("extdata", "demos", "two_group_responses.csv",
               package = "surveyframe"),
   instr,
   respondent_id = "respondent_id",
@@ -157,143 +169,5 @@ responses <- read_responses(
 # \donttest{
 results <- run_analysis_plan(responses, instr)
 print(results)
-#> Analysis Results: 34 research questions
-#> 
-#> RQ 1: Is perceived digital marketing effectiveness associated with tourist satisfaction?
-#>   Test: correlation_pearson
-#>   APA:  r(118) = .54, 95% CI [.40, .65], p < .001
-#> 
-#> RQ 2: Do digital marketing, service quality, and sustainability perceptions predict satisfaction?
-#>   Test: regression_linear
-#>   APA:  R² = .383, F(3, 116) = 23.95, p < .001
-#> 
-#> RQ 3: Do first-time and repeat visitors differ in behavioural intention?
-#>   Test: mann_whitney
-#>   APA:  U = 1576, z = -0.98, p = .326, r = -.09, 95% CI [-.26, .08], Hodges-Lehmann shift = 0.00, 95% CI [-0.50, 0.00], higher in Repeat visitor
-#> 
-#> RQ 4: What is the distribution of first-time and repeat visitors?
-#>   Test: frequency
-#>   APA:  Frequency distribution for "Visitor type" (N = 120).
-#> 
-#> RQ 5: What are the central tendency and spread of all response items?
-#>   Test: descriptives
-#>   APA:  Descriptive statistics were computed for 12 variables.
-#> 
-#> RQ 6: What is the pattern of missing responses across items?
-#>   Test: missing_data
-#>   APA:  Missing-data diagnostics were computed for 12 variables.
-#> 
-#> RQ 7: Do respondents meet attention check and data quality thresholds?
-#>   Test: quality
-#>   APA:  
-#> 
-#> RQ 8: What are the mean, SD, and range of each composite scale?
-#>   Test: descriptives
-#>   APA:  Descriptive statistics were computed for 5 variables.
-#> 
-#> RQ 9: What is the Cronbach alpha internal consistency of each scale?
-#>   Test: reliability_alpha
-#>   APA:  
-#> 
-#> RQ 10: What is the McDonald omega reliability of each scale?
-#>   Test: reliability_omega
-#>   APA:  
-#> 
-#> RQ 11: Which items show low item-total correlations or reduce alpha on removal?
-#>   Test: item_diagnostics
-#>   APA:  
-#> 
-#> RQ 12: Does the inter-item correlation matrix support exploratory factor analysis?
-#>   Test: efa_readiness
-#>   APA:  
-#> 
-#> RQ 13: How many factors emerge from digital marketing and service quality items?
-#>   Test: efa_solution
-#>   APA:  
-#> 
-#> RQ 14: What is the lavaan CFA syntax for the five-factor measurement model?
-#>   Test: cfa_lavaan_syntax
-#>   APA:  CFA lavaan syntax generated.
-#> 
-#> RQ 15: What is the CB-SEM lavaan syntax for digital marketing predicting satisfaction and behavioural intention via service quality?
-#>   Test: sem_lavaan_syntax
-#>   APA:  CB-SEM lavaan syntax generated.
-#> 
-#> RQ 16: What is the PLS-SEM seminr syntax for the full structural model?
-#>   Test: seminr_syntax
-#>   APA:  PLS-SEM seminr syntax generated.
-#> 
-#> RQ 17: Is visitor type associated with attention check response level?
-#>   Test: crosstab
-#>   APA:  χ²(1, N = 120) = 4.31, p = .038, φ = .19, 95% CI [.00, .37]
-#> 
-#> RQ 18: Is the distribution of satisfaction ratings different across visitor types?
-#>   Test: crosstab
-#>   APA:  χ²(4, N = 120) = 3.40, p = .494, V = .17, 95% CI [.00, .29]
-#> 
-#> RQ 19: Is there an association between visitor type and behavioural intention rating?
-#>   Test: fisher_exact
-#>   APA:  Fisher's exact test, p = .454, Cramer's V = .17
-#> 
-#> RQ 20: Do first-time and repeat visitors differ in mean satisfaction score?
-#>   Test: t_test_ind
-#>   APA:  t(106.77) = 0.15, p = .878, d = 0.03, 95% CI [-0.35, 0.40], higher in First-time visitor
-#> 
-#> RQ 21: Do respondents rate the two satisfaction items differently?
-#>   Test: t_test_pair
-#>   APA:  t(119) = 0.82, p = .416, d_z = 0.07, 95% CI [-0.11, 0.27], higher in "Overall, I was satisfied with the tourism experience."
-#> 
-#> RQ 22: Is there a significant distributional difference between the first two service quality items?
-#>   Test: wilcoxon_pair
-#>   APA:  V = 967, z = -1.18, p = .239, r = -.14, 95% CI [-.37, .11], pseudomedian = 0.00, 95% CI [0.00, 0.00], higher in "The service environment was easy to navigate."
-#> 
-#> RQ 23: Does satisfaction differ across visitor types?
-#>   Test: kruskal_wallis
-#>   APA:  H(1) = 0.00, p = .949, η² = .000, 95% CI [.00, .03]
-#> 
-#> RQ 24: Does mean behavioural intention differ between visitor types?
-#>   Test: anova_one
-#>   APA:  F(1, 118) = 0.74, p = .391, η² = .006, 95% CI [.00, .06]
-#> 
-#> RQ 25: Do visitor types differ in satisfaction after controlling for service quality?
-#>   Test: ancova
-#>   APA:  Adjusted for "Service quality", the group effect was F(1, 117) = 0.07, p = .791.
-#> 
-#> RQ 26: Do mean ratings differ across the three digital marketing items within respondents?
-#>   Test: repeated_anova
-#>   APA:  F(2, 238) = 0.40, p = .670, partial η² = .003
-#> 
-#> RQ 27: Do ordinal ratings differ across the three service quality items within respondents?
-#>   Test: friedman
-#>   APA:  Friedman chi-square(2, N = 120) = 1.09, p = .580
-#> 
-#> RQ 28: Are service quality perceptions associated with sustainability perceptions?
-#>   Test: correlation_spearman
-#>   APA:  r_s(118) = .00, 95% CI [-.18, .18], p = .984
-#> 
-#> RQ 29: Is sustainability perception associated with behavioural intention?
-#>   Test: correlation_kendall
-#>   APA:  tau = .05, 95% CI [-.11, .20], p = .519, N = 120
-#> 
-#> RQ 30: Is digital marketing associated with behavioural intention after controlling for satisfaction?
-#>   Test: partial_correlation
-#>   APA:  partial r(117) = -.09, p = .304
-#> 
-#> RQ 31: Do digital marketing and service quality perceptions predict visitor type?
-#>   Test: regression_logistic_binary
-#>   APA:  χ²(2) = 0.28, p = .869, McFadden R² = .002. The odds are of "Visitor type" being Repeat visitor, against First-time visitor.
-#> 
-#> RQ 32: Do digital marketing and sustainability perceptions predict ordered satisfaction?
-#>   Test: regression_logistic_ordinal
-#>   APA:  Ordinal logistic regression of "Overall, I was satisfied with the tourism experience.", ordered Strongly disagree < Disagree < Neither agree nor disagree < Agree < Strongly agree, was estimated with 120 complete cases.
-#> 
-#> RQ 33: Does visitor type moderate the relationship between digital marketing and satisfaction?
-#>   Test: moderation
-#>   APA:  Moderation was tested with a linear interaction model.
-#> 
-#> RQ 34: Does satisfaction mediate the path from digital marketing to behavioural intention?
-#>   Test: mediation
-#>   APA:  Indirect effect = 0.365, 95% bootstrap CI [0.231, 0.535], from 1000 of 1000 resamples.
-#> 
 # }
 ```

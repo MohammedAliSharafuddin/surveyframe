@@ -101,7 +101,7 @@ do not state delivery in it. It appears below the status line in every
 case except a failed send, and defaults to "Thank you for
 participating."
 
-Two settings in the instrument's `render` block suit a host too.
+2 settings in the instrument's `render` block suit a host too.
 `render$thankyou$show_restart = FALSE` hides "Submit another response".
 `render$save_draft = TRUE` keeps the answers in the browser's local
 storage as the respondent goes, under a key drawn from the instrument's
@@ -115,14 +115,14 @@ opening directly from disk.
 
 ## See also
 
-[`launch_studio()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_studio.md),
-[`launch_builder()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/launch_builder.md),
-[`run_survey()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/run_survey.md)
+[`launch_studio()`](https://surveyframe.org/reference/launch_studio.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`run_survey()`](https://surveyframe.org/reference/run_survey.md)
 
 Other Collect functions:
-[`export_google_sheet()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/export_google_sheet.md),
-[`sframe_survey_server()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_server.md),
-[`sframe_survey_ui()`](https://mohammedalisharafuddin.github.io/surveyframe/reference/sframe_survey_ui.md)
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md),
+[`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md),
+[`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md)
 
 ## Examples
 
@@ -139,17 +139,14 @@ instr <- sframe_instrument("Customer Satisfaction Survey",
 # Write to a temp file without opening the browser
 out <- export_survey(instr,
                              output_path = file.path(tempdir(), "sat.html"),
-                             open = FALSE)
-#> Static survey written to '/tmp/RtmpEPGRzn/sat.html' (79.4 KB).
-file.exists(out)
-#> [1] TRUE
+                             open = FALSE, overwrite = TRUE)
+sframe_show(out)
 
 # \donttest{
 # Write to a temp file and open in the default browser
 export_survey(instr,
                      output_path = file.path(tempdir(), "sat_browser.html"),
                      overwrite = TRUE)
-#> Static survey written to '/tmp/RtmpEPGRzn/sat_browser.html' (79.4 KB).
 
 # Write with a Google Apps Script endpoint for server-side collection
 export_survey(
@@ -159,6 +156,6 @@ export_survey(
   open         = FALSE,
   overwrite    = TRUE
 )
-#> Static survey written to '/tmp/RtmpEPGRzn/sat_endpoint.html' (79.5 KB).
+sframe_show(file.path(tempdir(), "sat_endpoint.html"))
 # }
 ```
