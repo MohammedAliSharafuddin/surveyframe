@@ -428,7 +428,7 @@ two_group <- sf_instrument(
     list(id = "RQ1", research_question = "Do in-person and online attendees reach a different number of sessions?",
          family = "group_comparison", method = "t_test_ind",
          roles = list(group = "format", outcome = "sessions_attended")),
-    list(id = "RQ2", research_question = "The same question without assuming normality.",
+    list(id = "RQ2", research_question = "Do in-person and online attendees reach different numbers of sessions according to a Mann-Whitney test?",
          family = "group_comparison", method = "mann_whitney",
          roles = list(group = "format", outcome = "sessions_attended"))
   )
@@ -462,7 +462,7 @@ paired <- sf_instrument(
     list(id = "RQ1", research_question = "Did confidence change over the day?",
          family = "group_comparison", method = "t_test_pair",
          roles = list(before = "confidence_before", after = "confidence_after")),
-    list(id = "RQ2", research_question = "The same question without assuming normality.",
+    list(id = "RQ2", research_question = "Did confidence change over the day according to a Wilcoxon signed-rank test?",
          family = "group_comparison", method = "wilcoxon_pair",
          roles = list(before = "confidence_before", after = "confidence_after")),
     list(id = "RQ3", research_question = "Did willingness to recommend change?",
@@ -505,7 +505,7 @@ multi_group <- sf_instrument(
     list(id = "RQ1", research_question = "Do the 3 attendee roles differ in sessions attended?",
          family = "group_comparison", method = "anova_one",
          roles = list(group = "attendee_role", outcome = "sessions_attended")),
-    list(id = "RQ2", research_question = "The same question without assuming normality.",
+    list(id = "RQ2", research_question = "Do the 3 attendee roles differ in sessions attended according to a Kruskal-Wallis test?",
          family = "group_comparison", method = "kruskal_wallis",
          roles = list(group = "attendee_role", outcome = "sessions_attended")),
     list(id = "RQ3", research_question = "Do role and format both matter?",
@@ -543,7 +543,7 @@ repeated <- sf_instrument(
     list(id = "RQ1", research_question = "Did ratings change across the 3 days?",
          family = "group_comparison", method = "repeated_anova",
          roles = list(measures = c("day1_rating", "day2_rating", "day3_rating"))),
-    list(id = "RQ2", research_question = "The same question without assuming normality.",
+    list(id = "RQ2", research_question = "Did ratings change across the 3 days according to a Friedman test?",
          family = "group_comparison", method = "friedman",
          roles = list(measures = c("day1_rating", "day2_rating", "day3_rating")))
   )
@@ -667,10 +667,10 @@ logistic <- sf_instrument(
     list(id = "RQ1", research_question = "Does attending more sessions predict returning?",
          family = "regression", method = "regression_logistic_binary",
          roles = list(predictors = "sessions_attended", dependent = "will_return")),
-    list(id = "RQ2", research_question = "And does it predict how satisfied they were?",
+    list(id = "RQ2", research_question = "Does attending more sessions predict a higher satisfaction rating?",
          family = "regression", method = "regression_logistic_ordinal",
          roles = list(predictors = "sessions_attended", dependent = "satisfaction")),
-    list(id = "RQ3", research_question = "And which session type they prefer?",
+    list(id = "RQ3", research_question = "Does attending more sessions predict which session type an attendee prefers?",
          family = "regression", method = "regression_logistic_multinomial",
          roles = list(predictors = "sessions_attended",
                       dependent = "preferred_session_type"))
@@ -883,7 +883,7 @@ open_text <- sf_instrument(
     list(id = "RQ1", research_question = "Which words come up most often?",
          family = "text", method = "term_freq",
          roles = list(item = "what_worked")),
-    list(id = "RQ2", research_question = "And which pairs of words?",
+    list(id = "RQ2", research_question = "Which pairs of words appear most often?",
          family = "text", method = "ngram_freq",
          roles = list(item = "what_worked")),
     list(id = "RQ3", research_question = "How is a key word actually used?",
@@ -907,7 +907,7 @@ open_text <- sf_instrument(
     list(id = "RQ9", research_question = "What topics are people writing about?",
          family = "text", method = "topic_model_lda",
          roles = list(item = "what_to_improve"), options = list(k = 2L)),
-    list(id = "RQ10", research_question = "The same question with a structural topic model.",
+    list(id = "RQ10", research_question = "What topics appear according to a structural topic model?",
          family = "text", method = "stm_topics",
          roles = list(item = "what_to_improve"), options = list(k = 2L))
   )
@@ -1027,7 +1027,7 @@ mcdm_choice <- sf_instrument(
       list(id = "RQ1", research_question = "What weight does each criterion carry?",
            family = "decision", method = "ahp",
            roles = list(pairwise = "crit_pairs"), options = list(cr_filter = FALSE)),
-      list(id = "RQ2", research_question = "The same weights with network dependence allowed.",
+      list(id = "RQ2", research_question = "What weight does each criterion carry when network dependence is allowed?",
            family = "decision", method = "anp",
            roles = list(pairwise = "crit_pairs"), options = list(cr_filter = FALSE)),
       list(id = "RQ3", research_question = "Which criteria drive the others?",
@@ -1036,12 +1036,12 @@ mcdm_choice <- sf_instrument(
     Map(matrix_block,
         sprintf("RQ%d", 4:10),
         c("Which venue ranks best overall?",
-          "And by compromise ranking?",
-          "And by ratio analysis?",
-          "And by simple multi-attribute rating?",
-          "And by weighted aggregated sum product?",
-          "And by outranking flows?",
-          "And by outranking with thresholds?"),
+          "Which venue ranks highest by compromise ranking?",
+          "Which venue ranks highest by ratio analysis?",
+          "Which venue ranks highest by simple multi-attribute rating?",
+          "Which venue ranks highest by weighted aggregated sum product?",
+          "Which venue ranks highest by outranking flows?",
+          "Which venue ranks highest by outranking with thresholds?"),
         c("topsis", "vikor", "moora", "smart", "waspas", "promethee", "electre"))
   )
 )

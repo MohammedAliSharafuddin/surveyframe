@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "8b7793fd1757b614c2d6fdc9706e0766fd6feb9dc9692cf5c3c1da8e8605bb70",
+    "value": "30d927bee3e2da554cb34e9219c0358b06f0a5a2daba60f0c091c3ab3ee8f01d",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -72,7 +72,7 @@
     },
     {
       "id": "RQ2",
-      "research_question": "And which pairs of words?",
+      "research_question": "Which pairs of words appear most often?",
       "family": "text",
       "method": "ngram_freq",
       "roles": {
@@ -221,7 +221,7 @@
     },
     {
       "id": "RQ10",
-      "research_question": "The same question with a structural topic model.",
+      "research_question": "What topics appear according to a structural topic model?",
       "family": "text",
       "method": "stm_topics",
       "roles": {

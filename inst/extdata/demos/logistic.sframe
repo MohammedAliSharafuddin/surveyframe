@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "eba433d9f51f994355a2ce09516270cb152bd4e848de02386c465ccb0d12c9e4",
+    "value": "f8d89092bd31f0906c2272af6b8eaaed6c9942191b8c19d8ec1ae352836027c9",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -100,7 +100,7 @@
     },
     {
       "id": "RQ2",
-      "research_question": "And does it predict how satisfied they were?",
+      "research_question": "Does attending more sessions predict a higher satisfaction rating?",
       "family": "regression",
       "method": "regression_logistic_ordinal",
       "roles": {
@@ -123,7 +123,7 @@
     },
     {
       "id": "RQ3",
-      "research_question": "And which session type they prefer?",
+      "research_question": "Does attending more sessions predict which session type an attendee prefers?",
       "family": "regression",
       "method": "regression_logistic_multinomial",
       "roles": {

@@ -26,7 +26,7 @@ results <- run_analysis_plan(d$responses, d$instrument)
 | Research question | Method | What the report gives |
 |---|---|---|
 | Do the 3 attendee roles differ in sessions attended? | One-way ANOVA | The APA 7 sentence and a table, with a chart where the method has one |
-| The same question without assuming normality. | Kruskal-Wallis test | The APA 7 sentence and a table, with a chart where the method has one |
+| Do the 3 attendee roles differ in sessions attended according to a Kruskal-Wallis test? | Kruskal-Wallis test | The APA 7 sentence and a table, with a chart where the method has one |
 | Do role and format both matter? | Two-way ANOVA | The APA 7 sentence and a table, with a chart where the method has one |
 | Does the role difference survive adjusting for age? | Analysis of covariance (ANCOVA) | The APA 7 sentence and a table, with a chart where the method has one |
 
