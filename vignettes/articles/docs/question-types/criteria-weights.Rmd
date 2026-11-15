@@ -15,7 +15,7 @@ Add a question, choose Criteria weight, and list the criteria to divide 100 poin
 
 ## Settings
 
-- **Criteria.** The things weighted. The points must add up to 100.
+- **Criteria.** List the things weighted. The points must add up to 100.
 
 ## Best practices for research
 

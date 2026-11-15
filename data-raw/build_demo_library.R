@@ -344,7 +344,7 @@ likert_scale <- sf_instrument(
          family = "descriptive", method = "scale_descriptives", roles = list()),
     list(id = "RQ2", research_question = "Is the scale internally consistent?",
          family = "reliability", method = "reliability_alpha", roles = list()),
-    list(id = "RQ3", research_question = "Same question, omega rather than alpha.",
+    list(id = "RQ3", research_question = "Is the scale internally consistent according to omega?",
          family = "reliability", method = "reliability_omega", roles = list()),
     list(id = "RQ4", research_question = "Does any item sit poorly with the rest?",
          family = "reliability", method = "item_diagnostics", roles = list())

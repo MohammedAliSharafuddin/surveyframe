@@ -15,7 +15,7 @@ Add a question, choose Slider, and set its range and step.
 
 ## Settings
 
-- **Minimum, maximum and step.** The range and how finely the respondent can place the handle.
+- **Minimum, maximum and step.** Set the range and how finely the respondent can place the handle.
 
 ## Best practices for research
 

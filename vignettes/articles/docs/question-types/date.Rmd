@@ -15,7 +15,7 @@ Add a question and choose Date. The respondent picks it from a calendar.
 
 ## Settings
 
-- **Required.** Asks for a date before the respondent goes on.
+- **Required.** Tick it to require a date before the respondent goes on.
 
 ## Best practices for research
 

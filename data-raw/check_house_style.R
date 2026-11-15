@@ -33,6 +33,43 @@ BANNED <- c(
   "ellipsis"         = "\\.\\.\\."
 )
 
+# A labelled clause needs a finite verb. This catches constructions such as
+# "**Range.** The accepted values." while accepting commands and clauses with
+# an auxiliary verb. The list is deliberately conservative so the checker
+# reports clear fragments instead of guessing at every word ending.
+FINITE_VERBS <- c(
+  "add", "adds", "analyse", "analyses", "are", "ask", "asks", "assign",
+  "assigns", "assume", "assumes", "be", "becomes", "begin", "begins", "build", "builds", "can",
+  "carry", "carries", "check", "checks", "choose", "chooses", "combine",
+  "combines", "compare", "compares", "contain", "contains", "create", "creates",
+  "describe", "describes", "do", "does", "enter", "enters", "fit", "fits",
+  "give", "gives", "has", "have", "include", "includes", "is", "keep", "keeps",
+  "leave", "leaves", "let", "lets", "list", "lists", "make", "makes", "may", "measure", "measures",
+  "must", "name", "names", "need", "needs", "open", "opens", "pick", "picks",
+  "record", "records", "require", "requires", "run", "runs", "select", "selects",
+  "set", "sets", "share", "shares", "show", "shows", "store", "stores", "take",
+  "takes", "tick", "ticks", "use", "uses", "verify", "verifies", "will", "write",
+  "writes"
+)
+
+labelled_fragments <- function(path) {
+  x <- readLines(path, warn = FALSE)
+  hits <- grep("\\*\\*[^*]+[.]\\*\\*", x, value = TRUE)
+  if (!length(hits)) return(character())
+  # Generated format strings do not contain the prose that follows the label.
+  hits <- hits[!grepl("sprintf|paste0", hits)]
+  if (!length(hits)) return(character())
+  clause <- sub("^.*?\\*\\*[^*]+[.]\\*\\*\\s*", "", hits, perl = TRUE)
+  clause <- sub("[.!?].*$", "", clause)
+  words <- strsplit(gsub("[^a-z']", " ", tolower(clause)), "\\s+")
+  finite <- vapply(words, function(w) any(w[nzchar(w)] %in% FINITE_VERBS), logical(1))
+  complete <- grepl("[.!?]", sub("^.*?\\*\\*[^*]+[.]\\*\\*\\s*", "", hits,
+                                  perl = TRUE))
+  question <- grepl("[?]", sub("^.*?\\*\\*[^*]+[.]\\*\\*\\s*", "", hits,
+                                  perl = TRUE))
+  trimws(hits[complete & !question & !finite])
+}
+
 # Prose only. Code, output and object names carry negations that say nothing
 # about the writing, so they are stripped before counting.
 prose_of <- function(path) {
@@ -65,16 +102,19 @@ prose_of <- function(path) {
 check_one <- function(path) {
   body <- prose_of(path)
   txt <- tolower(body)
-  words <- length(strsplit(trimws(gsub("[^a-z0-9 ]", " ", txt)), "\\s+")[[1]])
-  if (words < 50) return(NULL)
+  clean <- trimws(gsub("[^a-z0-9 ]", " ", txt))
+  words <- if (nzchar(clean)) length(strsplit(clean, "\\s+")[[1]]) else 0
+  fragments <- labelled_fragments(path)
+  if (words < 50 && !length(fragments)) return(NULL)
   hits <- gregexpr(NEGATIVE, txt)[[1]]
   n <- if (hits[1] > 0) length(hits) else 0
-  rate <- 1000 * n / words
+  rate <- if (words) 1000 * n / words else 0
   found <- names(BANNED)[vapply(BANNED, function(p) grepl(p, body), logical(1))]
   data.frame(file = path, words = words, negatives = n,
              per_1000 = round(rate, 1),
              over = rate > CEILING,
              banned = paste(found, collapse = ", "),
+             fragments = paste(fragments, collapse = " | "),
              stringsAsFactors = FALSE)
 }
 
@@ -94,12 +134,12 @@ if (is.null(res)) {
   quit(status = 0)
 }
 res <- res[order(-res$per_1000), ]
-bad <- res[res$over | nzchar(res$banned), ]
+bad <- res[res$over | nzchar(res$banned) | nzchar(res$fragments), ]
 
 cat(sprintf("%d files read, ceiling %d negative markers per 1,000 words\n\n",
             nrow(res), CEILING))
 if (nrow(bad)) {
-  print(bad[, c("file", "words", "per_1000", "over", "banned")], row.names = FALSE)
+  print(bad[, c("file", "words", "per_1000", "over", "banned", "fragments")], row.names = FALSE)
   cat(sprintf("\n%d files to reword.\n", nrow(bad)))
   quit(status = 1)
 }

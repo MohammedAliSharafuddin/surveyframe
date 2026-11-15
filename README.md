@@ -35,9 +35,9 @@ You write your analysis plan with your questions. When the answers arrive, surve
 
 - **A point-and-click studio.** Build, preview and run a whole study in SurveyStudio, from 1 line of R or the RStudio Addins menu.
 - **The plan before the data.** Each research question is tied to its test and its variables at design time, ready to preregister.
-- **APA 7 reports.** Tables, figures, effect sizes and references, in HTML, Word, PDF or Quarto.
-- **Psychometrics and models.** Reliability, item analysis, and EFA, CFA, SEM and PLS-SEM syntax from 1 model.
-- **Small samples and decisions.** Exact tests, Firth regression and 10 multi-criteria decision methods.
+- **APA 7 reports.** Create tables, figures, effect sizes and references in HTML, Word, PDF or Quarto.
+- **Psychometrics and models.** Run reliability, item analysis, EFA, CFA, SEM and PLS-SEM syntax from 1 model.
+- **Small samples and decisions.** Use exact tests, Firth regression and 10 multi-criteria decision methods.
 - **Files anyone can verify.** Every questionnaire carries a sealed hash and an amendment log.
 
 Free and open source under MIT, with no account. The analysis runs on your
