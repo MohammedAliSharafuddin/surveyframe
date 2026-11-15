@@ -7,7 +7,7 @@ description: "These methods test whether answers change between 2 or more measur
 
 These methods test whether answers change between 2 or more measurements of the same respondents.
 
-**Assumptions.** Each respondent measured every time. The paired t-test and repeated measures ANOVA assume roughly normal differences, the rank-based tests do not. McNemar and Cochran's Q take yes or no answers.
+**Assumptions.** Measure each respondent every time. The paired t-test and repeated measures ANOVA assume roughly normal differences, the rank-based tests do not. McNemar and Cochran's Q take yes or no answers.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set 2 or more measurements of the same respondents, each its own question, such as a rating before and after. Declare the hypotheses and the decision rule before collecting responses.
 

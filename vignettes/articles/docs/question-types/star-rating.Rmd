@@ -15,7 +15,7 @@ Add a question and choose Rating for a row of stars.
 
 ## Settings
 
-- **Number of stars.** The top of the scale. The answer is the number of stars given.
+- **Number of stars.** Set the top of the scale. The answer is the number of stars given.
 
 ## Best practices for research
 

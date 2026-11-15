@@ -15,7 +15,7 @@ Add a question, choose Numeric, and set the range the answer may take.
 
 ## Settings
 
-- **Minimum and maximum.** The accepted range. A respondent whose entry is outside it is asked to correct it.
+- **Minimum and maximum.** Set the accepted range. A respondent whose entry is outside it is asked to correct it.
 
 ## Best practices for research
 

@@ -7,7 +7,7 @@ description: "These methods find the words, phrases, contexts, tones and topics 
 
 These methods find the words, phrases, contexts, tones and topics in open answers.
 
-**Assumptions.** Enough text per answer for the method. Topic models need many answers.
+**Assumptions.** Use enough text per answer for the method. Topic models need many answers.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research question and choose the method. Set the text question. A comparison of groups takes a grouping variable, and keyword in context a key word. Declare the hypotheses and the decision rule before collecting responses.
 

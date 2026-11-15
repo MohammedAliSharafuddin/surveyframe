@@ -27,9 +27,9 @@ To build a scored scale:
 
 ## Settings
 
-- **Choice set.** The answer options, the labelled points of the scale such as Strongly disagree to Strongly agree. The items of 1 scale share 1 choice set.
-- **Scale.** The scored scale the item belongs to, so its items combine into 1 score and their reliability is checked together.
-- **Reverse-scored.** For an item worded against the others, so a high answer means the same on every item.
+- **Choice set.** Choose the answer options, the labelled points of the scale such as Strongly disagree to Strongly agree. Give the items of 1 scale the same choice set.
+- **Scale.** Assign the item to its scored scale, so the items combine into 1 score and their reliability is checked together.
+- **Reverse-scored.** Tick it for an item worded against the others, so a high answer means the same on every item.
 
 ## Best practices for research
 
