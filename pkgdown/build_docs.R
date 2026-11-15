@@ -11,7 +11,7 @@
 # Run from the repository root:  Rscript pkgdown/build_docs.R
 
 pkg_root <- normalizePath(".")
-devtools::load_all(pkg_root, quiet = TRUE)
+pkgload::load_all(pkg_root, quiet = TRUE)
 stopifnot(requireNamespace("chromote", quietly = TRUE))
 
 ref_kp <- "Krosnick, J. A., & Presser, S. (2010). Question and questionnaire design. In P. V. Marsden & J. D. Wright (Eds.), *Handbook of survey research* (2nd ed., pp. 263-313). Emerald."

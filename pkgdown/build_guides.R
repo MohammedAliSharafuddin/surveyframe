@@ -10,7 +10,7 @@
 # demos' own names and functions are unchanged.
 # Run from the repository root:  Rscript pkgdown/build_guides.R
 
-devtools::load_all(quiet = TRUE)
+pkgload::load_all(quiet = TRUE)
 source(file.path("pkgdown", "guide_specs.R"))
 
 guides <- c(
