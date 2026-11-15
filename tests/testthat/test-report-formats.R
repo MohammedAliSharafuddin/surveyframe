@@ -71,6 +71,16 @@ test_that("options(surveyframe.latex = FALSE) hides LaTeX", {
   expect_false(surveyframe:::sframe_latex_available())
 })
 
+test_that("older Quarto copies state the Typst caption limitation", {
+  expect_message(
+    surveyframe:::sframe_quarto_typst_note("1.6.43"),
+    "Quarto 1.7.0 or later keeps a long table's number and title together",
+    class = "sframe_quarto_version_note"
+  )
+  expect_no_message(surveyframe:::sframe_quarto_typst_note("1.7.0"))
+  expect_no_message(surveyframe:::sframe_quarto_typst_note("1.8.24"))
+})
+
 render_format <- function(format, ..., latex = NULL) {
   old <- options(surveyframe.use_quarto = TRUE, surveyframe.latex = latex)
   on.exit(options(old), add = TRUE)

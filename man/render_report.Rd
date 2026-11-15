@@ -173,6 +173,9 @@ them found none before 0.4.3. \code{QUARTO_PATH} takes the path of the
 executable itself, as in the quarto package. The Quarto report gives the
 version used and where it was found, and the returned path carries the
 executable as its \code{"quarto"} attribute. \code{options(surveyframe.use_quarto = FALSE)} uses the built-in engine whatever is installed.
+Quarto 1.7.0 or later supplies Typst 0.12 or later, which keeps a long
+table's number and title together at a page break. An older Quarto copy
+continues to render and reports that this caption may split across pages.
 }
 
 \section{Markdown in text fields}{
