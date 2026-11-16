@@ -64,10 +64,14 @@ test_that("the Collect screen downloads the survey and its collector", {
   survey <- fetch("collect_survey_dl")
   expect_match(survey, "<!doctype html>", ignore.case = TRUE)
   expect_match(survey, endpoint, fixed = TRUE)
+  survey_disposition <- js("fetch($('#collect_survey_dl').attr('href')).then(function(r) { return r.headers.get('content-disposition'); })")
+  expect_match(survey_disposition, "filename=.+[.]html", perl = TRUE)
 
   script <- fetch("collect_gs_dl")
   expect_match(script, "doPost", fixed = TRUE)
   expect_match(script, sheet, fixed = TRUE)
+  script_disposition <- js("fetch($('#collect_gs_dl').attr('href')).then(function(r) { return r.headers.get('content-disposition'); })")
+  expect_match(script_disposition, "filename=.+_collector[.]gs", perl = TRUE)
 
   # The steps end on the screen that reads the sheet, with the sheet given.
   steps <- js("$('#screen-collect').text()")
