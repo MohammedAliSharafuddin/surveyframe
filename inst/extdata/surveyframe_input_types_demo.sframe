@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "ff78a5524a473dcbd5a2072a2810e56c3681c049d99101f892fd8428e724f90f",
+    "value": "b0921232848000673155b79ba0a02e0a7c92626078803dc1a5f19e24af88413d",
     "canonical": "rfc8785"
   },
   "version": "0.3.0",
@@ -27,7 +27,7 @@
     },
     {
       "id": "info_block",
-      "label": "This is a display text block. It should not be treated as a response variable.",
+      "label": "A text block gives respondents information, such as an instruction or a consent statement. It collects no answer.",
       "type": "text_block",
       "required": false,
       "reverse": false,

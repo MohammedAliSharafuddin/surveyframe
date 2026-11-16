@@ -2066,6 +2066,11 @@ arithmetic.
 
 ## Demos
 
+* **The all-types demo's text block says what a text block does**
+  (owner, 2026-11-15): "A text block gives respondents information, such as
+  an instruction or a consent statement. It collects no answer." It read as
+  placeholder text in SurveyStudio's question list. The file has a new hash.
+
 * **2 guided tours now run through R's `demo()` system.** Run `demo("tour",
   package = "surveyframe")` for the 5 study stages, or `demo("verify", package
   = "surveyframe")` to see an integrity check catch a changed copy.
