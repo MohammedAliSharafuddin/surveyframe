@@ -171,7 +171,7 @@
   ),
   surveyframe = list(
     key  = "surveyframe",
-    apa  = "Sharafuddin, M. A. ({year}). *surveyframe: Survey Instrument Workflows* (Version {version}) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
+    apa  = "Sharafuddin, M. A. ({year}). *surveyframe: Design, Plan, Seal and Report Questionnaire Studies* (Version {version}) [Computer software]. https://github.com/MohammedAliSharafuddin/surveyframe",
     use  = "all"
   )
 )

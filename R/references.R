@@ -794,7 +794,7 @@ sframe_builtin_reference <- function(key) {
   r_core = list(type = "book", author = list(list(literal = "R Core Team")),
     title = "R: A language and environment for statistical computing", publisher = "R Foundation for Statistical Computing"),
   surveyframe = list(type = "software", author = list(.n("Sharafuddin", "M. A.")),
-    title = "surveyframe: Survey Instrument Workflows", URL = "https://github.com/MohammedAliSharafuddin/surveyframe")
+    title = "surveyframe: Design, Plan, Seal and Report Questionnaire Studies", URL = "https://github.com/MohammedAliSharafuddin/surveyframe")
 )
 rm(.n, .yr)
 

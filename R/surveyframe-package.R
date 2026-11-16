@@ -4,7 +4,7 @@
 # manual. This page is typeset first, which is why it is no longer marked
 # internal, and \global carries the looser line breaking to every page after
 # it. HTML help and pkgdown ignore the line.
-#' surveyframe: Survey Instrument Workflows for R
+#' surveyframe: Design, Plan, Seal and Report Questionnaire Studies
 #'
 #' @description
 #' \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}

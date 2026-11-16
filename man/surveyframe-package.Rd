@@ -4,7 +4,7 @@
 \name{surveyframe-package}
 \alias{surveyframe}
 \alias{surveyframe-package}
-\title{surveyframe: Survey Instrument Workflows for R}
+\title{surveyframe: Design, Plan, Seal and Report Questionnaire Studies}
 \description{
 \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
 surveyframe defines a survey instrument as a first-class R object and
