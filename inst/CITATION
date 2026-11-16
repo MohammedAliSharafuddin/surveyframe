@@ -11,7 +11,7 @@ for (field in c("Date/Publication", "Packaged", "Date")) {
 
 bibentry(
   bibtype  = "Manual",
-  title    = "surveyframe: Survey Instrument Workflows",
+  title    = "surveyframe: Design, Plan, Seal and Report Questionnaire Studies",
   author   = person(c("Mohammed", "Ali"), "Sharafuddin",
                     email = "mohammedali.page@gmail.com",
                     role  = c("aut", "cre"),

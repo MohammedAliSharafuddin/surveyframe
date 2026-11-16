@@ -1,5 +1,5 @@
 Package: surveyframe
-Title: Survey Instrument Workflows
+Title: Design, Plan, Seal and Report Questionnaire Studies
 Version: 0.4.3
 Authors@R: c(
     person(
@@ -10,8 +10,9 @@ Authors@R: c(
       comment = c(ORCID = "0000-0001-5247-2964")
     )
   )
-Description: Provides a design-first survey research workflow. An
-    instrument, an analysis plan declared before data collection, and a
+Description: Design a questionnaire, declare its analysis plan, seal
+    both in 1 verifiable file, then check responses and report from the
+    plan. An instrument, an analysis plan declared before data collection, and a
     measurement or structural model are held together in one typed,
     integrity-checked object (the 'sframe'), so a study's confirmatory
     tests are fixed before responses arrive rather than chosen

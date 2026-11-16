@@ -7,6 +7,11 @@ October 2026 and reaches CRAN with the fixes since. SurveyBuilder no longer
 changes content its user left alone, so an amended instrument saved from it
 can be written again, and every plan result can be serialised by a host.
 
+The package has a new title, "Design, Plan, Seal and Report Questionnaire
+Studies", which names the 4 steps it takes a study through. It replaces
+"Survey Instrument Workflows". The citation and every report's APA
+reference carry the new title.
+
 ## What you need to change
 
 * **11 helpers for SurveyStudio and the report template are internal.**
