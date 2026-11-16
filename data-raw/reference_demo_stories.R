@@ -70,6 +70,9 @@ reference_stories <- list(
   input_types = list(
     file = "surveyframe_input_types_demo.sframe",
     title = "Visitor experience survey",
+    # The text block read as a placeholder in SurveyStudio's list (owner
+    # 2026-11-15), so it says what a text block does for a respondent.
+    labels = c(info_block = "A text block gives respondents information, such as an instruction or a consent statement. It collects no answer."),
     description = "A visitor experience study of how online information, service and value relate to overall rating and the intention to recommend or reuse a service, asked with every kind of question a survey can hold.",
     study = list(
       problem = "A service wants to know how the online information visitors use before a visit relates to how they rate the visit and whether they would come back.",
@@ -118,6 +121,11 @@ for (name in names(reference_stories)) {
   # A study title in place of the builder's placeholder (owner 2026-11-15),
   # which the Docs screenshots show in SurveyStudio's header.
   if (!is.null(st$title)) ins$meta$title <- st$title
+  for (id in names(st$labels)) {
+    k <- which(vapply(ins$items, function(it) identical(it$id, id), logical(1)))
+    stopifnot(length(k) == 1L)
+    ins$items[[k]]$label <- st$labels[[id]]
+  }
   # Each block serves an objective: descriptive and quality blocks the
   # first, the blocks naming digital experience or marketing the second,
   # the rest the third.
