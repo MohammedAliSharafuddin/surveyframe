@@ -467,7 +467,11 @@ input,textarea,select{font-family:inherit;font-size:13px}
 /* Centre pane: the selected item drawn by the survey template itself. */
 .cv-pv{display:none;flex-direction:column;width:100%;max-width:900px;flex:1;min-height:0}
 .cv-pv.on{display:flex}
-.cv-pv-bar{display:flex;align-items:center;gap:6px;margin:0 0 8px;font-size:12px;color:var(--t2)}
+.cv-pv-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:12px;color:var(--t2)}
+/* The 2 width buttons are 1 group that never splits: at a narrow centre the
+   group moves below the hint as a whole (owner 2026-11-15). */
+.cv-pv-bar .cv-pv-w{display:inline-flex;flex:0 0 auto;gap:6px}
+.cv-pv-bar .cv-pv-w .btn{margin:0;white-space:nowrap}
 .cv-pv-bar .sp{flex:1}
 .cv-pv-bar [aria-pressed="true"]{background:var(--cp);color:var(--sf-white);border-color:var(--cp)}
 .cv-pv-frame{flex:1;display:flex;justify-content:center;min-height:320px}
@@ -959,7 +963,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
         <div class="c-prompt" id="cPrompt" aria-live="polite"></div>
         <div class="cv-pv" id="cvPv">
           <div class="cv-pv-bar"><span id="cvPvT">As respondents see it. Edit it on the right.</span><div class="sp"></div>
-            <div role="group" aria-label="Preview width"><button type="button" class="btn sf-secondary" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button> <button type="button" class="btn sf-secondary" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
+            <div role="group" class="cv-pv-w" aria-label="Preview width"><button type="button" class="btn sf-secondary" id="cvW-desktop" aria-pressed="true" onclick="centreWidth('desktop')">Desktop</button><button type="button" class="btn sf-secondary" id="cvW-mobile" aria-pressed="false" onclick="centreWidth('mobile')">Mobile</button></div></div>
           <div class="cv-pv-frame" id="cvPvFrame"></div>
         </div>
       </div>

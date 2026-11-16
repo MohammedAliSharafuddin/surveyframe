@@ -241,6 +241,31 @@ test_that("the centre has a desktop and a mobile width, and closes with the edit
   expect_false(js(s, "document.getElementById('cvPv').classList.contains('on')"))
 })
 
+# Owner 2026-11-15: at a tablet width the Desktop and Mobile buttons drifted
+# apart, 1 above the other, beside the hint. They are 1 group, so they share a
+# top edge at every width, standalone and as Studio hosts the builder.
+test_that("the Desktop and Mobile buttons stay in line at 1280, 1024 and 768 px", {
+  edges <- paste0(
+    "(function(){var d=document.getElementById('cvW-desktop').getBoundingClientRect(),",
+    "m=document.getElementById('cvW-mobile').getBoundingClientRect();",
+    "return [d.top,m.top,d.height,m.height,d.right<=m.left?1:0];})()")
+  for (query in c("", "?host=studio")) {
+    for (w in c(1280, 1024, 768)) {
+      s <- ui2_builder(centre_instrument(), width = w, query = query)
+      js(s, "selItem('q1');1")
+      centre_item(s, "q1")
+      # The preview must be drawn before its buttons are measured, so a hidden
+      # bar with 2 zero-sized buttons cannot pass.
+      expect_true(ui2_wait(s, "document.getElementById('cvW-mobile').getBoundingClientRect().height>0"),
+                  label = sprintf("the width buttons are visible at %d px%s", w, query))
+      e <- unlist(js(s, edges))
+      expect_lte(abs(e[1] - e[2]), 1, label = sprintf("top edges differ at %d px%s", w, query))
+      expect_equal(e[3], e[4], tolerance = 1, label = sprintf("heights at %d px%s", w, query))
+      expect_equal(e[5], 1, label = sprintf("Desktop left of Mobile at %d px%s", w, query))
+    }
+  }
+})
+
 
 # -- Welcome and thank-you pages ----------------------------------------------
 
