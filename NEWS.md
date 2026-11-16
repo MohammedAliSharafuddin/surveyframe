@@ -1542,6 +1542,11 @@ arithmetic.
 
 ## SurveyBuilder
 
+* **The Desktop and Mobile buttons stay in line** (owner, 2026-11-15). Above
+  the centre preview they are 1 group, which moves below the hint as a whole
+  when the centre is narrow, as in SurveyStudio beside its menu. They drifted
+  apart, 1 above the other, at tablet widths.
+
 * **The Plan screen reads in words** (owner check of the Docs screenshots,
   2026-11-15). A plan card shows α = .05, Draft, and a model by its
   name, such as Content quality to intention (CB-SEM), where it showed
