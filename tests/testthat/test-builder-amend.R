@@ -68,6 +68,24 @@ test_that("CX-12: a recorded amendment reads back verified and matches amend_sfr
     amend_sframe(back, again, "other", "Second pass.", tier = "pipeline")))
 })
 
+test_that("a builder amendment is verified and listed after its disk round trip", {
+  original <- sframe_instrument(
+    "Builder amendment",
+    components = list(sframe_item("q1", "Original wording", type = "text"))
+  )
+  ctx <- amend_context("{ mode:'amend', reason_code:'other', reason_text:'Clearer wording.',
+                          tier:'pipeline', version:'0.1.1' }")
+  builder_open(ctx, original)
+  ctx$eval("S.items[0].label = 'Revised wording';")
+  saved <- amend_save(ctx)
+
+  verified <- expect_no_condition(read_sframe(saved))
+  amendments <- sframe_get_amendments(verified)
+  expect_equal(nrow(amendments), 1L)
+  expect_identical(amendments$reason_text, "Clearer wording.")
+  expect_identical(amendments$new_hash, sframe_content_hash(verified))
+})
+
 test_that("CX-12: the dialog is told what changed, the tier and the suggested version", {
   ctx <- amend_context("null")
   builder_open(ctx, sframe_demo("likert_scale")$instrument)
