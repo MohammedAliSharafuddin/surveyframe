@@ -1,7 +1,7 @@
 # surveyframe 0.4.3
 
-It fixes what a teaching session on 0.4.2 found and what Ethos, the
-research platform built on surveyframe, reported from its own use, and adds
+It fixes what a teaching session on 0.4.2 found and what a research
+platform built on surveyframe reported from its own use, and adds
 references carried inside the `.sframe` file. It went out on GitHub on 19
 October 2026 and reaches CRAN with the fixes since. SurveyBuilder no longer
 changes content its user left alone, so an amended instrument saved from it
@@ -12,54 +12,61 @@ Studies", which names the 4 steps it takes a study through. It replaces
 "Survey Instrument Workflows". The citation and every report's APA
 reference carry the new title.
 
-## What you need to change
+## Upgrading from 0.4.2
 
-* **11 helpers for SurveyStudio and the report template are internal.**
-  `sframe_plot_item_chart()`, `sframe_plot_scale_chart()`,
+Code written for 0.4.2 may stop running, or give different numbers, after
+these changes. If you are upgrading from an earlier version, also read the
+"Upgrading from" section of each release in between: from 0.4.1, read
+0.4.2's as well.
+
+* 11 functions that only SurveyStudio and the report template used are no
+  longer exported: `sframe_plot_item_chart()`, `sframe_plot_scale_chart()`,
   `sframe_draw_likert_diverging()`, `sframe_draw_mosaic()`,
-  `sframe_likert_scale_groups()`, `sframe_codebook_items_display()`, the 3
-  `sframe_builder_*()` state helpers, `sframe_result_supplement()` and
-  `sframe_demo_branding()` were exported only because Studio and the
-  template ran outside the package. `sframe_demo(name, branded = TRUE)`
-  applies the demo branding.
-* **`write_sframe(new_instrument = TRUE)` needs a new title or version** on an
+  `sframe_likert_scale_groups()`, `sframe_codebook_items_display()`,
+  `sframe_builder_empty_state()`, `sframe_builder_state_from_instrument()`,
+  `sframe_builder_validate_draft()`, `sframe_result_supplement()` and
+  `sframe_demo_branding()`. They had to be public only because SurveyStudio
+  and the template ran outside the package, and now both run inside it. For
+  demo branding, use `sframe_demo(name, branded = TRUE)`. Code that called
+  any of the others can use `surveyframe:::` but should not rely on them.
+* `write_sframe(new_instrument = TRUE)` needs a new title or version on an
   instrument read with `read_sframe()`. It accepted the title and version of
   the file read, so 2 different files could claim to be one instrument. Set
   `meta$version` (or `meta$title`) before writing. SurveyBuilder applies the
   same rule when it saves changed content of a file it opened.
   An instrument unchanged since it was read writes without the flag, and the
-  error says so: Ethos, or any caller writing an unchanged file, drops
+  error says so: a caller writing an unchanged file drops
   `new_instrument = TRUE`.
-* **`amend_sframe()` starts the log from the file as read.** It took the
+* `amend_sframe()` starts the log from the file as read. It took the
   starting fingerprint from whatever `previous` held, so a file read, edited
   in memory and then amended got a log beginning at a state no file held,
   and the edit went undisclosed. `previous` must now match the file it was
   read from, or its last recorded amendment. Amend from the instrument as
   read, and put every change in `instrument`. `write_sframe()` also checks
   that the first new entry starts from the content read.
-* **An instrument that failed its integrity check cannot be amended.** A file
+* An instrument that failed its integrity check cannot be amended. A file
   changed by hand and read with `verify = FALSE` is marked unverified, but one
   amendment wrote it back as a verified file with the hand edit and a clean
   log. `amend_sframe()` now refuses a `previous` that failed its integrity
   check, and `write_sframe()` refuses any entry appended to the log of an
   unverified read. Restore the original file, or write the content as a new
   instrument with `new_instrument = TRUE`.
-* **A change to how a scale is scored is a design-tier amendment.** Dropping
+* A change to how a scale is scored is a design-tier amendment. Dropping
   an item from a scale, reverse keying one, or changing its weights, method
   or minimum answered changes every score the plan analyses, so
   `amend_sframe()` now treats it as it treats a plan or model change: it
   needs a `deviation_report` and cannot be recorded as `"pipeline"`. A
   scale's label alone stays a pipeline change.
-* **A frequency table now shows choice labels, with the code in its own
-  column.** The table's columns are `Value` (the label), `Code`, `Frequency`
+* A frequency table now shows choice labels, with the code in its own
+  column. The table's columns are `Value` (the label), `Code`, `Frequency`
   and `Percent`. Code reading `Value` for the stored code should read `Code`.
   Rows follow the choice set's declared order, and a declared choice nobody
   picked appears with a count of 0.
-* **A descriptives block counts choice items.** See
-  below. Numbers for a `single_choice` or `multiple_choice` column move from
-  the mean and SD table to a table of counts and percentages.
-* **A plan rerun on 0.4.3 can give different numbers from the same data
-  where categories were ordered or coded differently before.** A
+* A descriptives block counts choice items. Numbers for a
+  `single_choice` or `multiple_choice` column move from the mean and SD
+  table to a table of counts and percentages (see Analysis).
+* A plan rerun on 0.4.3 can give different numbers from the same data
+  where categories were ordered or coded differently before. A
   multinomial model's reference category is now the first category its
   choice set declares, not the first in alphabetical order: the logistic
   demo's reference moves from Keynotes to Workshops, and every coefficient
@@ -69,7 +76,7 @@ reference carry the new title.
   "Answers coded and ordered as the instrument declares them" under
   Analysis. Report the 0.4.3 numbers, and say which category is the
   reference.
-* **Every plan result serialises with `jsonlite::toJSON()`.** The classed
+* Every plan result serialises with `jsonlite::toJSON()`. The classed
   report behind a descriptives, missing-data, quality, reliability, EFA or
   item-diagnostics result, and a fitted LDA or STM topic model, now sit in an
   attribute for the current R session, which `toJSON()` leaves out. Code
@@ -79,7 +86,7 @@ reference carry the new title.
   are now plain lists holding the same numbers. A host serialising results
   failed on all of these, 20 blocks across the demos. Charts drawn with
   `plots = TRUE` stay on the result as `ggplot` objects.
-* **An empty `render` is written as `{}`**, an empty object, by
+* An empty `render` is written as `{}`, an empty object, by
   `write_sframe()` and SurveyBuilder. It was written as `[]`, which a host
   reading the JSON took for a list. A file written with `[]` still reads and
   verifies, and an amendment log recorded with `[]` still matches its
@@ -87,12 +94,12 @@ reference carry the new title.
 
 ## One prefix for every function, and the old names still work
 
-* **Old names keep working, silently.** Set
+* Old names keep working, silently. Set
   `options(surveyframe.warn_superseded = TRUE)` to get 1 warning per old name
   per session, naming its replacement, so a script or a host can find every
   old call before the old names start warning by default.
 
-* **Every exported function takes the `sframe_` prefix or a stage verb.**
+* Every exported function takes the `sframe_` prefix or a stage verb.
   The stage verbs keep their names (`read_sframe()`, `write_sframe()`,
   `validate_sframe()`, `amend_sframe()`, `read_responses()`, `score_scales()`,
   `run_analysis_plan()`, `render_report()`, `launch_builder()` and
@@ -182,36 +189,36 @@ reference carry the new title.
   | `sframe_demos()` | `sframe_list_demos()` |
   | `sf_plan(x) <- value` | `sframe_plan(x) <- value` |
 
-* **The 2 larger demo datasets load through `sframe_demo()`.**
+* The 2 larger demo datasets load through `sframe_demo()`.
   `sframe_demo("tourism_services")` replaces `sframe_demo_data()`, and
   `sframe_demo("input_types")` replaces `sframe_input_types_demo_data()`,
   with the same fields and the same reading of `submitted_at`.
   `sframe_list_demos()` lists them last, with focus `"reference"`, apart
-  from the 22 teaching demos. The old names still work.
+  from the 25 teaching demos. The old names still work.
 
-* **`launch_builder(demo =)` opens SurveyBuilder with any demo preloaded.**
+* `launch_builder(demo =)` opens SurveyBuilder with any demo preloaded.
   It replaces `launch_builder_demo()`, which loaded only the input-types
   demo. `launch_builder()` now always returns the path of the page it opens,
   and the old name still returns its list.
 
-* **`launch_studio(demo =)` opens SurveyStudio with any demo loaded.** It
+* `launch_studio(demo =)` opens SurveyStudio with any demo loaded. It
   replaces `launch_studio_demo()`, which loaded only the input-types demo.
   `demo` cannot be combined with `instrument` or `responses`.
 
-* **`preview_survey()` is the Preview stage verb.** `preview_survey(x)`
+* `preview_survey()` is the Preview stage verb. `preview_survey(x)`
   shows a survey as a respondent meets it, with the collector removed, in
   the browser or on SurveyStudio's preview screen. `x` is an instrument or a
   demo name, so it previews your own survey as well as a demo. It replaces
   `preview_demo()`, which still works and still defaults to `"two_group"`.
 
-* **Help is organised by stage.** The reference index runs Design, Plan,
+* Help is organised by stage. The reference index runs Design, Plan,
   Preview, Collect, Responses, Analyse, Report, References and Amendments,
   each saying where the stage lives in SurveyStudio or SurveyBuilder and
   which function does it in code, then the toolboxes. `?surveyframe` opens
   with "Start here" and the same stages, and every help page ends with links
   to the rest of its section.
 
-* **Proportion columns end in `_prop`.** `sframe_item_results()` reports
+* Proportion columns end in `_prop`. `sframe_item_results()` reports
   `floor_prop` and `ceiling_prop`, and `sframe_missing_data_results()`
   reports `missing_prop`, since each holds a proportion between 0 and 1.
   The `_pct` columns stay as copies for 1 release, and tables show the
@@ -219,7 +226,11 @@ reference carry the new title.
 
 ## References, cited where they are used and listed once at the end
 
-* **5 reference styles by name.** `render_report(csl = )` takes `"apa"`
+An instrument can now carry the works it draws on, and every report lists
+them once, in a References section at the end, in a standard bibliography
+style.
+
+* `render_report(csl = )` takes 5 reference styles by name: `"apa"`
   (the default), `"chicago-author-date"`, `"harvard"`, `"ieee"` or `"mla"`,
   bundled with the package under CC BY-SA 3.0 (see `inst/COPYRIGHTS`), or
   the path to a `.csl` file. No style is fetched from the network. The
@@ -227,41 +238,38 @@ reference carry the new title.
   `.qmd` report folder holds the style as `<name>.csl`, so a rerun formats
   with that copy. An unknown name stops with the list of the 5. The
   built-in page stays APA 7 only and says so.
-* **A report cites each source where it is used, in both engines.** Under
+* A report cites each source where it is used, in both engines. Under
   the title for the instrument, in the codebook for an item or a scale,
   under the reliability table for a scale, in a plan block's section, beside
   the hypotheses they support, and in the model appendix, as well as once in
   the References list. The built-in page cited only what its text named.
-* **Hypotheses and the study can cite sources.** `cited_by` takes
+* Hypotheses and the study can cite sources. `cited_by` takes
   `"hypothesis:<block id>"`, the hypotheses a plan block declares, and
   `"study"`, the study's problem, objectives and sampling.
   `validate_sframe()` reports a hypothesis target whose block is missing or
   declares no hypotheses, and a `study` target on an instrument with no
   study. The sframe-schema pattern for `cited_by` needs the same 2 targets.
-An instrument can now carry the works it draws on, and every report lists
-them once, in a References section at the end, in a standard bibliography
-style.
 
-* **The built-in report engine cites and lists references.** Without
+* The built-in report engine cites and lists references. Without
   Quarto, `render_report()` printed `[@key]` raw and left out the
   instrument's references and any passed in `references`. It now writes
   each citation as (Author, Year) and ends with an APA 7 References list of
   articles, books, chapters, reports, web pages and software. An entry of
   another type shows a visible note, and a `csl` other than APA 7 gets a
-  message that this engine formats APA 7 only (D8, CX-10).
-* **`sf_reference()`** creates a reference as a CSL-JSON record, the format
-  Zotero, Mendeley and pandoc share. **`read_bibtex()`** reads BibTeX, as
+  message that this engine formats APA 7 only.
+* `sf_reference()` creates a reference as a CSL-JSON record, the format
+  Zotero, Mendeley and pandoc share. `read_bibtex()` reads BibTeX, as
   exported by Google Scholar, Zotero, Mendeley and most journal pages, using
-  base R alone. **`add_references()`** attaches references to an
+  base R alone. `add_references()` attaches references to an
   instrument, and `sf_instrument(components = )` takes them too.
-  **`sframe_references()`** lists them, and **`sframe_bibliography()`**
+  `sframe_references()` lists them, and `sframe_bibliography()`
   writes the CSL-JSON a citation processor reads.
-* **Each reference says where it is cited**: the instrument as a whole, an
+* Each reference says where it is cited: the instrument as a whole, an
   item, a scale, a plan block or a model, in its `cited_by` field.
   `validate_sframe()` gains a `references` check that every target exists
   and every key is unique. A work in another language can carry `language`, which keeps a style
   from title-casing its journal name.
-* **`render_report()` cites in text and lists each work once, at the end.**
+* `render_report()` cites in text and lists each work once, at the end.
   Each result used to carry its own reference list, so the same works
   repeated through the report. Results now cite their methods in text, for
   example "(Cohen, 1988)", and the codebook names the source of
@@ -270,21 +278,21 @@ style.
   bundled with the package, or in any style given as `csl = `. The new
   `references =` argument adds works a host cites in the write-up.
   `render_results()` lists its references once at the end in the same way.
-* **The 30 built-in method references are also held as CSL-JSON.** A test
+* The 30 built-in method references are also held as CSL-JSON. A test
   formats each one through pandoc in APA 7 and compares it with the APA text
   the package already shipped, which holds the 2 forms together.
 * The building-survey-instrument vignette has a section on citing
   sources: `sf_reference()`, `read_bibtex()`, where a work is cited, and
   what `render_report()` does with the list.
-* **SurveyBuilder has a References tab in Survey settings.** Paste BibTeX or
+* SurveyBuilder has a References tab in Survey settings. Paste BibTeX or
   type a reference in, and choose where the instrument cites it. Changes
   apply at once, ahead of Save settings.
-* **SurveyBuilder cites a reference from the study and from a plan block's
-  hypotheses**, as the `cited_by` targets `study` and `hypothesis:<block id>`.
+* SurveyBuilder cites a reference from the study and from a plan block's
+  hypotheses, as the `cited_by` targets `study` and `hypothesis:<block id>`.
   Each is offered only while it is there: the study once it is declared, and
   a block's hypotheses while it states 1. A target cited and no longer there
   still shows, ticked, so it can be taken off.
-* **SurveyBuilder has a citation picker on the plan fields.** Type `@` or
+* SurveyBuilder has a citation picker on the plan fields. Type `@` or
   `/cite` in a research question, a hypothesis, a decision rule or an
   interpretation, or press Cite on its format toolbar, to list the instrument's
   references by key, author, year and title, filtered as you type. A pick
@@ -292,8 +300,8 @@ style.
   and inside an open `[...]` adds `; @key`. A key with no reference is
   shown under the field with "No reference with this key. Add it under
   References.", and "Manage references" opens that tab. The picker is 1 file,
-  `field_tools.js`, which SurveyStudio will share.
-* **SurveyBuilder's long text fields have a format toolbar.** It appears
+  `field_tools.js`, which SurveyStudio shares.
+* SurveyBuilder's long text fields have a format toolbar. It appears
   while a research question, hypothesis, decision rule or interpretation
   has focus, with bold, italic, bulleted and numbered lists, link, cite,
   subscript, superscript and equation. Each writes Markdown around the
@@ -303,25 +311,25 @@ style.
   shows it formatted, with an equation as its TeX. Ctrl+B and Ctrl+I work in
   the field, arrow keys move along the toolbar, and Escape returns to the
   field. The toolbar is part of `field_tools.js`.
-* **`read_bibtex()` reads entries written with parentheses.** BibTeX allows
+* `read_bibtex()` reads entries written with parentheses. BibTeX allows
   `@article(key, ...)` as well as `@article{key, ...}`, and a file may mix the
   2. A closing bracket inside a braced or quoted value ended a parenthesised
   entry early.
-* **`read_bibtex()` refuses a key used by more than 1 entry.** The later
+* `read_bibtex()` refuses a key used by more than 1 entry. The later
   entry replaced the earlier without a word. It is now an error naming every
   repeated key, as `add_references()` does for an id the instrument holds.
 
 ### The file format
 
-* **`read_sframe(text = )` reads a payload held in memory**, such as JSON a
-  host keeps in a database, with no temporary file. **`verify = FALSE`**
+* `read_sframe(text = )` reads a payload held in memory, such as JSON a
+  host keeps in a database, with no temporary file. `verify = FALSE`
   reads content whose hash is missing or does not match, with a warning of
   class `sframe_unverified_warning`, and marks the instrument with the
   attribute `sframe_verified = FALSE`, which `print()` shows. A host can then
   keep every field where it used to rebuild the instrument by hand. Such an
   instrument is written only as a new instrument, or when its amendment log
   names exactly its content.
-* **The bundled schema is the published one.**
+* The bundled schema is the published one.
   `inst/schema/sframe_schema.json` is now a copy of sframe-schema's
   instrument profile, kept identical by a test. The 2 had drifted: the
   bundled copy left `sframe_format` optional and lacked `references`, so a
@@ -332,7 +340,7 @@ style.
 * `references` is a new optional top-level field. It is written only when an
   instrument has at least one, so an instrument with no references keeps the
   file hash it had, the rule `designs` and `amendments` already follow.
-* **Citing a source is disclosure, outside the amendment record.** The
+* Citing a source is disclosure, outside the amendment record. The
   content hash that `amend_sframe()` records leaves `references` out, so a
   reference can be added to a published instrument directly.
 * `inst/schema/sframe_schema.json` documents the field. Its description of
@@ -342,14 +350,14 @@ style.
   `meta`, `render` and `version` included. Corrected.
 * `inst/csl/apa.csl`, the APA 7 style from the Zotero Style Repository, is
   bundled under CC BY-SA 3.0. See `inst/COPYRIGHTS`.
-* **A block's `error` opens with the block id and the method**, as in
+* A block's `error` opens with the block id and the method, as in
   "RQ3 (McNemar test): ". Code that matched the start of an error message
   needs to allow for it.
 
 ## The study an instrument serves
 
-* **The study holds what a preregistration asks for beyond the plan
-  blocks.** `study$preregistration` takes `exclusion_rules`,
+* The study holds what a preregistration asks for beyond the plan
+  blocks. `study$preregistration` takes `exclusion_rules`,
   `stopping_rule`, `primary_outcomes`, `secondary_outcomes`, `multiplicity`
   and `contingency`, each 1 optional text. Set it with
   `sframe_instrument(study = )` or `instrument$study`, and read it with
@@ -358,10 +366,10 @@ style.
   refuses an empty block, a blank or non-text field and an unknown field,
   and the published instrument profile declares it. An instrument with no
   preregistration hashes as before. SurveyBuilder edits the 6 fields on
-  its Study tab, below the sampling plan, and its Plan mode, also Studio's
+  its Study tab, below the sampling plan, and its Plan mode, also SurveyStudio's
   Plan screen, has a "Preregistration fields" button that opens them. A
   blank field is left out, as R writes it.
-* **Text fields may hold Markdown and equations.** A research question,
+* Text fields may hold Markdown and equations. A research question,
   H0, H1, decision rule, interpretation, study problem or deviation report
   may use bold, italic, lists, links, `[@key]` citations, `~sub~`, `^sup^`,
   footnotes and equations (`$...$`, `$$...$$`, by Pandoc's rule, so
@@ -375,20 +383,19 @@ style.
   in a field never runs, and `@word` is a citation only for a known key, so
   an email address or a handle never becomes a missing citation. A
   deviation report is formatted below the amendments table.
-* **A tested result with no hypothesis declared is labelled exploratory.**
+* A tested result with no hypothesis declared is labelled exploratory.
   A block whose result gives a p value and that declared no H0 and no H1
   prints "Exploratory: no hypothesis declared before the data" before its
   result, in both engines, and its entry in the results record carries
   `exploratory: true`. The 2 placeholder sentences earlier interfaces saved
   count as not declared. Descriptive blocks print nothing extra, and a
   block with no hypothesis stays valid.
-* **Every report prints the study in its plan section.** The problem
+* Every report prints the study in its plan section. The problem
   statement, its sources, and a table tracing each objective to the
   research questions that serve it, with "none yet" for an objective no
   question serves and a note naming any question that serves none, in both
   engines.
-* **A `study` field holds the problem, the objectives and the sampling plan**
-  (D13). `sframe_instrument(study = list(problem = , objectives = ,
+* A `study` field holds the problem, the objectives and the sampling plan. `sframe_instrument(study = list(problem = , objectives = ,
   sampling = ))`: the problem in 1 short paragraph, objectives each with an
   id such as `O1` and its text, and the sampling plan's population, method
   (from `sframe_sampling_methods()`, which groups the probability and
@@ -399,109 +406,108 @@ style.
   It is inside the content hash, never on the respondent's page, and a change
   to it after collection is a design amendment. SurveyBuilder and SurveyStudio
   carry it through a save.
-* **`validate_sframe()` checks the study and notes the trace.** It refuses a
+* `validate_sframe()` checks the study and notes the trace. It refuses a
   malformed study, an objective id used twice and a plan block naming an
   objective the study does not declare. It notes, without failing, an
   objective no research question serves, a research question that names no
   objective, and a problem over 150 words. `sframe_notes()` reads the notes,
   and the diagnostic prints them.
-* **`validate_sframe()` refuses what the sframe-schema instrument profile
-  refuses in these fields**, so nothing surveyframe writes fails it. A plan
+* `validate_sframe()` refuses what the sframe-schema instrument profile
+  refuses in these fields, so nothing surveyframe writes fails it. A plan
   block's `objective` is checked with or without a study: it is `""` or 1
   objective id such as `O1`, and an id with no study to declare it fails. A
   hypothesis that is `NA`, written as JSON null, is refused. A study,
   objectives or sampling that is present and empty is refused, with a message
   to drop it. A block with no hypotheses stays valid.
-* **The bundled schema documents the study.** `inst/schema/sframe_schema.json`
+* The bundled schema documents the study. `inst/schema/sframe_schema.json`
   is re-synced from sframe-schema v0.3-draft, whose instrument profile gains
   `study` (problem, objectives, sampling with `method_other`), the plan block
   `objective` and the `hypotheses` shape: a text `null`, a text `alternative`
   or both, or `null`. A reference's `cited_by` may also name
   `hypothesis:<block id>` and `study`. No field became required.
-* **SurveyBuilder edits the study in a Study tab of Survey settings**: the
+* SurveyBuilder edits the study in a Study tab of Survey settings: the
   problem statement, the objectives with their ids, the population, the
   sampling method from the fixed list (with a description for Other) and
   the planned sample size. The study is saved only when one of its fields
   changes, in the shape `write_sframe()` writes, so a study left alone keeps
   its content hash. The builder refuses what `validate_sframe()` refuses,
   including the removal of an objective a plan block names.
-* **The exported survey honours a choice set's `randomise`.** It was set in R
+* The exported survey honours a choice set's `randomise`. It was set in R
   and the builder, and the page never read it. A single choice, multiple
   choice or ranking item now shows its options in an order shuffled once per
   respondent and kept in a draft, and each option still submits its own
-  value (UX-11).
-* **SurveyBuilder works on a narrow screen.** Below 760 px Design shows 1
+  value.
+* SurveyBuilder works on a narrow screen. Below 760 px Design shows 1
   pane at a time, the question list, then the editor with its live preview
   and a Back control, in the standalone builder and inside SurveyStudio.
   Preview and Plan take the whole width, and at 390 x 844 no page is wider
-  than the viewport (UX-01, UX-08).
-* **SurveyBuilder's Survey settings sections are a tablist**: buttons with
+  than the viewport.
+* SurveyBuilder's Survey settings sections are a tablist: buttons with
   `aria-selected` and `aria-controls`, 1 of them in the Tab order, and the
   arrow keys, Home and End move between them. They were divs that answered a
-  click alone (UX-15).
-* **SurveyBuilder's 7 dialogs are labelled modal dialogs** with
+  click alone.
+* SurveyBuilder's 7 dialogs are labelled modal dialogs with
   `aria-modal` and `aria-labelledby`, and their close buttons have a name.
   Tab stays inside the open dialog, and Escape closes the top one through
   the same route as its close button, so focus returns to what opened it.
-  Escape used to drop every open dialog at once and leave focus behind
-  (UX-14).
-* **The exported survey honours a choice set's `allow_other`.** A single or
+  Escape used to drop every open dialog at once and leave focus behind.
+* The exported survey honours a choice set's `allow_other`. A single or
   multiple choice item adds "Other, please specify" last, with a text box,
   and typing in the box chooses it. A single choice submits the code
   `other` in its column, a multiple choice submits `<id>__other` as 1 or 0,
   and both submit the text in `<id>__other_text`. Other chosen with nothing
   typed blocks the page. SurveyBuilder turns the option off for an ordered
-  set (UX-11).
-* **The "Other, please specify" columns are known to R.** A choice set with
+  set.
+* The "Other, please specify" columns are known to R. A choice set with
   `allow_other` gives a single choice item `<id>__other_text` and a multiple
   choice item `<id>__other` and `<id>__other_text`, so validation, the
   Google Sheets header, the Shiny row and the quality report all list them.
   The Shiny survey fills them as the static survey does, and the text of an
   Other does not count as a missing answer.
-* **The Shiny survey draws "Other, please specify"** for a choice set with
+* The Shiny survey draws "Other, please specify" for a choice set with
   `allow_other`, as the exported survey does: the option last, a text box
   under it, and typing in the box chooses it. `run_survey()` and
   `sframe_survey_server()` submit the same columns as the exported survey,
   and Other chosen with nothing typed stops the page or the submission.
-* **`read_responses()` reads an Other answer.** A single choice item whose set
+* `read_responses()` reads an Other answer. A single choice item whose set
   allows Other accepts the code `other`, and its column stays text whatever
   the set's codes look like, since a numeric set with Other would otherwise
   turn on whether anyone chose Other. Every `<id>__other_text` column is read
   as text, and `<id>__other` as a number like the other option columns.
-* **`allow_other` is refused where it cannot work.** `sframe_choice_set()` and
+* `allow_other` is refused where it cannot work. `sframe_choice_set()` and
   `validate_sframe()` refuse it on a set holding the value `other` or
   `other_text`, which would share a code or a column with Other, and on an
   ordered set, where Other has no place on the scale.
-* **The codebook, the frequency tables and the report charts name Other.**
+* The codebook, the frequency tables and the report charts name Other.
   The choices table of `sframe_codebook()` and `as.data.frame()` lists
   `other` with the label "Other" for a set with `allow_other`, and a frequency
   table or chart shows "Other" for the code. The text typed for Other goes to
   the text-analysis path: `sframe_clean_text()` and the text plans take
   `<id>__other_text` as a text item, and the dashboard offers no filter on it.
-* **SurveyBuilder's welcome and thank-you pages are entries in the question
-  list**, "Welcome page" first and "Thank-you page" last. Selecting one opens
+* SurveyBuilder's welcome and thank-you pages are entries in the question
+  list, "Welcome page" first and "Thank-you page" last. Selecting one opens
   its editor on the right and its preview in the centre, and the Survey
-  settings dialog loses its Welcome and Thank You tabs (UX-10). A page left
+  settings dialog loses its Welcome and Thank You tabs. A page left
   alone keeps the content hash. Inside SurveyStudio, the dialog's Google
-  Sheets and References tabs link to Studio's Collect and References
+  Sheets and References tabs link to SurveyStudio's Collect and References
   screens, and the standalone builder keeps both tabs.
-* **SurveyBuilder shows the selected question in its centre pane** as a
+* SurveyBuilder shows the selected question in its centre pane as a
   respondent sees it, drawn by the survey template itself through a
   preview-only "show only this item" mode, so there is 1 renderer. It is
   redrawn a moment after each edit, has a desktop and a mobile width, and is
-  read-only: the editor stays on the right (UX-09). Section breaks and text
+  read-only: the editor stays on the right. Section breaks and text
   blocks show as on their page.
-* **SurveyBuilder's Plan tabs are "Declared analyses" and "Expected
-  outputs"**, where they were "Run preview" and "Report outline", so Preview
-  in the builder means the respondent's survey alone (UX-17).
-* **SurveyBuilder sets a cross-tab's percentages.** A cross-tab or
+* SurveyBuilder's Plan tabs are "Declared analyses" and "Expected
+  outputs", where they were "Run preview" and "Report outline", so Preview
+  in the builder means the respondent's survey alone.
+* SurveyBuilder sets a cross-tab's percentages. A cross-tab or
   chi-square plan has a "Percentages in the table" choice: counts only, row,
-  column or percent of the total, saved as `options$percent` (UX-02).
-* **SurveyBuilder drops an empty study on save.** A file holding
+  column or percent of the total, saved as `options$percent`.
+* SurveyBuilder drops an empty study on save. A file holding
   `"study": {}` was saved with `{}` again, which `validate_sframe()` and the
   sframe-schema profile refuse. Empty objectives and an empty sampling plan
   are left out the same way, as `write_sframe()` does.
-* **SurveyBuilder keeps the objective a plan block serves.** Saving the plan
+* SurveyBuilder keeps the objective a plan block serves. Saving the plan
   dialog built the block afresh, so any edit there dropped an `objective` set
   in R. The dialog now has an "Objective served" choice listing the study's
   objectives, and keeps the block's own objective even when the study no
@@ -511,20 +517,20 @@ style.
 
 * `?amend_sframe` says the amendment is sealed when the file is written:
   `write_sframe()` hashes the object as it stands then, so a change made to
-  it before writing is part of the author's new version (Codex U-1).
+  it before writing is part of the author's new version.
 
-* **`amend_sframe(version = )` sets the version an amendment writes.** `NULL`,
+* `amend_sframe(version = )` sets the version an amendment writes. `NULL`,
   the default, keeps the version, and when it is unchanged a message
   suggests the next: the minor number for a design amendment (1.0.0 to
   1.1.0), the patch number for a pipeline amendment (1.0.0 to 1.0.1), with
   the reason. The version set is inside the recorded content.
-* **`sframe_drop_items(instrument, items, from)` drops items from scales or
-  models.** It takes them out of the named scales (with their reverse keys
+* `sframe_drop_items(instrument, items, from)` drops items from scales or
+  models. It takes them out of the named scales (with their reverse keys
   and weights) or every construct of a named model, and out of any plan
   block role that lists them with other variables. A role naming only that
   item keeps it. The questions and their answers stay, and nothing is
   recorded: `amend_sframe()` records the drop as a design amendment.
-* **`sframe_item_flags(result)` lists the items past the usual cut-offs.**
+* `sframe_item_flags(result)` lists the items past the usual cut-offs.
   For a reliability, item, EFA readiness, EFA or validity result, a plan
   result for one of them, a lavaan CFA or a seminr PLS model, it gives each
   statistic, its cut-off and source in APA 7 form, and a ready reason such as
@@ -533,7 +539,7 @@ style.
   wording to be checked, HTMT takes .85 or .90 and keeps the value applied,
   and PLS keeps .708. Checked against psych, lavaan and seminr. A reliability
   result now carries `alpha_if_deleted` for each item.
-* **The report gives the instrument version and its amendment list.** Under
+* The report gives the instrument version and its amendment list. Under
   Reproducibility, both engines print the version beside the hash, then
   every recorded amendment, oldest first: date, tier, reason, what changed,
   deviation report, author and sign-off. An instrument with no log says "No
@@ -541,7 +547,7 @@ style.
 
 ## Analysis
 
-* **A plan may weight by a column that is not a question.** A design
+* A plan may weight by a column that is not a question. A design
   weight is set by the researcher, not asked of respondents, so the
   `weights` role of a frequency, descriptives, cross-tabulation or
   chi-square block may now name a column that is not an item.
@@ -550,19 +556,19 @@ style.
   Read it with `read_responses(meta_cols = )`. A named weight column the
   responses lack fails the block with a message saying so, where it was
   skipped and the result came out unweighted.
-* **Cross-tab percentages and totals.** A `crosstab` or `chi_square`
+* Cross-tabs give percentages and totals. A `crosstab` or `chi_square`
   result carries `$totals`, the counts with a Total row and column. With
   `options$percent = "row"`, `"column"` or `"total"` it also carries
   `$percent_table`, the percentages over that denominator, the report shows
   each count with its percentage beside it, and `sframe_plot_crosstab()`
   draws the percentages. Checked against `prop.table()` and `addmargins()`
   on 3 demo pairs, a zero cell among them.
-* **Multinomial logistic regression has a full table.** It gives b, SE, z,
+* Multinomial logistic regression has a full table. It gives b, SE, z,
   p, the odds ratio and its 95% interval for each outcome category against
   a named reference category, and the result text names the reference.
   `render_result()` also returns a result's `syntax` where it has one. The
-  logistic demo results are regenerated (CX-14).
-* **Model outlines give the notes for their own model type.**
+  logistic demo results are regenerated.
+* Model outlines give the notes for their own model type.
   `model_report_template()` gave every model the same notes, asking an EFA
   for structural paths and a PLS-SEM model for fit indices. EFA, CFA, CB-SEM
   and PLS-SEM now each get their own list. PLS-SEM follows Hair, Hult,
@@ -571,16 +577,16 @@ style.
   with the thresholds the book gives, then the structural model. The seminr
   script's assessment section follows the same checks.
 
-* **The seminr script tests every declared indirect effect.**
+* The seminr script tests every declared indirect effect.
   `seminr_syntax()` writes one `specific_effect_significance()` call per
   `sf_indirect()`, as the lavaan syntax already defined each one.
 
-* **EFA reads factor item columns by their labels.** `efa_report()` and
+* EFA reads factor item columns by their labels. `efa_report()` and
   `efa_solution()` read item columns with the same rule as every other
   numeric method, so a factor holding 10 to 50 counts as those values, where
-  its level positions had been used (CX-06).
+  its level positions had been used.
 
-* **Regression syntax codes predictors as the analysis does.** The code
+* Regression syntax codes predictors as the analysis does. The code
   `analysis_syntax()` writes for linear, binary, ordinal and multinomial
   logistic regression and ANCOVA codes each predictor the way the package
   does: a number when every value reads as a number, a category otherwise.
@@ -591,42 +597,41 @@ style.
   `analysis_syntax()` now covers ordinal and multinomial logistic
   regression.
 
-* **Choice descriptives honour `split_by` and weights.** A descriptives
+* Choice descriptives honour `split_by` and weights. A descriptives
   block counted choice items raw and pooled whatever its grouping and
   weights. Counts and percentages now come per group, in the order the
-  choice set declares, and weighted when a weight column is named (D5,
-  CX-07).
+  choice set declares, and weighted when a weight column is named.
 
-* **One check for every weight column.** Frequency, cross-tabulation and
+* Every weight column gets the same check. Frequency, cross-tabulation and
   descriptives blocks stop with an error naming the weight column when a
   weight is negative, infinite or not a number, or when the weights sum to
   zero. A row with a missing weight is dropped, and the result says how many
-  were (D6, CX-09).
+  were.
 
-* **Kendall's tau reports N, with no degrees of freedom.** `cor.test()`
+* Kendall's tau reports N, with no degrees of freedom. `cor.test()`
   gives Kendall no df, yet the line read `tau(58)` and the table carried a
   df column. It now reads `tau = 0.39, 95% CI [...], p < .001, N = 60`.
-  Pearson and Spearman keep `r(df)` and `r_s(df)` (D9, CX-17).
+  Pearson and Spearman keep `r(df)` and `r_s(df)`.
 
-* **The paired t test names the higher measure.** Its APA line and prompt
-  end with ", higher in <measure>", as the Wilcoxon signed-rank line already
-  did (D1 follow-up).
+* The paired t test names the higher measure. Its APA line and prompt
+  end with `", higher in <measure>"`, as the Wilcoxon signed-rank line already
+  did.
 
-* **Named weights in `sensitivity_analysis()` match criteria by name.**
+* Named weights in `sensitivity_analysis()` match criteria by name.
   Named weights are matched to the criteria in any order, as the ranking
   blocks already do, and a name that is not a criterion or a criterion with
   no weight is an error. Unnamed weights keep the order of the criteria.
 
-* **Logistic syntax codes the outcome as the analysis does.** The code
+* Logistic syntax codes the outcome as the analysis does. The code
   `analysis_syntax()` writes for a binary logistic regression recodes the
   outcome to 0 and 1 the way the runner does before `glm()`, so a text
   outcome runs and the coefficients match the result.
 
-* **ANCOVA syntax writes every covariate.** `analysis_syntax()` for an
+* ANCOVA syntax writes every covariate. `analysis_syntax()` for an
   ANCOVA wrote only the first declared covariate, so its F differed from
-  the result. It now writes each one (CX-02).
+  the result. It now writes each one.
 
-* **Two-group effect sizes keep their direction.** Cohen's d for the
+* Two-group effect sizes keep their direction. Cohen's d for the
   independent t test, and r for Mann-Whitney and the Wilcoxon signed-rank
   test, were magnitudes, and their bootstrap intervals were intervals of a
   magnitude, so they could never include zero. Each is now signed, first
@@ -636,19 +641,19 @@ style.
   `paired` and `small_sample` demo results are regenerated: their r values
   can print with a minus sign, and the `small_sample` r interval now starts at
   0.12.
-* **A two-group test takes its groups in the declared order.** The
+* A two-group test takes its groups in the declared order. The
   independent t test and Mann-Whitney ordered the 2 groups by first
   appearance in the data, so re-sorting the responses flipped the sign of t
   and z. The order is now the grouping item's choice set as the instrument
   lists it, then factor levels, then sorted values. The code
   `analysis_syntax()` writes names the same order.
-* **A statistic is never replaced by a choice label.** A result table read
+* A statistic is never replaced by a choice label. A result table read
   every text cell through the instrument's labels, so a statistic equal to a
   choice code took that code's label: the `factor_structure` demo's "Suggested
   factors" read "Disagree" in place of 2. Choice codes are now relabelled only
   in a column of response values, and never in a Statistic and Value table.
   Item and scale ids still read as their labels everywhere.
-* **A descriptives plan table has reader headings**: Variable, N, Valid N,
+* A descriptives plan table has reader headings: Variable, N, Valid N,
   Missing, Mean, SD, the confidence interval's bounds and the rest, as the
   other plan tables have. It showed `valid_n`, `missing_n` and `sd`. The
   group column is left out when there is no split, and the weighted mean
@@ -666,13 +671,13 @@ style.
 * A frequency table labels each code from the item's own choice set. A code
   that means different things in 2 choice sets (1 for Male in one, 1 for
   North in another) used to print as the bare code.
-* **Text codes such as "01" keep their leading zero when responses are read.**
+* Text codes such as "01" keep their leading zero when responses are read.
   `read_responses()` converted every choice column whose codes looked like
   numbers, so "01" and "02" became 1 and 2, and a frequency table showed the
   declared options First and Second with a count of 0 beside unlabelled rows
   1 and 2. Only codes that survive a numeric round trip, such as 1 and 2, are
   now read as numbers. The rest stay as written.
-* **Result text names variables and groups by their labels.** The tables
+* Result text names variables and groups by their labels. The tables
   and charts used the instrument's labels, while the text beside them said
   `attendee_type`, "higher in in_person" and "reference category keynote".
   A variable now appears as its label in double quotes, since a label is
@@ -680,15 +685,15 @@ style.
   A group or category appears as its choice label. An interaction term in a
   table, such as `attendee_role:format`, reads as its 2 labels joined by
   a times sign. A runner called outside `run_analysis_plan()` keeps the
-  ids (CX-20).
-* **A block that cannot run says which block, what is wrong and what to do.**
+  ids.
+* A block that cannot run says which block, what is wrong and what to do.
   McNemar, Friedman, ANCOVA, Fisher's exact test, partial correlation, the
   ordinal, multinomial and Firth logistic models and moderation said only
   "X failed.", and EFA readiness passed on "'x' is empty". Each now names
   the data problem, suggests a remedy and keeps R's own message. An infinite
   value in a variable is named as the cause, where R's message did not say
-  it (CX-13).
-* **`read_responses()` reads semicolon and tab files.** It detects a comma,
+  it.
+* `read_responses()` reads semicolon and tab files. It detects a comma,
   semicolon or tab separator from the header line, and a new `delim`
   argument overrides the detection. A semicolon file is read as Excel writes
   it in a comma decimal locale, so `3,5` in a numeric column reads as 3.5,
@@ -712,7 +717,7 @@ style.
   names the threshold too. The argument's help says how to check 3-item
   scales, in a call or in a plan.
 
-* **An `efa_solution` block that names a missing item says which.** Its
+* An `efa_solution` block that names a missing item says which. Its
   `items` and `variables` roles went unchecked, so a block naming an item the
   instrument or the responses lack failed with "EFA solution requires at least
   two available item columns." and never named the item. It now fails the
@@ -721,11 +726,10 @@ style.
 ### Answers coded and ordered as the instrument declares them
 
 Every statistic in a review of the runners against base R and reference
-packages matched (Fable sitting 2, Codex passes 2 and 3). These are defects
-in how answers were coded, ordered and labelled before and after the
-arithmetic.
+packages matched. The defects below were in how answers were coded,
+ordered and labelled before and after the arithmetic.
 
-* **McNemar's test pairs each category with itself.** The table was
+* McNemar's test pairs each category with itself. The table was
   `table()` of the 2 columns as they came, so the first row level was paired
   with the first column level whatever they were. 2 factors holding yes and
   no in opposite level order gave chi-square 0.80 and p = .371 where the
@@ -735,17 +739,17 @@ arithmetic.
   on 1 order for both items, the declared choice set and then any other
   value, 2 items with different choice sets are refused with both named,
   and a pair of categories nobody moved between gives an error in place of
-  a statistic of NaN (FR-22, P2-03).
-* **An ordinal outcome is ordered as its choice set declares.**
+  a statistic of NaN.
+* An ordinal outcome is ordered as its choice set declares.
   `regression_logistic_ordinal` ordered a text-coded outcome
   alphabetically, so low, medium, high became high < low < medium and the
-  slope's sign was reversed (0.85 became -0.60 on Fable's data). The order
+  slope's sign was reversed (0.85 became -0.60 on a test dataset). The order
   is now the declared choice set, then other values, numbers by value (an
   outcome coded "2", "9", "10" in that order, not "10" first). The result
   carries `$outcome_levels`, and the sentence names the order: "Ordinal
   logistic regression of "Rating", ordered Low < Medium < High, was
-  estimated with 90 complete cases." (FR-19).
-* **A nominal choice item enters a model as a category.** A
+  estimated with 90 complete cases."
+* A nominal choice item enters a model as a category. A
   `single_choice` item coded 1, 2, 3 for North, South and East entered
   linear regression as 1 slope, as if East were 3 times North (R squared
   .09 where the categorical model gives .23). A `single_choice` or
@@ -757,8 +761,8 @@ arithmetic.
   unused categories are dropped before fitting, the result carries
   `$predictor_coding`, and the sentence names the reference: ""Region"
   enters as 2 indicator terms against the reference category North." See
-  "How answers are coded" in `?run_analysis_plan` (FR-20).
-* **A binary model names the level it models, in every locale.** Binary
+  "How answers are coded" in `?run_analysis_plan`.
+* A binary model names the level it models, in every locale. Binary
   logistic regression modelled the level that sorted last in the session's
   collation: an outcome of "Yes" and "no" gave a slope of 1.238 under
   en_GB.UTF-8 and -1.238 under C, and nothing said which level the odds
@@ -770,8 +774,7 @@ arithmetic.
   logistic results carry `$event` and `$reference_level`, and the sentence
   says "The odds are of "Outcome" being Yes, against No." The multinomial
   reference category and the order of a t test's or Mann-Whitney test's 2
-  groups with no choice set follow the same locale-free order (FR-21,
-  P2-08).
+  groups with no choice set follow the same locale-free order.
   The event is the last declared code, as `glm()` models the second level,
   so a file whose choice set declares yes, then no, models No unless
   `options$event = "yes"` says otherwise. SurveyBuilder's Yes/No presets
@@ -779,20 +782,20 @@ arithmetic.
   the set a new yes/no question gets) now declare No first, so new files
   model Yes. The 2 bundled files that declare yes, then no keep their order,
   since changing it would change their hashes.
-* **A "do not know" code in a scale's choice set is not scored.** Every
+* A "do not know" code in a scale's choice set is not scored. Every
   numeric code was a score, so a set of 1 to 5 with 99 for "do not know"
   gave the item bounds 1 to 99: a reversed 1 became 99 and a respondent
   answering 4, 4, 2, 1 scored 27.25 where 3.75 is right, with nobody
   choosing 99. A 99 that was chosen entered the mean, and alpha fell from
-  .78 to .04 on Fable's data. `score_scales()`, the reliability and item
+  .78 to .04 on a test dataset. `score_scales()`, the reliability and item
   results now score the longest run of codes at 1 even step and read other
   codes as missing, with a message ("99 is not scored"), and
   `validate_sframe()` notes such a set, naming its codes. A set with 2
   equally long runs, such as 1, 2, 4, 5, has no clear run, so its scale is
   refused with an error and the note says so. See "Codes that are not scores" in
   `?score_scales`. A declared "not a score" code in the schema is planned
-  for 0.4.4 (FR-18).
-* **The R code shown beside a result codes answers as the result did.**
+  for 0.4.4.
+* The R code shown beside a result codes answers as the result did.
   `sframe_syntax_result()` and the report's code chunks wrote their own
   coding (`ordered()`, `as.factor()`, `table()` of the 2 McNemar columns,
   any column of numbers as a number), so after the 4 fixes above they would
@@ -802,46 +805,44 @@ arithmetic.
   predictor as `factor(x, levels = c("1", "2", "3"))`, the ordinal outcome in declared
   order, the binary event as `== "Yes"`, and McNemar's 2 items on 1 set of
   levels. The tests run the code and compare its estimates with the result.
-* **A CSV row wider than its header is refused, not shifted.** A file
+* A CSV row wider than its header is refused, not shifted. A file
   whose data rows had 1 field more than the header, as a trailing separator
   gives, was read with its first column as row names: every answer and the
   respondent id moved 1 column to the left, with no warning. `read_responses()`
   now counts each record's fields first. When every data row has exactly 1
   extra field and it is empty in all of them, the field is dropped with a
   message. Any other row whose width differs from the header's is refused,
-  naming the first 3 lines and their field counts (P3-01).
-* **A blank answer is missing in every column `read_responses()` returns.**
+  naming the first 3 lines and their field counts.
+* A blank answer is missing in every column `read_responses()` returns.
   Only text columns were cleaned, so a factor column of a data frame kept
   its "" as an answer, and a declared numeric column with 1 value that did
   not read as a number stayed text with its "" and no message. Every text
   or factor column now has its blank answers (empty, or only spaces) made
   missing first, factors become text, and a declared numeric column that
-  stays text gives a warning naming the column and up to 3 of its values
-  (P3-05).
-* **A file of 1 column keeps an unanswered respondent.** In a CSV file
+  stays text gives a warning naming the column and up to 3 of its values.
+* A file of 1 column keeps an unanswered respondent. In a CSV file
   with a single column, a respondent who left the question blank is a blank
   line, which was skipped, so the respondent was lost and every later row
   moved up. Blank lines are now kept as missing answers in a 1-column file,
   except those after the last line that holds anything. No surveyframe
-  collector writes such a file (P3-02).
-* **A choice code with white space at either end is refused.** The reader
+  collector writes such a file.
+* A choice code with white space at either end is refused. The reader
   trimmed a set's codes before deciding whether they were numbers, so a set
   declared as " 1" and "2" read as numeric and the answer " 1" became 1, a
   code the set does not hold: the frequency table gained an unlabelled
   category. `validate_sframe()` now reports such a code as a problem, naming
   the set and the code, and the reader compares codes as declared.
   SurveyBuilder already trims a code as it is typed, so only a set written
-  in R or edited by hand can hold one (P3-04).
-* **`export_responses()` keeps codes such as "01" as text.** It decided
+  in R or edited by hand can hold one.
+* `export_responses()` keeps codes such as "01" as text. It decided
   that a choice set's codes were numbers with `as.numeric()` alone, so codes
   "01" and "02" left as 1 and 2 in .sav and .dta files: the labels survived
   but the codes no longer matched the instrument, and analysis of the
   re-read file stopped. The export and `read_responses()` now share 1 test,
   the numeric round trip, so such codes take the text route already there:
-  labelled text in a .sav, positions 1, 2, 3 with their labels in a .dta
-  (P3-03).
-* **Every analysis treats a blank answer as missing and ignores unused
-  factor levels.** `read_responses()` made blanks missing, but data built in
+  labelled text in a .sav, positions 1, 2, 3 with their labels in a .dta.
+* Every analysis treats a blank answer as missing and ignores unused
+  factor levels. `read_responses()` made blanks missing, but data built in
   R or passed from a host application reached the runners with "" as an
   answer. It was a valid answer in the missing data report (2 valid of
   "", "a" and NA), a category in Fisher's test (N = 6 and a 3 by 2 table
@@ -852,16 +853,14 @@ arithmetic.
   with "missing value where TRUE/FALSE needed". Every runner, the
   descriptives and the missing data report now start from 1 cleaning, the
   blank rule `read_responses()` uses (empty, or only spaces) and only the
-  factor levels that have answers (P2-04, P2-05, P2-07, FR-28, FR-29,
-  FR-31).
-* **A chi-square cross-tab names both axes by their choice labels.** The
+  factor levels that have answers.
+* A chi-square cross-tab names both axes by their choice labels. The
   table carried the codes, and only a code meaning the same in every
   choice set of the instrument was relabelled, so a channel item coded 1 to
   3 showed rows "1", "2", "3", and a 0:1 item showed columns "No" and "1".
   Each axis is now labelled from its own item's choice set, in declared
-  order, in the counts, the totals, the percentages and the weighted table
-  (FR-37).
-* **A frequency table's percentages are of those who answered.** Its
+  order, in the counts, the totals, the percentages and the weighted table.
+* A frequency table's percentages are of those who answered. Its
   Percent column was of every row, missing included, while the weighted
   table beside it and a descriptives block's counts were of those who
   answered: North was 28.9% in 1 table and 36.1% in the other with every
@@ -869,8 +868,7 @@ arithmetic.
   the valid percent everywhere, the missing row keeps its count with no
   percentage, and the sentence gives the number who answered and the number
   missing: "Frequency distribution for "Region" (N = 72, 18 missing)."
-  (FR-23).
-* **The intervals for Cramer's V and eta squared can reach 0.**
+* The intervals for Cramer's V and eta squared can reach 0.
   `sframe_cramers_v_ci()` and `sframe_eta_sq_ci()` were percentile
   bootstraps, and a resampled V or eta squared is never below 0, so the
   interval sat above the estimate when the effect was small: an exactly
@@ -883,38 +881,38 @@ arithmetic.
   and ANOVAs. They involve no resampling, so `R` and `seed` are kept but
   not used, and the result carries `method`. The chi-square, phi and
   one-way ANOVA results change their intervals. The Kruskal-Wallis eta
-  squared keeps its bootstrap interval (FR-24).
-* **Every result sentence uses the block's alpha.** A block's `alpha`
+  squared keeps its bootstrap interval.
+* Every result sentence uses the block's alpha. A block's `alpha`
   reached the independent t test and the one-way ANOVA only, and the other
   sentences compared p with a fixed .05: with alpha .001, a Pearson
   correlation at p = .014 read "a positive, medium significant
   correlation". The chi-square, Mann-Whitney, paired t, Wilcoxon,
   Kruskal-Wallis, correlation, linear and binary logistic sentences now
-  compare p with the block's alpha too (FR-25).
-* **A sum score with unanswered items is prorated.** With `method =
+  compare p with the block's alpha too.
+* A sum score with unanswered items is prorated. With `method =
   "sum"` and `min_valid` below the number of items, an unanswered item
   counted as 0: a respondent answering 5 and 5 on 2 of 4 items scored 10,
   the middle of the 4 to 20 range, where the mean method gave the top. The
   sum is now the mean of the answered items times the number of items (with
   weights, the weighted mean times the sum of the weights), 20 here. A
   respondent who answered every item gets the plain sum, as before. The
-  help for `min_valid` and `?score_scales` say so (FR-26).
-* **A chi-square block with a constant variable is refused.** A variable
+  help for `min_valid` and `?score_scales` say so.
+* A chi-square block with a constant variable is refused. A variable
   with 1 category made a 1 by k table, which `chisq.test()` tests against
   equal shares: a goodness-of-fit test reported as "chi-square(2, N = 90) =
   6.67, p = .036, V = NA" and "a significant association". The block now
-  stops, naming the variable with 1 category (FR-27).
+  stops, naming the variable with 1 category.
 * A chi-square with `options$simulate_p_value` on a sparse table printed
   "chi-square(NA, N = 4)", since a simulated p value has no degrees of
   freedom. The line now omits them and says how the p value was found:
   "chi-square(N = 4) = 0.00, p = .52 (simulated from 2000 tables)", for
-  example (P2-09).
-* **`score_scales()` names the answers it cannot score.** A value outside
+  example.
+* `score_scales()` names the answers it cannot score. A value outside
   the item's choice set was scored: 7 on a 1 to 5 item counted as 7 and a
   reversed 0 became 6. An answer that is not a number, such as "4,5",
   became missing without a word and counted as unanswered toward
-  `min_valid`. Both are now missing with a message naming them (FR-30).
-* **APA 7 numbers.** A p value above .999 is written p > .999 (it was p =
+  `min_valid`. Both are now missing with a message naming them.
+* Numbers follow APA 7. A p value above .999 is written p > .999 (it was p =
   1.000), and one just below the alpha in force keeps the decimals that
   show it, p = .04996 where ".050" sat beside "significant". Cramer's V,
   written V by the chi-square block, drops its leading zero as phi does (V
@@ -922,42 +920,41 @@ arithmetic.
   -0.00. A model coefficient or standard error below .01 in size shows 3
   decimals, so a slope of 0.004 with p < .001 no longer prints as 0.00. A
   table column prints whole numbers with no decimals only when it holds
-  counts or percentages: F values of 4 and 9 printed "4" and "9" (FR-32).
-* **A block's bootstrap interval no longer depends on the blocks before
-  it.** The plan seed started 1 random stream for the whole plan, so adding
+  counts or percentages: F values of 4 and 9 printed "4" and "9".
+* A block's bootstrap interval no longer depends on the blocks before
+  it. The plan seed started 1 random stream for the whole plan, so adding
   a Spearman block before a t test moved its d interval from [0.097, 1.221]
   to [0.079, 1.180]. Each block now starts its own stream from the plan
   seed and its id, so amending the plan leaves every other block's interval
   as it was. Every bootstrap interval in a plan therefore differs from
-  0.4.2's for the same seed (FR-33).
+  0.4.2's for the same seed.
 * An interval prints its own level. Every bootstrap interval and the
   Fisher z interval printed "95% CI" whatever their `conf.level`, so a 90%
   interval read as 95%. The level now travels on each interval the package
-  builds (B-04).
+  builds.
 * A chi-square block with a weights role tests the unweighted counts, as
   before, and now says so in its sentence and note, naming the weight whose
-  counts are in the weighted table beside it (FR-34).
+  counts are in the weighted table beside it.
 * The ordinal logistic table gives each slope's standard error, p value,
   odds ratio and 95% interval. The thresholds (the cut points between
   outcome levels, such as low|medium) keep their estimate and standard
   error and no longer print an odds ratio. The result's `$coefficients`
-  gains `p` and `threshold` (FR-35).
+  gains `p` and `threshold`.
 * A Firth logistic block reads `options$conf_level` as well as
   `options$conf.level`. Both were accepted, and `conf_level` gave a 95%
-  interval and was not listed as ignored (FR-36).
-* **`sframe_assumption_results()` says which checks ran.** Its sentence was
+  interval and was not listed as ignored.
+* `sframe_assumption_results()` says which checks ran. Its sentence was
   always "Assumption checks were computed.", even when no check ran, as
   with an outcome and a group and no `variables`. It now names the checks
   that ran, or says none ran and which arguments each check needs, naming
-  an `outcome` given without `predictors` or a `group` without `variables`
-  (review_040 defect 3).
-* **`render_results()` refuses a citation format it does not write.** Its
+  an `outcome` given without `predictors` or a `group` without `variables`.
+* `render_results()` refuses a citation format it does not write. Its
   `citation_format` accepted "apa", "ama" and "vancouver" and never used the
   argument: all 3 gave the same APA 7 document, so a methods section could
   name a style the report never applied. "ama" and "vancouver" were never
   applied in any release. `citation_format` now defaults to "apa" and
-  refuses anything else with a message (review_040 defect 7).
-* **9 demos' stored results are regenerated** for the fixes above:
+  refuses anything else with a message.
+* 9 demos' stored results are regenerated for the fixes above:
   `categorical` (V's interval and leading zero, rows in declared order),
   `correlation_regression`, `paired`, `two_group`, `small_sample` and
   `sem_pls` (bootstrap intervals from the per-block seed, p > .999, the
@@ -968,15 +965,15 @@ arithmetic.
 
 ## Reports
 
-* **The missing-data patterns table gives a percentage under "Percent".**
+* The missing-data patterns table gives a percentage under "Percent".
   `sframe_missing_data_results()` stored each pattern's share as a
   proportion in `patterns$percent`, so both report engines printed "Complete
   case | 60 | 1" under "Percent" for 60 complete cases. `percent` now runs
   from 0 to 100 and a new `prop` column holds the proportion. The
   `missing_pct` columns kept for 1 release hold a proportion, as their help
-  now says (Codex P1-01).
+  now says.
 
-* **Descriptives count a categorical item's answers as valid.**
+* Descriptives count a categorical item's answers as valid.
   `sframe_descriptives_results()` turned every value into a number before
   counting, so category codes such as "online" counted as missing and the
   report gave a choice item 60 missing and 0 valid beside a missing-data
@@ -985,9 +982,9 @@ arithmetic.
   its counts with `NA` in every numeric column, and both report engines
   print a dash there with a table note. The Quarto report now lists the
   instrument's items, as the built-in report does, where it had listed
-  every column that held a number (Codex P1-02).
+  every column that held a number.
 
-* **Every report table heading is set as APA 7 sets it, in every format.**
+* Every report table heading is set as APA 7 sets it, in every format.
   The Quarto report printed raw column names (`missing_n`, `ci_low`,
   `weighted_mean`) and, in HTML, an unlabelled column of row names. 1 label
   map now gives both engines their headings: words for counts ("Valid
@@ -995,14 +992,13 @@ arithmetic.
   *Mdn*, *SE*) and the confidence level in an interval heading ("95% CI
   lower"). Row names are left out in every format.
   `sframe_apa_col_labels()`, on the `sframe_apa_cells()` help page, gives
-  those headings for HTML or Markdown. The `n_items` heading reads "Items"
-  (Codex P1-03).
+  those headings for HTML or Markdown. The `n_items` heading reads "Items".
 
 * Quarto reports in Word, OpenDocument and PDF number tables and figures as
   APA 7 does: "Table 1" or "Figure 1" in bold on its own line, and the title
   in italics on the next, both above the table or figure. Tables printed
   "Table 1: Provenance" on 1 line, and figures had a bold title with no
-  number (Codex P1-04).
+  number.
 
 * In the Typst and LaTeX PDFs a table's or figure's number and title stay
   on the page of the table or figure, where they could land at a page foot
@@ -1020,10 +1016,10 @@ arithmetic.
   single-spaced at 10 points, and each column is at least as wide as its
   longest word, since item IDs such as `sessions_attended` ran into the next
   column of the codebook and plan tables. Outside HTML the instrument hash
-  takes a line of its own, which it ran past the LaTeX margin (Codex P1-05).
+  takes a line of its own, which it ran past the LaTeX margin.
 
-* **Quarto is the report engine, and `render_report()` finds the copy
-  RStudio or Positron bundles.** It looked only for `quarto` on the PATH,
+* Quarto is the report engine, and `render_report()` finds the copy
+  RStudio or Positron bundles. It looked only for `quarto` on the PATH,
   where neither IDE puts its copy, so a machine with RStudio and no separate
   Quarto got the built-in page. It now tries, in order, `QUARTO_PATH` (the
   path of the executable), the PATH, `RSTUDIO_QUARTO`, RStudio's bundled
@@ -1034,7 +1030,7 @@ arithmetic.
   gets no new features and is not promised to match the Quarto report.
   The Quality summary table and Respondent-wise missingness, which only
   the built-in page had, are in the Quarto report too.
-* **Word, OpenDocument and a Quarto PDF.** `render_report(format =)` takes
+* Reports come in Word, OpenDocument and a Quarto PDF. `render_report(format =)` takes
   `"docx"` and `"odt"`, written by Quarto and styled by 2 bundled APA 7
   reference documents: Times New Roman 12, double spacing, a half-inch
   first-line indent, level 1 headings centred and bold. Without Quarto they
@@ -1043,7 +1039,7 @@ arithmetic.
   where none is, and only without Quarto through the built-in page printed
   by pagedown. The `"converter"` attribute and the manifest name the route.
   Outside HTML every table is numbered, and its title kept, in each format.
-* **On a Mac without XQuartz, a PDF report through Typst had no figures.**
+* On a Mac without XQuartz, a PDF report through Typst had no figures.
   Quarto stopped with "file not found" and no PDF was written. R's own
   `svg()` device needs the Cairo that XQuartz installs, and without it R
   still reports Cairo as present but draws nothing. `render_report()` now
@@ -1054,25 +1050,23 @@ arithmetic.
   Charts saved as SVG with `sframe_save_figures()` or
   `sframe_format_result()` need svglite, and now say so before drawing, also
   where Cairo is present.
-* **A PDF printed without Quarto left Chrome's scratch folders behind.**
+* A PDF printed without Quarto left Chrome's scratch folders behind.
   Each `render_report(format = "pdf")` through `pagedown::chrome_print()`
   left `com.google.Chrome.*` and `scoped_dir*` folders in the temp folder,
   since the cleanup looked in R's session folder and Chrome writes beside
   it. Chrome now runs with a temp folder of its own, removed afterwards.
-* **A report source could say its numbers differ when they did not.** The
+* A report source could say its numbers differ when they did not. The
   canonical JSON behind the results record, the instrument hash and the
   amendment fingerprints sorted its keys in the session's collation order,
   so a session in an English locale and one in the C locale put "Scale"
   and "ceiling_pct" in opposite orders and hashed the same numbers
   differently. Keys now sort by code point in every locale, as
-  SurveyBuilder does. A
-  file, results record or committed instrument hashed in the old order is
+  SurveyBuilder does. A file, results record or committed instrument hashed in the old order is
   still accepted, with a message that it was hashed in the order used
   before 0.4.3 and should be saved again to update the hash. New hashes
   are always written in code point order, and a changed file still fails.
-* **R, SurveyBuilder and the verifier page hash 1 canonical form, RFC 8785,
-  the JSON Canonicalization Scheme** (Codex pass 2 P2-01 and P2-06, Fable
-  FR-01 to FR-03, FR-09, FR-10 and FR-12). A null was hashed as `{}`, so a
+* R, SurveyBuilder and the verifier page hash 1 canonical form, RFC 8785,
+  the JSON Canonicalization Scheme. A null was hashed as `{}`, so a
   null changed to `{}` kept its hash, and an `NA` in a text field such as an
   item's `help` wrote a file its own check refused. Numbers below 0.0001,
   from 1e15 up or with 16 or 17 digits, and any text holding `</`, hashed
@@ -1087,20 +1081,18 @@ arithmetic.
   at write with its field named. An `NA` is written as null where the
   published schema allows null for that field, such as an item's `help`, and
   refused with the field named anywhere else, such as inside
-  `meta$authors`. A file hashed in
-  the 0.4.3 development form is accepted with a message to save it again.
+  `meta$authors`. A file hashed in the 0.4.3 development form is accepted with a message to save it again.
   The 26 bundled `.sframe` files were written again, and only their hash
   object changed. `tests/testthat/fixtures/canonical/` holds
   the payloads all 3 hash alike, checked through node.
-* **A file holding an escaped U+0000 or a lone surrogate is refused** by
+* A file holding an escaped U+0000 or a lone surrogate is refused by
   `read_sframe()`, SurveyBuilder and the verifier page. jsonlite cut a
   string at an escaped U+0000 and turned a lone surrogate escape into "?",
   so in R a text changed after the U+0000 kept its hash, and 2 different
   files could read as 1. The check reads the raw text before it is parsed,
   and an escaped backslash before `u0000` is plain text and passes. The
   shared fixture holds 53 cases with these.
-* **The hash names its canonical form, `hash$canonical = "rfc8785"`**
-  (owner, 2026-11-11). `write_sframe()` and SurveyBuilder write it inside
+* The hash names its canonical form, `hash$canonical = "rfc8785"`. `write_sframe()` and SurveyBuilder write it inside
   the hashed content, with only `hash$value` emptied, so changing it breaks
   the hash. `read_sframe()`, SurveyBuilder and the verifier page apply 1
   rule. A file naming `"rfc8785"` is checked in RFC 8785 alone, with no
@@ -1118,8 +1110,7 @@ arithmetic.
   the RFC 8785 hash and declares `canonical` as optional with `"rfc8785"` its
   only value, so a file naming any other form, or null, fails the profile as
   it fails `read_sframe()`.
-* **A file hashed before 0.4.3 is recognised in any session** (Fable FR-08
-  and FR-11). The old key order followed the collation of the session that
+* A file hashed before 0.4.3 is recognised in any session. The old key order followed the collation of the session that
   hashed, so a file hashed in an English session was refused as modified in
   a C session, such as a container or `R CMD check`. The old form is now
   tried in the session's, the C and the en_US collation. The legacy hash,
@@ -1127,7 +1118,7 @@ arithmetic.
   written. It keeps numbers to 4 decimals, as jsonlite's default did, so 2
   numbers that agree to 4 decimals hash the same in it. The verifier page
   hashed such numbers in full and now takes the legacy hash as R does.
-* **The Quarto source of a report, which checks itself.**
+* A report's Quarto source checks itself.
   `render_report(format = "qmd")` writes a folder: `report.qmd`, the
   `.sframe`, `responses.csv`, the bibliography and its style, the results
   record and `manifest.json`, with no `_quarto.yml`. Opened in RStudio or
@@ -1139,7 +1130,7 @@ arithmetic.
   instrument's text reaches the `.qmd` only as its JSON-quoted title and
   authors, so a title holding quotes, a colon or a `---` line leaves the
   front matter whole.
-* **An untouched report source says its numbers match.** The source folder
+* An untouched report source says its numbers match. The source folder
   of an instrument built in memory and never saved, or of responses given
   as a plain data frame, said "Numbers differ from the recorded results"
   before anything was changed. The record was computed from the objects in
@@ -1149,8 +1140,7 @@ arithmetic.
   last digit. Export now writes the files, reads them back and computes the
   record from those, as the check does. A changed response still turns the
   check `FALSE`.
-* **The report source checks every file it reads** (Codex pass 2 P2-02,
-  Fable FR-04, FR-07, FR-15 and FR-17). The check recomputed the plan
+* The report source checks every file it reads. The check recomputed the plan
   results and compared them with the record's hash in the manifest, but
   never opened `report_results.json`, so an edited or deleted record still
   passed. The record file is now hashed against the manifest, as its own
@@ -1166,14 +1156,13 @@ arithmetic.
   column is now hashed with its name and type, doubles in 17 significant
   digits with NA, NaN, Inf and -Inf by name, and a POSIXct as its seconds
   in UTC, so the same instant hashes alike in any time zone.
-* **An instrument read unverified is written only as a new instrument**
-  (Fable FR-05). `write_sframe()` let one read with `verify = FALSE` be
+* An instrument read unverified is written only as a new instrument. `write_sframe()` let one read with `verify = FALSE` be
   written back unchanged with the amendment log it was read with, but that
   log was read unchecked too, so a sign-off, a tier or a timestamp edited as
   text, or an entry deleted, was written back and read verified. It is now
   refused, and `new_instrument = TRUE` writes it with a new log, once the old
   one is cleared with `instrument$amendments <- list()`.
-* **More changes that move a score are design tier** (Fable FR-06).
+* More changes that move a score are design tier.
   `amend_sframe()` forced the design tier for a change to how a scale is
   scored, but not for an item's own `reverse = TRUE`, which
   `score_scales()` applies all the same, so reverse keying an item passed as
@@ -1181,19 +1170,19 @@ arithmetic.
   `reverse` or `scale_id`, to the choice codes of an item a scale scores, or
   to the item an attention check tests or its pass values is now design
   tier, and needs a deviation report.
-* **The help says what the write boundary rests on** (Fable FR-16).
+* The help says what the write boundary rests on.
   `?write_sframe` and `?amend_sframe` say that the link to the file read is
   the attribute `sframe_origin`, which the package's functions keep and base
   R that rebuilds the list, such as `x[names(x)]`, `c(x)` or `lapply()`,
   drops, after which a change is written with no amendment asked for.
-* **`validate_sframe()` reports 4 more malformed fields** (Fable FR-13).
+* `validate_sframe()` reports 4 more malformed fields.
   An item whose `choice_set` or `scale_id` holds more than 1 id, a
   branching rule with no `item_id` or `depends_on`, and a check with no
   `item_id` stopped it with "argument is of length zero", so
   `strict = FALSE` returned nothing and `read_sframe()` failed the same way.
   Each is now a problem naming the component and the field, such as
   "Branching rule 1's item_id is missing".
-* **`validate_sframe()` checks what scores and shows** (Fable FR-14). A
+* `validate_sframe()` checks what scores and shows. A
   scale `method` other than "mean" or "sum" (it was scored as the mean), a
   plan `alpha` or `options$alpha` that is not a number between 0 and 1 (it
   changed nothing), a choice set whose values and labels differ in length,
@@ -1206,21 +1195,21 @@ arithmetic.
   a pass value outside the item's codes, and choosing a scale for an item
   in its editor adds the item to that scale. A rule on an item asked later
   stays allowed, since on 1 page the answer arrives as it is given.
-* **A field with an empty name is refused at write.** JSON allows an empty
+* A field with an empty name is refused at write. JSON allows an empty
   key, but `write_sframe()` wrote an R list element with an empty name under
   its position, so `{"a":1,"":3}` read from a file was written back as
   `{"a":1,"2":3}`, a changed instrument with no amendment, and `{"":3}`
   alone became an array. Such a file still reads, and writing it is refused
   with the field named, such as "The field at $.meta.custom[1] has an empty
   name".
-* **Messages count in words.** Every message, warning, error and printed
+* Messages count in words. Every message, warning, error and printed
   summary from the R functions says "1 item" and "2 items", "There is 1
   weight" and "There are 3 weights", where 68 places wrote "item(s)" or
   "criterion/criteria". A list of ids takes the noun its length needs:
   "Plan block P1 names objective 'O1'" and "Plan blocks P1, P2 name
   objective 'O1'". A test walks every string in the package's functions and
   fails on a new "(s)".
-* **Every report has a results record and a manifest beside it.**
+* Every report has a results record and a manifest beside it.
   `render_report()` writes `<name>_results.json`, the plan results as
   canonical JSON, and `<name>_manifest.json`, the sha256 of the instrument
   content, the responses, the results record and the output as generated,
@@ -1231,98 +1220,98 @@ arithmetic.
   the results record's sha256. An edited copy of a report then no longer
   matches its recorded hash, while the numbers it presents still verify.
   The plan runs once per report and feeds both engines and the record.
-* **A Quarto report renders offline.** The report theme imported a Google
+* A Quarto report renders offline. The report theme imported a Google
   web font the report never used, so every render needed the internet, sent
   Google a request, and hung with no timeout when the connection stalled.
   The theme's web font is off, and a render fetches nothing.
-* **One computation feeds both report engines.** `render_report()` now
+* One computation feeds both report engines. `render_report()` now
   computes the codebook table, every distribution chart and the plan
   results inside the package and hands them to the Quarto template, which
   only prints them. The template used to run the analysis plan and draw
   the charts itself, so the 2 engines could disagree.
 
-* **A statistic that cannot exceed 1 has no leading zero.** Result text and
+* A statistic that cannot exceed 1 has no leading zero. Result text and
   prompts write r, r_s, tau, phi, Cramer's V, R squared, eta squared and
   their intervals as APA 7 does, `r(58) = .53, 95% CI [.33, .69]`, as p
   values already were. d, t, z, means and other values keep the zero. Done
-  once for every analysis, and the demo results are regenerated (D9, CX-24).
-* **Every report engine prints a table's cells the same way.** The built-in
+  once for every analysis, and the demo results are regenerated.
+* Every report engine prints a table's cells the same way. The built-in
   engine and the Quarto template rounded every number to 2 decimals, so a p
   of .004 showed as 0. A p column now shows 3 decimals with no leading zero,
   or `<.001`, a column that cannot exceed 1 drops its leading zero, other
   numbers show 2 decimals, and a missing value is a blank cell, in
   `render_report()`, `render_results()` and `render_result()` alike. The new
-  `sframe_apa_cells()` does it (CX-15).
-* **Result text in an HTML report sets its symbols as APA 7 does.** t, F,
+  `sframe_apa_cells()` does it.
+* Result text in an HTML report sets its symbols as APA 7 does. t, F,
   p, r, d, N and the other Latin symbols are italic, `r_s` and `d_z` print
   with a subscript, tau and phi as Greek letters and chi-square as its
-  symbol. The text was plain in all 3 HTML renderers (CX-24).
-* **Table headings set symbols as APA 7 does.** A `p` column was headed
+  symbol. The text was plain in all 3 HTML renderers.
+* Table headings set symbols as APA 7 does. A `p` column was headed
   "P", `t` "T" and `df` "Df", and `render_results()` printed raw names such
   as `missing_pct`. Symbols are now italic, `r_s` has its subscript, a
   proportion column such as `missing_prop` reads "Missing proportion" and
-  drops its leading zero, and other names read as words, in both report engines (CX-24).
-* **Result text counts with real plurals.** "7 power-iteration step(s)",
+  drops its leading zero, and other names read as words, in both report engines.
+* Result text counts with real plurals. "7 power-iteration step(s)",
   "5 choice column(s)" and the decision methods' notes and errors now read
   "7 power-iteration steps" and "1 respondent". The demo results are
-  regenerated (CX-24).
-* **A PDF report matches the HTML report from the same call.**
+  regenerated.
+* A PDF report matches the HTML report from the same call.
   `render_report(format = "pdf")` dropped `title`, `authors`, `references`,
   `csl` and `figures` on the way to the HTML report it prints. It now passes
-  all 5 (CX-04).
-* **Tables and figures are numbered, titled and described.** The built-in
+  all 5.
+* Tables and figures are numbered, titled and described. The built-in
   report, `render_results()` and `render_result()` number every table and
   figure in reading order as APA 7 does, with the number in bold and an
   italic title below it. A result's table and chart are titled by the block
   and its research question instead of "Results table", each chart sits in a
   figure with a caption, and base graphics charts carry real alt text where
-  every one read "distribution" (CX-22).
-* **The Quarto report numbers its tables and figures too.** Its tables
+  every one read "distribution".
+* The Quarto report numbers its tables and figures too. Its tables
   and figures take the same numbers and titles as the built-in report's,
   every chart image carries alt text where it had none, and a reliability
-  result no longer prints a second table under the same title (CX-22).
-* **The built-in report prints each research question's hypotheses and
-  decision rule before its result.** H0 and H1 print where written, then
+  result no longer prints a second table under the same title.
+* The built-in report prints each research question's hypotheses and
+  decision rule before its result. H0 and H1 print where written, then
   the planned decision rule, then the result, then the interpretation,
   labelled "Interpretation (written after the results)". The decision rule
   printed only beside a written interpretation, and an interpretation stood
   in for an empty decision rule. The 2 fixed sentences earlier versions of
   SurveyBuilder and SurveyStudio saved as hypotheses, and an interpretation
   copied from the decision rule, are not printed.
-* **`render_results()` and `render_result()` print the same declaration.**
+* `render_results()` and `render_result()` print the same declaration.
   H0, H1 and the decision rule print above the result, and the
   interpretation below it under the same label. `render_results()` showed
   the decision rule as the interpretation when none was written, and a
   result from `run_analysis_plan()` carried its decision rule as its
   interpretation. A result's `interpretation` is now only what was written.
-* **The Quarto report prints the same declaration as the built-in one.** It
+* The Quarto report prints the same declaration as the built-in one. It
   printed the block's interpretation as an "Interpretation prompt" before
   the data existed, and no hypotheses. `render_report()` now computes each
   block's declaration and interpretation with the built-in engine's helpers
   and hands them to the template, and the `interpretations` help for
   `render_report()` and `render_results()` says what prints where.
-* **A Quarto report records the surveyframe that rendered it.** Its
+* A Quarto report records the surveyframe that rendered it. Its
   Reproducibility section gives the version, and the commit where the
   install carries one (`RemoteSha`, written by remotes and pak). Quarto
   renders in its own R process, which loads the installed package, so this
   names the code that produced the numbers.
 
-* **The tests render Quarto reports with the build under test.** A test
+* The tests render Quarto reports with the build under test. A test
   setup file installs the source once per run and puts it first on
   `R_LIBS`, so every child R process, Quarto included, loads it. The
   earlier `render_report()` shadow never ran under `devtools::test()`, so
   Quarto tests had rendered with the installed copy.
-* **The Quarto build guard fails when a git source tree gives no commit.**
+* The Quarto build guard fails when a git source tree gives no commit.
   It skipped the commit comparison on an empty commit, so a failed lookup
   let a report from a stale install pass on its version alone.
-* **The tests have a fast tier and a slow tier.** In a source tree, the 18
+* The tests have a fast tier and a slow tier. In a source tree, the 18
   tests that render through Quarto or drive Chrome run only when
   `SURVEYFRAME_SLOW_TESTS=true`, and the source install they need is made
   only then. The skip message names the variable. The fast tier renders
   every report with the built-in engine from the source under test. Under
   `R CMD check` nothing changes.
 
-* **`render_report()` shows the report it writes.** In an interactive
+* `render_report()` shows the report it writes. In an interactive
   session the new `open = TRUE` default opens it in the viewer pane of
   RStudio, Positron or VS Code, or in the web browser elsewhere, and
   `open = FALSE` keeps it closed. A knitr or Quarto render opens nothing. The
@@ -1330,14 +1319,14 @@ arithmetic.
   often a bare file name. A line says when Quarto starts, since it works in
   silence for up to a minute, and `figure_dir =` reports where the chart
   files went.
-* **New `render_result()` renders one analysis result as the report does**:
+* New `render_result()` renders one analysis result as the report does:
   the formatted table with its caption and note, any second table, the APA
   line, and the chart the report picks for that method, with the
   instrument's labels, as an HTML fragment or with the chart written as PNG
   or SVG. It uses the report's own code, so a host showing results one at a
   time and the report agree. A host had to keep its own map from method to
   chart, which drifted with each release.
-* **Figures at the size, resolution and format a journal asks for.**
+* Figures come at the size, resolution and format a journal asks for.
   `render_report(figures = list(width =, height =, dpi =, format =))` applies
   to every figure in both engines, and defaults to the `surveyframe.figures`
   option, so a host can set it once. `figure_dir =` also writes each plan
@@ -1348,25 +1337,25 @@ arithmetic.
   SVG uses svglite where it is installed, now in Suggests, and R's own
   Cairo device otherwise. Where neither is available the report draws PNG,
   and a request to write SVG files says to install svglite.
-* **`codebook_report(format = "md")` gives Markdown.** The codebook carries
+* `codebook_report(format = "md")` gives Markdown. The codebook carries
   itself as Markdown text in `markdown`, a heading and a pipe table for the
   items, choice sets, scales, plan and models, and `print()` writes it. Save
   it with `writeLines(cb$markdown, "codebook.md")`. The format argument
   changed nothing before, so a host received the printed text table.
-* **`render_report()` takes `title` and `authors`**, which default to the
+* `render_report()` takes `title` and `authors`, which default to the
   instrument's title and authors. Every Quarto report was titled "Survey
   Research Report" whatever the study. The date under the title is labelled
   "Rendered" in place of Quarto's "Published", since a rendered report
   has not been published. The built-in HTML engine shows the authors too.
-* **The Quarto HTML report's captions and margin text are #565c61**, 6.8:1
-  on white, where Quarto's grey was 4.3:1, below WCAG AA (Codex WR197).
+* The Quarto HTML report's captions and margin text are #565c61, 6.8:1
+  on white, where Quarto's grey was 4.3:1, below WCAG AA.
 
 ## Validation
 
-* **A plan block's hypotheses must hold text fields named `null` and
-  `alternative`.** `validate_sframe()` accepted any shape there, and a report
+* A plan block's hypotheses must hold text fields named `null` and
+  `alternative`. `validate_sframe()` accepted any shape there, and a report
   has nothing to print from a hypothesis that is no text.
-* **A plan block whose roles its method never reads is refused.** A
+* A plan block whose roles its method never reads is refused. A
   frequency block naming its item under `items` ran on nothing and reported
   "Frequency distribution for NA (N = 0)" with an empty table.
   `validate_sframe()` now says which roles the method reads and which the
@@ -1374,41 +1363,40 @@ arithmetic.
   place of a result. The roles a method reads are found from the same
   resolver the analysis uses, so the 2 stay in step. `partial_correlation`
   and `mediation` also accept every role alias their runners read.
-* **A block's error names its cause.** A block whose role named an item the
+* A block's error names its cause. A block whose role named an item the
   instrument lacked reported "Test failed.", and 8 other runners gave
   errors as bare as "ANOVA failed.". `run_analysis_plan()` now names a
   variable the responses lack, saying whether it is an unknown name, an item
   with no column or a scale with no scored column, and a test that fails
   says which variable holds no numbers, or that too few responses had a
   value, or else passes on R's own reason.
-* **A choice set whose codes read as the same number is refused**, by
+* A choice set whose codes read as the same number is refused, by
   `sf_choices()` and by `validate_sframe()`. Responses to a set whose codes
   are all numbers are read as numbers, so the codes 1 and 1.0, or 2 and 02,
   became one option, and `sframe_export_labelled()` then failed on duplicate
   labels.
-* **`print()`, `format()` and `summary()` of an instrument check it before
-  they give its status**, as Studio's Open Instrument does. They read the
+* `print()`, `format()` and `summary()` of an instrument check it before
+  they give its status, as SurveyStudio's Open Instrument does. They read the
   stored `validated` flag, which an edit after validation can leave stale,
   so a valid instrument could print "not validated" and a broken one
   "valid". The status is now "valid", or "invalid" with the number of
   problems and a pointer to `validate_sframe(x, strict = FALSE)`. Counts are
-  in words, "1 block" and "2 analysis blocks", never "block(s)"
-  (coordinator, UF follow-up 1).
+  in words, "1 block" and "2 analysis blocks", never "block(s)".
 
 ## Documentation
 
-* **The website moves to https://surveyframe.org.** DESCRIPTION's URL
+* The website moves to https://surveyframe.org. DESCRIPTION's URL
   field names it first, with the GitHub repository second, and the
   start-up message, the README, the verifier page's canonical link and the
   sitemap point to it. The old address redirects.
-* **2 new vignettes for the 5 stages** (design, collect, check, analyse,
+* 2 new vignettes walk through the 5 stages (design, collect, check, analyse,
   report) on the `paired` demo, each with the pre-analysis plan before
   collecting. "Run a study in SurveyStudio" has screenshots and takes each
   stage by point and click, for researchers who work in SurveyStudio. "Run a study in R" gives the same
   stages as R code. Each links the other once, and both lead the "Start here"
   articles. "Deploying and collecting" describes SurveyStudio's Collect screen where it said "from
-  the SurveyBuilder" (UX-22).
-* **`sframe_show()` opens a file surveyframe wrote** (new export). In an
+  the SurveyBuilder".
+* `sframe_show()` opens a file surveyframe wrote (new export). In an
   interactive session an HTML page goes to the viewer of RStudio, Positron
   or VS Code, else the browser, and any other file to the program the
   system opens it with. In a script, a knitr or Quarto render, or under
@@ -1421,8 +1409,8 @@ arithmetic.
   examples of `export_survey()`, `sframe_analysis_qmd()` and
   `sframe_demo_qmd()` run a second time in the same session, where they
   stopped on the file they had written the first time.
-* **Every example ends with something to look at, in 40 console lines or
-  fewer.** The examples of `sframe_item()`, `sframe_scale()`,
+* Every example ends with something to look at, in 40 console lines or
+  fewer. The examples of `sframe_item()`, `sframe_scale()`,
   `sframe_branch()`, `sframe_choice_set()` and `sframe_attention_check()`
   print what they made, where they printed nothing. `sframe_plan()`'s
   example printed 1,647 lines, `run_analysis_plan()`'s 138 and
@@ -1443,23 +1431,22 @@ arithmetic.
 
 ## Export
 
-* **Text-coded choices keep their labels in Stata.** Stata attaches value
+* Text-coded choices keep their labels in Stata. Stata attaches value
   labels to numbers alone, so a choice set coded `a` and `b` with labels A
   and B read back from `sframe_export_labelled()` as A = 0 and B = 0. A
   `.dta` now holds such codes as 1, 2, 3 in the set's order, each with its
   label. A `.sav` keeps the text codes, which SPSS labels directly.
-* **Names and labels fit SPSS and Stata.** `sframe_export_labelled()` failed
+* Names and labels fit SPSS and Stata. `sframe_export_labelled()` failed
   on matrix row columns such as `session__Opening keynote` and on long MCDA
   pair names, and sent long labels to Stata uncut. Such names are now made
   valid for the format, with a number where 2 would match, and labels over
   the format's limit are cut. One message lists every change as old -> new,
-  and the table is attached to the returned path as `attr(path, "renamed")`
-  (D10, CX-18).
+  and the table is attached to the returned path as `attr(path, "renamed")`.
 
 ## The exported survey
 
-* **A shared survey no longer carries the instrument's references, analysis
-  plan or amendment history, or the answers to its attention checks.**
+* A shared survey no longer carries the instrument's references, analysis
+  plan or amendment history, or the answers to its attention checks.
   `export_survey()` embedded the whole instrument in the page, so anyone given
   the link could read the research questions, hypotheses, references,
   amendment notes and authors from the page source. A bot or a respondent who
@@ -1469,7 +1456,7 @@ arithmetic.
   item fields it draws and which items are checks. SurveyBuilder's Preview
   embeds the same fields.
 
-* **The thank-you screen states delivery, and the message is only thanks.**
+* The thank-you screen states delivery, and the message is only thanks.
   The screen now opens with a status line the package writes, one for each
   outcome: recorded, sent but unconfirmed, not sent, or failed. The study's
   `render$thankyou$message` sits below it in every case except a failed send,
@@ -1480,7 +1467,7 @@ arithmetic.
   feedback was recorded. A preview export keeps the study's message too, so
   a researcher sees the text respondents will read, under the status line
   that says nothing was sent.
-* **The Shiny surveys state delivery on their thank-you screen too.**
+* The Shiny surveys state delivery on their thank-you screen too.
   `survey_module_server()` said "Your response has been recorded." and
   `render_survey()` said "Submitted successfully" whether or not anything
   stored the answers. A module with no `on_submit`, or `render_survey()` with
@@ -1488,26 +1475,26 @@ arithmetic.
   happened: recorded to the CSV, submitted to `on_submit`, or not saved. The
   study's message sits below it, and the module's default message is
   "Thank you for participating."
-* **A sending screen while the answers are in flight.** The thank-you screen
-  said the response had been recorded while it was still being sent.
-* **Confirmed delivery for a host.** A page that defines
+* A sending screen shows while the answers are in flight. The thank-you
+  screen said the response had been recorded while it was still being sent.
+* A host can confirm delivery. A page that defines
   `window.sframeSendResponse(row)`, returning a Promise, takes over the send.
   Resolving to `true` or `{confirmed: true}` shows the response as recorded,
   in place of the note that the page cannot confirm storage, which every
   respondent saw, even on a host that confirms.
 * `render$thankyou$show_restart = FALSE` hides "Submit another response".
-* **Drafts.** `render$save_draft = TRUE` keeps the answers in the browser as
+* A respondent's answers can be kept as a draft. `render$save_draft = TRUE` keeps the answers in the browser as
   the respondent goes, so a closed tab can be resumed from the welcome screen.
   The draft is cleared once the response is submitted, and kept when delivery
   fails. SurveyBuilder's exported survey carries the same template.
-* **A draft belongs to the whole instrument, and to a given consent.** The
+* A draft belongs to the whole instrument, and to a given consent. The
   draft's key covers the instrument as exported, less its hash, so a changed
   choice set or consent text starts afresh. It covered the title, version and
   items alone. A draft records that consent was given, and resuming goes
   straight to the questions only then. Otherwise the welcome screen asks for
   consent first. Drafts held in browsers for a survey already in the field are
   dropped once it is exported again with this template.
-* **A preview sends nothing to a host either.** `export_static_survey(preview
+* A preview sends nothing to a host either. `export_static_survey(preview
   = TRUE)` removed the endpoint and the redirect, but a page defining
   `window.sframeSendResponse()` still received the preview's answers while the
   screen said nothing was sent. A preview flag in the page now blocks every
@@ -1515,40 +1502,38 @@ arithmetic.
 
 ## Charts
 
-* **`render_result()` draws the chart in the palette you ask for.** It
+* `render_result()` draws the chart in the palette you ask for. It
   used the chart attached to the result whatever `palette` said. A palette
   given explicitly now rebuilds the chart with it. Left out, the attached
-  chart is used as before (CX-19).
-* **Charts fit the default 6.5 by 4 inch export.** Titles, subtitles,
+  chart is used as before.
+* Charts fit the default 6.5 by 4 inch export. Titles, subtitles,
   captions, long category labels and legends were clipped at the edges.
   A chart from the analysis plan now wraps them to the figure width, lays a
   long legend over as many rows as it needs and keeps a margin at every
   edge. A legend the chart hides stays hidden. The 4 regression diagnostic
-  panels are fitted the same way, and each names the outcome by its label
-  (CX-23).
+  panels are fitted the same way, and each names the outcome by its label.
 * A chart from the analysis plan names each variable by its label in the
   instrument, as the tables beside it do. A regression on the scale `sat` was
   titled "Observed against fitted values for Sat" while its table read
   "Satisfaction". This covers the correlation, regression, group comparison,
   partial correlation and moderation charts, in `render_report()` and in
   SurveyStudio.
-* **A group comparison chart labels its groups**, in the choice set's
+* A group comparison chart labels its groups, in the choice set's
   order, where it showed the stored codes ("in_person" beside a table
   reading "In person"). This covers the t-test, Mann-Whitney, one-way
-  ANOVA, Kruskal-Wallis and ANCOVA charts. **A crosstab or Fisher chart
-  titles its axes and legend with the items' labels**, where it used their
+  ANOVA, Kruskal-Wallis and ANCOVA charts. A crosstab or Fisher chart
+  titles its axes and legend with the items' labels, where it used their
   ids. A sweep of every demo chart now finds no id or code where the
   instrument gives a label.
 
 ## SurveyBuilder
 
-* **The Desktop and Mobile buttons stay in line** (owner, 2026-11-15). Above
+* The Desktop and Mobile buttons stay in line. Above
   the centre preview they are 1 group, which moves below the hint as a whole
   when the centre is narrow, as in SurveyStudio beside its menu. They drifted
   apart, 1 above the other, at tablet widths.
 
-* **The Plan screen reads in words** (owner check of the Docs screenshots,
-  2026-11-15). A plan card shows α = .05, Draft, and a model by its
+* The Plan screen reads in words. A plan card shows α = .05, Draft, and a model by its
   name, such as Content quality to intention (CB-SEM), where it showed
   significance=0.05, draft and m1. A syntax-only block says what it gives,
   such as "Writes lavaan syntax for the declared model, to fit in lavaan".
@@ -1559,8 +1544,7 @@ arithmetic.
   construct from Path from. The study title in the item list wraps, and
   Preregistration fields sits among the Plan screen's tabs.
 
-* **The question list and its panel read in full** (owner check of the Docs
-  screenshots, 2026-11-15). The selected question stands out by a stronger
+* The question list and its panel read in full. The selected question stands out by a stronger
   ground, an accent bar and a bold label, beside its `aria-current`. A
   question's text wraps to 2 lines before it is cut, and hovering shows it
   all. Its tags are words: Required, Reverse-scored, Attention check, Single
@@ -1571,21 +1555,21 @@ arithmetic.
   SurveyStudio's logo reads "SurveyStudio", as its name is written
   everywhere else.
 
-* **One preview.** The builder's Preview shows the deployable survey,
+* SurveyBuilder has one preview. The builder's Preview shows the deployable survey,
   the page `export_survey(preview = TRUE)` writes and SurveyStudio's
-  Preview Survey screen shows. Answering, required checks and branching
+  Preview screen shows. Answering, required checks and branching
   run as a respondent sees them, and nothing is collected. The builder drew
   its own copy of the layout, which ran none of them and could drift from
   the survey. Its Welcome, Survey and Thank You tabs go, since the survey
   shows its own welcome and thank-you pages.
-* **The Plan editor has fields for the hypotheses.** Methods that test a
+* The Plan editor has fields for the hypotheses. Methods that test a
   hypothesis show optional "Null hypothesis (H0)" and "Alternative
   hypothesis (H1)" fields, with a method-appropriate example as placeholder
   text. Only what you write is saved, and the plan card shows it. The
   builder saved 2 fixed sentences, "No effect or association is present."
   and "An effect or association is present.", for every such block, and
   those load back as empty.
-* **The decision rule and the interpretation are separate text boxes.**
+* The decision rule and the interpretation are separate text boxes.
   One box filled both fields. The Plan editor's box is labelled "Decision
   rule (declared now)" and saves the decision rule only. The report outline
   shows the rule read-only, with an "Interpretation" box that saves the
@@ -1593,8 +1577,8 @@ arithmetic.
   the rule counts as unwritten, and a file holding only `interpretation`
   still opens with it as the rule.
 
-* **Changed content of an opened file is recorded as an amendment, or saved
-  as a new instrument.** The builder checked a file's hash when it opened
+* Changed content of an opened file is recorded as an amendment, or saved
+  as a new instrument. The builder checked a file's hash when it opened
   and then forgot it, so an edited instrument saved as verified, with no
   amendment. It now keeps the title, version and content it opened. Saving
   changed content of a file that had a hash opens 1 dialog: record an
@@ -1606,18 +1590,18 @@ arithmetic.
   file reads back in R with its log verified and writes again with no flag.
   A file opened without a matching hash can only be saved as a new
   instrument.
-* **`read_sframe()` checks an amendment log against the content.** A file's
+* `read_sframe()` checks an amendment log against the content. A file's
   hash vouches for the file, not for whether its log describes the content.
   A log whose entries do not follow one another, or whose last entry ends at
   a different state, now reads with a warning of class
   `sframe_amendment_warning`.
-* **A choice set can be declared ordered.** `sf_choices(ordered = TRUE)`
+* A choice set can be declared ordered. `sf_choices(ordered = TRUE)`
   marks options that run in a meaningful order, such as a frequency or an
   education level, and SurveyBuilder has the same switch in the choice set
   dialog and beside an item's choice set. A `single_choice` item on an
   ordered set is tagged ORD, ordinal, in SurveyBuilder and SurveyStudio, so
   it reaches the methods for ordered categories. Every `single_choice` item
-  was tagged NOM before, the known limitation 0.4.3 shipped with. The field
+  was tagged NOM before, a known limitation of the October GitHub release. The field
   is written only when `TRUE`, so existing files keep their hashes.
 * A plan block saved with the `outcome` role, which R accepts beside
   `dependent`, opens with that variable selected. Regression blocks opened
@@ -1634,62 +1618,62 @@ arithmetic.
 * The Outcome and other role dropdowns stay inside the Add or Edit Analysis
   Plan dialog when an item label is long. The role grid columns can now
   shrink, and each select fills its column.
-* **SurveyBuilder keeps the amendment log.** Opening an amended `.sframe`
+* SurveyBuilder keeps the amendment log. Opening an amended `.sframe`
   file in the builder and saving it dropped its `amendments`, `designs` and
   `sframe_format` fields, so a disclosed revision vanished silently. The
   builder now carries every field it leaves unedited through to the next
   save.
-* **Every file saved from SurveyBuilder carries `sframe_format`**, as
+* Every file saved from SurveyBuilder carries `sframe_format`, as
   `write_sframe()` writes it. sframe-schema's instrument profile requires
   the field, so each new file saved from the builder failed that schema.
-* **Save settings writes only the fields you changed.** It wrote every
+* Save settings writes only the fields you changed. It wrote every
   General, Welcome and Thank You field from its input, so an absent author
   list became an empty string and absent screens took their default
   wording. On an amended instrument that was a content change nobody had
   made, and `write_sframe()` refused the file. Opening a file also added
   empty screen objects to it. An emptied author list or description is now
   saved as absent, as R writes it.
-* **Settings saved on an instrument with an empty `render` are kept.** R
+* Settings saved on an instrument with an empty `render` are kept. R
   writes an empty `render` as a JSON array, and the builder held it as one,
   so a theme or welcome screen saved there vanished from the saved file.
   All 19 demos with an empty `render` were affected.
-* **Open asks before replacing unsaved changes**, and opens the file
+* Open asks before replacing unsaved changes, and opens the file
   chooser at once when there are none. It replaced them silently. Opening
   a file also closes the inspector, which kept showing an item from the
   survey being replaced, and the status reads "Opened" until the next
-  save. It read "Saved just now", which inside a host such as Ethos reads
+  save. It read "Saved just now", which inside a host application read
   as saved in the host.
 * The question editing area is a named, focusable region, so a keyboard
   user can reach and scroll it. At narrow widths it was a scroll region
   reachable by pointer alone.
-* **SurveyBuilder's Survey settings dialog scrolls.** A tab taller than the
+* SurveyBuilder's Survey settings dialog scrolls. A tab taller than the
   dialog ran past its bottom edge, with its last controls out of reach. The
   dialog body now shrinks to fit and scrolls.
 
 ## SurveyStudio
 
-* **1 design system for Studio and the builder.** Both apps take every
+* SurveyStudio and the builder share 1 design system. Both apps take every
   colour, size and radius from 1 shared stylesheet of design tokens,
-  `inst/builder/design_tokens.css`, which Studio links and the builder
-  carries inline, so a builder copied on its own still opens. Studio's teal
+  `inst/builder/design_tokens.css`, which SurveyStudio links and the builder
+  carries inline, so a builder copied on its own still opens. SurveyStudio's teal
   and the builder's blue become 1 primary colour, and the 2 dark sidebars
   1 navigation colour. The Explore charts take their colours from the same
   file.
-* **3 button levels in both apps**: a filled primary, 40 px high and sized
+* Both apps use 3 button levels: a filled primary, 40 px high and sized
   to its label, at most 1 per screen, panel or dialog, an outline
   secondary, 36 px high, and a text link for small actions. Shiny's own
   buttons and the builder's dialogs take the same levels. In the builder,
   the 2 add buttons on Settings' References tab and Export syntax become
-  secondary, and the Open Collect and Open References links in Studio text
+  secondary, and the Open Collect and Open References links in SurveyStudio text
   links.
-* **1 header row on Design and Plan.** The title (Design or Plan), the
+* Design and Plan have 1 header row. The title (Design or Plan), the
   instrument's title and version and the save state ("Saved", "Unsaved
   changes") sit on the left, and undo, redo and Save to Studio at the far
-  right. Inside Studio the builder's own bar is merged into this row. The
+  right. Inside SurveyStudio the builder's own bar is merged into this row. The
   standalone builder has the same row, with its title, version and save
   state on the left, its Build, Preview and Plan switch in the centre, and
   Save .sframe last on the right.
-* **The builder's left panel has 1 filled button.** Until the survey's
+* The builder's left panel has 1 filled button. Until the survey's
   settings are saved once, it is Survey settings, then "+ Add question",
   whose menu now also holds Section break and Branching rule. An opened
   instrument counts as set up, and the empty question list points to
@@ -1698,14 +1682,14 @@ arithmetic.
   pages". Configure is a text link named "Answer sets, scales and
   checks". Both menus follow the menu button pattern: the arrow keys, Home
   and End move through them, and Escape closes them back to their button.
-* **A guided start in the builder.** With no questions, the canvas shows 3
+* The builder guides a new survey. With no questions, the canvas shows 3
   steps, Survey settings, Add your first question and Save to Studio (Save
   .sframe on its own), each ticked once done, with the next step's button
   in its row. Once all 3 are done, the canvas names the next useful step:
   Plan when the survey has no analysis plan, otherwise another question.
   The empty question list no longer repeats the Survey settings and Open
   buttons.
-* **The same rules on every Studio screen.** Explore's Overview, Items,
+* The same rules on every SurveyStudio screen. Explore's Overview, Items,
   Scales and Data tabs look like the Report screen's tabs, the open one
   underlined. A long value in a summary tile, such as the version or a
   date range, takes a smaller size and stays inside its tile. A disabled
@@ -1713,37 +1697,37 @@ arithmetic.
   builder's Plan tabs take the same underlined style, in Plan the panel's
   Add question steps down to an outline beside + Add plan, and with no
   instrument open Design's head says "No changes" in place of "Saved".
-* **Contrast on the final colours.** Every Studio screen, the builder in
-  Studio and on its own, with its menus open, meets WCAG 2.2 AA. The
+* The final colours meet contrast rules. Every SurveyStudio screen, the builder in
+  SurveyStudio and on its own, with its menus open, meets WCAG 2.2 AA. The
   builder's menu group headings were white at 30 percent, 2.41 to 1, and
   now take the panel's text colour.
-* **Responses starts with the Google Sheet**, the planned route: the sheet
+* Responses starts with the Google Sheet, the planned route: the sheet
   card comes first with Read from Google Sheet as the screen's primary
   action, then the CSV file, then help for files from other tools. Without
   googlesheets4 the card stays first and says how to install it.
-* **1 primary action per screen**, a full-size filled button from 1 shared
+* Each screen has 1 primary action, a full-size filled button from 1 shared
   level in `inst/builder/design_tokens.css`: Save to Studio on Design,
   now first in the builder's bar, Download survey on Collect, Load
   responses, Export report beside the Report title, Edit in Design, Add
   from BibTeX, and the next step on the screens that only show results.
   Every other action is an outline button or a link, and a disabled
   primary says why in a visible hint.
-* **1 control per destination on each screen.** The Open card no longer
+* Each screen has 1 control per destination. The Open card no longer
   links its version label and its status line to Amendments both, and the
   embedded builder shows none of the Open, Export survey, Build/Plan,
-  Google Sheets or References controls that Studio's own screens hold.
-* **Each screen is 1 panel with its title inside.** The title and its
-  context line, such as Design's "Editing: <title> (<version>)", are 1
+  Google Sheets or References controls that SurveyStudio's own screens hold.
+* Each screen is 1 panel with its title inside. The title and its
+  context line, such as Design's `Editing: <title> (<version>)`, are 1
   compact row at the top of the screen, in place of a band above its cards.
-* **1 Build and Plan control in Studio.** The sidebar's Design and Plan
-  entries pick the builder's mode, and the builder inside Studio hides its
+* SurveyStudio has 1 Build and Plan control. The sidebar's Design and Plan
+  entries pick the builder's mode, and the builder inside SurveyStudio hides its
   own Build/Plan switch. The standalone SurveyBuilder keeps it.
-* **The sidebar's groups fold.** Build, Collect, Analyse, Report and Record
-  are buttons that fold their entries, all open at first. Studio remembers
+* The sidebar's groups fold. Build, Collect, Analyse, Report and Record
+  are buttons that fold their entries, all open at first. SurveyStudio remembers
   each choice in the browser, and the group holding the open screen always
   stays open, including when a link or the address opens a screen in a
   folded group.
-* **Plain words first** in Studio and SurveyBuilder (UX-18). A label says
+* SurveyStudio and SurveyBuilder use plain words first. A label says
   what a control does, and the technical term follows as help: "Type of
   change" with the pipeline and design tiers explained, "Where is this
   source used?" for cited by, "R package that fits the model" for the
@@ -1751,65 +1735,65 @@ arithmetic.
   collector endpoint, "Refuse a file with missing or unexpected columns" for
   the strict column check, and the manifest described as a list of every
   file with its checksum.
-* **SurveyBuilder's Open Collect, Open References and Manage references open
-  Studio's screens** when the builder runs inside Studio. Studio handles the
+* SurveyBuilder's Open Collect, Open References and Manage references open
+  SurveyStudio's screens when the builder runs inside it, through the
   builder's `goto` message for Collect and References.
-* **Studio's long text fields take SurveyBuilder's format toolbar**: the
+* SurveyStudio's long text fields take SurveyBuilder's format toolbar: the
   Report's interpretation boxes and the amendment dialog's deviation report
   show it on focus and hide it on blur, insert Markdown, and cite through
   the same picker.
-* **Studio fits a phone** (UX-01, UX-08). Below 800 px the sidebar becomes a
+* SurveyStudio fits a phone. Below 800 px the sidebar becomes a
   drawer behind a labelled Menu button, which closes after a choice or on
   Escape, cards stack, and a wide table or code block scrolls inside its
   own region. At 390 px the sidebar took 240 px and pages ran to 1233 px.
-* **The sidebar is a labelled navigation** (UX-16): a `nav` named "Studio
+* The sidebar is a labelled navigation: a `nav` named "Studio
   screens", `aria-current="page"` on the open screen, and a fragment link
   for each screen, Plan included, so the browser's Back and Forward move
   between screens and an address ending `#quality` opens Quality.
-* **The Open card's status says what it means** (UX-12). "Valid" is
+* The Open card's status says what it means. "Valid" is
   "Schema valid", the version and amendment count sit beside the integrity
   badge and link to Amendments, Draft links to Design, and a failed check
   names its remedy.
-* **A gate replaces the screen it guards** (UX-13). When a screen's
+* A gate replaces the screen it guards. When a screen's
   prerequisite is missing, such as an open instrument, its next-stage card
   takes the place of the screen's body, so References, Amendments and
   Report no longer show live editors under it. A gate that only warns, such
   as Preview's validation list, leaves the screen shown.
-* **References are added in 1 place** (UX-03). The Report screen's Further
+* References are added in 1 place. The Report screen's Further
   references (BibTeX) box is gone. The interpretation boxes take the shared
   citation picker, which lists the instrument's references and the
   built-in method references as you type @, and the Configure tab links to
   References with "Manage references". The References screen offers a plan
   block's hypotheses and the study as targets once they are written.
-* **A Reference style select on the Report screen's Configure tab**: APA 7,
+* A Reference style select on the Report screen's Configure tab: APA 7,
   Chicago author-date, Harvard, IEEE and MLA, then "Other style (.csl
   file)", which shows the upload and a link to zotero.org/styles. The
   choice reaches `render_report(csl = )`, so the source folder holds the
   style's file, such as `harvard.csl`. Without Quarto the select offers
   APA 7 only and says why. The citation style upload left More options.
-* **The Report screen makes 2 products** (UX-20). Export report writes the
+* The Report screen makes 2 products. Export report writes the
   finished report in HTML or PDF, and in Word or OpenDocument when Quarto is
   found. Reproduce downloads the reproducible source, the `.qmd` folder of
   `render_report(format = "qmd")` as 1 zip, for RStudio or Positron. The
   separate analysis notebook card is gone, and without Quarto the engine
   line names the remedy instead of offering a third engine.
-* **The Report screen has 4 tabs**, Interpret, Configure, Export report and
-  Reproduce, in place of 1 long page of 5 jobs (UX-07). A choice made in 1
+* The Report screen has 4 tabs, Interpret, Configure, Export report and
+  Reproduce, in place of 1 long page of 5 jobs. A choice made in 1
   tab stays when you switch, the arrow keys move along the tabs, and the
   `.sframe` download is "Download copy" beside the screen title.
-* **Analyse runs the declared plan** (UX-02). It shows the plan read-only,
+* Analyse runs the declared plan. It shows the plan read-only,
   with the method, variables, declared hypotheses and a cross-tab's
   percentages, and runs it. Its Plan and Report outline tabs, its plan
   editor and its model builder are gone: "Change plan" opens Plan, the only
   plan editor. A plan changed once responses are loaded opens the amendment
   dialog as a design amendment, with the changed blocks in the deviation
   report, so the report's amendment list discloses them.
-* **Studio finds Quarto where `render_report()` does**, including the copy
+* SurveyStudio finds Quarto where `render_report()` does, including the copy
   bundled with RStudio or Positron, and its status line gives the version
   and where it was found, such as "Quarto 1.8.24, found on the PATH".
   Without Quarto the line names the remedy. It asked `Sys.which("quarto")`
   and said Quarto was not found where the report would use it.
-* **Drop from scale and Put back under a result.** Under a reliability,
+* A result offers Drop from scale and Put back. Under a reliability,
   item, EFA readiness, EFA, CFA or PLS result, each item past the usual
   cut-offs has "Drop from scale", which opens the amendment dialog with the
   reason from `sframe_item_flags()` filled in, records the drop and runs the
@@ -1817,14 +1801,16 @@ arithmetic.
   amendment that restores the item's place in its scales and models with its
   reverse key, so the history keeps both. After the file is opened again the
   item goes back through Design.
-* **Quality and Responses record a change to the data.** "Record as
+* Quality and Responses record a change to the data. "Record as
   amendment" opens the same dialog for a bot removal or a data correction,
   as a pipeline amendment.
-* **The Amendments screen gives the whole history**, oldest first: date,
+* The Amendments screen gives the whole history, oldest first: date,
   tier, reason, what changed, the deviation report and the content hashes
   before and after. The status line, the Amendments screen and the Open
   card give the version and the count, such as "1.1.0, 2 amendments".
-* **1 amendment dialog, and "Edit in Design" on Amendments.** A Design save
+* 1 dialog records an amendment, and the Amendments screen offers "Edit
+  in Design".
+  A Design save
   that changes an instrument with a history (read from a file, or amended)
   opens 1 dialog. It shows what the change touches (the fields, the scales
   whose scoring changes, the models and plan blocks), the reason, the tier,
@@ -1835,7 +1821,7 @@ arithmetic.
   "edit it in SurveyBuilder and upload the after file", and the upload is
   folded under "Import an externally revised version", which opens the same
   dialog. Its own reason and tier form is gone.
-* **The sidebar follows the study.** Open Instrument comes first, then 5
+* The sidebar follows the study. Open Instrument comes first, then 5
   groups under headings: Build (Design, Plan, Preview), Collect (Collect,
   Responses), Analyse (Quality, Explore, Reliability, Analyse), Report, and
   Record (References, Amendments). Plan opens Design with SurveyBuilder in its
@@ -1844,56 +1830,56 @@ arithmetic.
   is Quality, Dashboard is Explore, Analysis Plan is Analyse and Export is
   Report. The screen names `launch_studio(screen =)` takes are unchanged.
 
-* **Studio runs inside the package.** `launch_studio()` now sources the
+* SurveyStudio runs inside the package. `launch_studio()` now sources the
   app into an environment under the surveyframe namespace, as
   `launch_dashboard()` does, so the app calls internal helpers directly.
-  The 2 helpers copied into the app when the installed Studio failed to
+  The 2 helpers copied into the app when the installed SurveyStudio failed to
   start are gone.
 
-* **A screen picked during start-up stays open.** Studio switched to its
+* A screen picked during start-up stays open. SurveyStudio switched to its
   launch screen after the first page update, so a click made before that
   was undone. The launch screen now applies only if nothing was picked.
 
-* **The Dashboard screen has filters.** Every text, factor or logical
+* The Explore screen has filters. Every text, factor or logical
   question with 2 to 12 values gets a filter named by its question, with
   its choice labels, plus a date range on `submitted_at` or `started_at`.
   The 4 views and the CSV download use the filtered rows, and the Overview
   shows a "Filtered responses" tile. The Quality screen still describes
   every response.
 
-* **Studio has a Design screen.** It holds the SurveyBuilder, which opens
-  the instrument Studio has open. Its Save button reads "Save to Studio",
-  and a save becomes Studio's open instrument, read and checked as an
-  opened file is. Studio and the builder each take a message only from the
+* SurveyStudio has a Design screen. It holds the SurveyBuilder, which opens
+  the instrument SurveyStudio has open. Its Save button reads "Save to Studio",
+  and a save becomes SurveyStudio's open instrument, read and checked as an
+  opened file is. SurveyStudio and the builder each take a message only from the
   other window, on the same origin. With no instrument, `launch_studio()`
   and the Addin open on Design. `screen = "build"` names `"design"` in its
   error.
   An instrument changed with no amendment recorded does not open in
   Design, and the screen says why. Rewriting it as a new instrument would
-  have dropped its amendment log, and a save would have replaced Studio's
+  have dropped its amendment log, and a save would have replaced SurveyStudio's
   instrument with one that has no history.
   A save keeps the loaded responses while each item keeps its id, its
   type, its choice codes and, for a matrix, its rows, as after a label,
   wording, help text or branding edit. When one of those changes, the
   responses are cleared, and a message names what changed.
 
-* **`launch_builder(instrument = )` opens an instrument of your own in
-  SurveyBuilder.** The builder opens from a temporary copy that loads it at
+* `launch_builder(instrument = )` opens an instrument of your own in
+  SurveyBuilder. The builder opens from a temporary copy that loads it at
   start-up through the same route as its Open button, so the file is
   checked as an opened file is, and its study, designs, amendments and
   references are kept on the next save. `demo =` and `instrument =` cannot
   be used together. With `launch_studio(instrument, screen = "design")`,
   this gives both routes a way to open an instrument held in R.
-* **SurveyStudio points to the pre-analysis plan.** The Design screen says
+* SurveyStudio points to the pre-analysis plan. The Design screen says
   "Plan complete? Save to Studio, then export it as a pre-analysis plan for
   OSF, Zenodo or your ethics committee", linking the Report screen. There,
   with no responses loaded, the button reads "Export pre-analysis plan",
   says what it writes, and names the file `<title>_pre_analysis_plan.<format>`.
 
-* **`render_report(instrument)` with no data writes a pre-analysis plan**,
+* `render_report(instrument)` with no data writes a pre-analysis plan,
   not a results page, for a student or a lab to submit to OSF, Zenodo or
-  an ethics committee before collecting data. It is titled "Pre-analysis
-  plan: <title>" and holds a title page with the version, the date, the
+  an ethics committee before collecting data. It is titled `Pre-analysis
+  plan: <title>` and holds a title page with the version, the date, the
   instrument hash and how to verify it at https://surveyframe.org/verify,
   the study and its objectives, the participant information as written,
   the questionnaire in order with each branching rule in words, the scales
@@ -1910,7 +1896,7 @@ arithmetic.
   writes the same content as plain HTML. Results rows (the results record,
   the responses hash and the analysis seed) are no longer printed with no
   data. A report source folder (`format = "qmd"`) with no data is as before.
-* **Each stage names the next.** At the console, `write_sframe()`,
+* Each stage names the next. At the console, `write_sframe()`,
   `export_survey()`, `export_google_sheet()`, `read_responses()`,
   `run_analysis_plan()` and `render_report()` end with 1 message saying
   what was done and the call that comes next, for example "Ran 2 planned
@@ -1919,107 +1905,101 @@ arithmetic.
   a call typed at the top level, so a script, a render, a test, a server
   and the package's own calls stay as quiet as before. Their class is
   `sframe_next_stage`, and `suppressMessages()` silences them.
-* **The RStudio Addins menu has "Try a demo".** It lists the 27 bundled
+* The RStudio Addins menu has "Try a demo". It lists the 27 bundled
   demos with what each teaches, and opens the chosen one in SurveyStudio on
   the Design screen with its responses loaded, so each of the 5 stages has
   something to show. It is the same as `launch_studio(demo = "two_group",
   screen = "design")`, and the start-up message names it.
-* **The builder on the Design screen is part of Studio.** It drops its
+* The builder on the Design screen is part of SurveyStudio. It drops its
   SurveyBuilder name, its Preview mode and its Export survey button, which
-  Studio's Preview Survey and Collect screens do. Its save state reads
-  "Saved" or "Unsaved changes", and Studio's line above it reads
-  "Editing: <title> (<version>)", with a reminder to save only while there
-  are unsaved changes. The builder's Analyse mode is now Plan, in Studio
+  SurveyStudio's Preview and Collect screens do. Its save state reads
+  "Saved" or "Unsaved changes", and SurveyStudio's line above it reads
+  `Editing: <title> (<version>)`, with a reminder to save only while there
+  are unsaved changes. The builder's Analyse mode is now Plan, in SurveyStudio
   and on its own, after the stages Design, Plan, Preview and Collect.
 
-* **The Open Instrument screen says where the instrument came from.** It
+* The Open Instrument screen says where the instrument came from. It
   reads "Loaded from R", "File checked: hash verified" or "Saved from
   Design: hash verified", or names the failed check. A Design save showed
   "Not verified", though its hash was checked. The screen no longer sends
   you to the SurveyBuilder to design, and the plan's count is labelled
   "Research questions" on the Open and Analysis screens.
 
-* **The sidebar shows 1 selected screen.** The entry under the mouse took
+* The sidebar shows 1 selected screen. The entry under the mouse took
   the selected look, so with Design open, Design and the entry the mouse
   rested on both looked selected. Hover is now a lighter tint.
 
-* **Every empty Studio screen names the next stage.** With no instrument,
+* Every empty SurveyStudio screen names the next stage. With no instrument,
   each screen past Design and Open Instrument links to those 2. With no
   responses, Quality, Reliability and the Dashboard link to Collect and
-  Upload Responses. Preview with no questions sent you to
+  Responses. Preview with no questions sent you to
   `launch_builder()` and back through a file, where Design now does it.
 
-* **Studio has a Collect screen.** It downloads the Google Sheets Apps
+* SurveyStudio has a Collect screen. It downloads the Google Sheets Apps
   Script collector for a sheet you name, with the steps to deploy it, and
   the survey file, sending to the collector URL you give. The last step
-  opens the Upload Responses screen, with that sheet ready to read. The
-  Export screen pointed to the SurveyBuilder for both files.
+  opens the Responses screen, with that sheet ready to read. The
+  Report screen, then called Export, pointed to the SurveyBuilder for both files.
 
-* **The Export screen takes the report options, and is shorter.** It sets
+* The Report screen takes the report options, and is shorter. It sets
   the report's title, authors, format (HTML or PDF), whether each result
-  shows its R code, figure size, resolution and format, a citation style,
-  and further references as BibTeX, as `render_report()` takes them. A line
+  shows its R code, figure size, resolution and format and a citation
+  style, as `render_report()` takes them. A line
   says whether Quarto or the built-in engine will write the report, and
   what the built-in one cannot do. Each research question folds to its
   heading and question, so the screen for the `input_types` demo is 5,302
-  px tall in place of 43,730. The analysis notebook downloads as 1 zip in
-  place of 3 files.
+  px tall in place of 43,730.
 
-* **A free-text question no longer becomes a Dashboard filter.** A text or
+* A free-text question no longer becomes a Dashboard filter. A text or
   textarea question with 12 or fewer distinct answers was offered as a
   filter, as `open_comment` in the `input_types` demo was.
 
-* **The SurveyStudio guide shows Studio's Dashboard screen**, with its
+* The SurveyStudio guide shows SurveyStudio's Explore screen, with its
   filters, in place of the retired dashboard app.
 
-* **`data-raw/rename_0.4.3.R` writes the 2 dashboard wrappers.**
-  `launch_dashboard()` and `launch_dashboard_demo()` were added to
-  `R/superseded.R` by hand, so a rerun of the generator dropped them. A test
-  reruns it on a copy of the source and expects no file to change.
-
-* **`launch_dashboard()` opens Studio's Dashboard screen.** It and
+* `launch_dashboard()` opens SurveyStudio's Dashboard screen. It and
   `launch_dashboard_demo()` are superseded by `launch_studio(screen =
   "dashboard")`, and the separate dashboard app is removed.
 
-* **Each screen draws when it is opened.** Studio kept 28 outputs on every
+* Each screen draws when it is opened. SurveyStudio kept 28 outputs on every
   screen computing from start-up, because its screens are hidden with CSS
   and Shiny was not told when one became visible. The screen switch now
   tells Shiny, so only the open screen's outputs are computed. A browser
   test opens every screen and checks that it draws.
-* **The Analysis Plan screen has fields for the hypotheses.** Methods that
+* The Analysis Plan screen has fields for the hypotheses. Methods that
   test a hypothesis show optional "Null hypothesis (H0)" and "Alternative
   hypothesis (H1)" fields, with a method-appropriate example as placeholder
-  text. Only what you write is saved. Studio saved 2 fixed sentences, "No
+  text. Only what you write is saved. SurveyStudio saved 2 fixed sentences, "No
   effect or association is present." and "An effect or association is
   present.", for every such block, and those load back as empty.
-* **The decision rule is no longer copied into the interpretation.** The
+* The decision rule is no longer copied into the interpretation. The
   plan editor box is labelled "Decision rule (declared now)" and saves the
   decision rule only. Saving an edited block keeps the interpretation it
   already had, and an interpretation identical to the decision rule counts
   as unwritten.
-* **Saving an opened file untouched keeps its content hash.** Studio rebuilt
+* Saving an opened file untouched keeps its content hash. SurveyStudio rebuilt
   the instrument metadata without the file's creation time, so the saved
   draft carried the time of the save. Any file opened and saved unchanged
-  then failed its hash check and Studio asked to save it as a new
+  then failed its hash check and SurveyStudio asked to save it as a new
   instrument. The creation time now carries over from the file.
 
-* **SurveyStudio has a References screen.** It lists the works the open
+* SurveyStudio has a References screen. It lists the works the open
   instrument cites, adds more from pasted BibTeX with where the instrument
   cites each one, and removes them. Changes apply to the open instrument at
   once, need no amendment, and travel in the exported `.sframe` file.
   `launch_studio(screen = "references")` opens on it.
-* **SurveyStudio keeps an instrument's references.** Its rebuild of the
+* SurveyStudio keeps an instrument's references. Its rebuild of the
   open instrument had no place for them, so they were dropped as soon as a
   file opened, and lost from anything exported.
-* **The dashboard's filters are named by their questions** and offer the
+* The dashboard's filters are named by their questions and offer the
   choice labels. They showed the item id, such as `visit_type`, and the
   stored codes. Each label is now tied to its control.
-* **Run results on the Analysis Plan screen take the full width.** Each
+* Run results on the Analysis Plan screen take the full width. Each
   result card sat inside the middle third of the screen, about 230 px wide,
   so a result table printed "120" one digit per line and cut off its p
   column. The cards now sit in a full-width row below the 3 columns on the
   Run preview tab.
-* The Quality Dashboard says when the duplicate check needs an id column, where it
+* The Quality screen says when the duplicate check needs an id column, where it
   printed "NA duplicate response row(s) detected". It now uses a
   `respondent_id` column for the check by default.
 * The Saved analysis plans table keeps short ids such as "RQ1" on one line
@@ -2027,78 +2007,76 @@ arithmetic.
 * A result card is headed "RQ 4" when its block id only repeats the number.
   It read "RQ 4: RQ4". A block id that says something more, such as "H2a",
   still shows beside the number.
-* Studio's page declares its language as English (`lang="en"`), so a
-  screen reader reads it with English pronunciation (WCAG 3.1.1, Codex
-  P1-06).
+* SurveyStudio's page declares its language as English (`lang="en"`), so a
+  screen reader reads it with English pronunciation (WCAG 3.1.1).
 * The sidebar's 5 group headings (Build, Collect, Analyse, Report,
   Record) and every fold, such as Amendments' "Import an externally
   revised version", are at least 24 px tall, the WCAG 2.5.8 target size.
-  The headings were 15.7 px and the import fold 20 px (Codex P1-07).
-* Studio and the builder count in words, "1 respondent" and "0
+  The headings were 15.7 px and the import fold 20 px.
+* SurveyStudio and the builder count in words, "1 respondent" and "0
   respondents", where Quality printed "0 respondent(s) (0.0%) flagged as
   too fast" and "0 duplicate response row(s) detected". The same holds for
   a role's maximum on the Plan screens and the builder's counts of scales,
-  constructs, paths, research questions and report sections (Codex P1-08).
-* **Open Instrument's status comes from `validate_sframe()` run on the open
-  instrument.** It read the stored `meta$validated`, so the valid
+  constructs, paths, research questions and report sections.
+* Open Instrument's status comes from `validate_sframe()` run on the open
+  instrument. It read the stored `meta$validated`, so the valid
   `two_group` demo showed "Draft" and "Status: fix in Design" with no
-  reason. The stored flag is a cache that Studio never trusts. The status
+  reason. The stored flag is a cache that SurveyStudio never trusts. The status
   reads "Schema valid", or "Fix in Design" with the number of problems and
   the first one named. With nothing open, the sidebar says "No instrument
-  open", where it said "Draft needs fixes" (Codex P1-09).
+  open", where it said "Draft needs fixes".
 * With no instrument open, the 9 screens from Collect to Amendments offer
   Open Instrument as the filled primary button and Design as the secondary
   one beside it, where both were outlined and neither stood out as the next
-  step (Codex P1-10).
+  step.
 * With an instrument open and no responses, Quality, Reliability and the
   Dashboard offer Collect as the filled primary button and Responses as the
-  secondary one beside it, where both were outlined (UF follow-up 2).
+  secondary one beside it, where both were outlined.
 * A table wider than its card, such as Analyse's declared plan at 390 px,
   scrolls inside a region a keyboard can focus and a screen reader names,
   "Declared plan" or "RQ 1 result table". The table itself was the scroll
   box, with nothing in it to focus, so a keyboard could not scroll it
-  (WCAG 2.1.1, Codex P1-12).
+  (WCAG 2.1.1).
 * The builder's question rows are list items in a list, and the question
   open for editing is marked `aria-current`. Each row was a focusable
   listbox option holding its own Move, Duplicate and Delete buttons, which
-  an option hides from assistive technology (WCAG 4.1.2, Codex P1-11).
+  an option hides from assistive technology (WCAG 4.1.2).
   Enter, Space, the arrow keys and Alt with an arrow work as before.
 
 ## Demos
 
-* **The all-types demo's text block says what a text block does**
-  (owner, 2026-11-15): "A text block gives respondents information, such as
+* The all-types demo's text block says what a text block does: "A text block gives respondents information, such as
   an instruction or a consent statement. It collects no answer." It read as
   placeholder text in SurveyStudio's question list. The file has a new hash.
 
-* **2 guided tours now run through R's `demo()` system.** Run `demo("tour",
+* 2 guided tours now run through R's `demo()` system. Run `demo("tour",
   package = "surveyframe")` for the 5 study stages, or `demo("verify", package
   = "surveyframe")` to see an integrity check catch a changed copy.
 
-* **Demo research questions now stand alone.** Each question names its method,
+* Demo research questions now stand alone. Each question names its method,
   outcome or comparison where the earlier wording depended on the question above it.
 
-* **The `factor_structure` demo is an employee engagement study
-  throughout**, "Employee engagement at work", with the scales "How my work
+* The `factor_structure` demo is an employee engagement study
+  throughout, "Employee engagement at work", with the scales "How my work
   is organised" and "The content of my work", where its title and scale
   labels still spoke of event attendees. The Employee engagement survey
   template is built on it. The file has a new hash, and its items' codes,
   responses and results are unchanged.
 
-* **The `sem_pls` demo's second model is "The same paths, as PLS-SEM
-  syntax"**, where it read "estimated by PLS": surveyframe writes its
+* The `sem_pls` demo's second model is "The same paths, as PLS-SEM
+  syntax", where it read "estimated by PLS": surveyframe writes its
   seminr syntax for the reader to fit. The `input_types` reference dataset
   is titled "Visitor experience survey", where it carried the builder's
   placeholder "Surveyframe Demo: Survey Title". Both files have a new hash,
   and their items, responses and results are unchanged.
 
-* **The `sem_pls` demo's RQ5 asks "And what seminr code would estimate the
-  PLS model?"**, where it asked what a PLS estimate gives. Its `pls_sem`
+* The `sem_pls` demo's RQ5 asks "And what seminr code would estimate the
+  PLS model?", where it asked what a PLS estimate gives. Its `pls_sem`
   block returns the seminr syntax for the model, which the reader fits in
   seminr. The file has a new hash, and its results and codebook are
   unchanged.
 
-* **Demonstration data says so wherever it goes.** Every demo's responses
+* Demonstration data says so wherever it goes. Every demo's responses
   have respondent ids `DEMO-001` and on, and a `data_status` column,
   "Demonstration data, not collected from participants". `read_responses()`
   keeps it without being told, in strict mode as well, as it keeps the
@@ -2109,7 +2087,7 @@ arithmetic.
   with both engines and in every format, also after the data is copied
   into another project. The 25 stored results files carry the stamp.
   `?sframe_demo` says how the demos may be used.
-* **3 regression charts** (first contact section 4a). A linear regression
+* Regressions and mediation draw 3 new charts. A linear regression
   with 2 predictors or more draws, beside its observed-against-fitted
   chart, the standardised coefficients with their 95% confidence
   intervals. A multinomial logistic regression draws 1 panel per outcome
@@ -2119,7 +2097,7 @@ arithmetic.
   engines show the second chart after the first, titled with the result,
   and `sframe_save_figures()` writes it as `<id>_2`. Variables are named by
   their questions' labels.
-* **3 new teaching demos**, 25 in all. `weighted_survey`: a resident
+* 3 new teaching demos bring the total to 25. `weighted_survey`: a resident
   satisfaction survey whose sample over-represents 1 region, with frequency,
   descriptives and a chi-square test weighted by a design weight carried in
   the responses as `survey_weight`, a column that is not a question and that
@@ -2130,12 +2108,12 @@ arithmetic.
   wellbeing, and whether a manager's support weakens the link from workload
   to stress. Each has a study, "Demo author", hypotheses, a codebook and its
   stored results, from the tracked generator.
-* **The all-types demo holds all 13 answerable types.** `input_types`
+* The all-types demo holds all 13 answerable types. `input_types`
   gains a pairwise comparison on the Saaty scale, 1 on the influence scale
   and a criteria weight, over price, location and service, with seeded
   answers in 12 columns appended to its responses file. Its other columns
   are unchanged. Added by `data-raw/input_types_comparison_items.R`.
-* **Each teaching demo tells a study.** The 22 teaching demos declare a
+* Each teaching demo tells a study. The 22 teaching demos declare a
   research-style purpose, a study (problem, objectives and a sampling plan
   with population, method and planned n), "Demo author" as a placeholder
   author, and on each inferential block H0, H1 and a decision rule, and
@@ -2152,8 +2130,7 @@ arithmetic.
   Assessment, Reading materials), not event sessions. A matrix row's name
   is also its column's, so `matrix_likert_responses.csv` changes its 4
   column headers, `session__Lectures` and the rest, with every value as
-  it was. The demos
-  are regenerated by the tracked `data-raw/build_demo_library.R` from
+  it was. The demos are regenerated by the tracked `data-raw/build_demo_library.R` from
   `data-raw/demo_stories.R`, still version 1.0.0, so every demo file's
   hash changes (first 12 characters, old and new). The 2 reference
   datasets, `tourism_services` and `input_types`, get the same placeholder
@@ -2189,7 +2166,8 @@ arithmetic.
   | `two_group` | `7d53e872d328` | `3907d53280ea` |
   | `verification` | `1d3995afbed6` | `3db2149ca3c3` |
   | `verification_tampered` | `1d3995afbed6` | `3db2149ca3c3` |
-* **`sframe_demo()` prints a short card and shows the survey.** At the
+
+* `sframe_demo()` prints a short card and shows the survey. At the
   console a demo printed every response, 125 to 1,112 lines. It is now a
   list of class `sframe_demo`, and printing it shows what the demo teaches,
   its questions, responses and planned methods, its files, that its data
@@ -2199,14 +2177,14 @@ arithmetic.
   also opens as a respondent sees it, in the viewer or the browser through
   `sframe_show()`. Nothing opens in a script, a knitr or Quarto render, or
   with `preview = FALSE` or `options(surveyframe.demo_preview = FALSE)`.
-* **`sframe_list_demos()` prints 1 line per demo**, grouped as analysis,
+* `sframe_list_demos()` prints 1 line per demo, grouped as analysis,
   presentation, provenance and reference datasets, with `two_group` named
   as the place to start, in 35 lines. It returns a data frame of class
   `sframe_demo_list`, and `as.data.frame()` gives the full table.
-* **In RStudio the commands on the card and the list are links that run
-  them**, through `cli`, now in Suggests. Without `cli`, or in a console
+* In RStudio the commands on the card and the list are links that run
+  them, through `cli`, now in Suggests. Without `cli`, or in a console
   with no run links, the same text prints plain.
-* **Every demo has welcome, consent and thank-you screens.** 19 of the 22
+* Every demo has welcome, consent and thank-you screens. 19 of the 22
   shipped with none, so a respondent met the questions with no consent step.
   They now carry plain screens in the default look, consent required, and
   `branded = TRUE` still replaces the whole block. `instrument_revision` is
@@ -2235,9 +2213,12 @@ arithmetic.
 A defect-fix release. An external review of 0.4.1 found defects that
 silently alter or lose data, and this release corrects them. Collection
 defects come first, because an answer recorded wrongly is lost for good.
-This section grows as each group of fixes lands.
 
-## What you need to change
+## Upgrading from 0.4.1
+
+Code written for 0.4.1 may stop running, or give different numbers, after
+these changes. If you are upgrading from an earlier version, also read the
+news of each release in between.
 
 * **A Shiny-collected response now carries a `respondent_id`**, as the first
   column, holding a generated identifier such as `RK3P8QX2A`. The static
