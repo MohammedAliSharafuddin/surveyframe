@@ -16,8 +16,10 @@ test_that("12: the package page documents the 2 kinds of name", {
   expect_match(src, "How functions are named", fixed = TRUE)
   # both kinds named, and the old names pointed to
   expect_match(src, "Everything else takes `sframe_`", fixed = TRUE)
-  expect_match(src, "No 2 names sit 1 letter apart", fixed = TRUE)
   expect_match(src, "carry no", fixed = TRUE)
+  # the package page points to the old names, and their page gives the reason
+  expect_match(src, "[superseded]", fixed = TRUE)
+  expect_match(source_of("superseded.R"), "no 2 names sit 1", fixed = TRUE)
   # only the superseded wrappers keep the old sf_ prefix
   ex <- sframe_exports()
   old <- grep("^sf_", ex, value = TRUE)

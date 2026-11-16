@@ -12,6 +12,8 @@ test_that("a child Rscript loads the build under test", {
   lib <- sframe_build_under_test()
   skip_if(is.na(lib), "the installed package is the build under test")
   skip_if(startsWith(lib, "skip:"), sub("^skip: ", "", lib))
+  commit <- sframe_build_commit(sframe_build_source())
+  skip_if(!nzchar(commit), "the source is not a git checkout, so there is no commit to compare")
   out <- system2(
     file.path(R.home("bin"), "Rscript"),
     c("-e", shQuote(paste0(
@@ -19,5 +21,5 @@ test_that("a child Rscript loads the build under test", {
       "utils::packageDescription('surveyframe')$RemoteSha, sep = '\\n')"))),
     stdout = TRUE)
   expect_equal(normalizePath(out[1]), normalizePath(lib))
-  expect_equal(out[2], sframe_build_commit(sframe_build_source()))
+  expect_equal(out[2], commit)
 })
