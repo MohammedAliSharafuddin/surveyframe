@@ -8,7 +8,7 @@ Demo author
 
 Rendered
 
-15 November 2026
+16 November 2026
 
 **Instrument:** Choosing next year’s venue
 
@@ -16,7 +16,7 @@ Rendered
 
 **Version:** 1.0.0
 
-**Date:** 15 November 2026
+**Date:** 16 November 2026
 
 **Instrument hash (SHA-256):**
 
@@ -194,8 +194,8 @@ None. This is the instrument as first planned.
 - Saaty, T. L. (1980). *The analytic hierarchy process*. McGraw-Hill.
 - Saaty, T. L. (1996). *Decision making with dependence and feedback:
   The analytic network process*. RWS Publications.
-- Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows*
-  (Version 0.4.3) \[Computer software\].
+- Sharafuddin, M. A. (2026). *surveyframe: Design, Plan, Seal and Report
+  Questionnaire Studies* (Version 0.4.3) \[Computer software\].
   https://github.com/MohammedAliSharafuddin/surveyframe
 - Si, S.-L., You, X.-Y., Liu, H.-C., & Zhang, P. (2018). DEMATEL
   technique: A systematic review of the state-of-the-art literature on

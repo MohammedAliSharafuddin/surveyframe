@@ -587,7 +587,7 @@ html_path <- export_survey(
   output_path = file.path(tempdir(), "tourism_services_survey.html"),
   open        = FALSE
 )
-#> Static survey written to '/tmp/RtmpVIJDLr/tourism_services_survey.html' (103.3
+#> Static survey written to '/tmp/RtmpRThwQ1/tourism_services_survey.html' (103.3
 #> KB).
 file.exists(html_path)
 ```
@@ -639,7 +639,7 @@ script_path <- export_google_sheet(
   sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
   output_dir = tempdir()
 )
-#> Apps Script written to: /tmp/RtmpVIJDLr/surveyframe_collector.gs
+#> Apps Script written to: /tmp/RtmpRThwQ1/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 ```
@@ -1117,7 +1117,7 @@ render_report(
 #> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
 #> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto. This usually takes under a minute.
-#> Report rendered with the Quarto engine: /tmp/RtmpVIJDLr/tourism_report.html
+#> Report rendered with the Quarto engine: /tmp/RtmpRThwQ1/tourism_report.html
 ```
 
 ------------------------------------------------------------------------

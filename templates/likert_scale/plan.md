@@ -8,7 +8,7 @@ Demo author
 
 Rendered
 
-15 November 2026
+16 November 2026
 
 **Instrument:** Was the event well organised?
 
@@ -16,11 +16,11 @@ Rendered
 
 **Version:** 1.0.0
 
-**Date:** 15 November 2026
+**Date:** 16 November 2026
 
 **Instrument hash (SHA-256):**
 
-`dccd03b03c96461abab2250032bdab015997f927f58fd190de630193e804b663`
+`fab7ddf43799e6e6f52be79a288a62dc103e2b291dc3abc2ee862bab96380147`
 
 The hash identifies the instrument file this plan describes. Anyone can
 check that a .sframe file is the one planned by opening it at
@@ -39,7 +39,7 @@ its score is used.
 | Objective | Research questions |
 |----|----|
 | O1: Describe how organised the event felt to attendees. | RQ1 (How does the scale score overall?) |
-| O2: Check that the organisation scale is reliable. | RQ2 (Is the scale internally consistent?); RQ3 (Same question, omega rather than alpha.); RQ4 (Does any item sit poorly with the rest?) |
+| O2: Check that the organisation scale is reliable. | RQ2 (Is the scale internally consistent?); RQ3 (Is the scale internally consistent according to omega?); RQ4 (Does any item sit poorly with the rest?) |
 
 **Table 1**  
 *Objectives and the research questions that serve them* {.caption-top
@@ -103,7 +103,7 @@ alpha is .70 or above.
 
 **Method reference:** (Cronbach, 1951)
 
-### RQ3: Same question, omega rather than alpha.
+### RQ3: Is the scale internally consistent according to omega?
 
 **Planned decision rule:** Treat the scale as reliable when omega is .70
 or above.
@@ -131,8 +131,8 @@ None. This is the instrument as first planned.
   Erlbaum.
 - R Core Team. (2026). *R: A language and environment for statistical
   computing*. R Foundation for Statistical Computing.
-- Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows*
-  (Version 0.4.3) \[Computer software\].
+- Sharafuddin, M. A. (2026). *surveyframe: Design, Plan, Seal and Report
+  Questionnaire Studies* (Version 0.4.3) \[Computer software\].
   https://github.com/MohammedAliSharafuddin/surveyframe
 
 ## To complete before submission

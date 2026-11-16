@@ -22,7 +22,7 @@ The criteria weighting question as the respondent sees it.
 
 ## Settings
 
-- **Criteria.** The things weighted. The points must add up to 100.
+- **Criteria.** List the things weighted. The points must add up to 100.
 
 ## Best practices for research
 

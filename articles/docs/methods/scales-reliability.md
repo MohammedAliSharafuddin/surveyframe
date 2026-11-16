@@ -6,8 +6,9 @@
 These methods give a scale’s score and test whether its items hold
 together.
 
-**Assumptions.** Items that measure 1 idea, with reverse-worded items
-scored back. Alpha assumes items contribute equally, omega does not.
+**Assumptions.** Use items that measure 1 idea, with reverse-worded
+items scored back. Alpha assumes items contribute equally, omega does
+not.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. Choose the scale. Its items, shared
@@ -66,8 +67,9 @@ McDonald’s omega (internal consistency) research question, from the
 
 In the pre-analysis plan:
 
-> **RQ3.** Same question, omega rather than alpha. **Planned decision
-> rule:** Treat the scale as reliable when omega is .70 or above.
+> **RQ3.** Is the scale internally consistent according to omega?
+> **Planned decision rule:** Treat the scale as reliable when omega is
+> .70 or above.
 
 In the report: the APA 7 sentence and a table, with a chart where the
 method has one, each titled with the research question.

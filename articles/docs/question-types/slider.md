@@ -21,8 +21,8 @@ The slider rating as the respondent sees it.
 
 ## Settings
 
-- **Minimum, maximum and step.** The range and how finely the respondent
-  can place the handle.
+- **Minimum, maximum and step.** Set the range and how finely the
+  respondent can place the handle.
 
 ## Best practices for research
 

@@ -8,7 +8,7 @@ Demo author
 
 Rendered
 
-15 November 2026
+16 November 2026
 
 **Instrument:** What worked, and what to change
 
@@ -16,7 +16,7 @@ Rendered
 
 **Version:** 1.0.0
 
-**Date:** 15 November 2026
+**Date:** 16 November 2026
 
 **Instrument hash (SHA-256):**
 
@@ -154,8 +154,8 @@ None. This is the instrument as first planned.
   *21*(11), 1129–1164. https://doi.org/10.1002/spe.4380211102
 - R Core Team. (2026). *R: A language and environment for statistical
   computing*. R Foundation for Statistical Computing.
-- Sharafuddin, M. A. (2026). *surveyframe: Survey Instrument Workflows*
-  (Version 0.4.3) \[Computer software\].
+- Sharafuddin, M. A. (2026). *surveyframe: Design, Plan, Seal and Report
+  Questionnaire Studies* (Version 0.4.3) \[Computer software\].
   https://github.com/MohammedAliSharafuddin/surveyframe
 
 ## To complete before submission

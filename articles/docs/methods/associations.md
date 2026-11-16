@@ -5,9 +5,9 @@
 
 These methods test whether 2 categorical answers go together.
 
-**Assumptions.** Independent respondents. The chi-square test needs
-expected counts of about 5 or more per cell, Fisher’s exact test does
-not.
+**Assumptions.** Use responses from independent respondents. The
+chi-square test needs expected counts of about 5 or more per cell,
+Fisher’s exact test does not.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. Set 2 single-choice answers, 1 for the

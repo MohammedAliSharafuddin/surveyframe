@@ -21,8 +21,8 @@ The short text question as the respondent sees it.
 
 ## Settings
 
-- **Required.** Asks for an answer before the respondent goes on. Leave
-  open questions optional where you can.
+- **Required.** Tick it to require an answer before the respondent goes
+  on. Leave open questions optional where you can.
 
 ## Best practices for research
 

@@ -21,8 +21,8 @@ The ranking question as the respondent sees it.
 
 ## Settings
 
-- **Choice set.** The options respondents put in order. Each option gets
-  its own column in the data, holding its position, 1 for first.
+- **Choice set.** Add the options respondents put in order. Each option
+  gets its own column in the data, holding its position, 1 for first.
 
 ## Best practices for research
 

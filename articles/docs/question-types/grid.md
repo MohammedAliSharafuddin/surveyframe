@@ -22,9 +22,10 @@ The grid of rating questions as the respondent sees it.
 
 ## Settings
 
-- **Rows.** The things rated. Each row becomes its own column, named
-  after it.
-- **Choice set.** The answer options every row is rated on.
+- **Rows.** List the things rated. Each row becomes its own column,
+  named after it.
+- **Choice set.** Choose the answer options that respondents use to rate
+  every row.
 
 ## Best practices for research
 

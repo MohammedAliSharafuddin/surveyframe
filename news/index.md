@@ -10,6 +10,11 @@ no longer changes content its user left alone, so an amended instrument
 saved from it can be written again, and every plan result can be
 serialised by a host.
 
+The package has a new title, “Design, Plan, Seal and Report
+Questionnaire Studies”, which names the 4 steps it takes a study
+through. It replaces “Survey Instrument Workflows”. The citation and
+every report’s APA reference carry the new title.
+
 ### What you need to change
 
 - **11 helpers for SurveyStudio and the report template are internal.**
@@ -77,7 +82,7 @@ serialised by a host.
   declares them” under Analysis. Report the 0.4.3 numbers, and say which
   category is the reference.
 - **Every plan result serialises with
-  [`jsonlite::toJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).**
+  [`jsonlite::toJSON()`](https://rdrr.io/pkg/jsonlite/man/fromJSON.html).**
   The classed report behind a descriptives, missing-data, quality,
   reliability, EFA or item-diagnostics result, and a fitted LDA or STM
   topic model, now sit in an attribute for the current R session, which
@@ -1943,6 +1948,11 @@ the arithmetic.
 
 ### SurveyBuilder
 
+- **The Desktop and Mobile buttons stay in line** (owner, 2026-11-15).
+  Above the centre preview they are 1 group, which moves below the hint
+  as a whole when the centre is narrow, as in SurveyStudio beside its
+  menu. They drifted apart, 1 above the other, at tablet widths.
+
 - **The Plan screen reads in words** (owner check of the Docs
   screenshots, 2026-11-15). A plan card shows α = .05, Draft, and a
   model by its name, such as Content quality to intention (CB-SEM),
@@ -2170,472 +2180,426 @@ the arithmetic.
 - **Each screen is 1 panel with its title inside.** The title and its
   context line, such as Design’s “Editing:
 
-  ()“, are 1 compact row at the top of the screen, in place of a band
-  above its cards.
-
-- **1 Build and Plan control in Studio.** The sidebar’s Design and Plan
-  entries pick the builder’s mode, and the builder inside Studio hides
-  its own Build/Plan switch. The standalone SurveyBuilder keeps it.
-
-- **The sidebar’s groups fold.** Build, Collect, Analyse, Report and
-  Record are buttons that fold their entries, all open at first. Studio
-  remembers each choice in the browser, and the group holding the open
-  screen always stays open, including when a link or the address opens a
-  screen in a folded group.
-
-- **Plain words first** in Studio and SurveyBuilder (UX-18). A label
-  says what a control does, and the technical term follows as help:
-  “Type of change” with the pipeline and design tiers explained, “Where
-  is this source used?” for cited by, “R package that fits the model”
-  for the output engine, “Web app address that receives the responses”
-  for the collector endpoint, “Refuse a file with missing or unexpected
-  columns” for the strict column check, and the manifest described as a
-  list of every file with its checksum.
-
-- **SurveyBuilder’s Open Collect, Open References and Manage references
-  open Studio’s screens** when the builder runs inside Studio. Studio
-  handles the builder’s `goto` message for Collect and References.
-
-- **Studio’s long text fields take SurveyBuilder’s format toolbar**: the
-  Report’s interpretation boxes and the amendment dialog’s deviation
-  report show it on focus and hide it on blur, insert Markdown, and cite
-  through the same picker.
-
-- **Studio fits a phone** (UX-01, UX-08). Below 800 px the sidebar
-  becomes a drawer behind a labelled Menu button, which closes after a
-  choice or on Escape, cards stack, and a wide table or code block
-  scrolls inside its own region. At 390 px the sidebar took 240 px and
-  pages ran to 1233 px.
-
-- **The sidebar is a labelled navigation** (UX-16): a `nav` named
-  “Studio screens”, `aria-current="page"` on the open screen, and a
+  \<p\>(\<version\>)“, are 1 compact row at the top of the screen, in
+  place of a band above its cards.\</p\>\</li\> \<li\>\<p\>\<strong\>1
+  Build and Plan control in Studio.\</strong\> The sidebar’s Design and
+  Plan entries pick the builder’s mode, and the builder inside Studio
+  hides its own Build/Plan switch. The standalone SurveyBuilder keeps
+  it.\</p\>\</li\> \<li\>\<p\>\<strong\>The sidebar’s groups
+  fold.\</strong\> Build, Collect, Analyse, Report and Record are
+  buttons that fold their entries, all open at first. Studio remembers
+  each choice in the browser, and the group holding the open screen
+  always stays open, including when a link or the address opens a screen
+  in a folded group.\</p\>\</li\> \<li\>\<p\>\<strong\>Plain words
+  first\</strong\> in Studio and SurveyBuilder (UX-18). A label says
+  what a control does, and the technical term follows as help: “Type of
+  change” with the pipeline and design tiers explained, “Where is this
+  source used?” for cited by, “R package that fits the model” for the
+  output engine, “Web app address that receives the responses” for the
+  collector endpoint, “Refuse a file with missing or unexpected columns”
+  for the strict column check, and the manifest described as a list of
+  every file with its checksum.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>SurveyBuilder’s Open Collect, Open References and
+  Manage references open Studio’s screens\</strong\> when the builder
+  runs inside Studio. Studio handles the builder’s \<code\>goto\</code\>
+  message for Collect and References.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Studio’s long text fields take SurveyBuilder’s
+  format toolbar\</strong\>: the Report’s interpretation boxes and the
+  amendment dialog’s deviation report show it on focus and hide it on
+  blur, insert Markdown, and cite through the same picker.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Studio fits a phone\</strong\> (UX-01, UX-08).
+  Below 800 px the sidebar becomes a drawer behind a labelled Menu
+  button, which closes after a choice or on Escape, cards stack, and a
+  wide table or code block scrolls inside its own region. At 390 px the
+  sidebar took 240 px and pages ran to 1233 px.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The sidebar is a labelled navigation\</strong\>
+  (UX-16): a \<code\>nav\</code\> named “Studio screens”,
+  \<code\>aria-current="page"\</code\> on the open screen, and a
   fragment link for each screen, Plan included, so the browser’s Back
-  and Forward move between screens and an address ending `#quality`
-  opens Quality.
-
-- **The Open card’s status says what it means** (UX-12). “Valid” is
-  “Schema valid”, the version and amendment count sit beside the
-  integrity badge and link to Amendments, Draft links to Design, and a
-  failed check names its remedy.
-
-- **A gate replaces the screen it guards** (UX-13). When a screen’s
-  prerequisite is missing, such as an open instrument, its next-stage
-  card takes the place of the screen’s body, so References, Amendments
-  and Report no longer show live editors under it. A gate that only
-  warns, such as Preview’s validation list, leaves the screen shown.
-
-- **References are added in 1 place** (UX-03). The Report screen’s
-  Further references (BibTeX) box is gone. The interpretation boxes take
-  the shared citation picker, which lists the instrument’s references
-  and the built-in method references as you type @, and the Configure
-  tab links to References with “Manage references”. The References
-  screen offers a plan block’s hypotheses and the study as targets once
-  they are written.
-
-- **A Reference style select on the Report screen’s Configure tab**: APA
-  7, Chicago author-date, Harvard, IEEE and MLA, then “Other style (.csl
-  file)”, which shows the upload and a link to zotero.org/styles. The
-  choice reaches `render_report(csl = )`, so the source folder holds the
-  style’s file, such as `harvard.csl`. Without Quarto the select offers
-  APA 7 only and says why. The citation style upload left More options.
-
-- **The Report screen makes 2 products** (UX-20). Export report writes
-  the finished report in HTML or PDF, and in Word or OpenDocument when
-  Quarto is found. Reproduce downloads the reproducible source, the
-  `.qmd` folder of `render_report(format = "qmd")` as 1 zip, for RStudio
-  or Positron. The separate analysis notebook card is gone, and without
-  Quarto the engine line names the remedy instead of offering a third
-  engine.
-
-- **The Report screen has 4 tabs**, Interpret, Configure, Export report
-  and Reproduce, in place of 1 long page of 5 jobs (UX-07). A choice
-  made in 1 tab stays when you switch, the arrow keys move along the
-  tabs, and the `.sframe` download is “Download copy” beside the screen
-  title.
-
-- **Analyse runs the declared plan** (UX-02). It shows the plan
-  read-only, with the method, variables, declared hypotheses and a
-  cross-tab’s percentages, and runs it. Its Plan and Report outline
-  tabs, its plan editor and its model builder are gone: “Change plan”
-  opens Plan, the only plan editor. A plan changed once responses are
-  loaded opens the amendment dialog as a design amendment, with the
-  changed blocks in the deviation report, so the report’s amendment list
-  discloses them.
-
-- **Studio finds Quarto where
-  [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  does**, including the copy bundled with RStudio or Positron, and its
-  status line gives the version and where it was found, such as “Quarto
-  1.8.24, found on the PATH”. Without Quarto the line names the remedy.
-  It asked `Sys.which("quarto")` and said Quarto was not found where the
-  report would use it.
-
-- **Drop from scale and Put back under a result.** Under a reliability,
-  item, EFA readiness, EFA, CFA or PLS result, each item past the usual
-  cut-offs has “Drop from scale”, which opens the amendment dialog with
-  the reason from
-  [`sframe_item_flags()`](https://surveyframe.org/reference/sframe_item_flags.md)
-  filled in, records the drop and runs the plan again. An item dropped
-  in the session has “Put back”, a second amendment that restores the
-  item’s place in its scales and models with its reverse key, so the
-  history keeps both. After the file is opened again the item goes back
-  through Design.
-
-- **Quality and Responses record a change to the data.** “Record as
-  amendment” opens the same dialog for a bot removal or a data
-  correction, as a pipeline amendment.
-
-- **The Amendments screen gives the whole history**, oldest first: date,
-  tier, reason, what changed, the deviation report and the content
-  hashes before and after. The status line, the Amendments screen and
-  the Open card give the version and the count, such as “1.1.0, 2
-  amendments”.
-
-- **1 amendment dialog, and “Edit in Design” on Amendments.** A Design
-  save that changes an instrument with a history (read from a file, or
-  amended) opens 1 dialog. It shows what the change touches (the fields,
-  the scales whose scoring changes, the models and plan blocks), the
-  reason, the tier, a deviation report for a design change, and the
-  version suggested for each tier with the reason, then records the
-  amendment with
-  [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
-  saves a new instrument, or cancels. The builder gets the recorded log
-  and version back. The Amendments screen says “Edit in Design” in place
-  of “edit it in SurveyBuilder and upload the after file”, and the
-  upload is folded under “Import an externally revised version”, which
-  opens the same dialog. Its own reason and tier form is gone.
-
-- **The sidebar follows the study.** Open Instrument comes first, then 5
-  groups under headings: Build (Design, Plan, Preview), Collect
+  and Forward move between screens and an address ending
+  \<code\>#quality\</code\> opens Quality.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The Open card’s status says what it
+  means\</strong\> (UX-12). “Valid” is “Schema valid”, the version and
+  amendment count sit beside the integrity badge and link to Amendments,
+  Draft links to Design, and a failed check names its
+  remedy.\</p\>\</li\> \<li\>\<p\>\<strong\>A gate replaces the screen
+  it guards\</strong\> (UX-13). When a screen’s prerequisite is missing,
+  such as an open instrument, its next-stage card takes the place of the
+  screen’s body, so References, Amendments and Report no longer show
+  live editors under it. A gate that only warns, such as Preview’s
+  validation list, leaves the screen shown.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>References are added in 1 place\</strong\>
+  (UX-03). The Report screen’s Further references (BibTeX) box is gone.
+  The interpretation boxes take the shared citation picker, which lists
+  the instrument’s references and the built-in method references as you
+  type @, and the Configure tab links to References with “Manage
+  references”. The References screen offers a plan block’s hypotheses
+  and the study as targets once they are written.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>A Reference style select on the Report screen’s
+  Configure tab\</strong\>: APA 7, Chicago author-date, Harvard, IEEE
+  and MLA, then “Other style (.csl file)”, which shows the upload and a
+  link to zotero.org/styles. The choice reaches
+  \<code\>render_report(csl = )\</code\>, so the source folder holds the
+  style’s file, such as \<code\>harvard.csl\</code\>. Without Quarto the
+  select offers APA 7 only and says why. The citation style upload left
+  More options.\</p\>\</li\> \<li\>\<p\>\<strong\>The Report screen
+  makes 2 products\</strong\> (UX-20). Export report writes the finished
+  report in HTML or PDF, and in Word or OpenDocument when Quarto is
+  found. Reproduce downloads the reproducible source, the
+  \<code\>.qmd\</code\> folder of \<code\>render_report(format =
+  "qmd")\</code\> as 1 zip, for RStudio or Positron. The separate
+  analysis notebook card is gone, and without Quarto the engine line
+  names the remedy instead of offering a third engine.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The Report screen has 4 tabs\</strong\>,
+  Interpret, Configure, Export report and Reproduce, in place of 1 long
+  page of 5 jobs (UX-07). A choice made in 1 tab stays when you switch,
+  the arrow keys move along the tabs, and the \<code\>.sframe\</code\>
+  download is “Download copy” beside the screen title.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Analyse runs the declared plan\</strong\>
+  (UX-02). It shows the plan read-only, with the method, variables,
+  declared hypotheses and a cross-tab’s percentages, and runs it. Its
+  Plan and Report outline tabs, its plan editor and its model builder
+  are gone: “Change plan” opens Plan, the only plan editor. A plan
+  changed once responses are loaded opens the amendment dialog as a
+  design amendment, with the changed blocks in the deviation report, so
+  the report’s amendment list discloses them.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Studio finds Quarto where
+  \<code\>render_report()\</code\> does\</strong\>, including the copy
+  bundled with RStudio or Positron, and its status line gives the
+  version and where it was found, such as “Quarto 1.8.24, found on the
+  PATH”. Without Quarto the line names the remedy. It asked
+  \<code\>Sys.which("quarto")\</code\> and said Quarto was not found
+  where the report would use it.\</p\>\</li\> \<li\>\<p\>\<strong\>Drop
+  from scale and Put back under a result.\</strong\> Under a
+  reliability, item, EFA readiness, EFA, CFA or PLS result, each item
+  past the usual cut-offs has “Drop from scale”, which opens the
+  amendment dialog with the reason from
+  \<code\>sframe_item_flags()\</code\> filled in, records the drop and
+  runs the plan again. An item dropped in the session has “Put back”, a
+  second amendment that restores the item’s place in its scales and
+  models with its reverse key, so the history keeps both. After the file
+  is opened again the item goes back through Design.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Quality and Responses record a change to the
+  data.\</strong\> “Record as amendment” opens the same dialog for a bot
+  removal or a data correction, as a pipeline amendment.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The Amendments screen gives the whole
+  history\</strong\>, oldest first: date, tier, reason, what changed,
+  the deviation report and the content hashes before and after. The
+  status line, the Amendments screen and the Open card give the version
+  and the count, such as “1.1.0, 2 amendments”.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>1 amendment dialog, and “Edit in Design” on
+  Amendments.\</strong\> A Design save that changes an instrument with a
+  history (read from a file, or amended) opens 1 dialog. It shows what
+  the change touches (the fields, the scales whose scoring changes, the
+  models and plan blocks), the reason, the tier, a deviation report for
+  a design change, and the version suggested for each tier with the
+  reason, then records the amendment with
+  \<code\>amend_sframe()\</code\>, saves a new instrument, or cancels.
+  The builder gets the recorded log and version back. The Amendments
+  screen says “Edit in Design” in place of “edit it in SurveyBuilder and
+  upload the after file”, and the upload is folded under “Import an
+  externally revised version”, which opens the same dialog. Its own
+  reason and tier form is gone.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  sidebar follows the study.\</strong\> Open Instrument comes first,
+  then 5 groups under headings: Build (Design, Plan, Preview), Collect
   (Collect, Responses), Analyse (Quality, Explore, Reliability,
   Analyse), Report, and Record (References, Amendments). Plan opens
   Design with SurveyBuilder in its Plan mode, and Design opens it in
   Build mode. 6 screens have shorter names: Preview Survey is Preview,
   Upload Responses is Responses, Quality Dashboard is Quality, Dashboard
   is Explore, Analysis Plan is Analyse and Export is Report. The screen
-  names `launch_studio(screen =)` takes are unchanged.
-
-- **Studio runs inside the package.**
-  [`launch_studio()`](https://surveyframe.org/reference/launch_studio.md)
-  now sources the app into an environment under the surveyframe
-  namespace, as
-  [`launch_dashboard()`](https://surveyframe.org/reference/superseded.md)
-  does, so the app calls internal helpers directly. The 2 helpers copied
-  into the app when the installed Studio failed to start are gone.
-
-- **A screen picked during start-up stays open.** Studio switched to its
-  launch screen after the first page update, so a click made before that
-  was undone. The launch screen now applies only if nothing was picked.
-
-- **The Dashboard screen has filters.** Every text, factor or logical
-  question with 2 to 12 values gets a filter named by its question, with
-  its choice labels, plus a date range on `submitted_at` or
-  `started_at`. The 4 views and the CSV download use the filtered rows,
-  and the Overview shows a “Filtered responses” tile. The Quality screen
-  still describes every response.
-
-- **Studio has a Design screen.** It holds the SurveyBuilder, which
-  opens the instrument Studio has open. Its Save button reads “Save to
-  Studio”, and a save becomes Studio’s open instrument, read and checked
-  as an opened file is. Studio and the builder each take a message only
-  from the other window, on the same origin. With no instrument,
-  [`launch_studio()`](https://surveyframe.org/reference/launch_studio.md)
-  and the Addin open on Design. `screen = "build"` names `"design"` in
-  its error. An instrument changed with no amendment recorded does not
-  open in Design, and the screen says why. Rewriting it as a new
-  instrument would have dropped its amendment log, and a save would have
-  replaced Studio’s instrument with one that has no history. A save
-  keeps the loaded responses while each item keeps its id, its type, its
-  choice codes and, for a matrix, its rows, as after a label, wording,
-  help text or branding edit. When one of those changes, the responses
-  are cleared, and a message names what changed.
-
-- **`launch_builder(instrument = )` opens an instrument of your own in
-  SurveyBuilder.** The builder opens from a temporary copy that loads it
-  at start-up through the same route as its Open button, so the file is
-  checked as an opened file is, and its study, designs, amendments and
-  references are kept on the next save. `demo =` and `instrument =`
-  cannot be used together. With
-  `launch_studio(instrument, screen = "design")`, this gives both routes
-  a way to open an instrument held in R.
-
-- **SurveyStudio points to the pre-analysis plan.** The Design screen
-  says “Plan complete? Save to Studio, then export it as a pre-analysis
-  plan for OSF, Zenodo or your ethics committee”, linking the Report
-  screen. There, with no responses loaded, the button reads “Export
-  pre-analysis plan”, says what it writes, and names the file
-  `<title>_pre_analysis_plan.<format>`.
-
-- **`render_report(instrument)` with no data writes a pre-analysis
-  plan**, not a results page, for a student or a lab to submit to OSF,
-  Zenodo or an ethics committee before collecting data. It is titled
-  “Pre-analysis plan:
-
-  ” and holds a title page with the version, the date, the instrument
-  hash and how to verify it at <https://surveyframe.org/verify>, the
-  study and its objectives, the participant information as written, the
-  questionnaire in order with each branching rule in words, the scales
-  with their reverse keys, scoring and missing-answer rule, each
-  research question with its hypotheses, the method in plain words with
-  its reference, the variables, the significance level and the decision
-  rule, the preregistration fields the study declares, with the
-  significance level where a plan block sets alpha, the models, the
-  amendments or “None”, the references, and “To complete before
-  submission”, a prompt and a blank line for each of those fields the
-  study leaves empty (exclusion rules, stopping rule, primary outcomes,
-  secondary outcomes, multiplicity, contingency decisions and the
-  significance level). Quarto writes it as HTML, PDF, Word or
-  OpenDocument from its own template, `plan.qmd`, and the built-in
-  engine writes the same content as plain HTML. Results rows (the
-  results record, the responses hash and the analysis seed) are no
-  longer printed with no data. A report source folder (`format = "qmd"`)
-  with no data is as before.
-
-- **Each stage names the next.** At the console,
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md),
-  [`export_survey()`](https://surveyframe.org/reference/export_survey.md),
-  [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md),
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md),
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  and
-  [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  end with 1 message saying what was done and the call that comes next,
-  for example “Ran 2 planned analyses. Next: write the report with
-  render_report(instrument, responses).” The messages appear only in an
-  interactive session and for a call typed at the top level, so a
-  script, a render, a test, a server and the package’s own calls stay as
-  quiet as before. Their class is `sframe_next_stage`, and
-  [`suppressMessages()`](https://rdrr.io/r/base/message.html) silences
-  them.
-
-- **The RStudio Addins menu has “Try a demo”.** It lists the 27 bundled
-  demos with what each teaches, and opens the chosen one in SurveyStudio
-  on the Design screen with its responses loaded, so each of the 5
-  stages has something to show. It is the same as
-  `launch_studio(demo = "two_group", screen = "design")`, and the
-  start-up message names it.
-
-- **The builder on the Design screen is part of Studio.** It drops its
-  SurveyBuilder name, its Preview mode and its Export survey button,
-  which Studio’s Preview Survey and Collect screens do. Its save state
-  reads “Saved” or “Unsaved changes”, and Studio’s line above it reads
-  “Editing:
-
-  ()“, with a reminder to save only while there are unsaved changes. The
-  builder’s Analyse mode is now Plan, in Studio and on its own, after
-  the stages Design, Plan, Preview and Collect.
-
-- **The Open Instrument screen says where the instrument came from.** It
-  reads “Loaded from R”, “File checked: hash verified” or “Saved from
-  Design: hash verified”, or names the failed check. A Design save
-  showed “Not verified”, though its hash was checked. The screen no
-  longer sends you to the SurveyBuilder to design, and the plan’s count
-  is labelled “Research questions” on the Open and Analysis screens.
-
-- **The sidebar shows 1 selected screen.** The entry under the mouse
-  took the selected look, so with Design open, Design and the entry the
-  mouse rested on both looked selected. Hover is now a lighter tint.
-
-- **Every empty Studio screen names the next stage.** With no
-  instrument, each screen past Design and Open Instrument links to
-  those 2. With no responses, Quality, Reliability and the Dashboard
-  link to Collect and Upload Responses. Preview with no questions sent
-  you to
-  [`launch_builder()`](https://surveyframe.org/reference/launch_builder.md)
-  and back through a file, where Design now does it.
-
-- **Studio has a Collect screen.** It downloads the Google Sheets Apps
-  Script collector for a sheet you name, with the steps to deploy it,
-  and the survey file, sending to the collector URL you give. The last
-  step opens the Upload Responses screen, with that sheet ready to read.
-  The Export screen pointed to the SurveyBuilder for both files.
-
-- **The Export screen takes the report options, and is shorter.** It
-  sets the report’s title, authors, format (HTML or PDF), whether each
-  result shows its R code, figure size, resolution and format, a
-  citation style, and further references as BibTeX, as
-  [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  takes them. A line says whether Quarto or the built-in engine will
-  write the report, and what the built-in one cannot do. Each research
-  question folds to its heading and question, so the screen for the
-  `input_types` demo is 5,302 px tall in place of 43,730. The analysis
-  notebook downloads as 1 zip in place of 3 files.
-
-- **A free-text question no longer becomes a Dashboard filter.** A text
-  or textarea question with 12 or fewer distinct answers was offered as
-  a filter, as `open_comment` in the `input_types` demo was.
-
-- **The SurveyStudio guide shows Studio’s Dashboard screen**, with its
-  filters, in place of the retired dashboard app.
-
-- **`data-raw/rename_0.4.3.R` writes the 2 dashboard wrappers.**
-  [`launch_dashboard()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`launch_dashboard_demo()`](https://surveyframe.org/reference/superseded.md)
-  were added to `R/superseded.R` by hand, so a rerun of the generator
+  names \<code\>launch_studio(screen =)\</code\> takes are
+  unchanged.\</p\>\</li\> \<li\>\<p\>\<strong\>Studio runs inside the
+  package.\</strong\> \<code\>launch_studio()\</code\> now sources the
+  app into an environment under the surveyframe namespace, as
+  \<code\>launch_dashboard()\</code\> does, so the app calls internal
+  helpers directly. The 2 helpers copied into the app when the installed
+  Studio failed to start are gone.\</p\>\</li\> \<li\>\<p\>\<strong\>A
+  screen picked during start-up stays open.\</strong\> Studio switched
+  to its launch screen after the first page update, so a click made
+  before that was undone. The launch screen now applies only if nothing
+  was picked.\</p\>\</li\> \<li\>\<p\>\<strong\>The Dashboard screen has
+  filters.\</strong\> Every text, factor or logical question with 2 to
+  12 values gets a filter named by its question, with its choice labels,
+  plus a date range on \<code\>submitted_at\</code\> or
+  \<code\>started_at\</code\>. The 4 views and the CSV download use the
+  filtered rows, and the Overview shows a “Filtered responses” tile. The
+  Quality screen still describes every response.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Studio has a Design screen.\</strong\> It holds
+  the SurveyBuilder, which opens the instrument Studio has open. Its
+  Save button reads “Save to Studio”, and a save becomes Studio’s open
+  instrument, read and checked as an opened file is. Studio and the
+  builder each take a message only from the other window, on the same
+  origin. With no instrument, \<code\>launch_studio()\</code\> and the
+  Addin open on Design. \<code\>screen = "build"\</code\> names
+  \<code\>"design"\</code\> in its error. An instrument changed with no
+  amendment recorded does not open in Design, and the screen says why.
+  Rewriting it as a new instrument would have dropped its amendment log,
+  and a save would have replaced Studio’s instrument with one that has
+  no history. A save keeps the loaded responses while each item keeps
+  its id, its type, its choice codes and, for a matrix, its rows, as
+  after a label, wording, help text or branding edit. When one of those
+  changes, the responses are cleared, and a message names what
+  changed.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>launch_builder(instrument = )\</code\>
+  opens an instrument of your own in SurveyBuilder.\</strong\> The
+  builder opens from a temporary copy that loads it at start-up through
+  the same route as its Open button, so the file is checked as an opened
+  file is, and its study, designs, amendments and references are kept on
+  the next save. \<code\>demo =\</code\> and \<code\>instrument
+  =\</code\> cannot be used together. With
+  \<code\>launch_studio(instrument, screen = "design")\</code\>, this
+  gives both routes a way to open an instrument held in R.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>SurveyStudio points to the pre-analysis
+  plan.\</strong\> The Design screen says “Plan complete? Save to
+  Studio, then export it as a pre-analysis plan for OSF, Zenodo or your
+  ethics committee”, linking the Report screen. There, with no responses
+  loaded, the button reads “Export pre-analysis plan”, says what it
+  writes, and names the file
+  \<code\>\<title\>\_pre_analysis_plan.\<format\>\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>render_report(instrument)\</code\> with
+  no data writes a pre-analysis plan\</strong\>, not a results page, for
+  a student or a lab to submit to OSF, Zenodo or an ethics committee
+  before collecting data. It is titled “Pre-analysis plan:\</p\>
+  \<title\> \<p\>” and holds a title page with the version, the date,
+  the instrument hash and how to verify it at \<a
+  href="https://surveyframe.org/verify"
+  class="uri"\>https://surveyframe.org/verify\</a\>, the study and its
+  objectives, the participant information as written, the questionnaire
+  in order with each branching rule in words, the scales with their
+  reverse keys, scoring and missing-answer rule, each research question
+  with its hypotheses, the method in plain words with its reference, the
+  variables, the significance level and the decision rule, the
+  preregistration fields the study declares, with the significance level
+  where a plan block sets alpha, the models, the amendments or “None”,
+  the references, and “To complete before submission”, a prompt and a
+  blank line for each of those fields the study leaves empty (exclusion
+  rules, stopping rule, primary outcomes, secondary outcomes,
+  multiplicity, contingency decisions and the significance level).
+  Quarto writes it as HTML, PDF, Word or OpenDocument from its own
+  template, \<code\>plan.qmd\</code\>, and the built-in engine writes
+  the same content as plain HTML. Results rows (the results record, the
+  responses hash and the analysis seed) are no longer printed with no
+  data. A report source folder (\<code\>format = "qmd"\</code\>) with no
+  data is as before.\</p\>\</li\> \<li\>\<p\>\<strong\>Each stage names
+  the next.\</strong\> At the console, \<code\>write_sframe()\</code\>,
+  \<code\>export_survey()\</code\>,
+  \<code\>export_google_sheet()\</code\>,
+  \<code\>read_responses()\</code\>,
+  \<code\>run_analysis_plan()\</code\> and
+  \<code\>render_report()\</code\> end with 1 message saying what was
+  done and the call that comes next, for example “Ran 2 planned
+  analyses. Next: write the report with render_report(instrument,
+  responses).” The messages appear only in an interactive session and
+  for a call typed at the top level, so a script, a render, a test, a
+  server and the package’s own calls stay as quiet as before. Their
+  class is \<code\>sframe_next_stage\</code\>, and
+  \<code\>suppressMessages()\</code\> silences them.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The RStudio Addins menu has “Try a
+  demo”.\</strong\> It lists the 27 bundled demos with what each
+  teaches, and opens the chosen one in SurveyStudio on the Design screen
+  with its responses loaded, so each of the 5 stages has something to
+  show. It is the same as \<code\>launch_studio(demo = "two_group",
+  screen = "design")\</code\>, and the start-up message names
+  it.\</p\>\</li\> \<li\>\<p\>\<strong\>The builder on the Design screen
+  is part of Studio.\</strong\> It drops its SurveyBuilder name, its
+  Preview mode and its Export survey button, which Studio’s Preview
+  Survey and Collect screens do. Its save state reads “Saved” or
+  “Unsaved changes”, and Studio’s line above it reads “Editing:\</p\>
+  \<title\> \<p\>(\<version\>)“, with a reminder to save only while
+  there are unsaved changes. The builder’s Analyse mode is now Plan, in
+  Studio and on its own, after the stages Design, Plan, Preview and
+  Collect.\</p\>\</li\> \<li\>\<p\>\<strong\>The Open Instrument screen
+  says where the instrument came from.\</strong\> It reads “Loaded from
+  R”, “File checked: hash verified” or “Saved from Design: hash
+  verified”, or names the failed check. A Design save showed “Not
+  verified”, though its hash was checked. The screen no longer sends you
+  to the SurveyBuilder to design, and the plan’s count is labelled
+  “Research questions” on the Open and Analysis screens.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The sidebar shows 1 selected screen.\</strong\>
+  The entry under the mouse took the selected look, so with Design open,
+  Design and the entry the mouse rested on both looked selected. Hover
+  is now a lighter tint.\</p\>\</li\> \<li\>\<p\>\<strong\>Every empty
+  Studio screen names the next stage.\</strong\> With no instrument,
+  each screen past Design and Open Instrument links to those 2. With no
+  responses, Quality, Reliability and the Dashboard link to Collect and
+  Upload Responses. Preview with no questions sent you to
+  \<code\>launch_builder()\</code\> and back through a file, where
+  Design now does it.\</p\>\</li\> \<li\>\<p\>\<strong\>Studio has a
+  Collect screen.\</strong\> It downloads the Google Sheets Apps Script
+  collector for a sheet you name, with the steps to deploy it, and the
+  survey file, sending to the collector URL you give. The last step
+  opens the Upload Responses screen, with that sheet ready to read. The
+  Export screen pointed to the SurveyBuilder for both
+  files.\</p\>\</li\> \<li\>\<p\>\<strong\>The Export screen takes the
+  report options, and is shorter.\</strong\> It sets the report’s title,
+  authors, format (HTML or PDF), whether each result shows its R code,
+  figure size, resolution and format, a citation style, and further
+  references as BibTeX, as \<code\>render_report()\</code\> takes them.
+  A line says whether Quarto or the built-in engine will write the
+  report, and what the built-in one cannot do. Each research question
+  folds to its heading and question, so the screen for the
+  \<code\>input_types\</code\> demo is 5,302 px tall in place of 43,730.
+  The analysis notebook downloads as 1 zip in place of 3
+  files.\</p\>\</li\> \<li\>\<p\>\<strong\>A free-text question no
+  longer becomes a Dashboard filter.\</strong\> A text or textarea
+  question with 12 or fewer distinct answers was offered as a filter, as
+  \<code\>open_comment\</code\> in the \<code\>input_types\</code\> demo
+  was.\</p\>\</li\> \<li\>\<p\>\<strong\>The SurveyStudio guide shows
+  Studio’s Dashboard screen\</strong\>, with its filters, in place of
+  the retired dashboard app.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>data-raw/rename_0.4.3.R\</code\> writes
+  the 2 dashboard wrappers.\</strong\>
+  \<code\>launch_dashboard()\</code\> and
+  \<code\>launch_dashboard_demo()\</code\> were added to
+  \<code\>R/superseded.R\</code\> by hand, so a rerun of the generator
   dropped them. A test reruns it on a copy of the source and expects no
-  file to change.
-
-- **[`launch_dashboard()`](https://surveyframe.org/reference/superseded.md)
-  opens Studio’s Dashboard screen.** It and
-  [`launch_dashboard_demo()`](https://surveyframe.org/reference/superseded.md)
-  are superseded by `launch_studio(screen = "dashboard")`, and the
-  separate dashboard app is removed.
-
-- **Each screen draws when it is opened.** Studio kept 28 outputs on
+  file to change.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>launch_dashboard()\</code\> opens
+  Studio’s Dashboard screen.\</strong\> It and
+  \<code\>launch_dashboard_demo()\</code\> are superseded by
+  \<code\>launch_studio(screen = "dashboard")\</code\>, and the separate
+  dashboard app is removed.\</p\>\</li\> \<li\>\<p\>\<strong\>Each
+  screen draws when it is opened.\</strong\> Studio kept 28 outputs on
   every screen computing from start-up, because its screens are hidden
   with CSS and Shiny was not told when one became visible. The screen
   switch now tells Shiny, so only the open screen’s outputs are
-  computed. A browser test opens every screen and checks that it draws.
-
-- **The Analysis Plan screen has fields for the hypotheses.** Methods
-  that test a hypothesis show optional “Null hypothesis (H0)” and
-  “Alternative hypothesis (H1)” fields, with a method-appropriate
-  example as placeholder text. Only what you write is saved. Studio
-  saved 2 fixed sentences, “No effect or association is present.” and
-  “An effect or association is present.”, for every such block, and
-  those load back as empty.
-
-- **The decision rule is no longer copied into the interpretation.** The
-  plan editor box is labelled “Decision rule (declared now)” and saves
-  the decision rule only. Saving an edited block keeps the
-  interpretation it already had, and an interpretation identical to the
-  decision rule counts as unwritten.
-
-- **Saving an opened file untouched keeps its content hash.** Studio
-  rebuilt the instrument metadata without the file’s creation time, so
-  the saved draft carried the time of the save. Any file opened and
-  saved unchanged then failed its hash check and Studio asked to save it
-  as a new instrument. The creation time now carries over from the file.
-
-- **SurveyStudio has a References screen.** It lists the works the open
-  instrument cites, adds more from pasted BibTeX with where the
-  instrument cites each one, and removes them. Changes apply to the open
-  instrument at once, need no amendment, and travel in the exported
-  `.sframe` file. `launch_studio(screen = "references")` opens on it.
-
-- **SurveyStudio keeps an instrument’s references.** Its rebuild of the
-  open instrument had no place for them, so they were dropped as soon as
-  a file opened, and lost from anything exported.
-
-- **The dashboard’s filters are named by their questions** and offer the
-  choice labels. They showed the item id, such as `visit_type`, and the
-  stored codes. Each label is now tied to its control.
-
-- **Run results on the Analysis Plan screen take the full width.** Each
-  result card sat inside the middle third of the screen, about 230 px
-  wide, so a result table printed “120” one digit per line and cut off
-  its p column. The cards now sit in a full-width row below the 3
-  columns on the Run preview tab.
-
-- The Quality Dashboard says when the duplicate check needs an id
-  column, where it printed “NA duplicate response row(s) detected”. It
-  now uses a `respondent_id` column for the check by default.
-
-- The Saved analysis plans table keeps short ids such as “RQ1” on one
-  line and scrolls sideways on a narrow screen.
-
-- A result card is headed “RQ 4” when its block id only repeats the
-  number. It read “RQ 4: RQ4”. A block id that says something more, such
-  as “H2a”, still shows beside the number.
-
-- Studio’s page declares its language as English (`lang="en"`), so a
-  screen reader reads it with English pronunciation (WCAG 3.1.1, Codex
-  P1-06).
-
-- The sidebar’s 5 group headings (Build, Collect, Analyse, Report,
-  Record) and every fold, such as Amendments’ “Import an externally
-  revised version”, are at least 24 px tall, the WCAG 2.5.8 target size.
-  The headings were 15.7 px and the import fold 20 px (Codex P1-07).
-
-- Studio and the builder count in words, “1 respondent” and “0
-  respondents”, where Quality printed “0 respondent(s) (0.0%) flagged as
-  too fast” and “0 duplicate response row(s) detected”. The same holds
-  for a role’s maximum on the Plan screens and the builder’s counts of
-  scales, constructs, paths, research questions and report sections
-  (Codex P1-08).
-
-- **Open Instrument’s status comes from
-  [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
-  run on the open instrument.** It read the stored `meta$validated`, so
-  the valid `two_group` demo showed “Draft” and “Status: fix in Design”
-  with no reason. The stored flag is a cache that Studio never trusts.
-  The status reads “Schema valid”, or “Fix in Design” with the number of
-  problems and the first one named. With nothing open, the sidebar says
-  “No instrument open”, where it said “Draft needs fixes” (Codex P1-09).
-
-- With no instrument open, the 9 screens from Collect to Amendments
-  offer Open Instrument as the filled primary button and Design as the
-  secondary one beside it, where both were outlined and neither stood
-  out as the next step (Codex P1-10).
-
-- With an instrument open and no responses, Quality, Reliability and the
-  Dashboard offer Collect as the filled primary button and Responses as
-  the secondary one beside it, where both were outlined (UF follow-up
-  2).
-
-- A table wider than its card, such as Analyse’s declared plan at 390
-  px, scrolls inside a region a keyboard can focus and a screen reader
+  computed. A browser test opens every screen and checks that it
+  draws.\</p\>\</li\> \<li\>\<p\>\<strong\>The Analysis Plan screen has
+  fields for the hypotheses.\</strong\> Methods that test a hypothesis
+  show optional “Null hypothesis (H0)” and “Alternative hypothesis (H1)”
+  fields, with a method-appropriate example as placeholder text. Only
+  what you write is saved. Studio saved 2 fixed sentences, “No effect or
+  association is present.” and “An effect or association is present.”,
+  for every such block, and those load back as empty.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The decision rule is no longer copied into the
+  interpretation.\</strong\> The plan editor box is labelled “Decision
+  rule (declared now)” and saves the decision rule only. Saving an
+  edited block keeps the interpretation it already had, and an
+  interpretation identical to the decision rule counts as
+  unwritten.\</p\>\</li\> \<li\>\<p\>\<strong\>Saving an opened file
+  untouched keeps its content hash.\</strong\> Studio rebuilt the
+  instrument metadata without the file’s creation time, so the saved
+  draft carried the time of the save. Any file opened and saved
+  unchanged then failed its hash check and Studio asked to save it as a
+  new instrument. The creation time now carries over from the
+  file.\</p\>\</li\> \<li\>\<p\>\<strong\>SurveyStudio has a References
+  screen.\</strong\> It lists the works the open instrument cites, adds
+  more from pasted BibTeX with where the instrument cites each one, and
+  removes them. Changes apply to the open instrument at once, need no
+  amendment, and travel in the exported \<code\>.sframe\</code\> file.
+  \<code\>launch_studio(screen = "references")\</code\> opens on
+  it.\</p\>\</li\> \<li\>\<p\>\<strong\>SurveyStudio keeps an
+  instrument’s references.\</strong\> Its rebuild of the open instrument
+  had no place for them, so they were dropped as soon as a file opened,
+  and lost from anything exported.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  dashboard’s filters are named by their questions\</strong\> and offer
+  the choice labels. They showed the item id, such as
+  \<code\>visit_type\</code\>, and the stored codes. Each label is now
+  tied to its control.\</p\>\</li\> \<li\>\<p\>\<strong\>Run results on
+  the Analysis Plan screen take the full width.\</strong\> Each result
+  card sat inside the middle third of the screen, about 230 px wide, so
+  a result table printed “120” one digit per line and cut off its p
+  column. The cards now sit in a full-width row below the 3 columns on
+  the Run preview tab.\</p\>\</li\> \<li\>\<p\>The Quality Dashboard
+  says when the duplicate check needs an id column, where it printed “NA
+  duplicate response row(s) detected”. It now uses a
+  \<code\>respondent_id\</code\> column for the check by
+  default.\</p\>\</li\> \<li\>\<p\>The Saved analysis plans table keeps
+  short ids such as “RQ1” on one line and scrolls sideways on a narrow
+  screen.\</p\>\</li\> \<li\>\<p\>A result card is headed “RQ 4” when
+  its block id only repeats the number. It read “RQ 4: RQ4”. A block id
+  that says something more, such as “H2a”, still shows beside the
+  number.\</p\>\</li\> \<li\>\<p\>Studio’s page declares its language as
+  English (\<code\>lang="en"\</code\>), so a screen reader reads it with
+  English pronunciation (WCAG 3.1.1, Codex P1-06).\</p\>\</li\>
+  \<li\>\<p\>The sidebar’s 5 group headings (Build, Collect, Analyse,
+  Report, Record) and every fold, such as Amendments’ “Import an
+  externally revised version”, are at least 24 px tall, the WCAG 2.5.8
+  target size. The headings were 15.7 px and the import fold 20 px
+  (Codex P1-07).\</p\>\</li\> \<li\>\<p\>Studio and the builder count in
+  words, “1 respondent” and “0 respondents”, where Quality printed “0
+  respondent(s) (0.0%) flagged as too fast” and “0 duplicate response
+  row(s) detected”. The same holds for a role’s maximum on the Plan
+  screens and the builder’s counts of scales, constructs, paths,
+  research questions and report sections (Codex P1-08).\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Open Instrument’s status comes from
+  \<code\>validate_sframe()\</code\> run on the open
+  instrument.\</strong\> It read the stored
+  \<code\>meta\$validated\</code\>, so the valid
+  \<code\>two_group\</code\> demo showed “Draft” and “Status: fix in
+  Design” with no reason. The stored flag is a cache that Studio never
+  trusts. The status reads “Schema valid”, or “Fix in Design” with the
+  number of problems and the first one named. With nothing open, the
+  sidebar says “No instrument open”, where it said “Draft needs fixes”
+  (Codex P1-09).\</p\>\</li\> \<li\>\<p\>With no instrument open, the 9
+  screens from Collect to Amendments offer Open Instrument as the filled
+  primary button and Design as the secondary one beside it, where both
+  were outlined and neither stood out as the next step (Codex
+  P1-10).\</p\>\</li\> \<li\>\<p\>With an instrument open and no
+  responses, Quality, Reliability and the Dashboard offer Collect as the
+  filled primary button and Responses as the secondary one beside it,
+  where both were outlined (UF follow-up 2).\</p\>\</li\> \<li\>\<p\>A
+  table wider than its card, such as Analyse’s declared plan at 390 px,
+  scrolls inside a region a keyboard can focus and a screen reader
   names, “Declared plan” or “RQ 1 result table”. The table itself was
   the scroll box, with nothing in it to focus, so a keyboard could not
-  scroll it (WCAG 2.1.1, Codex P1-12).
-
-- The builder’s question rows are list items in a list, and the question
-  open for editing is marked `aria-current`. Each row was a focusable
-  listbox option holding its own Move, Duplicate and Delete buttons,
-  which an option hides from assistive technology (WCAG 4.1.2, Codex
-  P1-11). Enter, Space, the arrow keys and Alt with an arrow work as
-  before.
-
-### Demos
-
-- **2 guided tours now run through R’s
-  [`demo()`](https://rdrr.io/r/utils/demo.html) system.** Run
-  `demo("tour", package = "surveyframe")` for the 5 study stages, or
-  `demo("verify", package = "surveyframe")` to see an integrity check
-  catch a changed copy.
-
-- **Demo research questions now stand alone.** Each question names its
-  method, outcome or comparison where the earlier wording depended on
-  the question above it.
-
-- **The `factor_structure` demo is an employee engagement study
-  throughout**, “Employee engagement at work”, with the scales “How my
-  work is organised” and “The content of my work”, where its title and
-  scale labels still spoke of event attendees. The Employee engagement
-  survey template is built on it. The file has a new hash, and its
-  items’ codes, responses and results are unchanged.
-
-- **The `sem_pls` demo’s second model is “The same paths, as PLS-SEM
-  syntax”**, where it read “estimated by PLS”: surveyframe writes its
-  seminr syntax for the reader to fit. The `input_types` reference
-  dataset is titled “Visitor experience survey”, where it carried the
-  builder’s placeholder “Surveyframe Demo: Survey Title”. Both files
-  have a new hash, and their items, responses and results are unchanged.
-
-- **The `sem_pls` demo’s RQ5 asks “And what seminr code would estimate
-  the PLS model?”**, where it asked what a PLS estimate gives. Its
-  `pls_sem` block returns the seminr syntax for the model, which the
-  reader fits in seminr. The file has a new hash, and its results and
-  codebook are unchanged.
-
-- **Demonstration data says so wherever it goes.** Every demo’s
-  responses have respondent ids `DEMO-001` and on, and a `data_status`
-  column, “Demonstration data, not collected from participants”.
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  keeps it without being told, in strict mode as well, as it keeps the
+  scroll it (WCAG 2.1.1, Codex P1-12).\</p\>\</li\> \<li\>\<p\>The
+  builder’s question rows are list items in a list, and the question
+  open for editing is marked \<code\>aria-current\</code\>. Each row was
+  a focusable listbox option holding its own Move, Duplicate and Delete
+  buttons, which an option hides from assistive technology (WCAG 4.1.2,
+  Codex P1-11). Enter, Space, the arrow keys and Alt with an arrow work
+  as before.\</p\>\</li\> \</ul\> \</div\> \<div id="demos"
+  class="section level2"\> \<h2\>Demos\</h2\> \<ul\>
+  \<li\>\<p\>\<strong\>The all-types demo’s text block says what a text
+  block does\</strong\> (owner, 2026-11-15): “A text block gives
+  respondents information, such as an instruction or a consent
+  statement. It collects no answer.” It read as placeholder text in
+  SurveyStudio’s question list. The file has a new hash.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>2 guided tours now run through R’s
+  \<code\>demo()\</code\> system.\</strong\> Run \<code\>demo("tour",
+  package = "surveyframe")\</code\> for the 5 study stages, or
+  \<code\>demo("verify", package = "surveyframe")\</code\> to see an
+  integrity check catch a changed copy.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Demo research questions now stand
+  alone.\</strong\> Each question names its method, outcome or
+  comparison where the earlier wording depended on the question above
+  it.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  \<code\>factor_structure\</code\> demo is an employee engagement study
+  throughout\</strong\>, “Employee engagement at work”, with the scales
+  “How my work is organised” and “The content of my work”, where its
+  title and scale labels still spoke of event attendees. The Employee
+  engagement survey template is built on it. The file has a new hash,
+  and its items’ codes, responses and results are
+  unchanged.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  \<code\>sem_pls\</code\> demo’s second model is “The same paths, as
+  PLS-SEM syntax”\</strong\>, where it read “estimated by PLS”:
+  surveyframe writes its seminr syntax for the reader to fit. The
+  \<code\>input_types\</code\> reference dataset is titled “Visitor
+  experience survey”, where it carried the builder’s placeholder
+  “Surveyframe Demo: Survey Title”. Both files have a new hash, and
+  their items, responses and results are unchanged.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The \<code\>sem_pls\</code\> demo’s RQ5 asks “And
+  what seminr code would estimate the PLS model?”\</strong\>, where it
+  asked what a PLS estimate gives. Its \<code\>pls_sem\</code\> block
+  returns the seminr syntax for the model, which the reader fits in
+  seminr. The file has a new hash, and its results and codebook are
+  unchanged.\</p\>\</li\> \<li\>\<p\>\<strong\>Demonstration data says
+  so wherever it goes.\</strong\> Every demo’s responses have respondent
+  ids \<code\>DEMO-001\</code\> and on, and a
+  \<code\>data_status\</code\> column, “Demonstration data, not
+  collected from participants”. \<code\>read_responses()\</code\> keeps
+  it without being told, in strict mode as well, as it keeps the
   collectors’ own columns, so an item or a scale cannot take that name.
   Data that carries it is stamped: each APA sentence from
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  ends with “(demonstration data)”, in the console as in a report, and a
-  report’s title, its opening line and each table and figure title say
-  the same, with both engines and in every format, also after the data
-  is copied into another project. The 25 stored results files carry the
-  stamp.
-  [`?sframe_demo`](https://surveyframe.org/reference/sframe_demo.md)
-  says how the demos may be used.
-
-- **3 regression charts** (first contact section 4a). A linear
+  \<code\>run_analysis_plan()\</code\> ends with “(demonstration data)”,
+  in the console as in a report, and a report’s title, its opening line
+  and each table and figure title say the same, with both engines and in
+  every format, also after the data is copied into another project. The
+  25 stored results files carry the stamp. \<code\>?sframe_demo\</code\>
+  says how the demos may be used.\</p\>\</li\> \<li\>\<p\>\<strong\>3
+  regression charts\</strong\> (first contact section 4a). A linear
   regression with 2 predictors or more draws, beside its
   observed-against-fitted chart, the standardised coefficients with
   their 95% confidence intervals. A multinomial logistic regression
@@ -2644,2080 +2608,1916 @@ the arithmetic.
   path diagram, with a, b, the direct effect and the total effect,
   beside its effects chart. Both report engines show the second chart
   after the first, titled with the result, and
-  [`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md)
-  writes it as `<id>_2`. Variables are named by their questions’ labels.
-
-- **3 new teaching demos**, 25 in all. `weighted_survey`: a resident
-  satisfaction survey whose sample over-represents 1 region, with
-  frequency, descriptives and a chi-square test weighted by a design
-  weight carried in the responses as `survey_weight`, a column that is
-  not a question and that
-  [`sframe_demo()`](https://surveyframe.org/reference/sframe_demo.md)
-  reads. `citing_sources`: a trust scale adapted from a published model,
-  with that source cited by the scale and the study and Cronbach (1951)
-  by the reliability check, each listed once at the end.
-  `mediation_moderation`: whether stress carries the effect of workload
-  on wellbeing, and whether a manager’s support weakens the link from
-  workload to stress. Each has a study, “Demo author”, hypotheses, a
-  codebook and its stored results, from the tracked generator.
-
-- **The all-types demo holds all 13 answerable types.** `input_types`
-  gains a pairwise comparison on the Saaty scale, 1 on the influence
-  scale and a criteria weight, over price, location and service, with
-  seeded answers in 12 columns appended to its responses file. Its other
-  columns are unchanged. Added by
-  `data-raw/input_types_comparison_items.R`.
-
-- **Each teaching demo tells a study.** The 22 teaching demos declare a
-  research-style purpose, a study (problem, objectives and a sampling
-  plan with population, method and planned n), “Demo author” as a
-  placeholder author, and on each inferential block H0, H1 and a
-  decision rule, and each block names the objective it serves. So
-  `render_report(instrument)` shows every section of the pre-analysis
-  plan for each. Questions are reworded for the use case each demo
-  serves: course evaluation (`matrix_likert`), training evaluation
-  (`paired`, `repeated`), customer satisfaction and return intention
-  (`correlation_regression`, `logistic`) and employee engagement
-  (`factor_structure`). Item ids, choice codes and the simulated
-  responses are unchanged, so no stored result number moves, and only
-  the labels quoted in the results of `logistic`, `matrix_likert` and
-  `paired` change. The rows of the course-evaluation grid are the parts
-  of a course (Lectures, Seminars, Assessment, Reading materials), not
-  event sessions. A matrix row’s name is also its column’s, so
-  `matrix_likert_responses.csv` changes its 4 column headers,
-  `session__Lectures` and the rest, with every value as it was. The
-  demos are regenerated by the tracked `data-raw/build_demo_library.R`
-  from `data-raw/demo_stories.R`, still version 1.0.0, so every demo
-  file’s hash changes (first 12 characters, old and new). The 2
-  reference datasets, `tourism_services` and `input_types`, get the same
-  placeholder author, purpose, study and hypotheses from
-  `data-raw/reference_demo_stories.R`, which writes them again at 1.0.0
-  with their items, choices and scales as they were. They named the
-  package’s author before, and now name “Demo author”:
-
-  | File                           | Old hash       | New hash       |
-  |--------------------------------|----------------|----------------|
-  | `tourism_services_demo`        | `ba6ab6936979` | `36942fb1db8b` |
-  | `surveyframe_input_types_demo` | `b1fe65aa8754` | `e2130477ce1f` |
-  | `branching`                    | `7b2575c5a289` | `242e5f4f304b` |
-  | `branded_survey`               | `9a5eac4fe2df` | `92d5a5a19692` |
-  | `categorical`                  | `94458440eef2` | `ce13e678eee5` |
-  | `conversational_branching`     | `32e8a2c8dc3f` | `de073a6a0771` |
-  | `conversational_survey`        | `d299da187c34` | `63f938716b5c` |
-  | `correlation_regression`       | `773eca25fd5e` | `1aa72dd4712f` |
-  | `factor_structure`             | `1e2a8325f7a7` | `200f6f4f4fc9` |
-  | `first_survey`                 | `1d3995afbed6` | `3db2149ca3c3` |
-  | `instrument_revision`          | `fcef5c7a8912` | `4706c4e7c1be` |
-  | `likert_scale`                 | `50106060b9ff` | `dccd03b03c96` |
-  | `logistic`                     | `f393034ee0f9` | `eba433d9f51f` |
-  | `matrix_likert`                | `5b7980fd7fb9` | `a73460703147` |
-  | `mcdm_choice`                  | `d515e4b6bc39` | `9afe289123c2` |
-  | `multi_group`                  | `0b95571d0000` | `6790bf18453a` |
-  | `multi_response`               | `b5fd4a52dd01` | `d8582159112b` |
-  | `open_text`                    | `0138438b70ac` | `8b7793fd1757` |
-  | `paired`                       | `32e5ffff5144` | `a434cf312406` |
-  | `repeated`                     | `3ea5a812ae86` | `7c4ac50ad8db` |
-  | `sem_pls`                      | `25ded3bee644` | `8300c52d07c8` |
-  | `small_sample`                 | `1c138723088f` | `06390f6257a5` |
-  | `two_group`                    | `7d53e872d328` | `3907d53280ea` |
-  | `verification`                 | `1d3995afbed6` | `3db2149ca3c3` |
-  | `verification_tampered`        | `1d3995afbed6` | `3db2149ca3c3` |
-
-- **[`sframe_demo()`](https://surveyframe.org/reference/sframe_demo.md)
-  prints a short card and shows the survey.** At the console a demo
-  printed every response, 125 to 1,112 lines. It is now a list of class
-  `sframe_demo`, and printing it shows what the demo teaches, its
-  questions, responses and planned methods, its files, that its data was
-  not collected from participants, and the commands to try next, in 15
-  lines at most. `demo$instrument`, `demo$responses` and the 4 paths are
-  unchanged. With `preview = interactive()`, the new default, the survey
+  \<code\>sframe_save_figures()\</code\> writes it as
+  \<code\>\<id\>\_2\</code\>. Variables are named by their questions’
+  labels.\</p\>\</li\> \<li\>\<p\>\<strong\>3 new teaching
+  demos\</strong\>, 25 in all. \<code\>weighted_survey\</code\>: a
+  resident satisfaction survey whose sample over-represents 1 region,
+  with frequency, descriptives and a chi-square test weighted by a
+  design weight carried in the responses as
+  \<code\>survey_weight\</code\>, a column that is not a question and
+  that \<code\>sframe_demo()\</code\> reads.
+  \<code\>citing_sources\</code\>: a trust scale adapted from a
+  published model, with that source cited by the scale and the study and
+  Cronbach (1951) by the reliability check, each listed once at the end.
+  \<code\>mediation_moderation\</code\>: whether stress carries the
+  effect of workload on wellbeing, and whether a manager’s support
+  weakens the link from workload to stress. Each has a study, “Demo
+  author”, hypotheses, a codebook and its stored results, from the
+  tracked generator.\</p\>\</li\> \<li\>\<p\>\<strong\>The all-types
+  demo holds all 13 answerable types.\</strong\>
+  \<code\>input_types\</code\> gains a pairwise comparison on the Saaty
+  scale, 1 on the influence scale and a criteria weight, over price,
+  location and service, with seeded answers in 12 columns appended to
+  its responses file. Its other columns are unchanged. Added by
+  \<code\>data-raw/input_types_comparison_items.R\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Each teaching demo tells a study.\</strong\> The
+  22 teaching demos declare a research-style purpose, a study (problem,
+  objectives and a sampling plan with population, method and planned n),
+  “Demo author” as a placeholder author, and on each inferential block
+  H0, H1 and a decision rule, and each block names the objective it
+  serves. So \<code\>render_report(instrument)\</code\> shows every
+  section of the pre-analysis plan for each. Questions are reworded for
+  the use case each demo serves: course evaluation
+  (\<code\>matrix_likert\</code\>), training evaluation
+  (\<code\>paired\</code\>, \<code\>repeated\</code\>), customer
+  satisfaction and return intention
+  (\<code\>correlation_regression\</code\>, \<code\>logistic\</code\>)
+  and employee engagement (\<code\>factor_structure\</code\>). Item ids,
+  choice codes and the simulated responses are unchanged, so no stored
+  result number moves, and only the labels quoted in the results of
+  \<code\>logistic\</code\>, \<code\>matrix_likert\</code\> and
+  \<code\>paired\</code\> change. The rows of the course-evaluation grid
+  are the parts of a course (Lectures, Seminars, Assessment, Reading
+  materials), not event sessions. A matrix row’s name is also its
+  column’s, so \<code\>matrix_likert_responses.csv\</code\> changes its
+  4 column headers, \<code\>session\_\_Lectures\</code\> and the rest,
+  with every value as it was. The demos are regenerated by the tracked
+  \<code\>data-raw/build_demo_library.R\</code\> from
+  \<code\>data-raw/demo_stories.R\</code\>, still version 1.0.0, so
+  every demo file’s hash changes (first 12 characters, old and new). The
+  2 reference datasets, \<code\>tourism_services\</code\> and
+  \<code\>input_types\</code\>, get the same placeholder author,
+  purpose, study and hypotheses from
+  \<code\>data-raw/reference_demo_stories.R\</code\>, which writes them
+  again at 1.0.0 with their items, choices and scales as they were. They
+  named the package’s author before, and now name “Demo author”:\</p\>
+  \<table\> \<thead\> \<tr\> \<th\>File\</th\> \<th\>Old hash\</th\>
+  \<th\>New hash\</th\> \</tr\> \</thead\> \<tbody\> \<tr\>
+  \<td\>\<code\>tourism_services_demo\</code\>\</td\>
+  \<td\>\<code\>ba6ab6936979\</code\>\</td\>
+  \<td\>\<code\>36942fb1db8b\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>surveyframe_input_types_demo\</code\>\</td\>
+  \<td\>\<code\>b1fe65aa8754\</code\>\</td\>
+  \<td\>\<code\>e2130477ce1f\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>branching\</code\>\</td\>
+  \<td\>\<code\>7b2575c5a289\</code\>\</td\>
+  \<td\>\<code\>242e5f4f304b\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>branded_survey\</code\>\</td\>
+  \<td\>\<code\>9a5eac4fe2df\</code\>\</td\>
+  \<td\>\<code\>92d5a5a19692\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>categorical\</code\>\</td\>
+  \<td\>\<code\>94458440eef2\</code\>\</td\>
+  \<td\>\<code\>ce13e678eee5\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>conversational_branching\</code\>\</td\>
+  \<td\>\<code\>32e8a2c8dc3f\</code\>\</td\>
+  \<td\>\<code\>de073a6a0771\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>conversational_survey\</code\>\</td\>
+  \<td\>\<code\>d299da187c34\</code\>\</td\>
+  \<td\>\<code\>63f938716b5c\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>correlation_regression\</code\>\</td\>
+  \<td\>\<code\>773eca25fd5e\</code\>\</td\>
+  \<td\>\<code\>1aa72dd4712f\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>factor_structure\</code\>\</td\>
+  \<td\>\<code\>1e2a8325f7a7\</code\>\</td\>
+  \<td\>\<code\>200f6f4f4fc9\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>first_survey\</code\>\</td\>
+  \<td\>\<code\>1d3995afbed6\</code\>\</td\>
+  \<td\>\<code\>3db2149ca3c3\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>instrument_revision\</code\>\</td\>
+  \<td\>\<code\>fcef5c7a8912\</code\>\</td\>
+  \<td\>\<code\>4706c4e7c1be\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>likert_scale\</code\>\</td\>
+  \<td\>\<code\>50106060b9ff\</code\>\</td\>
+  \<td\>\<code\>dccd03b03c96\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>logistic\</code\>\</td\>
+  \<td\>\<code\>f393034ee0f9\</code\>\</td\>
+  \<td\>\<code\>eba433d9f51f\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>matrix_likert\</code\>\</td\>
+  \<td\>\<code\>5b7980fd7fb9\</code\>\</td\>
+  \<td\>\<code\>a73460703147\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>mcdm_choice\</code\>\</td\>
+  \<td\>\<code\>d515e4b6bc39\</code\>\</td\>
+  \<td\>\<code\>9afe289123c2\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>multi_group\</code\>\</td\>
+  \<td\>\<code\>0b95571d0000\</code\>\</td\>
+  \<td\>\<code\>6790bf18453a\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>multi_response\</code\>\</td\>
+  \<td\>\<code\>b5fd4a52dd01\</code\>\</td\>
+  \<td\>\<code\>d8582159112b\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>open_text\</code\>\</td\>
+  \<td\>\<code\>0138438b70ac\</code\>\</td\>
+  \<td\>\<code\>8b7793fd1757\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>paired\</code\>\</td\>
+  \<td\>\<code\>32e5ffff5144\</code\>\</td\>
+  \<td\>\<code\>a434cf312406\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>repeated\</code\>\</td\>
+  \<td\>\<code\>3ea5a812ae86\</code\>\</td\>
+  \<td\>\<code\>7c4ac50ad8db\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>sem_pls\</code\>\</td\>
+  \<td\>\<code\>25ded3bee644\</code\>\</td\>
+  \<td\>\<code\>8300c52d07c8\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>small_sample\</code\>\</td\>
+  \<td\>\<code\>1c138723088f\</code\>\</td\>
+  \<td\>\<code\>06390f6257a5\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>two_group\</code\>\</td\>
+  \<td\>\<code\>7d53e872d328\</code\>\</td\>
+  \<td\>\<code\>3907d53280ea\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>verification\</code\>\</td\>
+  \<td\>\<code\>1d3995afbed6\</code\>\</td\>
+  \<td\>\<code\>3db2149ca3c3\</code\>\</td\> \</tr\> \<tr\>
+  \<td\>\<code\>verification_tampered\</code\>\</td\>
+  \<td\>\<code\>1d3995afbed6\</code\>\</td\>
+  \<td\>\<code\>3db2149ca3c3\</code\>\</td\> \</tr\> \</tbody\>
+  \</table\>\</li\> \<li\>\<p\>\<strong\>\<code\>sframe_demo()\</code\>
+  prints a short card and shows the survey.\</strong\> At the console a
+  demo printed every response, 125 to 1,112 lines. It is now a list of
+  class \<code\>sframe_demo\</code\>, and printing it shows what the
+  demo teaches, its questions, responses and planned methods, its files,
+  that its data was not collected from participants, and the commands to
+  try next, in 15 lines at most. \<code\>demo\$instrument\</code\>,
+  \<code\>demo\$responses\</code\> and the 4 paths are unchanged. With
+  \<code\>preview = interactive()\</code\>, the new default, the survey
   also opens as a respondent sees it, in the viewer or the browser
-  through
-  [`sframe_show()`](https://surveyframe.org/reference/sframe_show.md).
-  Nothing opens in a script, a knitr or Quarto render, or with
-  `preview = FALSE` or `options(surveyframe.demo_preview = FALSE)`.
-
-- **[`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md)
-  prints 1 line per demo**, grouped as analysis, presentation,
-  provenance and reference datasets, with `two_group` named as the place
-  to start, in 35 lines. It returns a data frame of class
-  `sframe_demo_list`, and
-  [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) gives
-  the full table.
-
-- **In RStudio the commands on the card and the list are links that run
-  them**, through `cli`, now in Suggests. Without `cli`, or in a console
-  with no run links, the same text prints plain.
-
-- **Every demo has welcome, consent and thank-you screens.** 19 of the
-  22 shipped with none, so a respondent met the questions with no
-  consent step. They now carry plain screens in the default look,
-  consent required, and `branded = TRUE` still replaces the whole block.
-  `instrument_revision` is rebuilt on the updated `first_survey`, and
-  the learn-by-example screenshots are recaptured.
-
-- `sframe_demo_branding()` prints each setting as a respondent meets it,
-  with a pointer to
-  [`preview_demo()`](https://surveyframe.org/reference/superseded.md).
-  It printed a raw nested list, which read as a failed demo. It returns
-  a list of class `sframe_branding`, and
-  [`sf_instrument()`](https://surveyframe.org/reference/superseded.md)
-  stores it as a plain list.
-
-- `sframe_demo("instrument_revision")` takes a further amendment. Its
-  amendment log recorded hashes from code that predates the settled
-  content hash, so
-  [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
+  through \<code\>sframe_show()\</code\>. Nothing opens in a script, a
+  knitr or Quarto render, or with \<code\>preview = FALSE\</code\> or
+  \<code\>options(surveyframe.demo_preview =
+  FALSE)\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>sframe_list_demos()\</code\> prints 1
+  line per demo\</strong\>, grouped as analysis, presentation,
+  provenance and reference datasets, with \<code\>two_group\</code\>
+  named as the place to start, in 35 lines. It returns a data frame of
+  class \<code\>sframe_demo_list\</code\>, and
+  \<code\>as.data.frame()\</code\> gives the full table.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>In RStudio the commands on the card and the list
+  are links that run them\</strong\>, through \<code\>cli\</code\>, now
+  in Suggests. Without \<code\>cli\</code\>, or in a console with no run
+  links, the same text prints plain.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Every demo has welcome, consent and thank-you
+  screens.\</strong\> 19 of the 22 shipped with none, so a respondent
+  met the questions with no consent step. They now carry plain screens
+  in the default look, consent required, and \<code\>branded =
+  TRUE\</code\> still replaces the whole block.
+  \<code\>instrument_revision\</code\> is rebuilt on the updated
+  \<code\>first_survey\</code\>, and the learn-by-example screenshots
+  are recaptured.\</p\>\</li\>
+  \<li\>\<p\>\<code\>sframe_demo_branding()\</code\> prints each setting
+  as a respondent meets it, with a pointer to
+  \<code\>preview_demo()\</code\>. It printed a raw nested list, which
+  read as a failed demo. It returns a list of class
+  \<code\>sframe_branding\</code\>, and \<code\>sf_instrument()\</code\>
+  stores it as a plain list.\</p\>\</li\>
+  \<li\>\<p\>\<code\>sframe_demo("instrument_revision")\</code\> takes a
+  further amendment. Its amendment log recorded hashes from code that
+  predates the settled content hash, so \<code\>amend_sframe()\</code\>
   on it failed with “The amendment log is out of sequence at entry 2”,
-  and so did
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
-  after any change. The demo is regenerated, its content unchanged, and
-  a test now amends and writes every shipped demo.
-
-- [`preview_demo()`](https://surveyframe.org/reference/superseded.md)
-  opens a branded demo as a respondent sees it in one line, in the
-  browser or on SurveyStudio’s preview screen. The start-up note now
-  shows it.
-
-- The reference results shipped with 6 demos are regenerated for the
-  changes above: `first_survey`, `instrument_revision`, `verification`,
-  `branching`, `conversational_branching` and `multi_response`.
-
-## surveyframe 0.4.2
-
-CRAN release: 2026-09-25
-
-A defect-fix release. An external review of 0.4.1 found defects that
-silently alter or lose data, and this release corrects them. Collection
-defects come first, because an answer recorded wrongly is lost for good.
-This section grows as each group of fixes lands.
-
-### What you need to change
-
-- **A Shiny-collected response now carries a `respondent_id`**, as the
-  first column, holding a generated identifier such as `RK3P8QX2A`. The
+  and so did \<code\>write_sframe()\</code\> after any change. The demo
+  is regenerated, its content unchanged, and a test now amends and
+  writes every shipped demo.\</p\>\</li\>
+  \<li\>\<p\>\<code\>preview_demo()\</code\> opens a branded demo as a
+  respondent sees it in one line, in the browser or on SurveyStudio’s
+  preview screen. The start-up note now shows it.\</p\>\</li\>
+  \<li\>\<p\>The reference results shipped with 6 demos are regenerated
+  for the changes above: \<code\>first_survey\</code\>,
+  \<code\>instrument_revision\</code\>, \<code\>verification\</code\>,
+  \<code\>branching\</code\>, \<code\>conversational_branching\</code\>
+  and \<code\>multi_response\</code\>.\</p\>\</li\> \</ul\> \</div\>
+  \</div\> \<div id="surveyframe-042" class="section level1"\>
+  \<h1\>surveyframe 0.4.2\</h1\> \<p\>A defect-fix release. An external
+  review of 0.4.1 found defects that silently alter or lose data, and
+  this release corrects them. Collection defects come first, because an
+  answer recorded wrongly is lost for good. This section grows as each
+  group of fixes lands.\</p\> \<div id="what-you-need-to-change-1"
+  class="section level2"\> \<h2\>What you need to change\</h2\> \<ul\>
+  \<li\>\<p\>\<strong\>A Shiny-collected response now carries a
+  \<code\>respondent_id\</code\>\</strong\>, as the first column,
+  holding a generated identifier such as \<code\>RK3P8QX2A\</code\>. The
   static survey has written one since the first release, so the two
   collection routes produced different column sets for the same
   instrument, leaving the duplicate check and a retry to work from
-  whatever they could find. **If you are collecting to a CSV written by
-  0.4.1 or earlier**, that file predates the column:
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md)
-  keeps appending to it and says once that the response went in
-  unidentified. Collect into a new file to record an identifier for
-  every response. Anything reading these files by column position needs
-  updating to read by name.
-
-- **[`survey_module_server()`](https://surveyframe.org/reference/superseded.md)
-  returns a different response shape.** The response is now the
-  collection row, as a list: `response_id`, `started_at`,
-  `submitted_at`, then one element per response column, named as
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  expects. A multiple-choice question becomes one element per option
-  holding `"1"` or `"0"`, and a matrix, ranking or decision question
+  whatever they could find. \<strong\>If you are collecting to a CSV
+  written by 0.4.1 or earlier\</strong\>, that file predates the column:
+  \<code\>render_survey()\</code\> keeps appending to it and says once
+  that the response went in unidentified. Collect into a new file to
+  record an identifier for every response. Anything reading these files
+  by column position needs updating to read by name.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>survey_module_server()\</code\> returns a
+  different response shape.\</strong\> The response is now the
+  collection row, as a list: \<code\>response_id\</code\>,
+  \<code\>started_at\</code\>, \<code\>submitted_at\</code\>, then one
+  element per response column, named as
+  \<code\>read_responses()\</code\> expects. A multiple-choice question
+  becomes one element per option holding \<code\>"1"\</code\> or
+  \<code\>"0"\</code\>, and a matrix, ranking or decision question
   becomes one element per row, option, pair or criterion. Values are
-  character. An item hidden by branching, or left unanswered, is `NA`.
-  The module previously returned one raw input value per item, and
-  lacked controls for matrix, ranking, rating and decision questions.
-
-- **Untouched sliders, rankings and dates are now unanswered** in
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md)
-  and the survey module. A slider counts once the respondent moves it,
-  and a ranking once it is reordered or confirmed with “Keep this
-  order”. Previously a slider stored its starting position, a ranking
-  stored the declared order, and a date question in the module stored
-  today’s date, for anyone who moved past them.
-
-- **`render_survey(save_responses = "csv")` refuses a response file
-  written for different questions**, when the app starts and on each
-  submission. Collect a changed instrument into a new file. A file with
-  the same columns in another order is still accepted, and rows are
-  aligned by column name.
-
-- **Google Sheets collection now needs the Sheets advanced service.**
-  The generated collector stores an answer through the Sheets API’s
-  `RAW` option, which is the documented way to store a value without the
-  spreadsheet parsing it. Regenerate and redeploy the collector with
-  [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md),
-  and in the Apps Script editor add Services \> Google Sheets API with
-  the identifier `Sheets`. **A collector lacking it refuses each
-  response** and replies with an error, in place of storing an answer it
-  would have to alter. Code that reads the sheet directly, bypassing
-  [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
-  should expect text cells where numbers appeared before.
-
-- **Scale scores and reliability can change.** Re-run analyses of scales
-  that reverse-code items, share items with other scales, or had an
-  absent item column. Reverse coding now applies within the scale that
-  declares it, a scale with an absent item column counts that item as
-  unanswered, and report figures now show the scores
-  [`score_scales()`](https://surveyframe.org/reference/score_scales.md)
-  computes.
-
-- **Some instruments that validated before are now rejected.** An item
-  and a scale sharing an ID, an ID equal to a response column or to
-  `respondent_id`, `response_id`, `started_at` or `submitted_at`,
-  reverse coding for an item outside the scale declaring it, repeated
-  scale items, a `min_valid` outside 1 to the number of items, and
-  weights that are zero, negative or infinite are all reported by
-  [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
-  and [`sf_scale()`](https://surveyframe.org/reference/superseded.md)
+  character. An item hidden by branching, or left unanswered, is
+  \<code\>NA\</code\>. The module previously returned one raw input
+  value per item, and lacked controls for matrix, ranking, rating and
+  decision questions.\</p\>\</li\> \<li\>\<p\>\<strong\>Untouched
+  sliders, rankings and dates are now unanswered\</strong\> in
+  \<code\>render_survey()\</code\> and the survey module. A slider
+  counts once the respondent moves it, and a ranking once it is
+  reordered or confirmed with “Keep this order”. Previously a slider
+  stored its starting position, a ranking stored the declared order, and
+  a date question in the module stored today’s date, for anyone who
+  moved past them.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>render_survey(save_responses =
+  "csv")\</code\> refuses a response file written for different
+  questions\</strong\>, when the app starts and on each submission.
+  Collect a changed instrument into a new file. A file with the same
+  columns in another order is still accepted, and rows are aligned by
+  column name.\</p\>\</li\> \<li\>\<p\>\<strong\>Google Sheets
+  collection now needs the Sheets advanced service.\</strong\> The
+  generated collector stores an answer through the Sheets API’s
+  \<code\>RAW\</code\> option, which is the documented way to store a
+  value without the spreadsheet parsing it. Regenerate and redeploy the
+  collector with \<code\>export_google_sheet()\</code\>, and in the Apps
+  Script editor add Services \> Google Sheets API with the identifier
+  \<code\>Sheets\</code\>. \<strong\>A collector lacking it refuses each
+  response\</strong\> and replies with an error, in place of storing an
+  answer it would have to alter. Code that reads the sheet directly,
+  bypassing \<code\>read_sheet_responses()\</code\>, should expect text
+  cells where numbers appeared before.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Scale scores and reliability can
+  change.\</strong\> Re-run analyses of scales that reverse-code items,
+  share items with other scales, or had an absent item column. Reverse
+  coding now applies within the scale that declares it, a scale with an
+  absent item column counts that item as unanswered, and report figures
+  now show the scores \<code\>score_scales()\</code\>
+  computes.\</p\>\</li\> \<li\>\<p\>\<strong\>Some instruments that
+  validated before are now rejected.\</strong\> An item and a scale
+  sharing an ID, an ID equal to a response column or to
+  \<code\>respondent_id\</code\>, \<code\>response_id\</code\>,
+  \<code\>started_at\</code\> or \<code\>submitted_at\</code\>, reverse
+  coding for an item outside the scale declaring it, repeated scale
+  items, a \<code\>min_valid\</code\> outside 1 to the number of items,
+  and weights that are zero, negative or infinite are all reported by
+  \<code\>validate_sframe()\</code\>, and \<code\>sf_scale()\</code\>
   refuses the scale parameters directly. Rename or correct the
-  declaration.
-
-- **A reverse-coded item needs declared response bounds**: a numeric
-  choice set, `slider_min` and `slider_max`, or a rating maximum.
-  Scoring reports an error for a reversed item that has none.
-
-- **A factor column is scored through its labels.** A factor whose
-  labels are text is an error. Convert it to numeric codes first.
-
-- **Some statistics change.** Re-run analyses using Cochran’s Q with
-  missing answers, ANCOVA, partial correlation, a Firth likelihood
-  ratio, PLS-SEM constructs with non-consecutive indicators, or a
-  Mann-Whitney or Wilcoxon signed-rank test. The rank tests now use the
-  normal approximation without continuity correction for z, p, r and its
-  interval alike, so their p values move slightly, and z is now signed
-  by the direction of the difference.
-
-- **Repeated-measures ANOVA now uses complete respondents.** A
-  respondent missing any repeated measure is excluded as a unit before
-  fitting the classical balanced model. Results report the retained `n`
-  and `n_excluded_incomplete`. This replaces a singular fit on
-  incomplete rows.
-
-- **ANCOVA tables hold adjusted tests**, each term tested after all
-  others, with columns `effect`, `df`, `sum_sq`, `mean_sq`, `F` and `p`.
-
-- **[`sample_size_plan()`](https://surveyframe.org/reference/superseded.md)
-  now calculates power** for t tests, ANOVA and, with the new `f2`,
-  regression. The new `d` and `f` arguments give the expected effect,
-  and a medium effect is assumed, with a warning, when they are left
-  out. Estimates now depend on `alpha` and `power`.
-
-- **[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  refuses repeated block IDs** and gains `strict`. Its results carry a
-  `status` attribute counting failed blocks, so check it, or set
-  `strict = TRUE`, before treating a returned object as success.
-
-- **Bootstrap intervals can be withheld.**
-  [`bootstrap_ci()`](https://surveyframe.org/reference/superseded.md),
-  [`cohens_d_ci()`](https://surveyframe.org/reference/superseded.md),
-  [`cramers_v_ci()`](https://surveyframe.org/reference/superseded.md)
-  and [`eta_sq_ci()`](https://surveyframe.org/reference/superseded.md)
-  return `NA` bounds with a `reason` attribute when fewer than 90% of
-  resamples give a value or all give the same value, and every result
-  records its resample counts.
-
-- **Decision rankings can change.** Re-run TOPSIS, VIKOR, MOORA, SMART,
-  WASPAS, PROMETHEE and ELECTRE analyses whose weights or criterion
-  types were named in a different order from the performance matrix, AHP
-  and ANP analyses given a data frame, and aggregations of judgement
-  matrices named in different orders. Weights, criterion types and
-  judgement matrices are now matched by criterion name.
-
-- **Some decision inputs that ran before are now refused**: weights
-  naming different criteria from the matrix, supplied AHP matrices that
-  are not positive, unit-diagonal and reciprocal, WASPAS values of zero
-  or below, infinite values, a VIKOR `v` or WASPAS `lambda` outside 0 to
-  1, ELECTRE cutoffs outside 0 to 1, and PROMETHEE thresholds that are
+  declaration.\</p\>\</li\> \<li\>\<p\>\<strong\>A reverse-coded item
+  needs declared response bounds\</strong\>: a numeric choice set,
+  \<code\>slider_min\</code\> and \<code\>slider_max\</code\>, or a
+  rating maximum. Scoring reports an error for a reversed item that has
+  none.\</p\>\</li\> \<li\>\<p\>\<strong\>A factor column is scored
+  through its labels.\</strong\> A factor whose labels are text is an
+  error. Convert it to numeric codes first.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Some statistics change.\</strong\> Re-run
+  analyses using Cochran’s Q with missing answers, ANCOVA, partial
+  correlation, a Firth likelihood ratio, PLS-SEM constructs with
+  non-consecutive indicators, or a Mann-Whitney or Wilcoxon signed-rank
+  test. The rank tests now use the normal approximation without
+  continuity correction for z, p, r and its interval alike, so their p
+  values move slightly, and z is now signed by the direction of the
+  difference.\</p\>\</li\> \<li\>\<p\>\<strong\>Repeated-measures ANOVA
+  now uses complete respondents.\</strong\> A respondent missing any
+  repeated measure is excluded as a unit before fitting the classical
+  balanced model. Results report the retained \<code\>n\</code\> and
+  \<code\>n_excluded_incomplete\</code\>. This replaces a singular fit
+  on incomplete rows.\</p\>\</li\> \<li\>\<p\>\<strong\>ANCOVA tables
+  hold adjusted tests\</strong\>, each term tested after all others,
+  with columns \<code\>effect\</code\>, \<code\>df\</code\>,
+  \<code\>sum_sq\</code\>, \<code\>mean_sq\</code\>, \<code\>F\</code\>
+  and \<code\>p\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>sample_size_plan()\</code\> now
+  calculates power\</strong\> for t tests, ANOVA and, with the new
+  \<code\>f2\</code\>, regression. The new \<code\>d\</code\> and
+  \<code\>f\</code\> arguments give the expected effect, and a medium
+  effect is assumed, with a warning, when they are left out. Estimates
+  now depend on \<code\>alpha\</code\> and
+  \<code\>power\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>run_analysis_plan()\</code\> refuses
+  repeated block IDs\</strong\> and gains \<code\>strict\</code\>. Its
+  results carry a \<code\>status\</code\> attribute counting failed
+  blocks, so check it, or set \<code\>strict = TRUE\</code\>, before
+  treating a returned object as success.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Bootstrap intervals can be withheld.\</strong\>
+  \<code\>bootstrap_ci()\</code\>, \<code\>cohens_d_ci()\</code\>,
+  \<code\>cramers_v_ci()\</code\> and \<code\>eta_sq_ci()\</code\>
+  return \<code\>NA\</code\> bounds with a \<code\>reason\</code\>
+  attribute when fewer than 90% of resamples give a value or all give
+  the same value, and every result records its resample
+  counts.\</p\>\</li\> \<li\>\<p\>\<strong\>Decision rankings can
+  change.\</strong\> Re-run TOPSIS, VIKOR, MOORA, SMART, WASPAS,
+  PROMETHEE and ELECTRE analyses whose weights or criterion types were
+  named in a different order from the performance matrix, AHP and ANP
+  analyses given a data frame, and aggregations of judgement matrices
+  named in different orders. Weights, criterion types and judgement
+  matrices are now matched by criterion name.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Some decision inputs that ran before are now
+  refused\</strong\>: weights naming different criteria from the matrix,
+  supplied AHP matrices that are not positive, unit-diagonal and
+  reciprocal, WASPAS values of zero or below, infinite values, a VIKOR
+  \<code\>v\</code\> or WASPAS \<code\>lambda\</code\> outside 0 to 1,
+  ELECTRE cutoffs outside 0 to 1, and PROMETHEE thresholds that are
   negative or out of order. ANP refuses a reducible network, and DEMATEL
-  a matrix whose total relation does not exist.
-
-- **ELECTRE’s kernel follows Roy’s definition**, so it can hold more
-  alternatives than before, and is reported as undefined when the
-  outranking relation has a cycle.
-
-- **[`sensitivity_analysis()`](https://surveyframe.org/reference/superseded.md)
-  results gain `n_perturbations`, `n_effective` and `n_failed`**, and
-  `stable` is `FALSE` when no perturbation moved the weights. A
+  a matrix whose total relation does not exist.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>ELECTRE’s kernel follows Roy’s
+  definition\</strong\>, so it can hold more alternatives than before,
+  and is reported as undefined when the outranking relation has a
+  cycle.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>sensitivity_analysis()\</code\> results
+  gain \<code\>n_perturbations\</code\>, \<code\>n_effective\</code\>
+  and \<code\>n_failed\</code\>\</strong\>, and \<code\>stable\</code\>
+  is \<code\>FALSE\</code\> when no perturbation moved the weights. A
   requested sensitivity run that could not be made is recorded in the
-  result’s `sensitivity_error`.
-
-- **[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
-  refuses an undisclosed revision.** An instrument read with
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
-  and then changed must record the change with
-  [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
-  before it is written, and its amendment log must stay complete and in
-  order. To publish changed content as a separate instrument, clear its
-  amendment log and pass `new_instrument = TRUE`. SurveyStudio offers
-  the same choice when exporting an edited file.
-
-- **[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
-  sets the tier from what changed.** An amendment that changes the
-  analysis plan, a model or a conjoint design is design tier and needs a
-  `deviation_report`, whatever `reason_code` or `tier` says.
-
-- **`.sframe` files write one-member collections as arrays**, as the
-  published instrument profile and the builder already did. Reading an
-  older file and writing it again gives it a new hash where it held such
-  a collection. Older files still read and verify as they are.
-
-- **[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  reads a CSV file as text** and converts only columns of items with
-  numeric responses. Identifiers such as `001` and metadata columns now
-  arrive as text, and numeric answers as doubles. A response file with 2
-  columns of the same name is refused.
-
-- **[`link_git_commit()`](https://surveyframe.org/reference/superseded.md)
-  gains `path` and returns `verified`**, which is `TRUE` only when the
-  instrument matches that file as committed. `linked` alone confirms a
-  repository and a commit.
-
-- **Some shipped demo results changed** to match the corrected
-  statistics: `likert_scale`, `two_group`, `paired`, `multi_group`,
-  `sem_pls`, `mcdm_choice` and `small_sample`.
-
-### Collection fixes
-
-- **The Shiny survey erased every answer.** In
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md),
-  each answer re-drew the survey page, and the re-drawn questions
-  reported themselves empty, so every answer was wiped about a second
-  after it was given. A submitted response came back blank. This
-  affected every standard-mode survey run with
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md)
-  in 0.4.1 and earlier. Answers now stay put, and the page stays as it
-  is when a question is answered.
-
-- **The Google Sheets collector could turn an answer into a formula.**
-  An answer beginning with `=` was evaluated by the spreadsheet, so
-  `=1+1` was stored as `2`, and a code such as `007` lost its leading
-  zeros. A stored answer is now written through the Sheets API’s `RAW`
-  option, which stores it as submitted. A deployment lacking that option
-  refuses the response and says so, in place of altering it. The same
-  fix applies to collectors generated from the survey builder. See the
-  setup note above.
-
-- **The exported survey said a response had been recorded when it could
-  not know.** The page posts with `no-cors`, which leaves the
-  collector’s reply unreadable, so the browser can establish that a
-  request left and nothing further. The thank-you screen claimed the
-  response had been recorded, hid the download, offered a restart that
-  discarded the page’s only copy, and could auto-redirect away from it.
-  It now reports that the answers were sent and that receipt is
-  unconfirmed, keeps the download available, withholds the restart that
-  would clear the response, and leaves any redirect for the participant
-  to choose.
-
-- **A custom thank-you message no longer shows on a survey with a
-  collector.** A message set through `render$thankyou$message` is fixed
-  text, written before anyone knew how delivery would go, so a wording
-  such as “your response has been recorded” put a claim on screen beside
-  the page’s own statement that receipt was unconfirmed. The package’s
-  own status is shown instead. A custom message still shows on a
+  result’s \<code\>sensitivity_error\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>write_sframe()\</code\> refuses an
+  undisclosed revision.\</strong\> An instrument read with
+  \<code\>read_sframe()\</code\> and then changed must record the change
+  with \<code\>amend_sframe()\</code\> before it is written, and its
+  amendment log must stay complete and in order. To publish changed
+  content as a separate instrument, clear its amendment log and pass
+  \<code\>new_instrument = TRUE\</code\>. SurveyStudio offers the same
+  choice when exporting an edited file.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>amend_sframe()\</code\> sets the tier
+  from what changed.\</strong\> An amendment that changes the analysis
+  plan, a model or a conjoint design is design tier and needs a
+  \<code\>deviation_report\</code\>, whatever
+  \<code\>reason_code\</code\> or \<code\>tier\</code\>
+  says.\</p\>\</li\> \<li\>\<p\>\<strong\>\<code\>.sframe\</code\> files
+  write one-member collections as arrays\</strong\>, as the published
+  instrument profile and the builder already did. Reading an older file
+  and writing it again gives it a new hash where it held such a
+  collection. Older files still read and verify as they
+  are.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>read_responses()\</code\> reads a CSV
+  file as text\</strong\> and converts only columns of items with
+  numeric responses. Identifiers such as \<code\>001\</code\> and
+  metadata columns now arrive as text, and numeric answers as doubles. A
+  response file with 2 columns of the same name is refused.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>\<code\>link_git_commit()\</code\> gains
+  \<code\>path\</code\> and returns
+  \<code\>verified\</code\>\</strong\>, which is \<code\>TRUE\</code\>
+  only when the instrument matches that file as committed.
+  \<code\>linked\</code\> alone confirms a repository and a
+  commit.\</p\>\</li\> \<li\>\<p\>\<strong\>Some shipped demo results
+  changed\</strong\> to match the corrected statistics:
+  \<code\>likert_scale\</code\>, \<code\>two_group\</code\>,
+  \<code\>paired\</code\>, \<code\>multi_group\</code\>,
+  \<code\>sem_pls\</code\>, \<code\>mcdm_choice\</code\> and
+  \<code\>small_sample\</code\>.\</p\>\</li\> \</ul\> \</div\> \<div
+  id="collection-fixes" class="section level2"\> \<h2\>Collection
+  fixes\</h2\> \<ul\> \<li\>\<p\>\<strong\>The Shiny survey erased every
+  answer.\</strong\> In \<code\>render_survey()\</code\>, each answer
+  re-drew the survey page, and the re-drawn questions reported
+  themselves empty, so every answer was wiped about a second after it
+  was given. A submitted response came back blank. This affected every
+  standard-mode survey run with \<code\>render_survey()\</code\> in
+  0.4.1 and earlier. Answers now stay put, and the page stays as it is
+  when a question is answered.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  Google Sheets collector could turn an answer into a
+  formula.\</strong\> An answer beginning with \<code\>=\</code\> was
+  evaluated by the spreadsheet, so \<code\>=1+1\</code\> was stored as
+  \<code\>2\</code\>, and a code such as \<code\>007\</code\> lost its
+  leading zeros. A stored answer is now written through the Sheets API’s
+  \<code\>RAW\</code\> option, which stores it as submitted. A
+  deployment lacking that option refuses the response and says so, in
+  place of altering it. The same fix applies to collectors generated
+  from the survey builder. See the setup note above.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The exported survey said a response had been
+  recorded when it could not know.\</strong\> The page posts with
+  \<code\>no-cors\</code\>, which leaves the collector’s reply
+  unreadable, so the browser can establish that a request left and
+  nothing further. The thank-you screen claimed the response had been
+  recorded, hid the download, offered a restart that discarded the
+  page’s only copy, and could auto-redirect away from it. It now reports
+  that the answers were sent and that receipt is unconfirmed, keeps the
+  download available, withholds the restart that would clear the
+  response, and leaves any redirect for the participant to
+  choose.\</p\>\</li\> \<li\>\<p\>\<strong\>A custom thank-you message
+  no longer shows on a survey with a collector.\</strong\> A message set
+  through \<code\>render\$thankyou\$message\</code\> is fixed text,
+  written before anyone knew how delivery would go, so a wording such as
+  “your response has been recorded” put a claim on screen beside the
+  page’s own statement that receipt was unconfirmed. The package’s own
+  status is shown instead. A custom message still shows on a
   download-only survey, where nothing is being claimed about a
   collector. Put debrief text, contact details or payment instructions
   on a final display item or in the redirect target, where they always
-  reach the participant.
-
-- **The exported survey changed typed numbers.** Clearing a number field
-  with a minimum wrote the minimum in, a number outside the range was
-  replaced with the nearest limit, and in a points allocation `2.5`
-  became `25`. What the respondent types is now kept, and the survey
-  asks for a correction.
-
-- **An option coded 0 was recorded as a blank** in the exported survey,
-  so a respondent choosing it on a required question was blocked from
-  continuing, and 0 looked identical to a blank. Affected 0/1 codings
-  and 0 to 10 scales.
-
-- **A ranking could show one order and submit another** in the exported
-  survey after dragging, and an untouched ranking was submitted as if
-  the respondent had chosen the order shown.
-
-- **Shiny matrix and ranking questions showed codes in place of
-  labels.** A five-point agreement scale appeared as `1 2 3 4 5`. Shiny
-  rankings also stored labels, so every rank came out empty wherever
-  labels and codes differed.
-
-- **Shiny rankings needed a mouse.** Each option now has move up and
-  move down buttons, and the new position is announced.
-
-- **Shiny decision questions started with an answer selected**, “Equally
-  important” or “No influence”, and points allocations started at 0, so
-  an untouched question submitted an invented judgement. They now start
-  empty. Every Shiny date question was also pre-filled with today’s
-  date, and now starts empty.
-
-- **Appending to a Shiny response file ignored its header**, so a
-  changed instrument wrote answers under another question’s heading. An
-  existing empty file also received headerless rows.
-
-- **The survey module lacked 5 item types.** Matrix, rating, ranking,
+  reach the participant.\</p\>\</li\> \<li\>\<p\>\<strong\>The exported
+  survey changed typed numbers.\</strong\> Clearing a number field with
+  a minimum wrote the minimum in, a number outside the range was
+  replaced with the nearest limit, and in a points allocation
+  \<code\>2.5\</code\> became \<code\>25\</code\>. What the respondent
+  types is now kept, and the survey asks for a correction.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>An option coded 0 was recorded as a
+  blank\</strong\> in the exported survey, so a respondent choosing it
+  on a required question was blocked from continuing, and 0 looked
+  identical to a blank. Affected 0/1 codings and 0 to 10
+  scales.\</p\>\</li\> \<li\>\<p\>\<strong\>A ranking could show one
+  order and submit another\</strong\> in the exported survey after
+  dragging, and an untouched ranking was submitted as if the respondent
+  had chosen the order shown.\</p\>\</li\> \<li\>\<p\>\<strong\>Shiny
+  matrix and ranking questions showed codes in place of
+  labels.\</strong\> A five-point agreement scale appeared as \<code\>1
+  2 3 4 5\</code\>. Shiny rankings also stored labels, so every rank
+  came out empty wherever labels and codes differed.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Shiny rankings needed a mouse.\</strong\> Each
+  option now has move up and move down buttons, and the new position is
+  announced.\</p\>\</li\> \<li\>\<p\>\<strong\>Shiny decision questions
+  started with an answer selected\</strong\>, “Equally important” or “No
+  influence”, and points allocations started at 0, so an untouched
+  question submitted an invented judgement. They now start empty. Every
+  Shiny date question was also pre-filled with today’s date, and now
+  starts empty.\</p\>\</li\> \<li\>\<p\>\<strong\>Appending to a Shiny
+  response file ignored its header\</strong\>, so a changed instrument
+  wrote answers under another question’s heading. An existing empty file
+  also received headerless rows.\</p\>\</li\> \<li\>\<p\>\<strong\>The
+  survey module lacked 5 item types.\</strong\> Matrix, rating, ranking,
   pairwise comparison and criteria weight showed only a placeholder, and
   a required one made the survey impossible to finish. The module now
   uses the same questions as
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md).
-
-- **The survey module submitted answers the respondent had removed.** A
-  cleared answer, and an answer to a question branching later hid, were
-  both submitted. A multiple-choice answer lost all but its first
-  selection when the page was revisited.
-
-- **A failed save in the survey module showed the thank-you screen.**
-  The survey was marked complete before `on_submit` ran, and an error
+  \<code\>render_survey()\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The survey module submitted answers the
+  respondent had removed.\</strong\> A cleared answer, and an answer to
+  a question branching later hid, were both submitted. A multiple-choice
+  answer lost all but its first selection when the page was
+  revisited.\</p\>\</li\> \<li\>\<p\>\<strong\>A failed save in the
+  survey module showed the thank-you screen.\</strong\> The survey was
+  marked complete before \<code\>on_submit\</code\> ran, and an error
   there ended the session. The respondent now sees a message, stays on
-  the page and can try again.
-
-- Changing a reactive instrument now resets the survey module, as its
-  help said it did, and starts every answer blank. Moving between pages
-  scrolls the module into view, where it scrolled the whole host page.
-
-- **The static survey said a response had been recorded before it
-  knew.** A failed send was discarded and the thank-you screen appeared
-  anyway, and a configured redirect then carried the participant away
-  with the answers in nobody’s hands. A failure now says so, keeps the
-  CSV download reachable, offers a retry, and withholds the redirect.
-  The submission is a `no-cors` POST, so the collector’s reply is
-  unreadable and acceptance cannot be confirmed from the page. The
-  screen claims only that the request was sent.
-
-- **A completed comparison or points allocation counted as unanswered**
-  in the progress display, because progress read the question’s own
-  answer where these types store one answer per pair or per criterion.
-  Progress and the required-question check now share one rule.
-
-- **A rating left the question that depends on it hidden** until another
-  control was touched, while the required check still demanded an answer
-  to it.
-
-- **A comparison answered on a phone could show the wrong selection on a
-  wider screen**, and the reverse. Each question renders a button strip
-  and a dropdown, shown by screen width, and each recorded the answer
-  while leaving the other as it was. The stored judgement was always the
-  one given.
-
-- **Long rating scales now stack on a phone.** An 11-point scale needed
-  550 pixels, so a participant on a 390-pixel screen saw part of it with
-  both ends off screen. Below 600 pixels each point becomes a full-width
-  row.
-
-- **Choice groups, rating scales and validation errors now read
-  correctly to a screen reader.** A group carries its question as its
-  name, each rating star reports whether it is the one chosen, and an
-  error is announced with the control that has it. Validation and a page
-  change move focus to the task instead of only scrolling.
-
-- **A multi-select answer failed a branching rule that allowed any of
-  its options.** Selecting two options stored them together, and the
-  static survey compared the pair as one value, so a rule showing a
-  follow-up for either option stayed closed. Any selected option the
-  rule allows now satisfies it, which is what the Shiny survey already
-  did.
-
-- **A second branching rule on the same question replaced the first** in
-  the Shiny survey, so a question gated on two conditions ran on one.
-  Every rule is kept and they combine, and a question controlled by one
-  that is itself hidden now counts as unanswered, so a stale answer
-  behind a closed branch keeps the questions below it closed too. The
-  static survey already worked this way.
-
-- **One-question-at-a-time mode ignored branching**, so a participant
-  could be required to answer a question the rules exclude, which was
-  then blanked on submission. Navigation follows the same visible
-  sequence the rest of the survey uses.
-
-- **A failed callback after a saved response invited a duplicate.** The
-  save and the `on_submit` callback shared one error handler, so a
+  the page and can try again.\</p\>\</li\> \<li\>\<p\>Changing a
+  reactive instrument now resets the survey module, as its help said it
+  did, and starts every answer blank. Moving between pages scrolls the
+  module into view, where it scrolled the whole host page.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>The static survey said a response had been
+  recorded before it knew.\</strong\> A failed send was discarded and
+  the thank-you screen appeared anyway, and a configured redirect then
+  carried the participant away with the answers in nobody’s hands. A
+  failure now says so, keeps the CSV download reachable, offers a retry,
+  and withholds the redirect. The submission is a
+  \<code\>no-cors\</code\> POST, so the collector’s reply is unreadable
+  and acceptance cannot be confirmed from the page. The screen claims
+  only that the request was sent.\</p\>\</li\> \<li\>\<p\>\<strong\>A
+  completed comparison or points allocation counted as
+  unanswered\</strong\> in the progress display, because progress read
+  the question’s own answer where these types store one answer per pair
+  or per criterion. Progress and the required-question check now share
+  one rule.\</p\>\</li\> \<li\>\<p\>\<strong\>A rating left the question
+  that depends on it hidden\</strong\> until another control was
+  touched, while the required check still demanded an answer to
+  it.\</p\>\</li\> \<li\>\<p\>\<strong\>A comparison answered on a phone
+  could show the wrong selection on a wider screen\</strong\>, and the
+  reverse. Each question renders a button strip and a dropdown, shown by
+  screen width, and each recorded the answer while leaving the other as
+  it was. The stored judgement was always the one given.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>Long rating scales now stack on a
+  phone.\</strong\> An 11-point scale needed 550 pixels, so a
+  participant on a 390-pixel screen saw part of it with both ends off
+  screen. Below 600 pixels each point becomes a full-width
+  row.\</p\>\</li\> \<li\>\<p\>\<strong\>Choice groups, rating scales
+  and validation errors now read correctly to a screen
+  reader.\</strong\> A group carries its question as its name, each
+  rating star reports whether it is the one chosen, and an error is
+  announced with the control that has it. Validation and a page change
+  move focus to the task instead of only scrolling.\</p\>\</li\>
+  \<li\>\<p\>\<strong\>A multi-select answer failed a branching rule
+  that allowed any of its options.\</strong\> Selecting two options
+  stored them together, and the static survey compared the pair as one
+  value, so a rule showing a follow-up for either option stayed closed.
+  Any selected option the rule allows now satisfies it, which is what
+  the Shiny survey already did.\</p\>\</li\> \<li\>\<p\>\<strong\>A
+  second branching rule on the same question replaced the
+  first\</strong\> in the Shiny survey, so a question gated on two
+  conditions ran on one. Every rule is kept and they combine, and a
+  question controlled by one that is itself hidden now counts as
+  unanswered, so a stale answer behind a closed branch keeps the
+  questions below it closed too. The static survey already worked this
+  way.\</p\>\</li\> \<li\>\<p\>\<strong\>One-question-at-a-time mode
+  ignored branching\</strong\>, so a participant could be required to
+  answer a question the rules exclude, which was then blanked on
+  submission. Navigation follows the same visible sequence the rest of
+  the survey uses.\</p\>\</li\> \<li\>\<p\>\<strong\>A failed callback
+  after a saved response invited a duplicate.\</strong\> The save and
+  the \<code\>on_submit\</code\> callback shared one error handler, so a
   callback failure reported that nothing was saved and submitting again
   wrote the answers a second time. The two steps are tracked separately,
   a retry repeats only what failed, and the two failures now read
-  differently.
-
-### Researcher interface fixes
-
-- **SurveyStudio’s preview could send test answers to the live
-  collector.** It exported the real instrument and the export fell back
-  to the instrument’s configured Google Sheets endpoint, so a test
-  response could land in a running study’s sheet beside real
-  participants’. The preview now exports with `preview = TRUE`, a new
-  [`export_static_survey()`](https://surveyframe.org/reference/superseded.md)
-  argument that removes the collector and the completion redirect. **If
-  you previewed a configured instrument in Studio on 0.4.1 or earlier,
-  check the collecting sheet for test rows.**
-- **The SurveyBuilder question list can be worked from the keyboard.** A
-  question row takes focus, opens on Enter or Space, and moves with Alt
-  and an arrow key, and named move-up and move-down buttons sit beside
-  duplicate and delete. Ordering was previously drag-only.
-- **An autosaved builder session is offered however old it is.**
-  Recovery refused anything older than two hours while the session sat
-  in storage, so returning the next day showed an empty builder. The
-  banner reports the age and clears the session only when dismissed.
-  Where the browser refuses to store anything, the builder now says so,
-  where it used to appear to save.
-- Opening a builder dialog moves focus into it, and closing one returns
-  focus where it was.
-- **The builder’s Preview is labelled a layout preview**, which is what
-  it is: it shows wording, order and branding and leaves out answering,
-  required checks and branching. Export the survey, or use Studio’s
-  preview, to test the respondent’s path.
-- **The RStudio add-ins are renamed after what they do**, all under a
-  `surveyframe:` prefix: Design an instrument, Open analysis workspace,
-  Analyse an existing instrument, and Insert starter instrument.
-  SurveyBuilder was described as a Shiny app, and it is a client-side
-  HTML page.
-- **“Analyse an existing instrument”, formerly “Open Dashboard”, opens
-  SurveyStudio on Upload Responses** with the chosen instrument loaded,
-  ready for a response file. It used to open an empty dashboard.
-- **Every add-in stops with one message saying what to do** when RStudio
-  is closed, the console has focus during an insert, the file dialog
-  fails, or the chosen `.sframe` fails to load. It used to handle a
+  differently.\</p\>\</li\> \</ul\> \</div\> \<div
+  id="researcher-interface-fixes" class="section level2"\>
+  \<h2\>Researcher interface fixes\</h2\> \<ul\>
+  \<li\>\<strong\>SurveyStudio’s preview could send test answers to the
+  live collector.\</strong\> It exported the real instrument and the
+  export fell back to the instrument’s configured Google Sheets
+  endpoint, so a test response could land in a running study’s sheet
+  beside real participants’. The preview now exports with
+  \<code\>preview = TRUE\</code\>, a new
+  \<code\>export_static_survey()\</code\> argument that removes the
+  collector and the completion redirect. \<strong\>If you previewed a
+  configured instrument in Studio on 0.4.1 or earlier, check the
+  collecting sheet for test rows.\</strong\>\</li\> \<li\>\<strong\>The
+  SurveyBuilder question list can be worked from the
+  keyboard.\</strong\> A question row takes focus, opens on Enter or
+  Space, and moves with Alt and an arrow key, and named move-up and
+  move-down buttons sit beside duplicate and delete. Ordering was
+  previously drag-only.\</li\> \<li\>\<strong\>An autosaved builder
+  session is offered however old it is.\</strong\> Recovery refused
+  anything older than two hours while the session sat in storage, so
+  returning the next day showed an empty builder. The banner reports the
+  age and clears the session only when dismissed. Where the browser
+  refuses to store anything, the builder now says so, where it used to
+  appear to save.\</li\> \<li\>Opening a builder dialog moves focus into
+  it, and closing one returns focus where it was.\</li\>
+  \<li\>\<strong\>The builder’s Preview is labelled a layout
+  preview\</strong\>, which is what it is: it shows wording, order and
+  branding and leaves out answering, required checks and branching.
+  Export the survey, or use Studio’s preview, to test the respondent’s
+  path.\</li\> \<li\>\<strong\>The RStudio add-ins are renamed after
+  what they do\</strong\>, all under a \<code\>surveyframe:\</code\>
+  prefix: Design an instrument, Open analysis workspace, Analyse an
+  existing instrument, and Insert starter instrument. SurveyBuilder was
+  described as a Shiny app, and it is a client-side HTML page.\</li\>
+  \<li\>\<strong\>“Analyse an existing instrument”, formerly “Open
+  Dashboard”, opens SurveyStudio on Upload Responses\</strong\> with the
+  chosen instrument loaded, ready for a response file. It used to open
+  an empty dashboard.\</li\> \<li\>\<strong\>Every add-in stops with one
+  message saying what to do\</strong\> when RStudio is closed, the
+  console has focus during an insert, the file dialog fails, or the
+  chosen \<code\>.sframe\</code\> fails to load. It used to handle a
   missing rstudioapi alone. The exported launchers keep raising their
-  errors.
-- The starter instrument keeps its validation result as `validation`,
-  and ends with a commented
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
-  line for saving it.
-- **[`library(surveyframe)`](https://surveyframe.org) now says where to
-  start.** In an interactive session it prints a short note: 3 commands
-  that load a branded demo and show it as a respondent sees it and
-  inside SurveyStudio, the functions to start your own study with,
-  `citation("surveyframe")`, and the website. Scripts, Quarto renders
-  and `R CMD check` stay silent, and
-  [`suppressPackageStartupMessages()`](https://rdrr.io/r/base/message.html)
-  removes it.
-- SurveyStudio’s preview points at the builder, where it used to name a
-  “Build Survey” screen of its own.
-
-### Scoring fixes
-
-- **A scale could overwrite a question’s answers.** A scale’s score is
-  stored in a column named by its ID, and an item and a scale were
-  allowed the same ID, so
-  [`score_scales()`](https://surveyframe.org/reference/score_scales.md)
-  replaced the item’s answers with the score, and an analysis of that
-  item read the score. Shared names are now rejected at validation, and
-  [`score_scales()`](https://surveyframe.org/reference/score_scales.md)
-  refuses to overwrite data.
-- **One scale could reverse another scale’s item.** A scale listing an
-  item in `reverse_items` reversed it everywhere, which changed the
-  scores and the alpha of any other scale using that item.
-- **Reports published a different scale score from the instrument’s.**
-  The report figures and the Quarto report template took a plain row
-  mean, ignoring the declared method, reverse coding, weights and
-  `min_valid`, so a declared sum of 2 and 4 was shown as 3.
-- **A missing item column lowered the scoring threshold.** With
-  `min_valid = NULL`, meaning every item, a 3-item scale with 1 absent
-  column was scored on 2 items. The absent item now counts as
-  unanswered, with a warning.
-- **Reversal used the sample’s own range** for an item with no numeric
-  choice set, so the same answer received a different reversed value as
-  respondents were added. Slider and rating items now reverse on their
-  declared limits.
-- **A factor was scored on its level positions**, so a factor holding 10
-  and 20 was scored as 1 and 2.
-- **[`item_report()`](https://surveyframe.org/reference/superseded.md)
-  diagnostics now match the scale’s scoring.** Item-rest correlations
-  use the reversed orientation, where a reverse-keyed item used to come
-  out strongly negative beside a high alpha. They use respondents who
+  errors.\</li\> \<li\>The starter instrument keeps its validation
+  result as \<code\>validation\</code\>, and ends with a commented
+  \<code\>write_sframe()\</code\> line for saving it.\</li\>
+  \<li\>\<strong\>\<code\>library(surveyframe)\</code\> now says where
+  to start.\</strong\> In an interactive session it prints a short note:
+  3 commands that load a branded demo and show it as a respondent sees
+  it and inside SurveyStudio, the functions to start your own study
+  with, \<code\>citation("surveyframe")\</code\>, and the website.
+  Scripts, Quarto renders and \<code\>R CMD check\</code\> stay silent,
+  and \<code\>suppressPackageStartupMessages()\</code\> removes
+  it.\</li\> \<li\>SurveyStudio’s preview points at the builder, where
+  it used to name a “Build Survey” screen of its own.\</li\> \</ul\>
+  \</div\> \<div id="scoring-fixes" class="section level2"\>
+  \<h2\>Scoring fixes\</h2\> \<ul\> \<li\>\<strong\>A scale could
+  overwrite a question’s answers.\</strong\> A scale’s score is stored
+  in a column named by its ID, and an item and a scale were allowed the
+  same ID, so \<code\>score_scales()\</code\> replaced the item’s
+  answers with the score, and an analysis of that item read the score.
+  Shared names are now rejected at validation, and
+  \<code\>score_scales()\</code\> refuses to overwrite data.\</li\>
+  \<li\>\<strong\>One scale could reverse another scale’s
+  item.\</strong\> A scale listing an item in
+  \<code\>reverse_items\</code\> reversed it everywhere, which changed
+  the scores and the alpha of any other scale using that item.\</li\>
+  \<li\>\<strong\>Reports published a different scale score from the
+  instrument’s.\</strong\> The report figures and the Quarto report
+  template took a plain row mean, ignoring the declared method, reverse
+  coding, weights and \<code\>min_valid\</code\>, so a declared sum of 2
+  and 4 was shown as 3.\</li\> \<li\>\<strong\>A missing item column
+  lowered the scoring threshold.\</strong\> With \<code\>min_valid =
+  NULL\</code\>, meaning every item, a 3-item scale with 1 absent column
+  was scored on 2 items. The absent item now counts as unanswered, with
+  a warning.\</li\> \<li\>\<strong\>Reversal used the sample’s own
+  range\</strong\> for an item with no numeric choice set, so the same
+  answer received a different reversed value as respondents were added.
+  Slider and rating items now reverse on their declared limits.\</li\>
+  \<li\>\<strong\>A factor was scored on its level positions\</strong\>,
+  so a factor holding 10 and 20 was scored as 1 and 2.\</li\>
+  \<li\>\<strong\>\<code\>item_report()\</code\> diagnostics now match
+  the scale’s scoring.\</strong\> Item-rest correlations use the
+  reversed orientation, where a reverse-keyed item used to come out
+  strongly negative beside a high alpha. They use respondents who
   answered every item, where a missing item counted as 0. Floor and
   ceiling use the item’s declared lowest and highest response, where
-  they used the sample’s extremes, and are `NA` for an item that
-  declares no bounds.
-- [`sf_scale()`](https://surveyframe.org/reference/superseded.md) now
-  checks its parameters, and refuses a constructed item passed inside a
-  scale’s `items`, which was silently dropped from the instrument.
-
-### Statistics fixes
-
-- **Cochran’s Q counted a missing answer as an observed 0**, changing
-  both Q and the analysed N, and read any unrecognised code as 0.
-  Missing answers now remove the respondent, and codes other than 1/0,
-  TRUE/FALSE and yes/no are reported.
-- **PLS-SEM syntax could add an indicator the model left out.** A
-  construct over `Q1` and `Q3` was written as the range `Q1` to `Q3`,
-  adding `Q2`.
-- **Indirect effects could use a path the model never declared**, and a
-  model with parallel mediators wrote its total effect twice, each copy
-  holding one route. Both are now caught or corrected.
-- **ANCOVA reported an unadjusted group test as adjusted.** The group
-  was tested before the covariates. The slope check also left out every
-  covariate after the first.
-- **Partial correlation p values used the wrong degrees of freedom**,
-  and partial Spearman ranked the residuals where it must rank the
-  variables.
-- **[`sample_size_plan()`](https://surveyframe.org/reference/superseded.md)
-  returned 64 or 50 per group for t tests and ANOVA** whatever alpha and
-  power were requested, while printing both.
-- **The Firth likelihood-ratio statistic was half its true value.**
-- **Two-way ANOVA gave the residual row a partial eta squared of 0.5.**
-- **Results tables rounded p values to 2 decimals**, showing .004 as 0.
-  They now show 3 decimals, or \<.001.
-- **Every
-  [`render_results()`](https://surveyframe.org/reference/render_results.md)
-  table put a whole row in a single cell**, headers included. Each value
-  now has its own cell.
-- **Rank-test effect sizes and their intervals described different
-  statistics.** A signed-rank r also divided by pairs the test had
-  dropped.
-- **Bootstrap intervals hid failed resamples**, and a collapsed
-  distribution gave a zero-width interval. A Kruskal-Wallis resample
-  with every value tied gave an effect of 0.
-- **An analysis plan whose blocks all failed returned as if it had
-  succeeded**, and a scale-scoring failure before analysis went
-  unrecorded.
-- **The t test ignored `var_equal`**, and t tests and one-way ANOVA
-  judged significance at .05 whatever `alpha` the block declared.
-  Options a method never reads are now listed in `options_ignored`.
-- **Reliability, item and EFA blocks analysed every scale** whatever the
-  block selected. The quality block ran its duplicate check only when
-  given a respondent ID it was never passed, and reported 0 duplicates.
-  It now reads the collected ID column, and says when a check did not
-  run.
-- **Statistics read a factor on its level positions**, and linear
-  regression turned a text predictor into a number. Factors are read
-  through their labels, and text predictors stay categorical.
-
-### Decision analysis fixes
-
-- **Weights could be applied to the wrong criteria.** They were matched
-  to the performance matrix by count and applied by position, so a
-  weight item listing quality before price gave price the weight meant
-  for quality. Rated items paired with a differently named weight item
-  still pair in declared order, and the result now lists each pairing.
-- **Aggregating judgements combined them by position**, so the same
-  judgement from 2 respondents whose matrices listed criteria in
-  different orders averaged to indifference.
-- **AHP and ANP read a data-frame matrix transposed**, reversing every
-  judgement while keeping perfect consistency.
-- **Factor judgements were read as level positions**, so a judgement of
-  -9 became 1.
-- **A supplied AHP matrix got a consistency verdict without being
-  reciprocal**, so rows (1, 9) and (9, 1) received a consistency ratio
-  of 0.
-- **Unavailable consistency ratios**, past 10 criteria, produced
-  infinite and undefined summaries, and filtering called them too
-  inconsistent.
-- **ANP could report a limit that does not exist.** A periodic network
-  now gets its stationary priorities, and a reducible one is refused.
-- **DEMATEL could fail on an undefined inverse**, and named the first
-  criterion the strongest cause when every net relation was 0. It now
-  explains the undefined case and names a cause only when one exists.
-- **WASPAS reversed its normalisation for negative values.**
-- **ELECTRE’s kernel could exclude an alternative nothing in it
-  outranked.**
-- **ELECTRE sensitivity re-ranked at the default cutoffs** in place of
-  the cutoffs the result used.
-- **Sensitivity called a ranking stable when no weight had moved**, as
-  happens with weights such as (1, 0).
-- **Conjoint balance rewarded leaving out an attribute level**, scoring
-  a design that never showed one as perfectly balanced. Balance now
-  counts every declared level, and the design lists any level it never
-  shows.
-
-### Text analysis fixes
-
-- **Words with accents and text in other scripts were being cut up.**
-  The tokeniser kept ASCII letters alone, so “café” was counted as
-  “caf”, “naïve” became two fragments, and a response written in a
-  non-Latin script could come out empty. Every Unicode letter and digit
-  is now kept, in term frequency, n-grams, co-occurrence, topic models
-  and sentiment. **Term counts and topic models over non-English text
-  will change.**
-- **N-grams reported phrases nobody wrote.** Stop words were removed
-  before the window slid over what was left, so “clean but not
-  comfortable” produced the bigram “clean comfortable”. An n-gram is now
-  built only from words that were next to each other, which is what
-  makes it a phrase a respondent used. **Bigram and trigram tables will
-  change, and some will be smaller.**
-- **A respondent with no group value was counted into every group** in
-  grouped sentiment. With twelve responses per group, both groups
+  they used the sample’s extremes, and are \<code\>NA\</code\> for an
+  item that declares no bounds.\</li\> \<li\>\<code\>sf_scale()\</code\>
+  now checks its parameters, and refuses a constructed item passed
+  inside a scale’s \<code\>items\</code\>, which was silently dropped
+  from the instrument.\</li\> \</ul\> \</div\> \<div
+  id="statistics-fixes" class="section level2"\> \<h2\>Statistics
+  fixes\</h2\> \<ul\> \<li\>\<strong\>Cochran’s Q counted a missing
+  answer as an observed 0\</strong\>, changing both Q and the analysed
+  N, and read any unrecognised code as 0. Missing answers now remove the
+  respondent, and codes other than 1/0, TRUE/FALSE and yes/no are
+  reported.\</li\> \<li\>\<strong\>PLS-SEM syntax could add an indicator
+  the model left out.\</strong\> A construct over \<code\>Q1\</code\>
+  and \<code\>Q3\</code\> was written as the range \<code\>Q1\</code\>
+  to \<code\>Q3\</code\>, adding \<code\>Q2\</code\>.\</li\>
+  \<li\>\<strong\>Indirect effects could use a path the model never
+  declared\</strong\>, and a model with parallel mediators wrote its
+  total effect twice, each copy holding one route. Both are now caught
+  or corrected.\</li\> \<li\>\<strong\>ANCOVA reported an unadjusted
+  group test as adjusted.\</strong\> The group was tested before the
+  covariates. The slope check also left out every covariate after the
+  first.\</li\> \<li\>\<strong\>Partial correlation p values used the
+  wrong degrees of freedom\</strong\>, and partial Spearman ranked the
+  residuals where it must rank the variables.\</li\>
+  \<li\>\<strong\>\<code\>sample_size_plan()\</code\> returned 64 or 50
+  per group for t tests and ANOVA\</strong\> whatever alpha and power
+  were requested, while printing both.\</li\> \<li\>\<strong\>The Firth
+  likelihood-ratio statistic was half its true value.\</strong\>\</li\>
+  \<li\>\<strong\>Two-way ANOVA gave the residual row a partial eta
+  squared of 0.5.\</strong\>\</li\> \<li\>\<strong\>Results tables
+  rounded p values to 2 decimals\</strong\>, showing .004 as 0. They now
+  show 3 decimals, or \<.001.\</li\> \<li\>\<strong\>Every
+  \<code\>render_results()\</code\> table put a whole row in a single
+  cell\</strong\>, headers included. Each value now has its own
+  cell.\</li\> \<li\>\<strong\>Rank-test effect sizes and their
+  intervals described different statistics.\</strong\> A signed-rank r
+  also divided by pairs the test had dropped.\</li\>
+  \<li\>\<strong\>Bootstrap intervals hid failed resamples\</strong\>,
+  and a collapsed distribution gave a zero-width interval. A
+  Kruskal-Wallis resample with every value tied gave an effect of
+  0.\</li\> \<li\>\<strong\>An analysis plan whose blocks all failed
+  returned as if it had succeeded\</strong\>, and a scale-scoring
+  failure before analysis went unrecorded.\</li\> \<li\>\<strong\>The t
+  test ignored \<code\>var_equal\</code\>\</strong\>, and t tests and
+  one-way ANOVA judged significance at .05 whatever
+  \<code\>alpha\</code\> the block declared. Options a method never
+  reads are now listed in \<code\>options_ignored\</code\>.\</li\>
+  \<li\>\<strong\>Reliability, item and EFA blocks analysed every
+  scale\</strong\> whatever the block selected. The quality block ran
+  its duplicate check only when given a respondent ID it was never
+  passed, and reported 0 duplicates. It now reads the collected ID
+  column, and says when a check did not run.\</li\>
+  \<li\>\<strong\>Statistics read a factor on its level
+  positions\</strong\>, and linear regression turned a text predictor
+  into a number. Factors are read through their labels, and text
+  predictors stay categorical.\</li\> \</ul\> \</div\> \<div
+  id="decision-analysis-fixes" class="section level2"\> \<h2\>Decision
+  analysis fixes\</h2\> \<ul\> \<li\>\<strong\>Weights could be applied
+  to the wrong criteria.\</strong\> They were matched to the performance
+  matrix by count and applied by position, so a weight item listing
+  quality before price gave price the weight meant for quality. Rated
+  items paired with a differently named weight item still pair in
+  declared order, and the result now lists each pairing.\</li\>
+  \<li\>\<strong\>Aggregating judgements combined them by
+  position\</strong\>, so the same judgement from 2 respondents whose
+  matrices listed criteria in different orders averaged to
+  indifference.\</li\> \<li\>\<strong\>AHP and ANP read a data-frame
+  matrix transposed\</strong\>, reversing every judgement while keeping
+  perfect consistency.\</li\> \<li\>\<strong\>Factor judgements were
+  read as level positions\</strong\>, so a judgement of -9 became
+  1.\</li\> \<li\>\<strong\>A supplied AHP matrix got a consistency
+  verdict without being reciprocal\</strong\>, so rows (1, 9) and (9, 1)
+  received a consistency ratio of 0.\</li\> \<li\>\<strong\>Unavailable
+  consistency ratios\</strong\>, past 10 criteria, produced infinite and
+  undefined summaries, and filtering called them too
+  inconsistent.\</li\> \<li\>\<strong\>ANP could report a limit that
+  does not exist.\</strong\> A periodic network now gets its stationary
+  priorities, and a reducible one is refused.\</li\>
+  \<li\>\<strong\>DEMATEL could fail on an undefined inverse\</strong\>,
+  and named the first criterion the strongest cause when every net
+  relation was 0. It now explains the undefined case and names a cause
+  only when one exists.\</li\> \<li\>\<strong\>WASPAS reversed its
+  normalisation for negative values.\</strong\>\</li\>
+  \<li\>\<strong\>ELECTRE’s kernel could exclude an alternative nothing
+  in it outranked.\</strong\>\</li\> \<li\>\<strong\>ELECTRE sensitivity
+  re-ranked at the default cutoffs\</strong\> in place of the cutoffs
+  the result used.\</li\> \<li\>\<strong\>Sensitivity called a ranking
+  stable when no weight had moved\</strong\>, as happens with weights
+  such as (1, 0).\</li\> \<li\>\<strong\>Conjoint balance rewarded
+  leaving out an attribute level\</strong\>, scoring a design that never
+  showed one as perfectly balanced. Balance now counts every declared
+  level, and the design lists any level it never shows.\</li\> \</ul\>
+  \</div\> \<div id="text-analysis-fixes" class="section level2"\>
+  \<h2\>Text analysis fixes\</h2\> \<ul\> \<li\>\<strong\>Words with
+  accents and text in other scripts were being cut up.\</strong\> The
+  tokeniser kept ASCII letters alone, so “café” was counted as “caf”,
+  “naïve” became two fragments, and a response written in a non-Latin
+  script could come out empty. Every Unicode letter and digit is now
+  kept, in term frequency, n-grams, co-occurrence, topic models and
+  sentiment. \<strong\>Term counts and topic models over non-English
+  text will change.\</strong\>\</li\> \<li\>\<strong\>N-grams reported
+  phrases nobody wrote.\</strong\> Stop words were removed before the
+  window slid over what was left, so “clean but not comfortable”
+  produced the bigram “clean comfortable”. An n-gram is now built only
+  from words that were next to each other, which is what makes it a
+  phrase a respondent used. \<strong\>Bigram and trigram tables will
+  change, and some will be smaller.\</strong\>\</li\> \<li\>\<strong\>A
+  respondent with no group value was counted into every group\</strong\>
+  in grouped sentiment. With twelve responses per group, both groups
   reported thirteen, the extra one scored as neutral. Grouped term
   frequency had the same mismatch between the text and the rows it came
-  from.
-- **A response of punctuation alone counted as a usable response.** Rows
-  were chosen before punctuation and numbers were stripped, so such a
-  response survived as an empty string, counted towards the minimum
-  corpus, and scored as a neutral observation in sentiment.
-- **`term_context(window = 0)` copied the match into its own context.**
-  A zero window now gives empty context, and a negative one is refused,
-  as is `max_matches` below 1 and an n-gram size below 2.
-
-### New: the R code behind each result
-
-- **A report now shows the statistical call that produced each number.**
-  Every result carries a folded “Show R code” block with the call, the
-  variables and the options resolved, so a reader sees
-  `cor.test(x, y, method = "pearson")` where the wrapper call was all
-  that showed before. Both report engines show it, and
-  `render_report(show_code = FALSE)` leaves it out.
-- **[`analysis_syntax()`](https://surveyframe.org/reference/superseded.md)
-  returns that code**, for one result or a whole set. `header = TRUE`
-  prepends the lines that load the instrument, read the responses and
-  score the scales, giving a script that runs on its own.
-- The code is built from the same resolved specification the analysis
-  ran, and the package’s tests run the generated code and compare its
-  statistic and p against the package’s own result. Where a method falls
-  outside its coverage the block is omitted, which keeps the report
-  honest about what it can show. The model families already carried
-  their syntax, through
-  [`cfa_syntax()`](https://surveyframe.org/reference/superseded.md) and
-  its neighbours.
-
-### Figure fixes
-
-- **Grouped rating charts drew two segments over each other.** The
-  negative block started at zero while the neutral block straddled zero,
-  so with five equally frequent options ten percentage points of the bar
-  were drawn twice and the bar was ten points short. This affected the
-  matrix and scale charts in every report. The single-item chart was
-  always correct.
-- **A repeated-measures figure described more respondents than its
-  test.** The test drops anyone missing a measure, where the figure
-  dropped missing values measure by measure, so an excluded respondent
-  could move the plotted medians. The figure now uses the same
-  respondents and says how many.
-- **A Q-Q plot compared raw values against the wrong line.** The
-  reference was y = x, so a normal variable with a mean of 100 looked
-  severely non-normal. The line now follows the sample’s own quartiles.
-- **A network figure renumbered its clusters.** Clusters were relabelled
-  by size while the legend said “Cluster”, so the cluster a table called
-  2 could appear as Cluster 1. The figure now uses the same numbers as
-  the table.
-
-### Report fixes
-
-- **A report could not render into a folder whose name contains a
-  space.** The Quarto renderer’s arguments were passed to the shell
-  unquoted, so such a path split into several arguments and the render
-  failed, falling back to the built-in HTML engine with no explanation.
-  Each argument is now quoted.
-- **Distributions disappeared when ggplot2 was absent.** A scale’s
-  rating items are grouped into one chart, and every item in such a
-  scale was skipped whether or not that chart could be drawn, though the
-  built-in charts draw each one. A missing optional package now costs
-  the grouping and keeps the information.
-- **A print-palette report mixed monochrome and colour figures**,
-  because the single-item diverging chart was drawn with the default
-  palette.
-- **Collected multiple-choice answers were missing from the
-  distributions.** A multiple-choice question is collected as one column
-  per option, and the section looked for a single column under the
-  question’s own name, so every such question was skipped. Both report
-  engines now count the options, label them from the choice set, and
-  state how many respondents answered, since one respondent can pick
-  several.
-- **A quanteda result’s leading features never reached the report**,
-  though its own prompt asked a reader to review them. A moderation’s
-  conditional slopes at the moderator’s own values were missing in the
-  same way. Both now render as a second table under the result.
-- **A mediation table did not say which model produced it.** It gave
-  Direct, Indirect and Total with no variable names and no a or b path,
-  so two negative paths looked the same as two positive ones: both give
-  a positive indirect effect. The table now names the predictor,
-  mediator and outcome and reports a and b with their signs.
-- **APA numbers follow APA 7 more closely.** `p` loses its leading zero,
-  as `p = .032`, and an interval says its level, as
-  `95% CI [0.12, 0.48]`. The sentence is plain text, so italicising the
-  symbols stays the author’s step, and
-  [`?sf_apa`](https://surveyframe.org/reference/superseded.md) now says
-  so.
-- **A report claimed an analysis seed when analysis was switched off.**
-  `render_report(include_analysis = FALSE)` still printed a seed beside
-  the instrument hash, which reads as provenance for an analysis that
-  never ran.
-
-### Provenance and file fixes
-
-- **A revised instrument could be written with its change undisclosed.**
-  Reading a file, editing it in memory and writing it produced a
-  consistent file with nothing in its amendment log, and a log with
-  entries removed or reordered was written as readily.
-- **An amendment could record a fingerprint of content that was never
-  written**, because the fingerprint was taken before validation updated
-  the instrument.
-- **A plan or model change could be recorded as a routine pipeline
-  amendment**, skipping its deviation report.
-- **A one-item scale was written as a single value** where the published
-  instrument profile requires an array, so a valid instrument failed the
-  profile, and the builder and R hashed the same instrument differently.
-- **The file reader, the bundled schema and the published profile
-  disagreed** on required fields. They now share one core, `hash`,
-  `meta` and `items`, and the reader refuses a file from a newer major
-  format version.
-- **[`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  changed values on the way in.** A respondent ID of `001` became `1`, a
-  text answer of `NA` became missing, a matrix missing a row column
-  raised no warning, and a duplicated column was silently dropped.
-- **The Google Sheets collector could mis-file answers under a duplicate
-  or blank heading**, and 2 submissions could interleave while the
+  from.\</li\> \<li\>\<strong\>A response of punctuation alone counted
+  as a usable response.\</strong\> Rows were chosen before punctuation
+  and numbers were stripped, so such a response survived as an empty
+  string, counted towards the minimum corpus, and scored as a neutral
+  observation in sentiment.\</li\>
+  \<li\>\<strong\>\<code\>term_context(window = 0)\</code\> copied the
+  match into its own context.\</strong\> A zero window now gives empty
+  context, and a negative one is refused, as is
+  \<code\>max_matches\</code\> below 1 and an n-gram size below
+  2.\</li\> \</ul\> \</div\> \<div
+  id="new-the-r-code-behind-each-result" class="section level2"\>
+  \<h2\>New: the R code behind each result\</h2\> \<ul\>
+  \<li\>\<strong\>A report now shows the statistical call that produced
+  each number.\</strong\> Every result carries a folded “Show R code”
+  block with the call, the variables and the options resolved, so a
+  reader sees \<code\>cor.test(x, y, method = "pearson")\</code\> where
+  the wrapper call was all that showed before. Both report engines show
+  it, and \<code\>render_report(show_code = FALSE)\</code\> leaves it
+  out.\</li\> \<li\>\<strong\>\<code\>analysis_syntax()\</code\> returns
+  that code\</strong\>, for one result or a whole set. \<code\>header =
+  TRUE\</code\> prepends the lines that load the instrument, read the
+  responses and score the scales, giving a script that runs on its
+  own.\</li\> \<li\>The code is built from the same resolved
+  specification the analysis ran, and the package’s tests run the
+  generated code and compare its statistic and p against the package’s
+  own result. Where a method falls outside its coverage the block is
+  omitted, which keeps the report honest about what it can show. The
+  model families already carried their syntax, through
+  \<code\>cfa_syntax()\</code\> and its neighbours.\</li\> \</ul\>
+  \</div\> \<div id="figure-fixes" class="section level2"\> \<h2\>Figure
+  fixes\</h2\> \<ul\> \<li\>\<strong\>Grouped rating charts drew two
+  segments over each other.\</strong\> The negative block started at
+  zero while the neutral block straddled zero, so with five equally
+  frequent options ten percentage points of the bar were drawn twice and
+  the bar was ten points short. This affected the matrix and scale
+  charts in every report. The single-item chart was always
+  correct.\</li\> \<li\>\<strong\>A repeated-measures figure described
+  more respondents than its test.\</strong\> The test drops anyone
+  missing a measure, where the figure dropped missing values measure by
+  measure, so an excluded respondent could move the plotted medians. The
+  figure now uses the same respondents and says how many.\</li\>
+  \<li\>\<strong\>A Q-Q plot compared raw values against the wrong
+  line.\</strong\> The reference was y = x, so a normal variable with a
+  mean of 100 looked severely non-normal. The line now follows the
+  sample’s own quartiles.\</li\> \<li\>\<strong\>A network figure
+  renumbered its clusters.\</strong\> Clusters were relabelled by size
+  while the legend said “Cluster”, so the cluster a table called 2 could
+  appear as Cluster 1. The figure now uses the same numbers as the
+  table.\</li\> \</ul\> \</div\> \<div id="report-fixes" class="section
+  level2"\> \<h2\>Report fixes\</h2\> \<ul\> \<li\>\<strong\>A report
+  could not render into a folder whose name contains a space.\</strong\>
+  The Quarto renderer’s arguments were passed to the shell unquoted, so
+  such a path split into several arguments and the render failed,
+  falling back to the built-in HTML engine with no explanation. Each
+  argument is now quoted.\</li\> \<li\>\<strong\>Distributions
+  disappeared when ggplot2 was absent.\</strong\> A scale’s rating items
+  are grouped into one chart, and every item in such a scale was skipped
+  whether or not that chart could be drawn, though the built-in charts
+  draw each one. A missing optional package now costs the grouping and
+  keeps the information.\</li\> \<li\>\<strong\>A print-palette report
+  mixed monochrome and colour figures\</strong\>, because the
+  single-item diverging chart was drawn with the default palette.\</li\>
+  \<li\>\<strong\>Collected multiple-choice answers were missing from
+  the distributions.\</strong\> A multiple-choice question is collected
+  as one column per option, and the section looked for a single column
+  under the question’s own name, so every such question was skipped.
+  Both report engines now count the options, label them from the choice
+  set, and state how many respondents answered, since one respondent can
+  pick several.\</li\> \<li\>\<strong\>A quanteda result’s leading
+  features never reached the report\</strong\>, though its own prompt
+  asked a reader to review them. A moderation’s conditional slopes at
+  the moderator’s own values were missing in the same way. Both now
+  render as a second table under the result.\</li\> \<li\>\<strong\>A
+  mediation table did not say which model produced it.\</strong\> It
+  gave Direct, Indirect and Total with no variable names and no a or b
+  path, so two negative paths looked the same as two positive ones: both
+  give a positive indirect effect. The table now names the predictor,
+  mediator and outcome and reports a and b with their signs.\</li\>
+  \<li\>\<strong\>APA numbers follow APA 7 more closely.\</strong\>
+  \<code\>p\</code\> loses its leading zero, as \<code\>p =
+  .032\</code\>, and an interval says its level, as \<code\>95% CI
+  \[0.12, 0.48\]\</code\>. The sentence is plain text, so italicising
+  the symbols stays the author’s step, and \<code\>?sf_apa\</code\> now
+  says so.\</li\> \<li\>\<strong\>A report claimed an analysis seed when
+  analysis was switched off.\</strong\>
+  \<code\>render_report(include_analysis = FALSE)\</code\> still printed
+  a seed beside the instrument hash, which reads as provenance for an
+  analysis that never ran.\</li\> \</ul\> \</div\> \<div
+  id="provenance-and-file-fixes" class="section level2"\>
+  \<h2\>Provenance and file fixes\</h2\> \<ul\> \<li\>\<strong\>A
+  revised instrument could be written with its change
+  undisclosed.\</strong\> Reading a file, editing it in memory and
+  writing it produced a consistent file with nothing in its amendment
+  log, and a log with entries removed or reordered was written as
+  readily.\</li\> \<li\>\<strong\>An amendment could record a
+  fingerprint of content that was never written\</strong\>, because the
+  fingerprint was taken before validation updated the instrument.\</li\>
+  \<li\>\<strong\>A plan or model change could be recorded as a routine
+  pipeline amendment\</strong\>, skipping its deviation report.\</li\>
+  \<li\>\<strong\>A one-item scale was written as a single
+  value\</strong\> where the published instrument profile requires an
+  array, so a valid instrument failed the profile, and the builder and R
+  hashed the same instrument differently.\</li\> \<li\>\<strong\>The
+  file reader, the bundled schema and the published profile
+  disagreed\</strong\> on required fields. They now share one core,
+  \<code\>hash\</code\>, \<code\>meta\</code\> and
+  \<code\>items\</code\>, and the reader refuses a file from a newer
+  major format version.\</li\>
+  \<li\>\<strong\>\<code\>read_responses()\</code\> changed values on
+  the way in.\</strong\> A respondent ID of \<code\>001\</code\> became
+  \<code\>1\</code\>, a text answer of \<code\>NA\</code\> became
+  missing, a matrix missing a row column raised no warning, and a
+  duplicated column was silently dropped.\</li\> \<li\>\<strong\>The
+  Google Sheets collector could mis-file answers under a duplicate or
+  blank heading\</strong\>, and 2 submissions could interleave while the
   header was being extended. Submissions now run inside a lock, and an
   ambiguous header sends the raw submission to an “Unmapped submissions”
-  sheet.
-- **[`sframe_export_labelled()`](https://surveyframe.org/reference/superseded.md)
-  left matrix cells, option columns and text-held codes unlabelled.**
-  Every response column now carries its row, option or criterion
-  wording, and every column of choice codes carries value labels.
-- **Generated notebooks hid failed analyses**, never ran their report
-  step, and broke on a title containing a quote. Each failed block now
-  shows its error, the report renders when at least one analysis
-  succeeded, and titles are escaped.
-- **Shipped demo results could fall out of step with the package.** A
-  test now holds every demo’s results file equal to what the package
-  computes.
-
-### SurveyStudio round-trip fixes
-
-- **A rebuild in SurveyStudio dropped item-level reverse coding.**
+  sheet.\</li\>
+  \<li\>\<strong\>\<code\>sframe_export_labelled()\</code\> left matrix
+  cells, option columns and text-held codes unlabelled.\</strong\> Every
+  response column now carries its row, option or criterion wording, and
+  every column of choice codes carries value labels.\</li\>
+  \<li\>\<strong\>Generated notebooks hid failed analyses\</strong\>,
+  never ran their report step, and broke on a title containing a quote.
+  Each failed block now shows its error, the report renders when at
+  least one analysis succeeded, and titles are escaped.\</li\>
+  \<li\>\<strong\>Shipped demo results could fall out of step with the
+  package.\</strong\> A test now holds every demo’s results file equal
+  to what the package computes.\</li\> \</ul\> \</div\> \<div
+  id="surveystudio-round-trip-fixes" class="section level2"\>
+  \<h2\>SurveyStudio round-trip fixes\</h2\> \<ul\> \<li\>\<strong\>A
+  rebuild in SurveyStudio dropped item-level reverse coding.\</strong\>
   Studio replaces the instrument it holds with a rebuild from its editor
   whenever the draft is valid, and that rebuild cleared every item’s
-  `reverse` flag, keeping only the reversal declared on a scale. An item
-  marked `reverse = TRUE` was scored as though answered in the same
-  direction as the rest, moving every composite and alpha built on it.
-- **A rebuild dropped conjoint designs**, so a declared design was lost
-  as soon as the instrument passed through Studio.
-- **An item held as a plain list lost its settings**: date limits,
-  matrix rows, slider and rating settings, comparison items and the
-  comparison scale. Every field the item constructor accepts is now
-  carried.
-- **Studio’s item-save handler replaced an item wholesale**, which would
-  have cleared reverse coding, scale membership, page and type settings
-  on any edit. Studio ships no item form, so the handler is unreachable
-  from the interface today and no released version could reach it. It
-  now applies an edit to the item already there, and drops settings
-  belonging to the previous type only when the type itself changes.
-- Reverse coding stays where it was declared. A scale’s `reverse_items`
-  stay on the scale, where a rebuild used to copy them onto each item,
-  which changed a loaded instrument’s content simply by opening it.
-
-### Documentation
-
-- **[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
-  told researchers to let anyone with the link edit the response
-  sheet**, which exposes participant data to anyone holding the URL. The
-  collector writes through the sheet it is attached to, so link sharing
-  was always unnecessary. The help now says to keep the sheet private.
-  If you followed the old advice, review the sheet’s sharing settings.
-- **The cross-check claim made for the decision methods is narrowed to
-  what the suite holds.** 0.4.0 said an independent computation had to
-  agree before a method was accepted. The suite calls RMCDA for 5 of the
-  10 methods, and 4 of those compare numbers: AHP weights, VIKOR’s S, R
-  and Q, MOORA’s ratio system and WASPAS scores. The ELECTRE call
-  compares the ordering of one concordance pair. ANP, DEMATEL, SMART,
-  PROMETHEE and TOPSIS are checked against hand-derived values and
-  published worked examples, with no second implementation. Both kinds
-  of evidence are recorded per method in
-  [`vignette("mcdm-analysis")`](https://surveyframe.org/articles/mcdm-analysis.md).
-- The
-  [`survey_module_ui()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`survey_module_server()`](https://surveyframe.org/reference/superseded.md)
-  help is rewritten, covering supported item types, what is submitted, a
-  failed save, and changing the instrument, with a complete example that
-  stores responses.
-- The [`item_report()`](https://surveyframe.org/reference/superseded.md)
-  help describes item-rest correlations, where it said item-total, and
-  the nested result it returns, with both ways to extract it. The
-  [`sf_scale()`](https://surveyframe.org/reference/superseded.md) help
-  states the rules for `min_valid`, `weights` and `reverse_items`.
-- The
-  [`sample_size_plan()`](https://surveyframe.org/reference/superseded.md)
-  help separates power calculations from precision targets and rules of
-  thumb, and states which arguments each one uses.
-- The
-  [`sensitivity_analysis()`](https://surveyframe.org/reference/superseded.md),
-  [`sframe_dematel_compute()`](https://surveyframe.org/reference/sframe_dematel_compute.md)
-  and
-  [`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md)
-  help describe the new counts, the undefined total relation, and how
-  rated items pair with a weight item.
-- The provenance help for
-  [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
-  [`link_git_commit()`](https://surveyframe.org/reference/superseded.md),
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
-  and
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+  \<code\>reverse\</code\> flag, keeping only the reversal declared on a
+  scale. An item marked \<code\>reverse = TRUE\</code\> was scored as
+  though answered in the same direction as the rest, moving every
+  composite and alpha built on it.\</li\> \<li\>\<strong\>A rebuild
+  dropped conjoint designs\</strong\>, so a declared design was lost as
+  soon as the instrument passed through Studio.\</li\>
+  \<li\>\<strong\>An item held as a plain list lost its
+  settings\</strong\>: date limits, matrix rows, slider and rating
+  settings, comparison items and the comparison scale. Every field the
+  item constructor accepts is now carried.\</li\>
+  \<li\>\<strong\>Studio’s item-save handler replaced an item
+  wholesale\</strong\>, which would have cleared reverse coding, scale
+  membership, page and type settings on any edit. Studio ships no item
+  form, so the handler is unreachable from the interface today and no
+  released version could reach it. It now applies an edit to the item
+  already there, and drops settings belonging to the previous type only
+  when the type itself changes.\</li\> \<li\>Reverse coding stays where
+  it was declared. A scale’s \<code\>reverse_items\</code\> stay on the
+  scale, where a rebuild used to copy them onto each item, which changed
+  a loaded instrument’s content simply by opening it.\</li\> \</ul\>
+  \</div\> \<div id="documentation-1" class="section level2"\>
+  \<h2\>Documentation\</h2\> \<ul\>
+  \<li\>\<strong\>\<code\>export_google_sheet()\</code\> told
+  researchers to let anyone with the link edit the response
+  sheet\</strong\>, which exposes participant data to anyone holding the
+  URL. The collector writes through the sheet it is attached to, so link
+  sharing was always unnecessary. The help now says to keep the sheet
+  private. If you followed the old advice, review the sheet’s sharing
+  settings.\</li\> \<li\>\<strong\>The cross-check claim made for the
+  decision methods is narrowed to what the suite holds.\</strong\> 0.4.0
+  said an independent computation had to agree before a method was
+  accepted. The suite calls RMCDA for 5 of the 10 methods, and 4 of
+  those compare numbers: AHP weights, VIKOR’s S, R and Q, MOORA’s ratio
+  system and WASPAS scores. The ELECTRE call compares the ordering of
+  one concordance pair. ANP, DEMATEL, SMART, PROMETHEE and TOPSIS are
+  checked against hand-derived values and published worked examples,
+  with no second implementation. Both kinds of evidence are recorded per
+  method in \<code\>vignette("mcdm-analysis")\</code\>.\</li\> \<li\>The
+  \<code\>survey_module_ui()\</code\> and
+  \<code\>survey_module_server()\</code\> help is rewritten, covering
+  supported item types, what is submitted, a failed save, and changing
+  the instrument, with a complete example that stores responses.\</li\>
+  \<li\>The \<code\>item_report()\</code\> help describes item-rest
+  correlations, where it said item-total, and the nested result it
+  returns, with both ways to extract it. The \<code\>sf_scale()\</code\>
+  help states the rules for \<code\>min_valid\</code\>,
+  \<code\>weights\</code\> and \<code\>reverse_items\</code\>.\</li\>
+  \<li\>The \<code\>sample_size_plan()\</code\> help separates power
+  calculations from precision targets and rules of thumb, and states
+  which arguments each one uses.\</li\> \<li\>The
+  \<code\>sensitivity_analysis()\</code\>,
+  \<code\>sframe_dematel_compute()\</code\> and
+  \<code\>sframe_rated_matrix()\</code\> help describe the new counts,
+  the undefined total relation, and how rated items pair with a weight
+  item.\</li\> \<li\>The provenance help for
+  \<code\>amend_sframe()\</code\>, \<code\>link_git_commit()\</code\>,
+  \<code\>read_sframe()\</code\> and \<code\>write_sframe()\</code\>
   states what the hashes establish: a canonical content check, local and
   unsigned. They identify content, and who wrote an instrument or when
-  needs other evidence. The bundled schema says the same.
-- The
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  help describes one contract for undeclared columns and documents
-  expansion columns and value conversion.
-- **[`vignette("scale-reliability-validity")`](https://surveyframe.org/articles/scale-reliability-validity.md)
-  said that supplying construct scores returns the HTMT matrix.** It
-  returns the absolute inter-construct correlations, and records
-  `htmt_method = "correlation_fallback"` to say which it computed. The
-  Henseler heterotrait-monotrait ratio needs `items_by_construct`, which
-  records `htmt_method = "henseler"`.
-  [`validity_report()`](https://surveyframe.org/reference/superseded.md)’s
-  own help was already accurate, and the vignette overstated it in an
-  unevaluated chunk. The section now names what each argument gives, and
-  its examples run, so a build would contradict the claim if it drifted
-  again.
-- **`citation("surveyframe")` abbreviated the author as “Sharafuddin
-  M”.** The given names Mohammed Ali were passed to
-  [`person()`](https://rdrr.io/r/utils/person.html) as one string, which
-  R shortens to a single initial. They are now 2 given names, so the
-  text citation reads “Sharafuddin MA”. The BibTeX entry keeps its
-  correct form. The citation year now comes from the release date, where
-  it followed the date the citation was run.
-- **The PDF reference manual kept its text inside the page margins.**
+  needs other evidence. The bundled schema says the same.\</li\>
+  \<li\>The \<code\>read_responses()\</code\> help describes one
+  contract for undeclared columns and documents expansion columns and
+  value conversion.\</li\>
+  \<li\>\<strong\>\<code\>vignette("scale-reliability-validity")\</code\>
+  said that supplying construct scores returns the HTMT
+  matrix.\</strong\> It returns the absolute inter-construct
+  correlations, and records \<code\>htmt_method =
+  "correlation_fallback"\</code\> to say which it computed. The Henseler
+  heterotrait-monotrait ratio needs \<code\>items_by_construct\</code\>,
+  which records \<code\>htmt_method = "henseler"\</code\>.
+  \<code\>validity_report()\</code\>’s own help was already accurate,
+  and the vignette overstated it in an unevaluated chunk. The section
+  now names what each argument gives, and its examples run, so a build
+  would contradict the claim if it drifted again.\</li\>
+  \<li\>\<strong\>\<code\>citation("surveyframe")\</code\> abbreviated
+  the author as “Sharafuddin M”.\</strong\> The given names Mohammed Ali
+  were passed to \<code\>person()\</code\> as one string, which R
+  shortens to a single initial. They are now 2 given names, so the text
+  citation reads “Sharafuddin MA”. The BibTeX entry keeps its correct
+  form. The citation year now comes from the release date, where it
+  followed the date the citation was run.\</li\> \<li\>\<strong\>The PDF
+  reference manual kept its text inside the page margins.\</strong\>
   Long function names in running text, 2 tables in
-  [`?sframe_plots`](https://surveyframe.org/reference/sframe_plots.md)
-  and
-  [`?sframe_as_data_frame`](https://surveyframe.org/reference/sframe_as_data_frame.md),
-  and the Usage of
-  [`sf_item()`](https://surveyframe.org/reference/superseded.md) and
-  [`sample_size_plan()`](https://surveyframe.org/reference/superseded.md)
-  ran past the right margin in 83 places. The tables are now lists, the
+  \<code\>?sframe_plots\</code\> and
+  \<code\>?sframe_as_data_frame\</code\>, and the Usage of
+  \<code\>sf_item()\</code\> and \<code\>sample_size_plan()\</code\> ran
+  past the right margin in 83 places. The tables are now lists, the
   Usage lines wrap, and the manual lets a line stretch its spaces before
-  letting a name overflow.
-- **The APA citations attached to results carried a fixed year of
-  2026.** surveyframe’s own citation now takes its year from the
-  installed release, and R Core Team’s from the running version of R.
-
-### Dependencies
-
-`callr`, `chromote`, `httpuv` and `pkgload` join Suggests. They are used
-only by tests that drive a survey in a real browser, which are skipped
-on CRAN.
-
-## surveyframe 0.4.1
-
-CRAN release: 2026-09-03
-
-### New
-
-- **A demo library.** Twenty-two small demos, each showing one thing, in
-  [`sframe_demos()`](https://surveyframe.org/reference/superseded.md).
-  Load one with `sframe_demo("two_group")`, or get a Quarto notebook to
-  edit with `sframe_demo_qmd("two_group")`. Together they cover every
-  analysis method and every question type.
-- **[`vignette("learn-by-example")`](https://surveyframe.org/articles/learn-by-example.md).**
+  letting a name overflow.\</li\> \<li\>\<strong\>The APA citations
+  attached to results carried a fixed year of 2026.\</strong\>
+  surveyframe’s own citation now takes its year from the installed
+  release, and R Core Team’s from the running version of R.\</li\>
+  \</ul\> \</div\> \<div id="dependencies" class="section level2"\>
+  \<h2\>Dependencies\</h2\> \<p\>\<code\>callr\</code\>,
+  \<code\>chromote\</code\>, \<code\>httpuv\</code\> and
+  \<code\>pkgload\</code\> join Suggests. They are used only by tests
+  that drive a survey in a real browser, which are skipped on
+  CRAN.\</p\> \</div\> \</div\> \<div id="surveyframe-041"
+  class="section level1"\> \<h1\>surveyframe 0.4.1\</h1\> \<div id="new"
+  class="section level2"\> \<h2\>New\</h2\> \<ul\> \<li\>\<strong\>A
+  demo library.\</strong\> Twenty-two small demos, each showing one
+  thing, in \<code\>sframe_demos()\</code\>. Load one with
+  \<code\>sframe_demo("two_group")\</code\>, or get a Quarto notebook to
+  edit with \<code\>sframe_demo_qmd("two_group")\</code\>. Together they
+  cover every analysis method and every question type.\</li\>
+  \<li\>\<strong\>\<code\>vignette("learn-by-example")\</code\>.\</strong\>
   Pick the demo that matches the data you have, and follow it from
-  questionnaire to report.
-- **[`sframe_export_labelled()`](https://surveyframe.org/reference/superseded.md)**
-  writes SPSS `.sav` or Stata `.dta` with the question wording and
-  response options attached, so variables arrive labelled rather than as
-  codes.
-- Each demo also ships a codebook of variable and value labels, and the
-  results surveyframe produced, so you can check the numbers in other
-  software.
-
-### Reports are now reproducible
-
-[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-gains a `seed` argument, set by default. Bootstrap confidence intervals
-and the EFA parallel analysis previously drew from the random stream
-unseeded, so the same data gave a slightly different interval on every
-run.
-
-**Confidence intervals will move once** when you re-run an older
-analysis. Test statistics and p values are unaffected. Use `seed = NULL`
-for the previous behaviour.
-
-[`render_report()`](https://surveyframe.org/reference/render_report.md)
-now says which engine produced the file, Quarto or the built-in writer,
-in a message, in an `engine` attribute, and in the report itself beside
-the instrument hash and the seed.
-
-### Bug fixes
-
-- **The Google Sheets collector could corrupt collected data.** Adding a
-  question mid-study left the sheet’s header stale while new rows used
-  the new order, so values landed under the wrong headings with no
-  error. The collector now matches columns by name.
-- **Branching rules using `%in%` with more than one value never worked
-  in an exported survey.** The question stayed hidden whatever the
-  respondent answered. Present since 0.3.0.
-- **[`sem_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md)
-  produced a mediation model lavaan could not fit.** Indirect effects
-  referred to path labels that were never written.
-- Straight-lining no longer flags scales shorter than four items, where
-  identical answers are normal rather than careless.
-  [`quality_report()`](https://surveyframe.org/reference/superseded.md)
-  gains `straightline_min_items`. When no scale is long enough to check,
-  the report now says so instead of omitting the chart silently.
-- Reading a response file with
-  [`read.csv()`](https://rdrr.io/r/utils/read.table.html) no longer
-  mangles matrix columns whose labels contain spaces. Use
-  `check.names = FALSE`.
-
-### Dependencies
-
-`haven` and `V8` join Suggests, both optional.
-
-## surveyframe 0.4.0
-
-CRAN release: 2026-08-20
-
-A major release. It adds multi-criteria decision analysis (10 methods),
-small-sample statistics, text and open-ended response analysis (9
-methods), and a disclosed-amendment and Git-linked provenance trail for
-`.sframe` files, alongside 4 corrected results and 2 breaking changes.
-See below for full detail on each.
-
-### New: multi-criteria decision analysis (MCDA)
-
-surveyframe’s decision-family extension links survey collection directly
-to 10 MCDA methods, closing the gap between MCDA computation packages,
-which assume a clean matrix already exists, and survey software, which
-has no concept of a decision method at all.
-
-- 10 decision methods: the Analytic Hierarchy Process (AHP), the
-  Analytic Network Process (ANP), the Decision Making Trial and
-  Evaluation Laboratory method (DEMATEL), VIKOR, MOORA, SMART, WASPAS,
-  PROMETHEE, ELECTRE, and TOPSIS. Every method carries a verified
-  literature citation.
-- 2 new item types collect judgement data directly inside the survey
-  instrument: `pairwise_comparison` (Saaty’s 1-to-9 ratio scale for AHP
-  and ANP, or a 0-to-4 directed influence scale for DEMATEL) and
-  `criteria_weight` (a constant-sum allocation across criteria).
-- A documented aggregation layer (`R/decision_data.R`) turns
-  per-respondent answers into the matrices the methods consume:
-  [`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md)
-  builds one matrix per respondent and validates every pair was
-  answered,
-  [`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md)
-  combines them (geometric mean for AHP/ANP, which preserves
-  reciprocity, or arithmetic mean for DEMATEL), and
-  [`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md)
-  builds a performance matrix from ordinary matrix items. AHP judgements
-  are additionally screened for consistency against Saaty’s random-index
-  table, with the CR distribution reported whether or not a study has
-  pre-declared a filtering threshold.
-- Every ranking method resolves its matrix and weight inputs in the same
-  order (a researcher-supplied override, then a collected item, then a
-  typed error naming what is missing) and records where each input came
-  from, so a results table states the provenance of every number.
-- [`sensitivity_analysis()`](https://surveyframe.org/reference/superseded.md)
-  reports how far a ranking moves under a declared perturbation of the
-  weights, and carries a `degenerate` flag so a ranking that never
+  questionnaire to report.\</li\>
+  \<li\>\<strong\>\<code\>sframe_export_labelled()\</code\>\</strong\>
+  writes SPSS \<code\>.sav\</code\> or Stata \<code\>.dta\</code\> with
+  the question wording and response options attached, so variables
+  arrive labelled rather than as codes.\</li\> \<li\>Each demo also
+  ships a codebook of variable and value labels, and the results
+  surveyframe produced, so you can check the numbers in other
+  software.\</li\> \</ul\> \</div\> \<div
+  id="reports-are-now-reproducible" class="section level2"\>
+  \<h2\>Reports are now reproducible\</h2\>
+  \<p\>\<code\>run_analysis_plan()\</code\> gains a
+  \<code\>seed\</code\> argument, set by default. Bootstrap confidence
+  intervals and the EFA parallel analysis previously drew from the
+  random stream unseeded, so the same data gave a slightly different
+  interval on every run.\</p\> \<p\>\<strong\>Confidence intervals will
+  move once\</strong\> when you re-run an older analysis. Test
+  statistics and p values are unaffected. Use \<code\>seed =
+  NULL\</code\> for the previous behaviour.\</p\>
+  \<p\>\<code\>render_report()\</code\> now says which engine produced
+  the file, Quarto or the built-in writer, in a message, in an
+  \<code\>engine\</code\> attribute, and in the report itself beside the
+  instrument hash and the seed.\</p\> \</div\> \<div id="bug-fixes"
+  class="section level2"\> \<h2\>Bug fixes\</h2\> \<ul\>
+  \<li\>\<strong\>The Google Sheets collector could corrupt collected
+  data.\</strong\> Adding a question mid-study left the sheet’s header
+  stale while new rows used the new order, so values landed under the
+  wrong headings with no error. The collector now matches columns by
+  name.\</li\> \<li\>\<strong\>Branching rules using
+  \<code\>%in%\</code\> with more than one value never worked in an
+  exported survey.\</strong\> The question stayed hidden whatever the
+  respondent answered. Present since 0.3.0.\</li\>
+  \<li\>\<strong\>\<code\>sem_lavaan_syntax()\</code\> produced a
+  mediation model lavaan could not fit.\</strong\> Indirect effects
+  referred to path labels that were never written.\</li\>
+  \<li\>Straight-lining no longer flags scales shorter than four items,
+  where identical answers are normal rather than careless.
+  \<code\>quality_report()\</code\> gains
+  \<code\>straightline_min_items\</code\>. When no scale is long enough
+  to check, the report now says so instead of omitting the chart
+  silently.\</li\> \<li\>Reading a response file with
+  \<code\>read.csv()\</code\> no longer mangles matrix columns whose
+  labels contain spaces. Use \<code\>check.names =
+  FALSE\</code\>.\</li\> \</ul\> \</div\> \<div id="dependencies-1"
+  class="section level2"\> \<h2\>Dependencies\</h2\>
+  \<p\>\<code\>haven\</code\> and \<code\>V8\</code\> join Suggests,
+  both optional.\</p\> \</div\> \</div\> \<div id="surveyframe-040"
+  class="section level1"\> \<h1\>surveyframe 0.4.0\</h1\> \<p\>A major
+  release. It adds multi-criteria decision analysis (10 methods),
+  small-sample statistics, text and open-ended response analysis (9
+  methods), and a disclosed-amendment and Git-linked provenance trail
+  for \<code\>.sframe\</code\> files, alongside 4 corrected results and
+  2 breaking changes. See below for full detail on each.\</p\> \<div
+  id="new-multi-criteria-decision-analysis-mcda" class="section
+  level2"\> \<h2\>New: multi-criteria decision analysis (MCDA)\</h2\>
+  \<p\>surveyframe’s decision-family extension links survey collection
+  directly to 10 MCDA methods, closing the gap between MCDA computation
+  packages, which assume a clean matrix already exists, and survey
+  software, which has no concept of a decision method at all.\</p\>
+  \<ul\> \<li\>10 decision methods: the Analytic Hierarchy Process
+  (AHP), the Analytic Network Process (ANP), the Decision Making Trial
+  and Evaluation Laboratory method (DEMATEL), VIKOR, MOORA, SMART,
+  WASPAS, PROMETHEE, ELECTRE, and TOPSIS. Every method carries a
+  verified literature citation.\</li\> \<li\>2 new item types collect
+  judgement data directly inside the survey instrument:
+  \<code\>pairwise_comparison\</code\> (Saaty’s 1-to-9 ratio scale for
+  AHP and ANP, or a 0-to-4 directed influence scale for DEMATEL) and
+  \<code\>criteria_weight\</code\> (a constant-sum allocation across
+  criteria).\</li\> \<li\>A documented aggregation layer
+  (\<code\>R/decision_data.R\</code\>) turns per-respondent answers into
+  the matrices the methods consume:
+  \<code\>sframe_assemble_pairwise()\</code\> builds one matrix per
+  respondent and validates every pair was answered,
+  \<code\>sframe_aggregate_judgements()\</code\> combines them
+  (geometric mean for AHP/ANP, which preserves reciprocity, or
+  arithmetic mean for DEMATEL), and
+  \<code\>sframe_rated_matrix()\</code\> builds a performance matrix
+  from ordinary matrix items. AHP judgements are additionally screened
+  for consistency against Saaty’s random-index table, with the CR
+  distribution reported whether or not a study has pre-declared a
+  filtering threshold.\</li\> \<li\>Every ranking method resolves its
+  matrix and weight inputs in the same order (a researcher-supplied
+  override, then a collected item, then a typed error naming what is
+  missing) and records where each input came from, so a results table
+  states the provenance of every number.\</li\>
+  \<li\>\<code\>sensitivity_analysis()\</code\> reports how far a
+  ranking moves under a declared perturbation of the weights, and
+  carries a \<code\>degenerate\</code\> flag so a ranking that never
   separated its alternatives cannot report false stability (see
-  “Decision analysis: non-results now say so” below).
-- Both the visual builder and SurveyStudio support the 2 new item types,
-  and the static HTML survey, the Shiny module, and the builder preview
-  render all 3 judgement-collection structures identically.
-- RMCDA joins Suggests as a test-time cross-check oracle: an independent
-  computation of the same method on the same matrix is compared with the
-  package’s own result. This practice caught a real defect during
-  development, a WASPAS runner that had inherited SMART’s normalisation
-  step by mistake. (Corrected in 0.4.2: this bullet first said
-  independent agreement was required before any method was accepted,
-  which was wider than the suite. See 0.4.2’s note for the coverage each
-  method has.)
-
-### New: small-sample statistics
-
-A track of corrections for comparisons run on small samples, where the
-ordinary versions of these tests can flip significance on repeated draws
-from data whose true difference never changed.
-
-- The Hodges-Lehmann shift estimator as an alternative to the
-  independent two-group Mann-Whitney comparison.
-- The paired Wilcoxon pseudomedian confidence interval as an alternative
-  to the paired t-test.
-- The exact odds-ratio confidence interval on Fisher’s test for small
-  2x2 tables, avoiding the ad hoc continuity correction a conventional
-  Wald interval needs when a cell is zero.
-- Firth’s bias-reduced logistic regression (`logistf` in Suggests) for
-  regression prone to separation at small n.
-- A small-sample advisory surfaced on
-  [`assumption_report()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`sample_size_plan()`](https://surveyframe.org/reference/superseded.md),
-  flagging when a study’s sample size falls in the range where these
-  corrections are worth considering.
-- `vignettes/small-sample.Rmd` walks through when to prefer each
-  correction over its conventional counterpart.
-
-### New: text and open-ended response analysis
-
-A 9-method text-analysis family for open-ended survey items, from term
-frequency through topic modelling, sharing the same analysis-plan,
-role-resolution, and reporting pipeline every other method family uses.
-
-- `term_freq`: top terms by frequency, optionally split by a group
-  variable, rendered as a bar chart or a word cloud.
-- `ngram_freq`: top bigrams or trigrams by frequency.
-- `term_context`: a keyword-in-context concordance table (before/match/
-  after) for a chosen keyword.
-- `co_occurrence`: pairwise within-response co-occurrence counts on the
-  top terms, rendered as a heatmap.
-- `co_occurrence_network`: a Louvain-clustered (Blondel et al. 2008),
-  force-directed (Fruchterman & Reingold 1991) term co-occurrence
-  network; requires the optional igraph package.
-- `tidy_sentiment`: positive/negative sentiment counts and proportion
-  positive using the bing lexicon, optionally split by a group variable,
-  rendered as a diverging bar chart or a positive/negative comparison
-  word cloud; requires the optional tidytext package.
-- `quanteda_dfm`: a document-feature matrix summary (feature count,
-  sparsity, top features); requires the optional quanteda package.
-- `topic_model_lda`: Latent Dirichlet Allocation topic modelling, top
-  terms per topic as a ranked table and a faceted bar chart; requires
-  the optional tidytext and topicmodels packages.
-- `stm_topics`: structural topic modelling, the same top-terms-per-topic
-  output; requires the optional stm and tidytext packages.
-- A shared cleaning step
-  ([`clean_text_responses()`](https://surveyframe.org/reference/superseded.md))
-  and a 174-word Snowball-based English stopword list, both exported so
-  a study can reuse or override them outside a runner.
-- Both the visual builder and SurveyStudio support all 9 methods,
-  including the word-cloud, top-N, seed, and topic-count (`k`) options
-  that steer their plots and models.
-- `vignettes/text-analysis.Rmd` walks through cleaning, each method, and
-  what the family deliberately does not attempt (stemming/lemmatisation,
-  tf-idf, and keyness comparison are not yet implemented).
-
-### New: disclosed amendments and a Git-linked provenance trail
-
-[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)’s
-SHA-256 hash proves a `.sframe` file is unchanged since it was written,
-but gives no way to distinguish a legitimate revision (a data-entry
-correction, bot-response removal, a documented model respecification)
-from an undisclosed edit – both break the hash identically. This release
-adds a disclosed-revision path alongside the existing hash check,
-without weakening it.
-
-- [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
-  compares an instrument before and after a change and appends a
-  structured, timestamped entry to an ordered amendment log – never
-  overwrites – recording the reason (a controlled vocabulary:
-  `data_correction`, `bot_removal`, `model_respecification`,
-  `instrument_revision`, `other`), a free-text explanation, and which
-  top-level fields changed.
-- Two tiers, by default inferred from the reason: `"pipeline"`
-  amendments (data corrections, bot removal) need only a reason.
-  `"design"` amendments (anything touching the analysis plan or a model)
-  require a `deviation_report` describing what changed in the research
-  question, method, or model and why, matching how a formal
-  preregistration deviation is normally handled. `signoff` is never left
-  blank – it records a reviewer’s name or the literal `"none"`, so an
-  unreviewed design change stays visible to an auditor.
-- [`amendment_log()`](https://surveyframe.org/reference/superseded.md)
-  returns the full history as a data frame, one row per disclosed
-  amendment, exportable with
-  [`write.csv()`](https://rdrr.io/r/utils/write.table.html).
-- An edit made directly to a `.sframe` file, bypassing
-  [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
-  still fails
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)’s
-  integrity check exactly as before. The amendment log adds a disclosed
-  path alongside the existing hash check.
-- [`link_git_commit()`](https://surveyframe.org/reference/superseded.md)
-  records the current Git commit SHA and subject line alongside an
-  instrument. This ties the SHA-256 hash to a specific,
-  already-explained commit. It returns an informative message when Git
-  isn’t installed or the path isn’t a repository. Git is optional.
-- `inst/schema/sframe_schema.json` documents the `.sframe` format (every
-  top-level field, including the new `amendments` log) as a standalone
-  JSON Schema, so a reviewer or a second tool can read and validate a
-  `.sframe` file without installing the package. `.sframe` was already
-  plain, git-diffable JSON before this release; the schema makes that
-  format explicit and independently checkable.
-- `vignettes/surveyframe.Rmd` gains a “What the SHA-256 hash proves, and
-  what it does not” section, stating plainly that the hash proves file
-  identity, not methodological validity, and pointing to the design-time
-  `analysis_plan` binding and
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)’s
-  single-pass execution as the package’s separate, complementary defence
-  against HARKing and p-hacking.
-
-### Corrected results (read before comparing against earlier output)
-
-Four defects found by independent cross-validation are fixed. Each
-produced normal-looking numbers with no error or warning, so re-run any
-results computed with an earlier version.
-
-- [`item_report()`](https://surveyframe.org/reference/superseded.md)
+  “Decision analysis: non-results now say so” below).\</li\> \<li\>Both
+  the visual builder and SurveyStudio support the 2 new item types, and
+  the static HTML survey, the Shiny module, and the builder preview
+  render all 3 judgement-collection structures identically.\</li\>
+  \<li\>RMCDA joins Suggests as a test-time cross-check oracle: an
+  independent computation of the same method on the same matrix is
+  compared with the package’s own result. This practice caught a real
+  defect during development, a WASPAS runner that had inherited SMART’s
+  normalisation step by mistake. (Corrected in 0.4.2: this bullet first
+  said independent agreement was required before any method was
+  accepted, which was wider than the suite. See 0.4.2’s note for the
+  coverage each method has.)\</li\> \</ul\> \</div\> \<div
+  id="new-small-sample-statistics" class="section level2"\> \<h2\>New:
+  small-sample statistics\</h2\> \<p\>A track of corrections for
+  comparisons run on small samples, where the ordinary versions of these
+  tests can flip significance on repeated draws from data whose true
+  difference never changed.\</p\> \<ul\> \<li\>The Hodges-Lehmann shift
+  estimator as an alternative to the independent two-group Mann-Whitney
+  comparison.\</li\> \<li\>The paired Wilcoxon pseudomedian confidence
+  interval as an alternative to the paired t-test.\</li\> \<li\>The
+  exact odds-ratio confidence interval on Fisher’s test for small 2x2
+  tables, avoiding the ad hoc continuity correction a conventional Wald
+  interval needs when a cell is zero.\</li\> \<li\>Firth’s bias-reduced
+  logistic regression (\<code\>logistf\</code\> in Suggests) for
+  regression prone to separation at small n.\</li\> \<li\>A small-sample
+  advisory surfaced on \<code\>assumption_report()\</code\> and
+  \<code\>sample_size_plan()\</code\>, flagging when a study’s sample
+  size falls in the range where these corrections are worth
+  considering.\</li\> \<li\>\<code\>vignettes/small-sample.Rmd\</code\>
+  walks through when to prefer each correction over its conventional
+  counterpart.\</li\> \</ul\> \</div\> \<div
+  id="new-text-and-open-ended-response-analysis" class="section
+  level2"\> \<h2\>New: text and open-ended response analysis\</h2\>
+  \<p\>A 9-method text-analysis family for open-ended survey items, from
+  term frequency through topic modelling, sharing the same
+  analysis-plan, role-resolution, and reporting pipeline every other
+  method family uses.\</p\> \<ul\> \<li\>\<code\>term_freq\</code\>: top
+  terms by frequency, optionally split by a group variable, rendered as
+  a bar chart or a word cloud.\</li\> \<li\>\<code\>ngram_freq\</code\>:
+  top bigrams or trigrams by frequency.\</li\>
+  \<li\>\<code\>term_context\</code\>: a keyword-in-context concordance
+  table (before/match/ after) for a chosen keyword.\</li\>
+  \<li\>\<code\>co_occurrence\</code\>: pairwise within-response
+  co-occurrence counts on the top terms, rendered as a heatmap.\</li\>
+  \<li\>\<code\>co_occurrence_network\</code\>: a Louvain-clustered
+  (Blondel et al. 2008), force-directed (Fruchterman & Reingold 1991)
+  term co-occurrence network; requires the optional igraph
+  package.\</li\> \<li\>\<code\>tidy_sentiment\</code\>:
+  positive/negative sentiment counts and proportion positive using the
+  bing lexicon, optionally split by a group variable, rendered as a
+  diverging bar chart or a positive/negative comparison word cloud;
+  requires the optional tidytext package.\</li\>
+  \<li\>\<code\>quanteda_dfm\</code\>: a document-feature matrix summary
+  (feature count, sparsity, top features); requires the optional
+  quanteda package.\</li\> \<li\>\<code\>topic_model_lda\</code\>:
+  Latent Dirichlet Allocation topic modelling, top terms per topic as a
+  ranked table and a faceted bar chart; requires the optional tidytext
+  and topicmodels packages.\</li\> \<li\>\<code\>stm_topics\</code\>:
+  structural topic modelling, the same top-terms-per-topic output;
+  requires the optional stm and tidytext packages.\</li\> \<li\>A shared
+  cleaning step (\<code\>clean_text_responses()\</code\>) and a 174-word
+  Snowball-based English stopword list, both exported so a study can
+  reuse or override them outside a runner.\</li\> \<li\>Both the visual
+  builder and SurveyStudio support all 9 methods, including the
+  word-cloud, top-N, seed, and topic-count (\<code\>k\</code\>) options
+  that steer their plots and models.\</li\>
+  \<li\>\<code\>vignettes/text-analysis.Rmd\</code\> walks through
+  cleaning, each method, and what the family deliberately does not
+  attempt (stemming/lemmatisation, tf-idf, and keyness comparison are
+  not yet implemented).\</li\> \</ul\> \</div\> \<div
+  id="new-disclosed-amendments-and-a-git-linked-provenance-trail"
+  class="section level2"\> \<h2\>New: disclosed amendments and a
+  Git-linked provenance trail\</h2\>
+  \<p\>\<code\>write_sframe()\</code\>’s SHA-256 hash proves a
+  \<code\>.sframe\</code\> file is unchanged since it was written, but
+  gives no way to distinguish a legitimate revision (a data-entry
+  correction, bot-response removal, a documented model respecification)
+  from an undisclosed edit – both break the hash identically. This
+  release adds a disclosed-revision path alongside the existing hash
+  check, without weakening it.\</p\> \<ul\>
+  \<li\>\<code\>amend_sframe()\</code\> compares an instrument before
+  and after a change and appends a structured, timestamped entry to an
+  ordered amendment log – never overwrites – recording the reason (a
+  controlled vocabulary: \<code\>data_correction\</code\>,
+  \<code\>bot_removal\</code\>, \<code\>model_respecification\</code\>,
+  \<code\>instrument_revision\</code\>, \<code\>other\</code\>), a
+  free-text explanation, and which top-level fields changed.\</li\>
+  \<li\>Two tiers, by default inferred from the reason:
+  \<code\>"pipeline"\</code\> amendments (data corrections, bot removal)
+  need only a reason. \<code\>"design"\</code\> amendments (anything
+  touching the analysis plan or a model) require a
+  \<code\>deviation_report\</code\> describing what changed in the
+  research question, method, or model and why, matching how a formal
+  preregistration deviation is normally handled.
+  \<code\>signoff\</code\> is never left blank – it records a reviewer’s
+  name or the literal \<code\>"none"\</code\>, so an unreviewed design
+  change stays visible to an auditor.\</li\>
+  \<li\>\<code\>amendment_log()\</code\> returns the full history as a
+  data frame, one row per disclosed amendment, exportable with
+  \<code\>write.csv()\</code\>.\</li\> \<li\>An edit made directly to a
+  \<code\>.sframe\</code\> file, bypassing
+  \<code\>amend_sframe()\</code\>, still fails
+  \<code\>read_sframe()\</code\>’s integrity check exactly as before.
+  The amendment log adds a disclosed path alongside the existing hash
+  check.\</li\> \<li\>\<code\>link_git_commit()\</code\> records the
+  current Git commit SHA and subject line alongside an instrument. This
+  ties the SHA-256 hash to a specific, already-explained commit. It
+  returns an informative message when Git isn’t installed or the path
+  isn’t a repository. Git is optional.\</li\>
+  \<li\>\<code\>inst/schema/sframe_schema.json\</code\> documents the
+  \<code\>.sframe\</code\> format (every top-level field, including the
+  new \<code\>amendments\</code\> log) as a standalone JSON Schema, so a
+  reviewer or a second tool can read and validate a
+  \<code\>.sframe\</code\> file without installing the package.
+  \<code\>.sframe\</code\> was already plain, git-diffable JSON before
+  this release; the schema makes that format explicit and independently
+  checkable.\</li\> \<li\>\<code\>vignettes/surveyframe.Rmd\</code\>
+  gains a “What the SHA-256 hash proves, and what it does not” section,
+  stating plainly that the hash proves file identity, not methodological
+  validity, and pointing to the design-time
+  \<code\>analysis_plan\</code\> binding and
+  \<code\>run_analysis_plan()\</code\>’s single-pass execution as the
+  package’s separate, complementary defence against HARKing and
+  p-hacking.\</li\> \</ul\> \</div\> \<div
+  id="corrected-results-read-before-comparing-against-earlier-output"
+  class="section level2"\> \<h2\>Corrected results (read before
+  comparing against earlier output)\</h2\> \<p\>Four defects found by
+  independent cross-validation are fixed. Each produced normal-looking
+  numbers with no error or warning, so re-run any results computed with
+  an earlier version.\</p\> \<ul\> \<li\>\<code\>item_report()\</code\>
   returned the wrong item-rest correlation. It subtracted each item from
-  a [`rowMeans()`](https://rdrr.io/r/base/colSums.html) total, which
-  leaves roughly noise carrying the item negatively, so a highly
-  reliable scale reported strong negative values. On simulated data with
-  alpha 0.947 every item came back at about -0.46. The statistic is now
-  the item against the sum of the other items in its scale, and matches
-  [`psych::alpha()`](https://rdrr.io/pkg/psych/man/alpha.html)’s
-  `item.stats$r.drop` to 1e-10.
-- Repeated-measures ANOVA tested the condition effect against the wrong
-  error term, because the subject identifier was left as an integer and
-  [`aov()`](https://rdrr.io/r/stats/aov.html) treated it as a continuous
-  covariate. On a fixture where
-  [`jmv::anovaRM()`](https://rdrr.io/pkg/jmv/man/anovaRM.html) gives
-  F(2, 78) = 86.93, surveyframe reported F = 1.45, p = 0.24. Correcting
-  the identifier alone was not sufficient: the corrected design produces
-  no `Error: Within` stratum, so the effect is now located by searching
-  the strata directly.
-- [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
+  a \<code\>rowMeans()\</code\> total, which leaves roughly noise
+  carrying the item negatively, so a highly reliable scale reported
+  strong negative values. On simulated data with alpha 0.947 every item
+  came back at about -0.46. The statistic is now the item against the
+  sum of the other items in its scale, and matches
+  \<code\>psych::alpha()\</code\>’s \<code\>item.stats\$r.drop\</code\>
+  to 1e-10.\</li\> \<li\>Repeated-measures ANOVA tested the condition
+  effect against the wrong error term, because the subject identifier
+  was left as an integer and \<code\>aov()\</code\> treated it as a
+  continuous covariate. On a fixture where
+  \<code\>jmv::anovaRM()\</code\> gives F(2, 78) = 86.93, surveyframe
+  reported F = 1.45, p = 0.24. Correcting the identifier alone was not
+  sufficient: the corrected design produces no \<code\>Error:
+  Within\</code\> stratum, so the effect is now located by searching the
+  strata directly.\</li\> \<li\>\<code\>validate_sframe()\</code\>
   rejected valid instruments. Its known-variable list held only base
   item and scale ids, so an analysis plan naming an expansion column
-  (`item__sub`, `item__option`, `item__a__vs__b`, `item__crit`) failed
-  validation for variables that do exist, including real exports from
-  the visual builder.
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  already accepted those columns. Both now derive the list from one
-  shared helper.
-- The SEM syntax generators ignored the model type.
-  [`seminr_syntax()`](https://surveyframe.org/reference/superseded.md),
-  [`sem_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`cfa_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md)
-  never checked `model$type`, and the builder offered every saved model
-  to all 3 generators, so a covariance-based model produced PLS-SEM
-  syntax with no complaint. That is a runnable script estimating a model
-  the researcher never declared. All 3 now refuse a mismatched
+  (\<code\>item\_\_sub\</code\>, \<code\>item\_\_option\</code\>,
+  \<code\>item\_\_a\_\_vs\_\_b\</code\>, \<code\>item\_\_crit\</code\>)
+  failed validation for variables that do exist, including real exports
+  from the visual builder. \<code\>read_responses()\</code\> already
+  accepted those columns. Both now derive the list from one shared
+  helper.\</li\> \<li\>The SEM syntax generators ignored the model type.
+  \<code\>seminr_syntax()\</code\>,
+  \<code\>sem_lavaan_syntax()\</code\>, and
+  \<code\>cfa_lavaan_syntax()\</code\> never checked
+  \<code\>model\$type\</code\>, and the builder offered every saved
+  model to all 3 generators, so a covariance-based model produced
+  PLS-SEM syntax with no complaint. That is a runnable script estimating
+  a model the researcher never declared. All 3 now refuse a mismatched
   estimation family, and the builder filters each model role to the
-  types its generator can produce.
-
-### Breaking: `validate_sframe()` and `validate_model()` return a diagnostic
-
-Both validators previously returned two different things depending on
-`strict`: the object itself, invisibly, when `strict = TRUE`, and a bare
-unclassed list when `strict = FALSE`. Neither was a diagnostic, the
-success path printed nothing at all, and the `strict = FALSE` return had
-no methods. Both now return an `sframe_validation` object, and they
-return it visibly, so `validate_sframe(instrument)` typed at the console
-shows the user what it found.
-
-- The object records `valid`, every `problems` message, and a `checks`
-  table listing all 18 instrument checks (10 for a model) whether or not
-  each found anything. A diagnostic that lists only failures cannot tell
-  a user that a check passed from one that was never reached.
-- Read it with [`print()`](https://rdrr.io/r/base/print.html),
-  [`summary()`](https://rdrr.io/r/base/summary.html) for the check
-  roster, [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html)
-  for one row per problem,
-  [`sf_is_valid()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`sf_problems()`](https://surveyframe.org/reference/superseded.md).
-- `strict = TRUE` still aborts with `sframe_validation_error` when
-  anything is wrong. That has not changed.
-- **`$valid` and `$problems` keep working**, so the common reading
-  pattern needs no migration.
-- **What breaks**: code using the `strict = TRUE` return as an
-  instrument, as in `instrument <- validate_sframe(instrument)`. Wrap it
-  in [`as_sframe()`](https://surveyframe.org/reference/as_sframe.md).
-  Passing a validation result where an instrument is expected now raises
-  a directed error naming
-  [`as_sframe()`](https://surveyframe.org/reference/as_sframe.md)
-  immediately.
-
-Raised by a Journal of Statistical Software editor reviewing the code:
-“we would at least expect that the object is not silently returned and
-that the print method is adapted to allow the user to read directly the
-diagnostic”.
-
-### New: accessor and exploration methods for every class
-
-The same review found that the classes carried `print`, `summary` and
-`format` only, so user code had no route to their contents except `$` on
-the underlying list, which makes the internal layout part of the public
-contract. Two facts made that concrete:
-[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) failed on
-all 14 result classes with “cannot coerce class … to a data.frame”, and
-`[` dropped the class on the list-backed reports, so `results[1:2]`
-silently degraded to a bare list and lost its print method.
-
-- [`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) now
-  works on the instrument and on every report class, returning that
-  object’s primary table.
-- `[` keeps the class on `sframe_analysis_results`,
-  `sframe_reliability_report` and `sframe_item_report`.
-- Instrument accessors:
-  [`sf_meta()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_items()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_scales()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_choice_sets()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_branches()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_checks()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_models()`](https://surveyframe.org/reference/superseded.md) and
-  [`sf_plan()`](https://surveyframe.org/reference/superseded.md), with
-  `sf_plan<-` for declaring the plan. The component accessors return an
-  `sf_component_list` named by ID, so `sf_items(instrument)[["sat_1"]]`
-  reaches one item.
-- Component accessors:
-  [`sf_id()`](https://surveyframe.org/reference/superseded.md) and
-  [`sf_label()`](https://surveyframe.org/reference/superseded.md).
-- Report accessors:
-  [`sf_apa()`](https://surveyframe.org/reference/superseded.md) and
-  [`sf_flagged()`](https://surveyframe.org/reference/superseded.md).
-- Coercion:
-  [`as_sframe()`](https://surveyframe.org/reference/as_sframe.md).
-
-The vignettes and the examples are rewritten to use these accessors. The
-registered S3 method count goes from 41 to 103.
-
-### Breaking: the Shiny collector now emits expansion columns
-
-- [`render_survey()`](https://surveyframe.org/reference/superseded.md)
+  types its generator can produce.\</li\> \</ul\> \</div\> \<div
+  id="breaking-validate_sframe-and-validate_model-return-a-diagnostic"
+  class="section level2"\> \<h2\>Breaking:
+  \<code\>validate_sframe()\</code\> and
+  \<code\>validate_model()\</code\> return a diagnostic\</h2\> \<p\>Both
+  validators previously returned two different things depending on
+  \<code\>strict\</code\>: the object itself, invisibly, when
+  \<code\>strict = TRUE\</code\>, and a bare unclassed list when
+  \<code\>strict = FALSE\</code\>. Neither was a diagnostic, the success
+  path printed nothing at all, and the \<code\>strict = FALSE\</code\>
+  return had no methods. Both now return an
+  \<code\>sframe_validation\</code\> object, and they return it visibly,
+  so \<code\>validate_sframe(instrument)\</code\> typed at the console
+  shows the user what it found.\</p\> \<ul\> \<li\>The object records
+  \<code\>valid\</code\>, every \<code\>problems\</code\> message, and a
+  \<code\>checks\</code\> table listing all 18 instrument checks (10 for
+  a model) whether or not each found anything. A diagnostic that lists
+  only failures cannot tell a user that a check passed from one that was
+  never reached.\</li\> \<li\>Read it with \<code\>print()\</code\>,
+  \<code\>summary()\</code\> for the check roster,
+  \<code\>as.data.frame()\</code\> for one row per problem,
+  \<code\>sf_is_valid()\</code\>, and
+  \<code\>sf_problems()\</code\>.\</li\> \<li\>\<code\>strict =
+  TRUE\</code\> still aborts with
+  \<code\>sframe_validation_error\</code\> when anything is wrong. That
+  has not changed.\</li\> \<li\>\<strong\>\<code\>\$valid\</code\> and
+  \<code\>\$problems\</code\> keep working\</strong\>, so the common
+  reading pattern needs no migration.\</li\> \<li\>\<strong\>What
+  breaks\</strong\>: code using the \<code\>strict = TRUE\</code\>
+  return as an instrument, as in \<code\>instrument \<-
+  validate_sframe(instrument)\</code\>. Wrap it in
+  \<code\>as_sframe()\</code\>. Passing a validation result where an
+  instrument is expected now raises a directed error naming
+  \<code\>as_sframe()\</code\> immediately.\</li\> \</ul\> \<p\>Raised
+  by a Journal of Statistical Software editor reviewing the code: “we
+  would at least expect that the object is not silently returned and
+  that the print method is adapted to allow the user to read directly
+  the diagnostic”.\</p\> \</div\> \<div
+  id="new-accessor-and-exploration-methods-for-every-class"
+  class="section level2"\> \<h2\>New: accessor and exploration methods
+  for every class\</h2\> \<p\>The same review found that the classes
+  carried \<code\>print\</code\>, \<code\>summary\</code\> and
+  \<code\>format\</code\> only, so user code had no route to their
+  contents except \<code\>\$\</code\> on the underlying list, which
+  makes the internal layout part of the public contract. Two facts made
+  that concrete: \<code\>as.data.frame()\</code\> failed on all 14
+  result classes with “cannot coerce class … to a data.frame”, and
+  \<code\>\[\</code\> dropped the class on the list-backed reports, so
+  \<code\>results\[1:2\]\</code\> silently degraded to a bare list and
+  lost its print method.\</p\> \<ul\>
+  \<li\>\<code\>as.data.frame()\</code\> now works on the instrument and
+  on every report class, returning that object’s primary table.\</li\>
+  \<li\>\<code\>\[\</code\> keeps the class on
+  \<code\>sframe_analysis_results\</code\>,
+  \<code\>sframe_reliability_report\</code\> and
+  \<code\>sframe_item_report\</code\>.\</li\> \<li\>Instrument
+  accessors: \<code\>sf_meta()\</code\>, \<code\>sf_items()\</code\>,
+  \<code\>sf_scales()\</code\>, \<code\>sf_choice_sets()\</code\>,
+  \<code\>sf_branches()\</code\>, \<code\>sf_checks()\</code\>,
+  \<code\>sf_models()\</code\> and \<code\>sf_plan()\</code\>, with
+  \<code\>sf_plan\<-\</code\> for declaring the plan. The component
+  accessors return an \<code\>sf_component_list\</code\> named by ID, so
+  \<code\>sf_items(instrument)\[\["sat_1"\]\]\</code\> reaches one
+  item.\</li\> \<li\>Component accessors: \<code\>sf_id()\</code\> and
+  \<code\>sf_label()\</code\>.\</li\> \<li\>Report accessors:
+  \<code\>sf_apa()\</code\> and \<code\>sf_flagged()\</code\>.\</li\>
+  \<li\>Coercion: \<code\>as_sframe()\</code\>.\</li\> \</ul\> \<p\>The
+  vignettes and the examples are rewritten to use these accessors. The
+  registered S3 method count goes from 41 to 103.\</p\> \</div\> \<div
+  id="breaking-the-shiny-collector-now-emits-expansion-columns"
+  class="section level2"\> \<h2\>Breaking: the Shiny collector now emits
+  expansion columns\</h2\> \<ul\> \<li\>\<code\>render_survey()\</code\>
   pipe-joined a matrix item’s cells into a single column, so a matrix
-  question answered in the Shiny survey arrived as `mx = "4|5"` where
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  and the whole analysis layer expect `mx__r1` and `mx__r2`. Data
-  collected that way could not be read back by the package at all, and
-  nothing said so at collection time. Ranking and multiple-choice items
-  had the same shape problem.
-- All 3 now emit the expansion columns that the static template and the
-  Google Sheets collector already emitted: one column per matrix
+  question answered in the Shiny survey arrived as \<code\>mx =
+  "4\|5"\</code\> where \<code\>read_responses()\</code\> and the whole
+  analysis layer expect \<code\>mx\_\_r1\</code\> and
+  \<code\>mx\_\_r2\</code\>. Data collected that way could not be read
+  back by the package at all, and nothing said so at collection time.
+  Ranking and multiple-choice items had the same shape problem.\</li\>
+  \<li\>All 3 now emit the expansion columns that the static template
+  and the Google Sheets collector already emitted: one column per matrix
   sub-item carrying its value, one per ranking option carrying its rank
-  position, and one per multi-select option carrying 0 or 1.
-- **This changes the output shape of the Shiny collector.** A study
-  mid-collection through
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md)
-  will see its matrix, ranking, and multi-select columns change name and
-  layout between versions. Responses already gathered under the old
-  shape need re-shaping before they can be read, and the decision item
-  types are unaffected because they emitted the correct columns from the
-  start.
-
-### The rated performance matrix can now be wired in both GUIs
-
-- SurveyStudio and the visual builder both offered an empty “Performance
-  matrix items” dropdown for all 7 ranking methods (TOPSIS, VIKOR,
-  MOORA, SMART, WASPAS, PROMETHEE, ELECTRE). That role matches on a
-  `"matrix"` level, and neither surface gave matrix items one: the
-  studio classified them as `"identifier"` and the builder grouped them
-  under `"expanded"`, which no role accepts. The effect was that the
-  rated-matrix path, where respondents rate every alternative on every
-  criterion, could only be built by writing R directly, even though it
-  is one of the 3 declared ways to supply a decision matrix. Matrix
-  items now carry their own `"matrix"` level in both surfaces.
-
-### Decision analysis: non-results now say so
-
-- ELECTRE I reports when it establishes no outranking relation at all.
-  On a 9-criterion problem at the default 0.70 and 0.30 thresholds no
-  alternative clears concordance against any other, so every score is 0
-  and every alternative ranks 1. That is legitimate behaviour for the
+  position, and one per multi-select option carrying 0 or 1.\</li\>
+  \<li\>\<strong\>This changes the output shape of the Shiny
+  collector.\</strong\> A study mid-collection through
+  \<code\>render_survey()\</code\> will see its matrix, ranking, and
+  multi-select columns change name and layout between versions.
+  Responses already gathered under the old shape need re-shaping before
+  they can be read, and the decision item types are unaffected because
+  they emitted the correct columns from the start.\</li\> \</ul\>
+  \</div\> \<div
+  id="the-rated-performance-matrix-can-now-be-wired-in-both-guis"
+  class="section level2"\> \<h2\>The rated performance matrix can now be
+  wired in both GUIs\</h2\> \<ul\> \<li\>SurveyStudio and the visual
+  builder both offered an empty “Performance matrix items” dropdown for
+  all 7 ranking methods (TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE,
+  ELECTRE). That role matches on a \<code\>"matrix"\</code\> level, and
+  neither surface gave matrix items one: the studio classified them as
+  \<code\>"identifier"\</code\> and the builder grouped them under
+  \<code\>"expanded"\</code\>, which no role accepts. The effect was
+  that the rated-matrix path, where respondents rate every alternative
+  on every criterion, could only be built by writing R directly, even
+  though it is one of the 3 declared ways to supply a decision matrix.
+  Matrix items now carry their own \<code\>"matrix"\</code\> level in
+  both surfaces.\</li\> \</ul\> \</div\> \<div
+  id="decision-analysis-non-results-now-say-so" class="section level2"\>
+  \<h2\>Decision analysis: non-results now say so\</h2\> \<ul\>
+  \<li\>ELECTRE I reports when it establishes no outranking relation at
+  all. On a 9-criterion problem at the default 0.70 and 0.30 thresholds
+  no alternative clears concordance against any other, so every score is
+  0 and every alternative ranks 1. That is legitimate behaviour for the
   method, but the results table read as “all 9 alternatives are jointly
   best” and the APA sentence reported a kernel containing every
   alternative. A note now explains the equal ranks as an absence of
-  evidence.
-- [`sensitivity_analysis()`](https://surveyframe.org/reference/superseded.md)
-  gains a `degenerate` flag for the same reason. A ranking that never
-  separated the alternatives cannot be changed by perturbing a weight,
-  so every check passed and `stable` came back `TRUE`: the strongest
-  robustness signal the function can give, produced by the weakest
-  result it can be handed.
-  [`print()`](https://rdrr.io/r/base/print.html) now leads with “No
-  result to test” instead of “Stable” in that case.
-
-### Data quality
-
-- [`quality_report()`](https://surveyframe.org/reference/superseded.md)
-  counted only columns matching a bare item id, and multi-column items
-  never post under those, so every expansion column was invisible to the
-  missingness check. A respondent who skipped an entire pairwise battery
-  was reported at 0 percent missing. Expansion columns now count as item
-  data, which brings matrix, ranking, multi-select, and the 2 decision
-  item types into the missingness figures for the first time. **Reported
+  evidence.\</li\> \<li\>\<code\>sensitivity_analysis()\</code\> gains a
+  \<code\>degenerate\</code\> flag for the same reason. A ranking that
+  never separated the alternatives cannot be changed by perturbing a
+  weight, so every check passed and \<code\>stable\</code\> came back
+  \<code\>TRUE\</code\>: the strongest robustness signal the function
+  can give, produced by the weakest result it can be handed.
+  \<code\>print()\</code\> now leads with “No result to test” instead of
+  “Stable” in that case.\</li\> \</ul\> \</div\> \<div id="data-quality"
+  class="section level2"\> \<h2\>Data quality\</h2\> \<ul\>
+  \<li\>\<code\>quality_report()\</code\> counted only columns matching
+  a bare item id, and multi-column items never post under those, so
+  every expansion column was invisible to the missingness check. A
+  respondent who skipped an entire pairwise battery was reported at 0
+  percent missing. Expansion columns now count as item data, which
+  brings matrix, ranking, multi-select, and the 2 decision item types
+  into the missingness figures for the first time. \<strong\>Reported
   missingness rates will change for any instrument using those item
-  types**, because columns that were silently excluded are now counted.
-  Straight-lining and timing are unaffected: straight-lining runs over
-  declared scales, and timing is measured on the clock.
-
-### Bundled demo data
-
-- Both bundled demo instruments wired their seminr block to a `cb_sem`
-  model, so
-  [`sframe_demo_data()`](https://surveyframe.org/reference/superseded.md)
-  generated PLS-SEM syntax from a covariance-based model, and every
-  vignette and example loading it inherited the same mismatch. Each demo
-  now carries a real `pls_sem` model with composite constructs. The
-  instrument hashes changed with it.
-
-### Decision analysis
-
-- All 10 MCDM methods now return a citation. Previously only TOPSIS and
-  AHP had one. Every reference was checked against the publication
-  record.
-- [`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md)
-  documents PROMETHEE’s preference functions and records why the default
-  is `"usual"`, Brans and Vincke’s type I step function, chosen over the
-  linear function several other implementations default to. Net flows
-  differ between the 2 functions, and the ranking changed in 226 of 400
-  randomly drawn 4-alternative by 3-criterion matrices.
-
-## surveyframe 0.3.4
-
-CRAN release: 2026-07-24
-
-This release completes the plotting, interface, statistics, and
-reporting work started in 0.3.3. Every analysis family now has a chart,
-every effect size ships with a confidence interval, reports accept
-written interpretations and print to PDF, both dashboards gain quality
-and correlation panels, date questions gain bounds, and the builder and
-vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies are
-unchanged. naniar and pagedown join Suggests.
-
-### Effect sizes and intervals
-
-- Four new exported helpers, all base R:
-  [`bootstrap_ci()`](https://surveyframe.org/reference/superseded.md)
-  (percentile bootstrap for any statistic),
-  [`cohens_d_ci()`](https://surveyframe.org/reference/superseded.md),
-  [`cramers_v_ci()`](https://surveyframe.org/reference/superseded.md),
-  and [`eta_sq_ci()`](https://surveyframe.org/reference/superseded.md).
-- Analysis-plan runners attach a confidence interval to their effect
-  size as a new result key: `d_ci` on the t-tests, `r_ci` on
-  Mann-Whitney and Wilcoxon, `eta_ci` on ANOVA and Kruskal-Wallis, `ci`
-  on the correlations (analytic Fisher z for Pearson, bootstrap for the
-  rank methods), and `v_ci` on chi-square and cross-tabulation.
-- APA strings and writing prompts now carry the interval, for example
-  `d = 0.62 [0.18, 1.05]`. Data too small for an interval keeps the
-  previous string.
-
-### Psychometrics
-
-- [`validity_report()`](https://surveyframe.org/reference/superseded.md)
-  computes the Henseler heterotrait-monotrait ratio when item-level data
-  is supplied through the new `items_by_construct` argument. Without it,
-  the previous correlation-based fallback applies and the `htmt_method`
-  element records which was used.
-- [`missing_data_report()`](https://surveyframe.org/reference/superseded.md)
-  runs Little’s MCAR test when naniar is installed. Without naniar the
-  result is unchanged.
-- [`reliability_report()`](https://surveyframe.org/reference/superseded.md)
-  records why omega is unavailable for a scale in an `omega_note`, and
-  the reliability chart names those scales in its subtitle.
-- [`efa_solution()`](https://surveyframe.org/reference/superseded.md)
+  types\</strong\>, because columns that were silently excluded are now
+  counted. Straight-lining and timing are unaffected: straight-lining
+  runs over declared scales, and timing is measured on the clock.\</li\>
+  \</ul\> \</div\> \<div id="bundled-demo-data" class="section level2"\>
+  \<h2\>Bundled demo data\</h2\> \<ul\> \<li\>Both bundled demo
+  instruments wired their seminr block to a \<code\>cb_sem\</code\>
+  model, so \<code\>sframe_demo_data()\</code\> generated PLS-SEM syntax
+  from a covariance-based model, and every vignette and example loading
+  it inherited the same mismatch. Each demo now carries a real
+  \<code\>pls_sem\</code\> model with composite constructs. The
+  instrument hashes changed with it.\</li\> \</ul\> \</div\> \<div
+  id="decision-analysis" class="section level2"\> \<h2\>Decision
+  analysis\</h2\> \<ul\> \<li\>All 10 MCDM methods now return a
+  citation. Previously only TOPSIS and AHP had one. Every reference was
+  checked against the publication record.\</li\>
+  \<li\>\<code\>sframe_decision_options()\</code\> documents PROMETHEE’s
+  preference functions and records why the default is
+  \<code\>"usual"\</code\>, Brans and Vincke’s type I step function,
+  chosen over the linear function several other implementations default
+  to. Net flows differ between the 2 functions, and the ranking changed
+  in 226 of 400 randomly drawn 4-alternative by 3-criterion
+  matrices.\</li\> \</ul\> \</div\> \</div\> \<div id="surveyframe-034"
+  class="section level1"\> \<h1\>surveyframe 0.3.4\</h1\> \<p\>This
+  release completes the plotting, interface, statistics, and reporting
+  work started in 0.3.3. Every analysis family now has a chart, every
+  effect size ships with a confidence interval, reports accept written
+  interpretations and print to PDF, both dashboards gain quality and
+  correlation panels, date questions gain bounds, and the builder and
+  vignettes pass a WCAG 2.2 AA accessibility audit. Hard dependencies
+  are unchanged. naniar and pagedown join Suggests.\</p\> \<div
+  id="effect-sizes-and-intervals" class="section level2"\> \<h2\>Effect
+  sizes and intervals\</h2\> \<ul\> \<li\>Four new exported helpers, all
+  base R: \<code\>bootstrap_ci()\</code\> (percentile bootstrap for any
+  statistic), \<code\>cohens_d_ci()\</code\>,
+  \<code\>cramers_v_ci()\</code\>, and
+  \<code\>eta_sq_ci()\</code\>.\</li\> \<li\>Analysis-plan runners
+  attach a confidence interval to their effect size as a new result key:
+  \<code\>d_ci\</code\> on the t-tests, \<code\>r_ci\</code\> on
+  Mann-Whitney and Wilcoxon, \<code\>eta_ci\</code\> on ANOVA and
+  Kruskal-Wallis, \<code\>ci\</code\> on the correlations (analytic
+  Fisher z for Pearson, bootstrap for the rank methods), and
+  \<code\>v_ci\</code\> on chi-square and cross-tabulation.\</li\>
+  \<li\>APA strings and writing prompts now carry the interval, for
+  example \<code\>d = 0.62 \[0.18, 1.05\]\</code\>. Data too small for
+  an interval keeps the previous string.\</li\> \</ul\> \</div\> \<div
+  id="psychometrics" class="section level2"\> \<h2\>Psychometrics\</h2\>
+  \<ul\> \<li\>\<code\>validity_report()\</code\> computes the Henseler
+  heterotrait-monotrait ratio when item-level data is supplied through
+  the new \<code\>items_by_construct\</code\> argument. Without it, the
+  previous correlation-based fallback applies and the
+  \<code\>htmt_method\</code\> element records which was used.\</li\>
+  \<li\>\<code\>missing_data_report()\</code\> runs Little’s MCAR test
+  when naniar is installed. Without naniar the result is
+  unchanged.\</li\> \<li\>\<code\>reliability_report()\</code\> records
+  why omega is unavailable for a scale in an
+  \<code\>omega_note\</code\>, and the reliability chart names those
+  scales in its subtitle.\</li\> \<li\>\<code\>efa_solution()\</code\>
   adds three tidy data frames ready for plotting and reporting:
-  `loadings_long`, `communalities_table`, and `variance_table`.
-
-### Reports and codebook
-
-- `render_report(format = "pdf")` prints the HTML report to PDF through
-  pagedown, which requires a local Chrome or Chromium. HTML output is
-  unchanged and remains the default.
-- The report’s built-in styling now uses a small set of CSS variables,
-  so a re-theme is a one-line change, and a print stylesheet paginates
-  the report cleanly. Tables carry captions and header scopes, and every
-  embedded chart has descriptive alternative text.
-- The codebook now includes the pre-declared analysis plan and the saved
-  measurement and structural models, so one document fully records the
-  instrument a study used.
-- The codebook’s items table shows each item’s actual response options
-  and scale label directly, instead of an id that needed a separate
-  choice-sets table to decode.
-- Analysis-result tables (frequency, cross-tabulation, group
+  \<code\>loadings_long\</code\>, \<code\>communalities_table\</code\>,
+  and \<code\>variance_table\</code\>.\</li\> \</ul\> \</div\> \<div
+  id="reports-and-codebook" class="section level2"\> \<h2\>Reports and
+  codebook\</h2\> \<ul\> \<li\>\<code\>render_report(format =
+  "pdf")\</code\> prints the HTML report to PDF through pagedown, which
+  requires a local Chrome or Chromium. HTML output is unchanged and
+  remains the default.\</li\> \<li\>The report’s built-in styling now
+  uses a small set of CSS variables, so a re-theme is a one-line change,
+  and a print stylesheet paginates the report cleanly. Tables carry
+  captions and header scopes, and every embedded chart has descriptive
+  alternative text.\</li\> \<li\>The codebook now includes the
+  pre-declared analysis plan and the saved measurement and structural
+  models, so one document fully records the instrument a study
+  used.\</li\> \<li\>The codebook’s items table shows each item’s actual
+  response options and scale label directly, instead of an id that
+  needed a separate choice-sets table to decode.\</li\>
+  \<li\>Analysis-result tables (frequency, cross-tabulation, group
   comparisons, regression coefficients, and the rest) show item, scale,
   and response-option labels instead of the underlying ids and coded
-  values.
-- Report tables render as properly split HTML tables in both the Quarto
-  and internal HTML report paths.
-
-### Written interpretations in reports
-
-- New `interpretations` argument on
-  [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  and
-  [`render_results()`](https://surveyframe.org/reference/render_results.md).
-  Pass a named list keyed by analysis-plan block id to add a written
-  interpretation to each research question after the results are known.
-  The report shows it beside the pre-declared decision rule, so the
-  prospective plan stays visible next to the post-hoc narrative.
-  Interpretations are report content only and are never written into the
-  instrument file.
-- SurveyStudio’s Export screen gains an Interpretations card: one block
-  per research question, in reading order (result table, chart, planned
-  decision rule, then the interpretation), shown with the live result
-  once responses are loaded. The generated report includes whatever you
-  write there.
-- A “Copy result” button on each Interpretations block copies the whole
-  result, table, chart, and the interpretation as written, as one block,
-  for pasting into a document.
-- The SurveyBuilder Report outline now edits the planned decision rule
-  inline, in sync with the research-question dialogue.
-
-### Charts
-
-- `run_analysis_plan(plots = TRUE)` now attaches a chart to every
-  supported family: regression diagnostics (4 panels), EFA scree and
-  loadings heatmap, reliability bars, mosaic and crosstab, correlation
-  heatmap, quality flag rates, group-comparison boxplots, paired slope
-  charts, raw-variable distributions, repeated-measures profiles, a
-  partial-correlation residual scatter, logistic-regression odds-ratio
-  forest plots, a moderation interaction plot, and a mediation effect
-  chart. Every analysis-plan block now returns a table, a chart, or
-  generated syntax.
-- Distribution shape by variable draws as a violin per variable, instead
-  of a bar chart of the skewness and kurtosis summary statistics.
-- A scale’s separate Likert items, and a matrix question’s rows, draw as
-  one grouped diverging chart, instead of one chart per item.
-- New [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods
-  for descriptives, EFA, quality, reliability, validity, missing-data,
-  and analysis-results objects. `plot(results)` draws every attached
-  chart, and `plot(results, which = "rq_id")` returns one.
-- New `plot_palette` argument on
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  and
-  [`render_report()`](https://surveyframe.org/reference/render_report.md):
-  `"web"` for brand colour on screen, `"print"` for black and white
+  values.\</li\> \<li\>Report tables render as properly split HTML
+  tables in both the Quarto and internal HTML report paths.\</li\>
+  \</ul\> \</div\> \<div id="written-interpretations-in-reports"
+  class="section level2"\> \<h2\>Written interpretations in
+  reports\</h2\> \<ul\> \<li\>New \<code\>interpretations\</code\>
+  argument on \<code\>render_report()\</code\> and
+  \<code\>render_results()\</code\>. Pass a named list keyed by
+  analysis-plan block id to add a written interpretation to each
+  research question after the results are known. The report shows it
+  beside the pre-declared decision rule, so the prospective plan stays
+  visible next to the post-hoc narrative. Interpretations are report
+  content only and are never written into the instrument file.\</li\>
+  \<li\>SurveyStudio’s Export screen gains an Interpretations card: one
+  block per research question, in reading order (result table, chart,
+  planned decision rule, then the interpretation), shown with the live
+  result once responses are loaded. The generated report includes
+  whatever you write there.\</li\> \<li\>A “Copy result” button on each
+  Interpretations block copies the whole result, table, chart, and the
+  interpretation as written, as one block, for pasting into a
+  document.\</li\> \<li\>The SurveyBuilder Report outline now edits the
+  planned decision rule inline, in sync with the research-question
+  dialogue.\</li\> \</ul\> \</div\> \<div id="charts-1" class="section
+  level2"\> \<h2\>Charts\</h2\> \<ul\>
+  \<li\>\<code\>run_analysis_plan(plots = TRUE)\</code\> now attaches a
+  chart to every supported family: regression diagnostics (4 panels),
+  EFA scree and loadings heatmap, reliability bars, mosaic and crosstab,
+  correlation heatmap, quality flag rates, group-comparison boxplots,
+  paired slope charts, raw-variable distributions, repeated-measures
+  profiles, a partial-correlation residual scatter, logistic-regression
+  odds-ratio forest plots, a moderation interaction plot, and a
+  mediation effect chart. Every analysis-plan block now returns a table,
+  a chart, or generated syntax.\</li\> \<li\>Distribution shape by
+  variable draws as a violin per variable, instead of a bar chart of the
+  skewness and kurtosis summary statistics.\</li\> \<li\>A scale’s
+  separate Likert items, and a matrix question’s rows, draw as one
+  grouped diverging chart, instead of one chart per item.\</li\>
+  \<li\>New \<code\>plot()\</code\> methods for descriptives, EFA,
+  quality, reliability, validity, missing-data, and analysis-results
+  objects. \<code\>plot(results)\</code\> draws every attached chart,
+  and \<code\>plot(results, which = "rq_id")\</code\> returns
+  one.\</li\> \<li\>New \<code\>plot_palette\</code\> argument on
+  \<code\>run_analysis_plan()\</code\> and
+  \<code\>render_report()\</code\>: \<code\>"web"\</code\> for brand
+  colour on screen, \<code\>"print"\</code\> for black and white
   suitable for print and journal submission. SurveyStudio exposes the
-  choice as a Chart theme option on the Export screen.
-- SurveyStudio’s Analyse screen shows one result card per research
-  question with its chart beneath the statistic.
-- Both dashboards (the standalone response dashboard and the
-  SurveyStudio Dashboard tab) gain a straight-lining flag-rate chart, a
-  missing-data chart, and a scale-score correlation heatmap. All
-  dashboard charts keep a base-graphics fallback, so ggplot2 remains
-  optional.
-
-### Survey design
-
-- Date questions accept `date_min` and `date_max` bounds in
-  [`sf_item()`](https://surveyframe.org/reference/superseded.md), the
-  SurveyBuilder, and the exported survey. The date picker enforces the
-  bounds and typed dates outside them show a clear message.
-- The SurveyBuilder ships a library of 14 preset choice sets,
-  regenerates item ids safely when the response type changes, and
-  expands matrix, ranking, and multiple-choice items into the same
-  per-option variables that
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  produces.
-- The survey thank-you page no longer forces a CSV download. It offers a
-  “Download my response” button and honours a configured redirect.
-
-### Accessibility
-
-- The SurveyBuilder interface passes an instrumented WCAG 2.2 AA audit
-  with zero findings across its build, preview, and analyse screens and
-  dialogues.
-- All 7 vignettes pass the same audit: language metadata, AA contrast
-  for links and code highlighting, wrapped code blocks,
-  keyboard-reachable content, and alternative text on every chart.
-
-### Bug fixes
-
-- [`sf_item()`](https://surveyframe.org/reference/superseded.md)’s
-  `date_min` and `date_max` accept only `"YYYY-MM-DD"` or a `Date`
-  object now (an ambiguous string such as `"01/02/2024"` used to parse
-  silently into a specific date depending on locale). Anything else
-  raises a validation error.
-- [`bootstrap_ci()`](https://surveyframe.org/reference/superseded.md),
-  [`cohens_d_ci()`](https://surveyframe.org/reference/superseded.md),
-  [`cramers_v_ci()`](https://surveyframe.org/reference/superseded.md),
-  and [`eta_sq_ci()`](https://surveyframe.org/reference/superseded.md)
-  no longer alter the random-number seed for code that runs after a
-  reproducible, seeded call.
-
-## surveyframe 0.3.3
-
-CRAN release: 2026-07-11
-
-This release adds an opt-in plotting layer, fixes bugs surfaced by the
-package’s first field deployment, and redesigns the survey-taking
-experience. ggplot2 joins Suggests; hard dependencies are unchanged.
-
-### Analysis and plotting
-
-- New `plots` argument on
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  (default `FALSE`). When `TRUE`, supported analysis blocks return a
-  ggplot object in `$plot`: bar charts for frequency and chi-square
-  blocks, and scatter plots with a regression overlay for correlation
-  and regression blocks.
-- New exported
-  [`theme_surveyframe()`](https://surveyframe.org/reference/theme_surveyframe.md),
-  a publication-oriented ggplot2 theme with an accessible fixed-order
-  series palette. All plots use it.
-- Inferential runners return a `$table` data frame ready for
-  [`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html); the HTML
-  report shows these tables automatically.
-- Frequency and cross-tab runners treat empty strings as missing values,
-  so partially completed responses no longer form a blank category.
-- Ranking items now export one column per option holding its rank
-  (`item__option = 1` for the top choice), so ranks are directly
-  analysable. Multiple-choice items likewise export one 0/1 column per
-  option instead of a single comma-joined column.
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  accepts the expanded columns for ranking, matrix, and multiple-choice
-  items without warnings.
-- [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  now attaches each analysis block’s chart directly under its result
-  table, in both the Quarto and internal HTML report paths, instead of
-  tables and plots appearing in separate places.
-- Likert items in the report’s response-distributions section get a
-  diverging stacked bar chart (darkest at each pole, lightest next to
-  neutral) instead of a plain frequency bar, so the direction and
-  strength of opinion is visible at a glance.
-
-### Survey experience
-
-- A full redesign of the exported survey: larger serif question
+  choice as a Chart theme option on the Export screen.\</li\>
+  \<li\>SurveyStudio’s Analyse screen shows one result card per research
+  question with its chart beneath the statistic.\</li\> \<li\>Both
+  dashboards (the standalone response dashboard and the SurveyStudio
+  Dashboard tab) gain a straight-lining flag-rate chart, a missing-data
+  chart, and a scale-score correlation heatmap. All dashboard charts
+  keep a base-graphics fallback, so ggplot2 remains optional.\</li\>
+  \</ul\> \</div\> \<div id="survey-design" class="section level2"\>
+  \<h2\>Survey design\</h2\> \<ul\> \<li\>Date questions accept
+  \<code\>date_min\</code\> and \<code\>date_max\</code\> bounds in
+  \<code\>sf_item()\</code\>, the SurveyBuilder, and the exported
+  survey. The date picker enforces the bounds and typed dates outside
+  them show a clear message.\</li\> \<li\>The SurveyBuilder ships a
+  library of 14 preset choice sets, regenerates item ids safely when the
+  response type changes, and expands matrix, ranking, and
+  multiple-choice items into the same per-option variables that
+  \<code\>read_responses()\</code\> produces.\</li\> \<li\>The survey
+  thank-you page no longer forces a CSV download. It offers a “Download
+  my response” button and honours a configured redirect.\</li\> \</ul\>
+  \</div\> \<div id="accessibility" class="section level2"\>
+  \<h2\>Accessibility\</h2\> \<ul\> \<li\>The SurveyBuilder interface
+  passes an instrumented WCAG 2.2 AA audit with zero findings across its
+  build, preview, and analyse screens and dialogues.\</li\> \<li\>All 7
+  vignettes pass the same audit: language metadata, AA contrast for
+  links and code highlighting, wrapped code blocks, keyboard-reachable
+  content, and alternative text on every chart.\</li\> \</ul\> \</div\>
+  \<div id="bug-fixes-1" class="section level2"\> \<h2\>Bug fixes\</h2\>
+  \<ul\> \<li\>\<code\>sf_item()\</code\>’s \<code\>date_min\</code\>
+  and \<code\>date_max\</code\> accept only
+  \<code\>"YYYY-MM-DD"\</code\> or a \<code\>Date\</code\> object now
+  (an ambiguous string such as \<code\>"01/02/2024"\</code\> used to
+  parse silently into a specific date depending on locale). Anything
+  else raises a validation error.\</li\>
+  \<li\>\<code\>bootstrap_ci()\</code\>, \<code\>cohens_d_ci()\</code\>,
+  \<code\>cramers_v_ci()\</code\>, and \<code\>eta_sq_ci()\</code\> no
+  longer alter the random-number seed for code that runs after a
+  reproducible, seeded call.\</li\> \</ul\> \</div\> \</div\> \<div
+  id="surveyframe-033" class="section level1"\> \<h1\>surveyframe
+  0.3.3\</h1\> \<p\>This release adds an opt-in plotting layer, fixes
+  bugs surfaced by the package’s first field deployment, and redesigns
+  the survey-taking experience. ggplot2 joins Suggests; hard
+  dependencies are unchanged.\</p\> \<div id="analysis-and-plotting"
+  class="section level2"\> \<h2\>Analysis and plotting\</h2\> \<ul\>
+  \<li\>New \<code\>plots\</code\> argument on
+  \<code\>run_analysis_plan()\</code\> (default \<code\>FALSE\</code\>).
+  When \<code\>TRUE\</code\>, supported analysis blocks return a ggplot
+  object in \<code\>\$plot\</code\>: bar charts for frequency and
+  chi-square blocks, and scatter plots with a regression overlay for
+  correlation and regression blocks.\</li\> \<li\>New exported
+  \<code\>theme_surveyframe()\</code\>, a publication-oriented ggplot2
+  theme with an accessible fixed-order series palette. All plots use
+  it.\</li\> \<li\>Inferential runners return a \<code\>\$table\</code\>
+  data frame ready for \<code\>knitr::kable()\</code\>; the HTML report
+  shows these tables automatically.\</li\> \<li\>Frequency and cross-tab
+  runners treat empty strings as missing values, so partially completed
+  responses no longer form a blank category.\</li\> \<li\>Ranking items
+  now export one column per option holding its rank
+  (\<code\>item\_\_option = 1\</code\> for the top choice), so ranks are
+  directly analysable. Multiple-choice items likewise export one 0/1
+  column per option instead of a single comma-joined column.
+  \<code\>read_responses()\</code\> accepts the expanded columns for
+  ranking, matrix, and multiple-choice items without warnings.\</li\>
+  \<li\>\<code\>render_report()\</code\> now attaches each analysis
+  block’s chart directly under its result table, in both the Quarto and
+  internal HTML report paths, instead of tables and plots appearing in
+  separate places.\</li\> \<li\>Likert items in the report’s
+  response-distributions section get a diverging stacked bar chart
+  (darkest at each pole, lightest next to neutral) instead of a plain
+  frequency bar, so the direction and strength of opinion is visible at
+  a glance.\</li\> \</ul\> \</div\> \<div id="survey-experience"
+  class="section level2"\> \<h2\>Survey experience\</h2\> \<ul\> \<li\>A
+  full redesign of the exported survey: larger serif question
   typography, bordered option cards with selection ticks, numbered
   Likert squares, restyled matrix, slider, and ranking blocks, and a
   slim top progress bar. Every colour derives from the instrument’s
   single theme colour, so one colour choice re-skins the whole survey.
-  Touch targets meet a 44 pixel minimum on phones.
-- Branching rules on one question now combine with AND, and hiding a
-  controlling question also hides everything that depends on it, so
-  screening logic behaves as declared even when answers change.
-- Single-page surveys show answered-questions progress (for example “12
-  of 44 answered”); numeric questions respect declared minimum and
-  maximum bounds.
-- Branching rules can now show and hide section breaks and text blocks,
-  so a branched text block works as a screen-out message (“Sorry, you
-  are not eligible”) and section headings disappear with their
-  questions.
-- A matrix question reflows into stacked, labelled row-cards below 600
-  pixels instead of a table that needs horizontal scrolling to complete.
-- The exported survey meets WCAG 2.2 AA on an instrumented audit: every
-  input carries an accessible name, keyboard focus is visible on option
-  cards, errors are announced to assistive technology, required
+  Touch targets meet a 44 pixel minimum on phones.\</li\>
+  \<li\>Branching rules on one question now combine with AND, and hiding
+  a controlling question also hides everything that depends on it, so
+  screening logic behaves as declared even when answers change.\</li\>
+  \<li\>Single-page surveys show answered-questions progress (for
+  example “12 of 44 answered”); numeric questions respect declared
+  minimum and maximum bounds.\</li\> \<li\>Branching rules can now show
+  and hide section breaks and text blocks, so a branched text block
+  works as a screen-out message (“Sorry, you are not eligible”) and
+  section headings disappear with their questions.\</li\> \<li\>A matrix
+  question reflows into stacked, labelled row-cards below 600 pixels
+  instead of a table that needs horizontal scrolling to complete.\</li\>
+  \<li\>The exported survey meets WCAG 2.2 AA on an instrumented audit:
+  every input carries an accessible name, keyboard focus is visible on
+  option cards, errors are announced to assistive technology, required
   questions are marked beyond colour, ranking items gain keyboard
   reorder buttons, headings are real headings, and all touch targets and
-  text contrast meet the standard.
-
-### Data collection
-
-- Fixed a bug that silently blocked submissions from hosted surveys: the
-  Google Apps Script POST now avoids the CORS preflight that Apps Script
-  never answers. Collectors no longer emit columns for section breaks or
-  text blocks.
-- [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
-  gains a `meta_cols` argument for extra sheet columns a host
+  text contrast meet the standard.\</li\> \</ul\> \</div\> \<div
+  id="data-collection" class="section level2"\> \<h2\>Data
+  collection\</h2\> \<ul\> \<li\>Fixed a bug that silently blocked
+  submissions from hosted surveys: the Google Apps Script POST now
+  avoids the CORS preflight that Apps Script never answers. Collectors
+  no longer emit columns for section breaks or text blocks.\</li\>
+  \<li\>\<code\>read_sheet_responses()\</code\> gains a
+  \<code\>meta_cols\</code\> argument for extra sheet columns a host
   application appends, and SurveyStudio’s dashboard now computes
-  completion times from imported sheet responses.
-
-### Model syntax
-
-- [`sem_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md)
-  turns free-text path labels into valid lavaan parameter names (a label
-  starting “H1:” becomes the parameter `H1`).
-- [`seminr_syntax()`](https://surveyframe.org/reference/superseded.md)
-  output loads seminr and uses
-  [`summary()`](https://rdrr.io/r/base/summary.html) accessors, so the
-  generated code runs as pasted.
-- [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  accepts `pls_sem` as an alias for `seminr_syntax`.
-
-### SurveyBuilder and report
-
-- Opening a `.sframe` verifies and reports its SHA-256 integrity status.
-- New choice questions start with a fresh option set, and editing shared
-  options forks the set first, so options never leak between questions.
-- The analysis-plan modal blocks using one variable in two roles, and
-  the test suggester handles Likert items and multi-group comparisons
-  sensibly.
-- Reports print generated model syntax in code blocks and show
-  reliability results as a table.
-- “+ Add question” now opens the question-type picker instead of
-  silently adding a Likert item, and the redundant icon-only button next
-  to it is gone. Survey settings live only in the sidebar; the top bar
-  no longer duplicates that entry point.
-
-## surveyframe 0.3.2
-
-CRAN release: 2026-06-17
-
-This release corrects the package citation, completes the S3 method
-surface for the component classes, and improves the graphical tools and
-the HTML report. It adds no new exported functions, no new statistical
-methods, and no new bundled datasets.
-
-### Citation and methods
-
-- `inst/CITATION` now reports the correct package title and reads the
-  version dynamically from the package metadata, so the citation no
-  longer pins an old version or an outdated title.
-- Added [`print()`](https://rdrr.io/r/base/print.html),
-  [`format()`](https://rdrr.io/r/base/format.html), and
-  [`summary()`](https://rdrr.io/r/base/summary.html) methods for the
-  component classes `sf_choices`, `sf_item`, `sf_scale`, `sf_branch`,
-  `sf_check`, and `sf_model`, so each class now has a visible,
-  documented S3 surface.
-- `lavaan` is declared in `Suggests`. It is used only to fit the syntax
-  produced by
-  [`cfa_syntax()`](https://surveyframe.org/reference/superseded.md). The
-  package itself generates syntax and never requires `lavaan` to be
-  installed.
-
-### Graphical tools
-
-- SurveyBuilder exports a deployable survey in the browser through a new
-  Export survey button, and generates the Google Sheets Apps Script
-  collector through a Generate collector button. Both reuse the same
-  templates the R functions use, so the output matches
-  [`export_static_survey()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md).
-- The builder Analyse tab shows three distinct stages: Plan, Run preview
-  (the methods that need response data), and Report outline (analyses
-  plus measurement models). Analysis plans can be reordered by dragging.
-- The exported survey carries a “Built with surveyframe” footer, sizes a
-  header logo consistently across aspect ratios, shows a page progress
-  indicator only on multi-page surveys, and gains a mobile layout.
-- SurveyStudio opens an instrument designed in the builder, previews the
-  exact deployable survey in a frame, and analyses uploaded responses.
-  The response dashboard, with an overview, item and scale
-  distributions, and a raw-data table, is now built into the studio. A
-  button loads the bundled sample survey and 120 responses. Survey
-  design moved entirely to the builder.
-
-### HTML report
-
-- [`render_report()`](https://surveyframe.org/reference/render_report.md)
-  renders reliably through Quarto when it is installed. A path defect
-  that made the Quarto render fail and fall back to the plain internal
-  output is fixed.
-- Reports include a response distributions section, with one chart per
-  item and one per scale, in both the Quarto output and the built-in
-  HTML fallback.
-- Tables are formatted, wide tables scroll within the page, the table of
-  contents sits on the left, and numeric values are rounded to two
-  decimal places.
-
-### Documentation
-
-- Added the “Deploying a survey and collecting responses on free
-  hosting” vignette, covering the Apps Script collector, GitHub Pages
-  and Blogger hosting, and reading the responses back into R.
-
-## surveyframe 0.3.1
-
-CRAN release: 2026-06-02
-
-This is a patch release. It fixes the static-survey to Google Sheets to
-R collection loop, repairs a serialisation defect, and improves the
-first-time user experience. There are no new exported functions, no new
-statistical methods, and no new bundled datasets.
-
-### Bug fixes
-
-#### Data collection round-trip
-
-- [`export_static_survey()`](https://surveyframe.org/reference/superseded.md)
-  now renders the header logo and institution name from `render$header`,
-  so exported surveys match the Shiny renderer and the builder preview.
-- [`export_static_survey()`](https://surveyframe.org/reference/superseded.md)
-  now falls back to the instrument’s `render$google_sheets_endpoint`
-  when `endpoint_url` is not supplied, so a Google Sheets endpoint set
-  in the builder is honoured on export.
-- The static survey now posts the respondent identifier under the column
-  name `respondent_id`, matching the Google Apps Script collector and
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md).
-  The collection round-trip now preserves the identifier.
-- [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
-  now includes matrix sub-item columns (`item_id__sub`) in the Apps
-  Script header row, so matrix answers are stored in the Sheet.
-- [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
-  now declares `started_at` as a meta column and no longer raises a
-  warning on every read.
-- Survey logos now keep their original MIME type (`image/png`,
-  `image/jpeg`, `image/gif`), so JPEG and GIF logos display correctly in
-  the builder, the Shiny renderer, and the static export.
-
-#### Serialisation
-
-- [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
-  now strips list-level names from the item, choice, scale, branching,
-  check, and model collections before serialisation. Instruments built
-  with [`Map()`](https://rdrr.io/r/base/funprog.html) or other helpers
-  that attach element names (for example, using item IDs as names)
-  previously serialised those collections as keyed JSON objects,
-  producing a hash mismatch and an integrity error on
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md).
-  Saved instruments now round-trip correctly regardless of how the
-  component lists were constructed.
-
-### User experience
-
-- Every exported function that takes an instrument now reports a clear,
-  actionable message when passed something that is not an `sframe`
-  object. The message points the user to
-  [`sf_instrument()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
-  instead of showing a raw
-  [`inherits()`](https://rdrr.io/r/base/class.html) assertion failure.
-- [`reliability_report()`](https://surveyframe.org/reference/superseded.md)
-  no longer prints `psych` internal warnings to the console. McDonald’s
+  completion times from imported sheet responses.\</li\> \</ul\>
+  \</div\> \<div id="model-syntax" class="section level2"\> \<h2\>Model
+  syntax\</h2\> \<ul\> \<li\>\<code\>sem_lavaan_syntax()\</code\> turns
+  free-text path labels into valid lavaan parameter names (a label
+  starting “H1:” becomes the parameter \<code\>H1\</code\>).\</li\>
+  \<li\>\<code\>seminr_syntax()\</code\> output loads seminr and uses
+  \<code\>summary()\</code\> accessors, so the generated code runs as
+  pasted.\</li\> \<li\>\<code\>run_analysis_plan()\</code\> accepts
+  \<code\>pls_sem\</code\> as an alias for
+  \<code\>seminr_syntax\</code\>.\</li\> \</ul\> \</div\> \<div
+  id="surveybuilder-and-report" class="section level2"\>
+  \<h2\>SurveyBuilder and report\</h2\> \<ul\> \<li\>Opening a
+  \<code\>.sframe\</code\> verifies and reports its SHA-256 integrity
+  status.\</li\> \<li\>New choice questions start with a fresh option
+  set, and editing shared options forks the set first, so options never
+  leak between questions.\</li\> \<li\>The analysis-plan modal blocks
+  using one variable in two roles, and the test suggester handles Likert
+  items and multi-group comparisons sensibly.\</li\> \<li\>Reports print
+  generated model syntax in code blocks and show reliability results as
+  a table.\</li\> \<li\>“+ Add question” now opens the question-type
+  picker instead of silently adding a Likert item, and the redundant
+  icon-only button next to it is gone. Survey settings live only in the
+  sidebar; the top bar no longer duplicates that entry point.\</li\>
+  \</ul\> \</div\> \</div\> \<div id="surveyframe-032" class="section
+  level1"\> \<h1\>surveyframe 0.3.2\</h1\> \<p\>This release corrects
+  the package citation, completes the S3 method surface for the
+  component classes, and improves the graphical tools and the HTML
+  report. It adds no new exported functions, no new statistical methods,
+  and no new bundled datasets.\</p\> \<div id="citation-and-methods"
+  class="section level2"\> \<h2\>Citation and methods\</h2\> \<ul\>
+  \<li\>\<code\>inst/CITATION\</code\> now reports the correct package
+  title and reads the version dynamically from the package metadata, so
+  the citation no longer pins an old version or an outdated
+  title.\</li\> \<li\>Added \<code\>print()\</code\>,
+  \<code\>format()\</code\>, and \<code\>summary()\</code\> methods for
+  the component classes \<code\>sf_choices\</code\>,
+  \<code\>sf_item\</code\>, \<code\>sf_scale\</code\>,
+  \<code\>sf_branch\</code\>, \<code\>sf_check\</code\>, and
+  \<code\>sf_model\</code\>, so each class now has a visible, documented
+  S3 surface.\</li\> \<li\>\<code\>lavaan\</code\> is declared in
+  \<code\>Suggests\</code\>. It is used only to fit the syntax produced
+  by \<code\>cfa_syntax()\</code\>. The package itself generates syntax
+  and never requires \<code\>lavaan\</code\> to be installed.\</li\>
+  \</ul\> \</div\> \<div id="graphical-tools" class="section level2"\>
+  \<h2\>Graphical tools\</h2\> \<ul\> \<li\>SurveyBuilder exports a
+  deployable survey in the browser through a new Export survey button,
+  and generates the Google Sheets Apps Script collector through a
+  Generate collector button. Both reuse the same templates the R
+  functions use, so the output matches
+  \<code\>export_static_survey()\</code\> and
+  \<code\>export_google_sheet()\</code\>.\</li\> \<li\>The builder
+  Analyse tab shows three distinct stages: Plan, Run preview (the
+  methods that need response data), and Report outline (analyses plus
+  measurement models). Analysis plans can be reordered by
+  dragging.\</li\> \<li\>The exported survey carries a “Built with
+  surveyframe” footer, sizes a header logo consistently across aspect
+  ratios, shows a page progress indicator only on multi-page surveys,
+  and gains a mobile layout.\</li\> \<li\>SurveyStudio opens an
+  instrument designed in the builder, previews the exact deployable
+  survey in a frame, and analyses uploaded responses. The response
+  dashboard, with an overview, item and scale distributions, and a
+  raw-data table, is now built into the studio. A button loads the
+  bundled sample survey and 120 responses. Survey design moved entirely
+  to the builder.\</li\> \</ul\> \</div\> \<div id="html-report"
+  class="section level2"\> \<h2\>HTML report\</h2\> \<ul\>
+  \<li\>\<code\>render_report()\</code\> renders reliably through Quarto
+  when it is installed. A path defect that made the Quarto render fail
+  and fall back to the plain internal output is fixed.\</li\>
+  \<li\>Reports include a response distributions section, with one chart
+  per item and one per scale, in both the Quarto output and the built-in
+  HTML fallback.\</li\> \<li\>Tables are formatted, wide tables scroll
+  within the page, the table of contents sits on the left, and numeric
+  values are rounded to two decimal places.\</li\> \</ul\> \</div\>
+  \<div id="documentation-2" class="section level2"\>
+  \<h2\>Documentation\</h2\> \<ul\> \<li\>Added the “Deploying a survey
+  and collecting responses on free hosting” vignette, covering the Apps
+  Script collector, GitHub Pages and Blogger hosting, and reading the
+  responses back into R.\</li\> \</ul\> \</div\> \</div\> \<div
+  id="surveyframe-031" class="section level1"\> \<h1\>surveyframe
+  0.3.1\</h1\> \<p\>This is a patch release. It fixes the static-survey
+  to Google Sheets to R collection loop, repairs a serialisation defect,
+  and improves the first-time user experience. There are no new exported
+  functions, no new statistical methods, and no new bundled
+  datasets.\</p\> \<div id="bug-fixes-2" class="section level2"\>
+  \<h2\>Bug fixes\</h2\> \<div id="data-collection-round-trip"
+  class="section level3"\> \<h3\>Data collection round-trip\</h3\>
+  \<ul\> \<li\>\<code\>export_static_survey()\</code\> now renders the
+  header logo and institution name from \<code\>render\$header\</code\>,
+  so exported surveys match the Shiny renderer and the builder
+  preview.\</li\> \<li\>\<code\>export_static_survey()\</code\> now
+  falls back to the instrument’s
+  \<code\>render\$google_sheets_endpoint\</code\> when
+  \<code\>endpoint_url\</code\> is not supplied, so a Google Sheets
+  endpoint set in the builder is honoured on export.\</li\> \<li\>The
+  static survey now posts the respondent identifier under the column
+  name \<code\>respondent_id\</code\>, matching the Google Apps Script
+  collector and \<code\>read_responses()\</code\>. The collection
+  round-trip now preserves the identifier.\</li\>
+  \<li\>\<code\>export_google_sheet()\</code\> now includes matrix
+  sub-item columns (\<code\>item_id\_\_sub\</code\>) in the Apps Script
+  header row, so matrix answers are stored in the Sheet.\</li\>
+  \<li\>\<code\>read_sheet_responses()\</code\> now declares
+  \<code\>started_at\</code\> as a meta column and no longer raises a
+  warning on every read.\</li\> \<li\>Survey logos now keep their
+  original MIME type (\<code\>image/png\</code\>,
+  \<code\>image/jpeg\</code\>, \<code\>image/gif\</code\>), so JPEG and
+  GIF logos display correctly in the builder, the Shiny renderer, and
+  the static export.\</li\> \</ul\> \</div\> \<div id="serialisation"
+  class="section level3"\> \<h3\>Serialisation\</h3\> \<ul\>
+  \<li\>\<code\>write_sframe()\</code\> now strips list-level names from
+  the item, choice, scale, branching, check, and model collections
+  before serialisation. Instruments built with \<code\>Map()\</code\> or
+  other helpers that attach element names (for example, using item IDs
+  as names) previously serialised those collections as keyed JSON
+  objects, producing a hash mismatch and an integrity error on
+  \<code\>read_sframe()\</code\>. Saved instruments now round-trip
+  correctly regardless of how the component lists were
+  constructed.\</li\> \</ul\> \</div\> \</div\> \<div
+  id="user-experience" class="section level2"\> \<h2\>User
+  experience\</h2\> \<ul\> \<li\>Every exported function that takes an
+  instrument now reports a clear, actionable message when passed
+  something that is not an \<code\>sframe\</code\> object. The message
+  points the user to \<code\>sf_instrument()\</code\> and
+  \<code\>read_sframe()\</code\> instead of showing a raw
+  \<code\>inherits()\</code\> assertion failure.\</li\>
+  \<li\>\<code\>reliability_report()\</code\> no longer prints
+  \<code\>psych\</code\> internal warnings to the console. McDonald’s
   omega is skipped silently for scales with fewer than three items,
-  where the statistic is not meaningful.
-- The error message from
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  when no analysis plan is present now describes both the programmatic
-  route (`instrument$analysis_plan`) and the visual SurveyBuilder route.
-
-### Documentation
-
-- Rewrote the main vignette (`surveyframe.Rmd`) as an end-to-end worked
-  example: design the questionnaire, export it as a hosted survey with a
-  Google Sheets backend, collect responses, score them, run the analysis
-  plan, and render a report. The results section uses simulated
-  responses so the vignette builds offline; a single
-  [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
-  call connects the same workflow to live responses. The questionnaire
-  and concept are adopted from Sharafuddin, Madhavan, and Wangtueai
-  (2024, *Administrative Sciences*, 14(11), 273,
-  <doi:10.3390/admsci14110273>), with generic destination wording so the
-  example transfers to any tourism services context.
-- Updated the supporting vignettes to reflect the research-design-first
-  workflow where the instrument holds the questions, the analysis plan,
-  and the measurement model.
-- [`sf_instrument()`](https://surveyframe.org/reference/superseded.md)
-  examples now include a complete `analysis_plan` block.
-- The README now leads with `install.packages("surveyframe")`, adds a
+  where the statistic is not meaningful.\</li\> \<li\>The error message
+  from \<code\>run_analysis_plan()\</code\> when no analysis plan is
+  present now describes both the programmatic route
+  (\<code\>instrument\$analysis_plan\</code\>) and the visual
+  SurveyBuilder route.\</li\> \</ul\> \</div\> \<div
+  id="documentation-3" class="section level2"\>
+  \<h2\>Documentation\</h2\> \<ul\> \<li\>Rewrote the main vignette
+  (\<code\>surveyframe.Rmd\</code\>) as an end-to-end worked example:
+  design the questionnaire, export it as a hosted survey with a Google
+  Sheets backend, collect responses, score them, run the analysis plan,
+  and render a report. The results section uses simulated responses so
+  the vignette builds offline; a single
+  \<code\>read_sheet_responses()\</code\> call connects the same
+  workflow to live responses. The questionnaire and concept are adopted
+  from Sharafuddin, Madhavan, and Wangtueai (2024, \<em\>Administrative
+  Sciences\</em\>, 14(11), 273, \<a href="doi:10.3390/admsci14110273"
+  class="uri"\>doi:10.3390/admsci14110273\</a\>), with generic
+  destination wording so the example transfers to any tourism services
+  context.\</li\> \<li\>Updated the supporting vignettes to reflect the
+  research-design-first workflow where the instrument holds the
+  questions, the analysis plan, and the measurement model.\</li\>
+  \<li\>\<code\>sf_instrument()\</code\> examples now include a complete
+  \<code\>analysis_plan\</code\> block.\</li\> \<li\>The README now
+  leads with \<code\>install.packages("surveyframe")\</code\>, adds a
   short path for users who already have a response CSV, and points to
-  `browseVignettes("surveyframe")`.
-
-## surveyframe 0.3.0
-
-CRAN release: 2026-05-27
-
-The first CRAN release of the full workflow: a typed instrument object
-carrying the questions, the analysis plan, and the measurement model,
-with deployment, collection, analysis, and reporting built around it.
-
-### New features
-
-#### Analysis planning, survey statistics, and model syntax
-
-- Added a role-based analysis-plan structure while preserving old
-  `variables`/`test` analysis blocks. New plans can store `family`,
-  `method`, `roles`, `options`, `hypotheses`, `decision_rule`,
-  `reporting_references`, `status`, and `requires_data`.
-- Added common survey analysis helpers:
-  [`descriptives_report()`](https://surveyframe.org/reference/superseded.md),
-  [`missing_data_report()`](https://surveyframe.org/reference/superseded.md),
-  [`assumption_report()`](https://surveyframe.org/reference/superseded.md),
-  [`posthoc_report()`](https://surveyframe.org/reference/superseded.md),
-  [`validity_report()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`sample_size_plan()`](https://surveyframe.org/reference/superseded.md).
-- Expanded
-  [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-  to dispatch the v0.3 method registry, including descriptives, missing
-  data, sparse-table tests, related-sample tests, Kendall and partial
-  correlations, two-way ANOVA, ANCOVA, repeated ANOVA, ordinal and
-  multinomial logistic regression, mediation, moderation, and
-  model-syntax output.
-- Added a model specification layer:
-  [`sf_construct()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_path()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_covariance()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_indirect()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_model()`](https://surveyframe.org/reference/superseded.md),
-  [`validate_model()`](https://surveyframe.org/reference/superseded.md),
-  [`model_json()`](https://surveyframe.org/reference/superseded.md),
-  [`add_model()`](https://surveyframe.org/reference/superseded.md),
-  [`efa_solution()`](https://surveyframe.org/reference/superseded.md),
-  [`efa_syntax()`](https://surveyframe.org/reference/superseded.md),
-  [`cfa_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md),
-  [`sem_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md),
-  [`seminr_syntax()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`model_report_template()`](https://surveyframe.org/reference/superseded.md).
-  Syntax generation does not require `lavaan` or `seminr`.
-- [`cfa_syntax()`](https://surveyframe.org/reference/superseded.md)
-  remains available as a backward-compatible wrapper around
-  [`cfa_lavaan_syntax()`](https://surveyframe.org/reference/superseded.md).
-- SurveyBuilder Analyse mode now uses a three-panel Plan/Run/Report
-  workspace with variable metadata badges, role-based variable
-  assignment, method options, output preview, reporting references, and
-  a table-based model builder. Significance level is shown only for
-  inferential methods.
-
-#### Static HTML survey export
-
-- Added
-  [`export_static_survey()`](https://surveyframe.org/reference/superseded.md).
-  This produces a single, self-contained HTML file that runs the survey
-  in any modern browser without a Shiny server or an internet
-  connection. All thirteen item types are fully rendered (Likert, single
-  choice, multiple choice, matrix, numeric, text, long text, date,
-  slider, rating, ranking, section break, text block). Branching logic,
+  \<code\>browseVignettes("surveyframe")\</code\>.\</li\> \</ul\>
+  \</div\> \</div\> \<div id="surveyframe-030" class="section level1"\>
+  \<h1\>surveyframe 0.3.0\</h1\> \<p\>The first CRAN release of the full
+  workflow: a typed instrument object carrying the questions, the
+  analysis plan, and the measurement model, with deployment, collection,
+  analysis, and reporting built around it.\</p\> \<div id="new-features"
+  class="section level2"\> \<h2\>New features\</h2\> \<div
+  id="analysis-planning-survey-statistics-and-model-syntax"
+  class="section level3"\> \<h3\>Analysis planning, survey statistics,
+  and model syntax\</h3\> \<ul\> \<li\>Added a role-based analysis-plan
+  structure while preserving old
+  \<code\>variables\</code\>/\<code\>test\</code\> analysis blocks. New
+  plans can store \<code\>family\</code\>, \<code\>method\</code\>,
+  \<code\>roles\</code\>, \<code\>options\</code\>,
+  \<code\>hypotheses\</code\>, \<code\>decision_rule\</code\>,
+  \<code\>reporting_references\</code\>, \<code\>status\</code\>, and
+  \<code\>requires_data\</code\>.\</li\> \<li\>Added common survey
+  analysis helpers: \<code\>descriptives_report()\</code\>,
+  \<code\>missing_data_report()\</code\>,
+  \<code\>assumption_report()\</code\>,
+  \<code\>posthoc_report()\</code\>, \<code\>validity_report()\</code\>,
+  and \<code\>sample_size_plan()\</code\>.\</li\> \<li\>Expanded
+  \<code\>run_analysis_plan()\</code\> to dispatch the v0.3 method
+  registry, including descriptives, missing data, sparse-table tests,
+  related-sample tests, Kendall and partial correlations, two-way ANOVA,
+  ANCOVA, repeated ANOVA, ordinal and multinomial logistic regression,
+  mediation, moderation, and model-syntax output.\</li\> \<li\>Added a
+  model specification layer: \<code\>sf_construct()\</code\>,
+  \<code\>sf_path()\</code\>, \<code\>sf_covariance()\</code\>,
+  \<code\>sf_indirect()\</code\>, \<code\>sf_model()\</code\>,
+  \<code\>validate_model()\</code\>, \<code\>model_json()\</code\>,
+  \<code\>add_model()\</code\>, \<code\>efa_solution()\</code\>,
+  \<code\>efa_syntax()\</code\>, \<code\>cfa_lavaan_syntax()\</code\>,
+  \<code\>sem_lavaan_syntax()\</code\>,
+  \<code\>seminr_syntax()\</code\>, and
+  \<code\>model_report_template()\</code\>. Syntax generation does not
+  require \<code\>lavaan\</code\> or \<code\>seminr\</code\>.\</li\>
+  \<li\>\<code\>cfa_syntax()\</code\> remains available as a
+  backward-compatible wrapper around
+  \<code\>cfa_lavaan_syntax()\</code\>.\</li\> \<li\>SurveyBuilder
+  Analyse mode now uses a three-panel Plan/Run/Report workspace with
+  variable metadata badges, role-based variable assignment, method
+  options, output preview, reporting references, and a table-based model
+  builder. Significance level is shown only for inferential
+  methods.\</li\> \</ul\> \</div\> \<div id="static-html-survey-export"
+  class="section level3"\> \<h3\>Static HTML survey export\</h3\> \<ul\>
+  \<li\>\<p\>Added \<code\>export_static_survey()\</code\>. This
+  produces a single, self-contained HTML file that runs the survey in
+  any modern browser without a Shiny server or an internet connection.
+  All thirteen item types are fully rendered (Likert, single choice,
+  multiple choice, matrix, numeric, text, long text, date, slider,
+  rating, ranking, section break, text block). Branching logic,
   required-field validation, a progress bar, welcome and thank-you pages
   are all handled in client-side JavaScript. On submission the browser
-  downloads a per-respondent CSV file. An optional `endpoint_url`
-  argument adds a parallel JSON POST to any serverless endpoint (Google
-  Apps Script, Netlify function, etc.).
-
-  The exported file is suitable for hosting on GitHub Pages, Netlify, or
-  any static file server, and can also be shared directly as an e-mail
-  attachment and opened from disk.
-
-  The SHA-256 hash written into `.sframe` files by
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
-  and by the SurveyBuilder HTML is computed using the same
-  canonicalisation algorithm, so instruments round-trip correctly
-  between the browser and R.
-
-#### Interactive response dashboard
-
-- Added
-  [`launch_dashboard()`](https://surveyframe.org/reference/superseded.md).
-  Opens a five-panel Shiny dashboard for exploring collected response
-  data alongside the instrument definition, without modifying either.
-  The panels are: Overview (response count, date range, instrument
+  downloads a per-respondent CSV file. An optional
+  \<code\>endpoint_url\</code\> argument adds a parallel JSON POST to
+  any serverless endpoint (Google Apps Script, Netlify function,
+  etc.).\</p\> \<p\>The exported file is suitable for hosting on GitHub
+  Pages, Netlify, or any static file server, and can also be shared
+  directly as an e-mail attachment and opened from disk.\</p\> \<p\>The
+  SHA-256 hash written into \<code\>.sframe\</code\> files by
+  \<code\>write_sframe()\</code\> and by the SurveyBuilder HTML is
+  computed using the same canonicalisation algorithm, so instruments
+  round-trip correctly between the browser and R.\</p\>\</li\> \</ul\>
+  \</div\> \<div id="interactive-response-dashboard" class="section
+  level3"\> \<h3\>Interactive response dashboard\</h3\> \<ul\>
+  \<li\>\<p\>Added \<code\>launch_dashboard()\</code\>. Opens a
+  five-panel Shiny dashboard for exploring collected response data
+  alongside the instrument definition, without modifying either. The
+  panels are: Overview (response count, date range, instrument
   metadata), Items (per-item bar charts, histograms, and frequency
   tables), Scales (scale score distributions with mean overlay), Quality
   (attention-check pass rates), and Raw data (a scrollable response
-  table with CSV download).
-
-  When called without arguments the dashboard loads the bundled tourism
-  services demo. When called with a user-supplied instrument and no
-  `responses` argument, it opens in metadata-only mode showing
-  instrument structure.
-
-- Added
-  [`sframe_demo_data()`](https://surveyframe.org/reference/superseded.md),
-  [`sframe_input_types_demo_data()`](https://surveyframe.org/reference/superseded.md),
-  [`launch_builder_demo()`](https://surveyframe.org/reference/superseded.md),
-  [`launch_studio_demo()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`launch_dashboard_demo()`](https://surveyframe.org/reference/superseded.md)
-  for CRAN-safe examples, training, and local GUI testing.
-
-- Added a bundled input-types demo instrument and simulated response
-  dataset for testing SurveyBuilder, SurveyStudio, the dashboard, and
-  all supported item controls.
-
-- [`launch_studio()`](https://surveyframe.org/reference/launch_studio.md)
-  now accepts preloaded instruments, response data frames, CSV response
-  paths, initial screen selection, host, port, and browser control.
-  SurveyStudio reads these preloaded values during startup.
-
-#### Shiny survey module
-
-- Added
-  [`survey_module_ui()`](https://surveyframe.org/reference/superseded.md)
-  and
-  [`survey_module_server()`](https://surveyframe.org/reference/superseded.md).
-  These allow a survey to be embedded inside a larger Shiny application
-  as a first-class module.
-  [`survey_module_server()`](https://surveyframe.org/reference/superseded.md)
-  returns a `reactive` that holds `NULL` until the form is submitted,
-  then returns the response as a named list keyed by item ID.
-
-  ``` r
-
-  ui <- fluidPage(survey_module_ui("s1"))
-  server <- function(input, output, session) {
-    resp <- survey_module_server("s1", instrument = instr)
-    observeEvent(resp(), { saveRDS(resp(), "response.rds") })
-  }
-  ```
-
-  An optional `on_submit` callback fires immediately on submission,
-  before any
-  [`observeEvent()`](https://rdrr.io/pkg/shiny/man/observeEvent.html)
-  elsewhere in the app.
-
-#### Extended analysis plan tests
-
-[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
-now implements four additional tests used by the SurveyBuilder’s test
-dropdown:
-
-- `anova_one`: One-way ANOVA with eta-squared effect size. When the
-  result is significant and there are more than two groups, Tukey HSD
-  post-hoc output is included in the result object.
-- `t_test_pair`: Paired-samples t-test with Cohen’s d_z.
-- `wilcoxon_pair`: Wilcoxon signed-rank test with r effect size.
-- `regression_logistic_binary`: Binary logistic regression with McFadden
-  R-squared and an overall model chi-square test. The full coefficient
-  table is returned for interpretation.
-
-All four runners produce an APA-formatted summary string and an
-interpretation `prompt` field to guide write-up.
-
-### Bug fixes
-
-- [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+  table with CSV download).\</p\> \<p\>When called without arguments the
+  dashboard loads the bundled tourism services demo. When called with a
+  user-supplied instrument and no \<code\>responses\</code\> argument,
+  it opens in metadata-only mode showing instrument
+  structure.\</p\>\</li\> \<li\>\<p\>Added
+  \<code\>sframe_demo_data()\</code\>,
+  \<code\>sframe_input_types_demo_data()\</code\>,
+  \<code\>launch_builder_demo()\</code\>,
+  \<code\>launch_studio_demo()\</code\>, and
+  \<code\>launch_dashboard_demo()\</code\> for CRAN-safe examples,
+  training, and local GUI testing.\</p\>\</li\> \<li\>\<p\>Added a
+  bundled input-types demo instrument and simulated response dataset for
+  testing SurveyBuilder, SurveyStudio, the dashboard, and all supported
+  item controls.\</p\>\</li\>
+  \<li\>\<p\>\<code\>launch_studio()\</code\> now accepts preloaded
+  instruments, response data frames, CSV response paths, initial screen
+  selection, host, port, and browser control. SurveyStudio reads these
+  preloaded values during startup.\</p\>\</li\> \</ul\> \</div\> \<div
+  id="shiny-survey-module" class="section level3"\> \<h3\>Shiny survey
+  module\</h3\> \<ul\> \<li\>\<p\>Added
+  \<code\>survey_module_ui()\</code\> and
+  \<code\>survey_module_server()\</code\>. These allow a survey to be
+  embedded inside a larger Shiny application as a first-class module.
+  \<code\>survey_module_server()\</code\> returns a
+  \<code\>reactive\</code\> that holds \<code\>NULL\</code\> until the
+  form is submitted, then returns the response as a named list keyed by
+  item ID.\</p\> \<div class="sourceCode" id="cb1"\>\<pre
+  class="sourceCode r"\>\<code class="sourceCode r"\>\<span
+  id="cb1-1"\>\<a href="#cb1-1" tabindex="-1"\>\</a\>ui \<span
+  class="ot"\>\<-\</span\> \<span class="fu"\>fluidPage\</span\>(\<span
+  class="fu"\>survey_module_ui\</span\>(\<span
+  class="st"\>"s1"\</span\>))\</span\> \<span id="cb1-2"\>\<a
+  href="#cb1-2" tabindex="-1"\>\</a\>server \<span
+  class="ot"\>\<-\</span\> \<span class="cf"\>function\</span\>(input,
+  output, session) {\</span\> \<span id="cb1-3"\>\<a href="#cb1-3"
+  tabindex="-1"\>\</a\> resp \<span class="ot"\>\<-\</span\> \<span
+  class="fu"\>survey_module_server\</span\>(\<span
+  class="st"\>"s1"\</span\>, \<span class="at"\>instrument =\</span\>
+  instr)\</span\> \<span id="cb1-4"\>\<a href="#cb1-4"
+  tabindex="-1"\>\</a\> \<span class="fu"\>observeEvent\</span\>(\<span
+  class="fu"\>resp\</span\>(), { \<span
+  class="fu"\>saveRDS\</span\>(\<span class="fu"\>resp\</span\>(),
+  \<span class="st"\>"response.rds"\</span\>) })\</span\> \<span
+  id="cb1-5"\>\<a href="#cb1-5"
+  tabindex="-1"\>\</a\>}\</span\>\</code\>\</pre\>\</div\> \<p\>An
+  optional \<code\>on_submit\</code\> callback fires immediately on
+  submission, before any \<code\>observeEvent()\</code\> elsewhere in
+  the app.\</p\>\</li\> \</ul\> \</div\> \<div
+  id="extended-analysis-plan-tests" class="section level3"\>
+  \<h3\>Extended analysis plan tests\</h3\>
+  \<p\>\<code\>run_analysis_plan()\</code\> now implements four
+  additional tests used by the SurveyBuilder’s test dropdown:\</p\>
+  \<ul\> \<li\>\<code\>anova_one\</code\>: One-way ANOVA with
+  eta-squared effect size. When the result is significant and there are
+  more than two groups, Tukey HSD post-hoc output is included in the
+  result object.\</li\> \<li\>\<code\>t_test_pair\</code\>:
+  Paired-samples t-test with Cohen’s d_z.\</li\>
+  \<li\>\<code\>wilcoxon_pair\</code\>: Wilcoxon signed-rank test with r
+  effect size.\</li\> \<li\>\<code\>regression_logistic_binary\</code\>:
+  Binary logistic regression with McFadden R-squared and an overall
+  model chi-square test. The full coefficient table is returned for
+  interpretation.\</li\> \</ul\> \<p\>All four runners produce an
+  APA-formatted summary string and an interpretation
+  \<code\>prompt\</code\> field to guide write-up.\</p\> \</div\>
+  \</div\> \<div id="bug-fixes-3" class="section level2"\> \<h2\>Bug
+  fixes\</h2\> \<ul\> \<li\>\<p\>\<code\>write_sframe()\</code\>
   validates the instrument and writes the validated object, preserving
-  `meta$validated = TRUE` in the saved `.sframe` file.
-
-- `.sframe` serialisation now includes a `models` field and continues to
-  read older `.sframe` files where `models` is absent.
-
-- [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
-  no longer requires display-only items such as `section_break` and
-  `text_block` to appear as response columns.
-
-- [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
-  now checks model references, analysis-plan roles, invalid model IDs,
-  duplicate model IDs, and model indicator/path integrity.
-
-- `launch_builder(open = TRUE)` opens the SurveyBuilder HTML in the
-  system’s default browser via
-  [`utils::browseURL()`](https://rdrr.io/r/utils/browseURL.html).
-
-- `R/studio_builder.R` contains three fully implemented internal
-  functions (`sframe_builder_empty_state`,
-  `sframe_builder_state_from_instrument`,
-  `sframe_builder_validate_draft`) used by SurveyStudio startup and
-  draft validation.
-
-- SHA-256 hashing in the SurveyBuilder HTML includes a pure-JavaScript
-  fallback for environments where `crypto.subtle` is unavailable on
-  `file://` origins, including common Firefox `file://` configurations.
-  Saving a `.sframe` file from the builder now always succeeds.
-
-- The SurveyBuilder’s `rqSuggest` box now appears with an icon and a
+  \<code\>meta\$validated = TRUE\</code\> in the saved
+  \<code\>.sframe\</code\> file.\</p\>\</li\>
+  \<li\>\<p\>\<code\>.sframe\</code\> serialisation now includes a
+  \<code\>models\</code\> field and continues to read older
+  \<code\>.sframe\</code\> files where \<code\>models\</code\> is
+  absent.\</p\>\</li\> \<li\>\<p\>\<code\>read_responses()\</code\> no
+  longer requires display-only items such as
+  \<code\>section_break\</code\> and \<code\>text_block\</code\> to
+  appear as response columns.\</p\>\</li\>
+  \<li\>\<p\>\<code\>validate_sframe()\</code\> now checks model
+  references, analysis-plan roles, invalid model IDs, duplicate model
+  IDs, and model indicator/path integrity.\</p\>\</li\>
+  \<li\>\<p\>\<code\>launch_builder(open = TRUE)\</code\> opens the
+  SurveyBuilder HTML in the system’s default browser via
+  \<code\>utils::browseURL()\</code\>.\</p\>\</li\>
+  \<li\>\<p\>\<code\>R/studio_builder.R\</code\> contains three fully
+  implemented internal functions
+  (\<code\>sframe_builder_empty_state\</code\>,
+  \<code\>sframe_builder_state_from_instrument\</code\>,
+  \<code\>sframe_builder_validate_draft\</code\>) used by SurveyStudio
+  startup and draft validation.\</p\>\</li\> \<li\>\<p\>SHA-256 hashing
+  in the SurveyBuilder HTML includes a pure-JavaScript fallback for
+  environments where \<code\>crypto.subtle\</code\> is unavailable on
+  \<code\>file://\</code\> origins, including common Firefox
+  \<code\>file://\</code\> configurations. Saving a
+  \<code\>.sframe\</code\> file from the builder now always
+  succeeds.\</p\>\</li\> \<li\>\<p\>The SurveyBuilder’s
+  \<code\>rqSuggest\</code\> box now appears with an icon and a
   plain-language recommendation when two or more variables are selected
-  in the RQ modal.
-
-- The undo and redo buttons in the SurveyBuilder topbar are now
-  correctly disabled when their respective history stacks are empty.
-
-### Security hardening
-
-- [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
+  in the RQ modal.\</p\>\</li\> \<li\>\<p\>The undo and redo buttons in
+  the SurveyBuilder topbar are now correctly disabled when their
+  respective history stacks are empty.\</p\>\</li\> \</ul\> \</div\>
+  \<div id="security-hardening" class="section level2"\> \<h2\>Security
+  hardening\</h2\> \<ul\> \<li\>\<code\>export_google_sheet()\</code\>
   now writes Google Apps Script using JSON-encoded JavaScript literals
   instead of interpolating instrument metadata directly into executable
   code. The generated endpoint also rejects missing, over-large, and
-  non-object JSON POST bodies.
-- SurveyStudio upload handlers now validate uploaded `.sframe` and
-  `.csv` files by extension, size, and text-content checks before
-  passing them to import functions.
-- [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
-  now validates the top-level `.sframe` payload structure before hash
-  verification and object reconstruction.
-- Internal HTML report generation now applies escaping consistently to
-  report titles, instrument metadata, citations, and effect labels.
-- Quarto report rendering now cleans temporary render directories and
-  RDS files with [`on.exit()`](https://rdrr.io/r/base/on.exit.html) even
-  when rendering fails.
-
-### Documentation
-
-- [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
-  [`score_scales()`](https://surveyframe.org/reference/score_scales.md),
-  [`codebook_report()`](https://surveyframe.org/reference/superseded.md),
-  [`cfa_syntax()`](https://surveyframe.org/reference/superseded.md), and
-  `launch_builder(open = FALSE)` have fully runnable examples.
-- Reworked the vignette set into a coherent workflow covering instrument
+  non-object JSON POST bodies.\</li\> \<li\>SurveyStudio upload handlers
+  now validate uploaded \<code\>.sframe\</code\> and
+  \<code\>.csv\</code\> files by extension, size, and text-content
+  checks before passing them to import functions.\</li\>
+  \<li\>\<code\>read_sframe()\</code\> now validates the top-level
+  \<code\>.sframe\</code\> payload structure before hash verification
+  and object reconstruction.\</li\> \<li\>Internal HTML report
+  generation now applies escaping consistently to report titles,
+  instrument metadata, citations, and effect labels.\</li\> \<li\>Quarto
+  report rendering now cleans temporary render directories and RDS files
+  with \<code\>on.exit()\</code\> even when rendering fails.\</li\>
+  \</ul\> \</div\> \<div id="documentation-4" class="section level2"\>
+  \<h2\>Documentation\</h2\> \<ul\>
+  \<li\>\<code\>validate_sframe()\</code\>,
+  \<code\>score_scales()\</code\>, \<code\>codebook_report()\</code\>,
+  \<code\>cfa_syntax()\</code\>, and \<code\>launch_builder(open =
+  FALSE)\</code\> have fully runnable examples.\</li\> \<li\>Reworked
+  the vignette set into a coherent workflow covering instrument
   building, response analysis, reliability and validity, EFA/CFA/SEM/PLS
-  syntax generation, and GUI usage.
-- The demo launchers
-  ([`launch_builder_demo()`](https://surveyframe.org/reference/superseded.md),
-  [`launch_studio_demo()`](https://surveyframe.org/reference/superseded.md),
-  and
-  [`launch_dashboard_demo()`](https://surveyframe.org/reference/superseded.md))
-  open in the browser with the demo instrument, scales, and analysis
-  plan preloaded, so no manual file loading is needed.
-- The interactive package demo (`demo("survey")`) walks through the
-  whole workflow with step-by-step prompts.
-
-### Dashboard and report polish
-
-- The dashboard parses response dates in the common formats (ISO 8601,
-  date-only, UK and US day orders) instead of erroring on non-standard
-  strings, colour-codes quality rows by flag status, matches the
-  download button to the active theme, and draws the Items and Scales
-  charts as soon as their tabs open.
-- HTML report tables use APA formatting, with horizontal rules only and
-  a significance footnote added automatically when a p-value column is
-  present.
-
-## surveyframe 0.1.0
-
-- Initial release.
-- Core S3 object system:
-  [`sf_instrument()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_item()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_choices()`](https://surveyframe.org/reference/superseded.md),
-  [`sf_scale()`](https://surveyframe.org/reference/superseded.md).
-- Serialisation:
-  [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md),
-  [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
-  with SHA-256 integrity checking.
-- Shiny survey renderer:
-  [`render_survey()`](https://surveyframe.org/reference/superseded.md).
-- Static SurveyBuilder HTML:
-  [`launch_builder()`](https://surveyframe.org/reference/launch_builder.md).
-- Response reader:
-  [`read_responses()`](https://surveyframe.org/reference/read_responses.md).
+  syntax generation, and GUI usage.\</li\> \<li\>The demo launchers
+  (\<code\>launch_builder_demo()\</code\>,
+  \<code\>launch_studio_demo()\</code\>, and
+  \<code\>launch_dashboard_demo()\</code\>) open in the browser with the
+  demo instrument, scales, and analysis plan preloaded, so no manual
+  file loading is needed.\</li\> \<li\>The interactive package demo
+  (\<code\>demo("survey")\</code\>) walks through the whole workflow
+  with step-by-step prompts.\</li\> \</ul\> \</div\> \<div
+  id="dashboard-and-report-polish" class="section level2"\>
+  \<h2\>Dashboard and report polish\</h2\> \<ul\> \<li\>The dashboard
+  parses response dates in the common formats (ISO 8601, date-only, UK
+  and US day orders) instead of erroring on non-standard strings,
+  colour-codes quality rows by flag status, matches the download button
+  to the active theme, and draws the Items and Scales charts as soon as
+  their tabs open.\</li\> \<li\>HTML report tables use APA formatting,
+  with horizontal rules only and a significance footnote added
+  automatically when a p-value column is present.\</li\> \</ul\>
+  \</div\> \</div\> \<div id="surveyframe-010" class="section level1"\>
+  \<h1\>surveyframe 0.1.0\</h1\> \<ul\> \<li\>Initial release.\</li\>
+  \<li\>Core S3 object system: \<code\>sf_instrument()\</code\>,
+  \<code\>sf_item()\</code\>, \<code\>sf_choices()\</code\>,
+  \<code\>sf_scale()\</code\>.\</li\> \<li\>Serialisation:
+  \<code\>write_sframe()\</code\>, \<code\>read_sframe()\</code\> with
+  SHA-256 integrity checking.\</li\> \<li\>Shiny survey renderer:
+  \<code\>render_survey()\</code\>.\</li\> \<li\>Static SurveyBuilder
+  HTML: \<code\>launch_builder()\</code\>.\</li\> \<li\>Response reader:
+  \<code\>read_responses()\</code\>.\</li\> \</ul\> \</div\>

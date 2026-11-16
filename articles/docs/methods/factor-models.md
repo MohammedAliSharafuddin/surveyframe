@@ -7,10 +7,10 @@ These methods check whether items measure the factors assumed, write the
 lavaan or seminr syntax for a declared model, and estimate mediation and
 moderation.
 
-**Assumptions.** Enough respondents for the number of items, and items
-that correlate. surveyframe writes the CFA, SEM and PLS-SEM syntax, and
-you fit it in lavaan or seminr. It estimates factor analysis, mediation
-and moderation itself.
+**Assumptions.** Use enough respondents for the number of items, and use
+items that correlate. surveyframe writes the CFA, SEM and PLS-SEM
+syntax, and you fit it in lavaan or seminr. It estimates factor
+analysis, mediation and moderation itself.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. For factor analysis, set the items. For

@@ -21,8 +21,8 @@ The star rating as the respondent sees it.
 
 ## Settings
 
-- **Number of stars.** The top of the scale. The answer is the number of
-  stars given.
+- **Number of stars.** Set the top of the scale. The answer is the
+  number of stars given.
 
 ## Best practices for research
 

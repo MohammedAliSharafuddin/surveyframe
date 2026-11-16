@@ -12,7 +12,7 @@ package version 0.4.3) \[Computer software\].
 ## BibTeX
 
     @Manual{surveyframe,
-      title  = {surveyframe: Survey Instrument Workflows},
+      title  = {surveyframe: Design, Plan, Seal and Report Questionnaire Studies},
       author = {Mohammed Ali Sharafuddin},
       year   = {2026},
       note   = {R package version 0.4.3},

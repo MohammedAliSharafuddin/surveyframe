@@ -6,7 +6,7 @@
 These methods test whether answers change between 2 or more measurements
 of the same respondents.
 
-**Assumptions.** Each respondent measured every time. The paired t-test
+**Assumptions.** Measure each respondent every time. The paired t-test
 and repeated measures ANOVA assume roughly normal differences, the
 rank-based tests do not. McNemar and Cochran’s Q take yes or no answers.
 

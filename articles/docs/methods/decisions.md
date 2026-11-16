@@ -5,8 +5,9 @@
 
 These methods weigh each criterion and rank the options.
 
-**Assumptions.** Consistent pairwise judgements (a consistency ratio
-below .10) and a performance score for each option on each criterion.
+**Assumptions.** Use consistent pairwise judgements, with a consistency
+ratio below .10, and give each option a performance score on each
+criterion.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. Set the criteria weight or pairwise

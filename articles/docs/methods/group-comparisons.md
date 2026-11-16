@@ -6,9 +6,10 @@
 These methods test whether an outcome differs between 2 or more groups
 of respondents.
 
-**Assumptions.** Independent respondents. The t-test and ANOVA assume a
-roughly normal outcome in each group and similar spread, the rank-based
-tests do not. ANCOVA adds a straight-line relation with the covariate.
+**Assumptions.** Use responses from independent respondents. The t-test
+and ANOVA assume a roughly normal outcome in each group and similar
+spread, the rank-based tests do not. ANCOVA adds a straight-line
+relation with the covariate.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. Set the outcome, a numeric answer, and

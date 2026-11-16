@@ -22,10 +22,10 @@ The single-choice question as the respondent sees it.
 
 ## Settings
 
-- **Choice set.** The answer options, each with the label respondents
-  see and the code stored in the data.
-- **Other, please specify.** Adds a text box for an answer the options
-  miss, kept beside the code.
+- **Choice set.** Add the answer options, each with the label
+  respondents see and the code stored in the data.
+- **Other, please specify.** Tick it to add a text box for an answer the
+  options miss, kept beside the code.
 - **Ordered.** Tick it when the options follow a meaningful sequence,
   such as low, medium and high, so the analysis treats them as ranked.
 

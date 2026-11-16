@@ -10,13 +10,14 @@
 Source:
 [`inst/CITATION`](https://github.com/MohammedAliSharafuddin/surveyframe/blob/main/inst/CITATION)
 
-Sharafuddin MA (2026). *surveyframe: Survey Instrument Workflows*.
+Sharafuddin MA (2026). *surveyframe: Design, Plan, Seal and Report
+Questionnaire Studies*.
 [doi:10.32614/CRAN.package.surveyframe](https://doi.org/10.32614/CRAN.package.surveyframe).
 R package version 0.4.3,
 <https://CRAN.R-project.org/package=surveyframe>.
 
     @Manual{,
-      title = {surveyframe: Survey Instrument Workflows},
+      title = {surveyframe: Design, Plan, Seal and Report Questionnaire Studies},
       author = {Mohammed Ali Sharafuddin},
       year = {2026},
       note = {R package version 0.4.3},

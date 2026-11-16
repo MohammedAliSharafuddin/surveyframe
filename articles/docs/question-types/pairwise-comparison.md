@@ -24,12 +24,13 @@ The pairwise comparisons as the respondent sees it.
 
 ## Settings
 
-- **Criteria.** The things compared. On Saaty’s scale each pair is asked
-  once, since judging A against B also answers B against A. On the
+- **Criteria.** List the things compared. On Saaty’s scale each pair is
+  asked once, since judging A against B also answers B against A. On the
   influence scale each pair is asked in both directions, since the
   influence of A on B can differ from that of B on A.
-- **Scale.** Saaty’s 1 to 9 for which matters more and by how much (AHP,
-  ANP), or 0 to 4 for how much 1 influences another (DEMATEL).
+- **Scale.** Choose Saaty’s 1 to 9 for which matters more and by how
+  much (AHP, ANP), or 0 to 4 for how much 1 influences another
+  (DEMATEL).
 
 ## Best practices for research
 

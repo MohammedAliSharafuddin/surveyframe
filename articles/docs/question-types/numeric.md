@@ -21,8 +21,8 @@ The number question as the respondent sees it.
 
 ## Settings
 
-- **Minimum and maximum.** The accepted range. A respondent whose entry
-  is outside it is asked to correct it.
+- **Minimum and maximum.** Set the accepted range. A respondent whose
+  entry is outside it is asked to correct it.
 
 ## Best practices for research
 

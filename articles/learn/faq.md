@@ -22,6 +22,22 @@ and no data, and upload it to OSF or Zenodo with the `.sframe` file. The
 plan names the file’s hash, so the registration identifies the exact
 instrument.
 
+## Does planning the analysis first limit creative thinking?
+
+No. Planning first separates what you predicted from what you
+discovered, and you keep both. Any analysis you add after the data
+arrive still runs, and the report labels its result “Exploratory: no
+hypothesis declared before the data”, so a reader sees it as a finding
+to test next. If your plan changes after sealing, record the change with
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md).
+Each amendment keeps its reason and points to the hash it replaces, and
+the [verify page](https://surveyframe.org/verify/) lists it.
+
+The creative work moves earlier, into the questions, the hypotheses and
+the design, where a weak idea costs the least to change. You still make
+every analytical decision. surveyframe keeps the record of those
+decisions, and writes the formatting and the codebook for you.
+
 ## How are answers collected?
 
 Export the questionnaire from SurveyStudio’s Collect screen as 1 HTML

@@ -25,7 +25,7 @@ A single character string.
 
 ## See also
 
-Other print, format and summary methods:
+Other printing formatting and summary methods:
 [`format.sf_branch()`](https://surveyframe.org/reference/format.sf_branch.md),
 [`format.sf_choices()`](https://surveyframe.org/reference/format.sf_choices.md),
 [`format.sf_item()`](https://surveyframe.org/reference/format.sf_item.md),

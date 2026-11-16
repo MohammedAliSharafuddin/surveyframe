@@ -6,7 +6,7 @@
 These methods find the words, phrases, contexts, tones and topics in
 open answers.
 
-**Assumptions.** Enough text per answer for the method. Topic models
+**Assumptions.** Use enough text per answer for the method. Topic models
 need many answers.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research

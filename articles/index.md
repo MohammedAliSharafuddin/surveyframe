@@ -431,8 +431,9 @@ and how to cite surveyframe.
   questions](https://surveyframe.org/articles/learn/faq.md):
 
   Answers about surveyframe: using it for a thesis, preregistering on
-  OSF, working by point and click in SurveyStudio, collecting answers,
-  and checking a questionnaire file.
+  OSF, planning first and creative thinking, working by point and click
+  in SurveyStudio, collecting answers, and checking a questionnaire
+  file.
 
 - [Reviewing survey studies for an ethics
   committee](https://surveyframe.org/articles/learn/for-ethics-committees.md):

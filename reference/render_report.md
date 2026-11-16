@@ -229,7 +229,10 @@ path of the executable itself, as in the quarto package. The Quarto
 report gives the version used and where it was found, and the returned
 path carries the executable as its `"quarto"` attribute.
 `options(surveyframe.use_quarto = FALSE)` uses the built-in engine
-whatever is installed.
+whatever is installed. Quarto 1.7.0 or later supplies Typst 0.12 or
+later, which keeps a long table's number and title together at a page
+break. An older Quarto copy continues to render and reports that this
+caption may split across pages.
 
 ## Markdown in text fields
 

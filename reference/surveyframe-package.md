@@ -1,4 +1,4 @@
-# surveyframe: Survey Instrument Workflows for R
+# surveyframe: Design, Plan, Seal and Report Questionnaire Studies
 
 surveyframe defines a survey instrument as a first-class R object and
 supports a complete workflow from questionnaire design through data

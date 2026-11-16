@@ -40,7 +40,7 @@ results <- run_analysis_plan(d$responses, d$instrument)
 |----|----|----|
 | How does the scale score overall? | Descriptive statistics | The APA 7 sentence and a table, with a chart where the method has one |
 | Is the scale internally consistent? | Cronbach’s alpha (internal consistency) | The APA 7 sentence and a table, with a chart where the method has one |
-| Same question, omega rather than alpha. | McDonald’s omega (internal consistency) | The APA 7 sentence and a table, with a chart where the method has one |
+| Is the scale internally consistent according to omega? | McDonald’s omega (internal consistency) | The APA 7 sentence and a table, with a chart where the method has one |
 | Does any item sit poorly with the rest? | Item diagnostics | The APA 7 sentence and a table, with a chart where the method has one |
 
 Run the example in SurveyStudio or R to see the results, each marked as

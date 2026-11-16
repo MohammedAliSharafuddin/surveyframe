@@ -6,10 +6,10 @@
 These methods estimate how much predictors explain a numeric outcome, or
 how they change the odds of a yes, an ordered rating or a choice.
 
-**Assumptions.** Independent respondents, predictors only loosely
-related to each other, and for linear regression a straight-line
-relation with roughly normal residuals. Firth’s correction suits small
-samples and rare outcomes.
+**Assumptions.** Use independent respondents and predictors that are
+only loosely related to each other. For linear regression, use a
+straight-line relation with roughly normal residuals. Firth’s correction
+suits small samples and rare outcomes.
 
 In SurveyStudio, open **Plan** on the Design screen, add a research
 question and choose the method. Set the outcome and 1 or more

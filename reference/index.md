@@ -8,7 +8,7 @@ sframe_demo(“first_survey”) is a whole survey to start from.
 
 - [`surveyframe`](https://surveyframe.org/reference/surveyframe-package.md)
   [`surveyframe-package`](https://surveyframe.org/reference/surveyframe-package.md)
-  : surveyframe: Survey Instrument Workflows for R
+  : surveyframe: Design, Plan, Seal and Report Questionnaire Studies
 - [`launch_studio()`](https://surveyframe.org/reference/launch_studio.md)
   : Launch the SurveyStudio interface
 

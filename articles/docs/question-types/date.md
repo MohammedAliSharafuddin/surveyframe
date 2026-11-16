@@ -20,7 +20,7 @@ The date question as the respondent sees it.
 
 ## Settings
 
-- **Required.** Asks for a date before the respondent goes on.
+- **Required.** Tick it to require a date before the respondent goes on.
 
 ## Best practices for research
 

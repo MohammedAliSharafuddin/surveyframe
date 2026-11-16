@@ -2,7 +2,7 @@
   "sframe_format": "1.0",
   "hash": {
     "algo": "sha256",
-    "value": "dccd03b03c96461abab2250032bdab015997f927f58fd190de630193e804b663",
+    "value": "fab7ddf43799e6e6f52be79a288a62dc103e2b291dc3abc2ee862bab96380147",
     "canonical": "rfc8785"
   },
   "version": "1.0.0",
@@ -109,7 +109,7 @@
     },
     {
       "id": "RQ3",
-      "research_question": "Same question, omega rather than alpha.",
+      "research_question": "Is the scale internally consistent according to omega?",
       "family": "reliability",
       "method": "reliability_omega",
       "roles": [],

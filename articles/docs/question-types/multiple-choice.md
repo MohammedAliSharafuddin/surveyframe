@@ -22,9 +22,9 @@ The choose-any question as the respondent sees it.
 
 ## Settings
 
-- **Choice set.** The answer options. Each becomes its own column in the
-  data, ticked or left blank.
-- **Required.** Asks for at least 1 tick.
+- **Choice set.** Add the answer options. Each becomes its own column in
+  the data, ticked or left blank.
+- **Required.** Tick it to require at least 1 answer.
 
 ## Best practices for research
 
