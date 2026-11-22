@@ -59,7 +59,7 @@ test_that("a missing file is not shown", {
   expect_false(surveyframe:::sframe_show(tempfile(fileext = ".html")))
 })
 
-test_that("not interactive, it opens nothing and prints 1 line with the path", {
+test_that("not interactive, it opens nothing and prints the path on its own line", {
   calls <- 0
   local_mocked_bindings(sframe_is_interactive = function() FALSE)
   local_mocked_bindings(browseURL = function(url, ...) calls <<- calls + 1, .package = "utils")
@@ -68,7 +68,7 @@ test_that("not interactive, it opens nothing and prints 1 line with the path", {
   out <- show_fixture()
   printed <- capture.output(res <- sframe_show(out))
   expect_false(res)
-  expect_identical(printed, paste0("Written: ", normalizePath(out)))
+  expect_identical(printed, c("Written:", normalizePath(out, winslash = "/")))
   expect_identical(capture.output(sframe_show(out, quiet = TRUE)), character(0))
   expect_equal(calls, 0)
 })

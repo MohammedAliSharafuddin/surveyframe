@@ -22,7 +22,7 @@ Applies to reciprocal matrices only. Default \code{FALSE}.}
 }
 \value{
 A list with \code{matrix}, \code{method}, \code{n_respondents}, \code{n_dropped},
-\code{n_dropped_consistency}, and \code{consistency} (the per-respondent CR
+\code{n_dropped_consistency} and \code{consistency} (the per-respondent CR
 distribution, or \code{NULL} for a non-reciprocal set).
 }
 \description{

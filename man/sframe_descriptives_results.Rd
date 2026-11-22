@@ -34,14 +34,14 @@ as a choice item's category codes, keeps those counts and has \code{NA} in
 every numeric column, since a mean or standard deviation does not apply.
 }
 \description{
-Computes survey descriptives for numeric, Likert, and scale-score columns,
+Computes survey descriptives for numeric, Likert and scale-score columns,
 including missingness, mean, standard deviation, median, IQR, range,
-skewness, kurtosis, standard error, and confidence intervals.
+skewness, kurtosis, standard error and confidence intervals.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
-                           split_by = "visit_type")
+demo <- sframe_demo("two_group")
+dr <- sframe_descriptives_results(demo$responses, variables = "sessions_attended",
+                           split_by = "format")
 dr$table
 }
 \seealso{

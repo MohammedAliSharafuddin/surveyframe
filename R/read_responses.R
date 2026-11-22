@@ -5,7 +5,7 @@
 #' Loads survey response data and checks that it conforms to the instrument
 #' specification. Column names in the response file must match item IDs defined
 #' in the instrument. Non-item columns are allowed only when declared through
-#' `respondent_id`, `submitted_at`, or `meta_cols`.
+#' `respondent_id`, `submitted_at` or `meta_cols`.
 #'
 #' # Columns
 #'
@@ -77,24 +77,24 @@
 #' @return A `data.frame` with columns ordered as: metadata columns first, then
 #'   item columns in instrument order, each item followed by its expansion
 #'   columns, then any undeclared columns kept under `strict = FALSE`. To keep
-#'   an extra column under `strict = TRUE`, name it in `meta_cols`, or select
+#'   an extra column under `strict = TRUE`, name it in `meta_cols` or select
 #'   the columns you need before reading.
 #' @export
 #' @seealso [sframe_quality_results()], [score_scales()]
 #'
 #' @examples
 #' responses <- read_responses(
-#'   x = system.file("extdata", "tourism_services_responses.csv",
+#'   x = system.file("extdata", "demos", "two_group_responses.csv",
 #'                   package = "surveyframe"),
 #'   instrument = read_sframe(
-#'     system.file("extdata", "tourism_services_demo.sframe",
+#'     system.file("extdata", "demos", "two_group.sframe",
 #'                 package = "surveyframe")
 #'   ),
 #'   respondent_id = "respondent_id",
 #'   submitted_at = "submitted_at",
 #'   meta_cols = "started_at"
 #' )
-#' head(responses[, c("respondent_id", "visit_type", "dm_1")])
+#' head(responses[, c("respondent_id", "format", "sessions_attended")])
 #' @family Responses functions
 read_responses <- function(
     x,

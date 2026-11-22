@@ -34,7 +34,7 @@ leaves a sampling distribution to read. The bounds
 are \code{NA} when \code{x} has fewer than 3 finite values.
 }
 \description{
-Resamples \code{x} with replacement \code{R} times, applies \code{FUN} to each resample,
+Resamples \code{x} with replacement \code{R} times, applies \code{FUN} to each resample
 and returns the percentile interval of the resampled statistics together
 with the observed value.
 }

@@ -14,15 +14,15 @@ sframe_plot_missingness(x, palette = c("web", "print"))
 }
 \value{
 A ggplot2 object. When no item has missing values, this is a
-short "no missing responses" message rather than an empty bar chart.
+short "no missing responses" message.
 }
 \description{
-Missing-data report plot: missingness rate by item
+Draws the share of missing answers for each item, highest first.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("first_survey")
   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
   sframe_plot_missingness(mr)
 }

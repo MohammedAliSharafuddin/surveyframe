@@ -17,18 +17,18 @@ the built-in English list, or \code{character(0)} for no filtering.}
 first. Default \code{30}.}
 }
 \value{
-A data.frame with columns \code{term}, \code{n}, and \code{pct}.
+A data.frame with columns \code{term}, \code{n} and \code{pct}.
 }
 \description{
-Tokenises \code{text} (splitting on whitespace, lower-casing, and stripping
-punctuation), removes stop words, and counts term frequency. Ships a
+Tokenises \code{text} (splitting on whitespace, lower-casing and stripping
+punctuation), removes stop words and counts term frequency. Ships a
 small built-in English stop-word list so this works with zero optional
 packages. Pass \code{stop_words = character(0)} to disable filtering, or a
 custom vector to override it.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-cleaned <- sframe_clean_text(demo$responses, "comments")
+demo <- sframe_demo("open_text")
+cleaned <- sframe_clean_text(demo$responses, "what_worked")
 head(sframe_term_frequency(cleaned, top_n = 10))
 }
 \seealso{

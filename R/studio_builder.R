@@ -147,7 +147,7 @@ sframe_builder_empty_state <- function() {
 #'   can be edited or validated by SurveyStudio.
 #' @noRd
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("likert_scale")
 #' state <- sframe_builder_state_from_instrument(demo$instrument)
 #' length(state$items)
 #' length(state$scales)
@@ -318,7 +318,7 @@ sframe_builder_revision_problem <- function(instrument) {
 #'   an undisclosed revision, or `NULL`.
 #' @noRd
 #' @examples
-#' demo  <- sframe_demo("tourism_services")
+#' demo  <- sframe_demo("likert_scale")
 #' state <- sframe_builder_state_from_instrument(demo$instrument)
 #' draft <- sframe_builder_validate_draft(
 #'   meta = state$meta, choices = state$choices, items = state$items,

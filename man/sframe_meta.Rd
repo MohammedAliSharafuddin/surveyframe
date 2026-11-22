@@ -15,11 +15,11 @@ sframe_meta(x, ...)
 A list of instrument or codebook metadata.
 }
 \description{
-Reads the title, version, description, language, validation state, and other
+Reads the title, version, description, language, validation state and other
 metadata without depending on the object's internal list layout.
 }
 \examples{
-sframe_meta(sframe_demo("tourism_services")$instrument)
+sframe_meta(sframe_demo("two_group")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

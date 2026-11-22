@@ -19,13 +19,13 @@ sframe_conjoint_design(
 }
 \arguments{
 \item{id}{Design identifier. Must start with a letter and contain only
-letters, numbers, and \verb{_} characters.}
+letters, numbers and \verb{_} characters.}
 
 \item{attributes}{Named list of character vectors, one per attribute,
 giving that attribute's levels. At least 2 attributes, each with at
 least 2 levels.}
 
-\item{method}{One of \code{"full"}, \code{"balanced"}, or \code{"random"}. Ignored when
+\item{method}{One of \code{"full"}, \code{"balanced"} or \code{"random"}. Ignored when
 \code{profiles} is supplied.}
 
 \item{n_profiles}{Number of profiles to keep. Required for \code{"balanced"}
@@ -48,8 +48,8 @@ given.}
 }
 \value{
 An object of class \code{sf_conjoint_design} with \verb{$profiles}, \verb{$tasks}
-(long format, one row per block, task, and alternative, ready for a
-choice model), \verb{$balance}, and the declaration that produced them.
+(long format, one row per block, task and alternative, ready for a
+choice model), \verb{$balance} and the declaration that produced them.
 }
 \description{
 Generates and stores a conjoint profile set and task schedule as part of

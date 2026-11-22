@@ -19,7 +19,8 @@ sframe_indirect_effect(from, through, to, label = NULL)
 An object of class \code{sf_indirect}.
 }
 \description{
-Define an indirect effect path
+Declares an effect that runs from 1 construct through 1 or more mediators
+to another, so the syntax generators estimate it as a defined parameter.
 }
 \examples{
 ind <- sframe_indirect_effect("sq", through = "sat", to = "bi", label = "mediation")

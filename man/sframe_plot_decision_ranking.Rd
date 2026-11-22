@@ -18,11 +18,11 @@ A ggplot2 object, or \code{NULL} when the result carries no ranking.
 \description{
 The shared chart for every MCDM ranking method: one horizontal bar per
 alternative, ordered best first, with the leading alternative picked out.
-It is generic over the method rather than tied to one, so AHP criterion
+It works for any method, so AHP criterion
 weights and any ranking method's scores all draw through it. The score
 column is whatever the method reports as its headline quantity (a
-closeness coefficient, a net flow, a priority weight), so the axis is
-labelled from the result rather than hard-coded.
+closeness coefficient, a net flow, a priority weight), so the axis takes
+its label from the result.
 }
 \examples{
 \donttest{

@@ -29,7 +29,7 @@ error.}
 criterion.}
 
 \item{method}{Ranking method. One of \code{"topsis"}, \code{"vikor"}, \code{"moora"},
-\code{"smart"}, \code{"waspas"}, \code{"promethee"}, or \code{"electre"}.}
+\code{"smart"}, \code{"waspas"}, \code{"promethee"} or \code{"electre"}.}
 
 \item{delta}{Perturbation size as a proportion of the weight, default
 \code{0.05}. A weight of 0.40 with \code{delta = 0.05} is tested at 0.42 and 0.38
@@ -45,7 +45,7 @@ before renormalisation.}
 \value{
 An object of class \code{sframe_sensitivity}, a list with \verb{$table} (one
 row per criterion and direction, carrying \code{criterion}, \code{direction},
-\code{rho}, \code{rank_changed}, and \code{top_changed}), \verb{$base_ranks}, \verb{$method},
+\code{rho}, \code{rank_changed} and \code{top_changed}), \verb{$base_ranks}, \verb{$method},
 \verb{$delta}, \verb{$stable}, \verb{$degenerate}, \verb{$n_perturbations}, \verb{$n_effective}
 and \verb{$n_failed}. \verb{$stable} is \code{TRUE} when at least one perturbation moved
 the weights and none of those that did changed the ranking. A
@@ -56,7 +56,7 @@ same rank, which no perturbation can move.
 }
 \description{
 Perturbs each criterion weight up and down by \code{delta}, renormalises the
-weight vector to sum to 1, reruns the same ranking method, and compares
+weight vector to sum to 1, reruns the same ranking method and compares
 the perturbed ranking against the base ranking. A ranking that survives
 this unchanged is one a reviewer can be told is robust to the weights. A
 ranking whose leader changes under a 5 percent nudge is not.

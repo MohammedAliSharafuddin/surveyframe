@@ -25,20 +25,18 @@ A data.frame with columns \code{respondent}, \code{before}, \code{match}, and
 \description{
 Finds every case-insensitive, whole-word match of \code{term} in \code{text} and
 returns the words immediately before and after each match, so a reader
-can judge how a term is actually being used rather than reading a bare
-frequency count. Matching is on whole words only, so searching for
+can judge how a term is used in context. Matching is on whole words only, so searching for
 "room" does not match "roomy". \code{text} is expected to already have been
 run through \code{\link[=sframe_clean_text]{sframe_clean_text()}} (its \code{respondent} attribute is used
 to cite the original row index for each match, and when absent, positions
 \code{seq_along(text)} are used instead). Tokenisation here is a plain
-whitespace split, not the internal stop-word-stripping tokeniser behind
-\code{\link[=sframe_term_frequency]{sframe_term_frequency()}}: stop words are part of a match's context and
-stripping them would corrupt the very thing a concordance is for.
+whitespace split that keeps stop words, because they are part of a
+match's context.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-cleaned <- sframe_clean_text(demo$responses, "comments")
-sframe_term_context(cleaned, "service", window = 4)
+demo <- sframe_demo("open_text")
+cleaned <- sframe_clean_text(demo$responses, "what_worked")
+sframe_term_context(cleaned, "speakers", window = 4)
 }
 \seealso{
 Other Text analysis functions:

@@ -20,7 +20,8 @@ build a frame. Ignored by the methods that return a stored table.}
 The primary results table from a sensitivity analysis.
 }
 \description{
-Extract a sensitivity-analysis results table
+Returns 1 row for each weight change tried, with whether it changed the
+ranking and whether it changed the top option.
 }
 \seealso{
 \link{sframe_as_data_frame}

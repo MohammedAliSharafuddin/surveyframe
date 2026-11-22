@@ -104,11 +104,11 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' through `profiles`, which keeps the declaration in the contract either way.
 #'
 #' @param id Design identifier. Must start with a letter and contain only
-#'   letters, numbers, and `_` characters.
+#'   letters, numbers and `_` characters.
 #' @param attributes Named list of character vectors, one per attribute,
 #'   giving that attribute's levels. At least 2 attributes, each with at
 #'   least 2 levels.
-#' @param method One of `"full"`, `"balanced"`, or `"random"`. Ignored when
+#' @param method One of `"full"`, `"balanced"` or `"random"`. Ignored when
 #'   `profiles` is supplied.
 #' @param n_profiles Number of profiles to keep. Required for `"balanced"`
 #'   and `"random"`, ignored for `"full"`.
@@ -123,8 +123,8 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' @param label Human-readable label.
 #'
 #' @return An object of class `sf_conjoint_design` with `$profiles`, `$tasks`
-#'   (long format, one row per block, task, and alternative, ready for a
-#'   choice model), `$balance`, and the declaration that produced them.
+#'   (long format, one row per block, task and alternative, ready for a
+#'   choice model), `$balance` and the declaration that produced them.
 #' @export
 #' @seealso [sframe_instrument()]
 #' @examples

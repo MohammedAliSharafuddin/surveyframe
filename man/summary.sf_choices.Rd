@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_choices object
+Prints the choice set's 1-line format, then whether it offers an "Other"
+answer and whether it shows its options in random order.
 }
 \seealso{
 Other printing formatting and summary methods:

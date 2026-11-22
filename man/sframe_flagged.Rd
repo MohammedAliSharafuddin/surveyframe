@@ -15,11 +15,11 @@ sframe_flagged(x, ...)
 A sorted integer vector of unique response-row positions.
 }
 \description{
-Pools failed attention checks, straight-lining, excess missingness, timing,
+Pools failed attention checks, straight-lining, excess missingness, timing
 and duplicate checks into one set of response-row positions.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("first_survey")
 qr <- sframe_quality_results(demo$responses, demo$instrument)
 sframe_flagged(qr)
 }

@@ -22,7 +22,7 @@ can be recovered with \code{\link[=sframe_object]{sframe_object()}}.
 }
 \description{
 Checks model IDs, construct IDs, indicators, structural path endpoints,
-duplicate paths, indirect paths, and engine/type compatibility.
+duplicate paths, indirect paths and engine/type compatibility.
 }
 \section{Changed in 0.4.0}{
 
@@ -33,14 +33,14 @@ console. Code that read \verb{$valid} and \verb{$problems} keeps working.
 }
 
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("sem_pls")
 m <- sframe_model_spec(
   "cb1", type = "cb_sem",
   constructs = list(
-    sframe_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
-    sframe_construct("sat", items = c("sat_1", "sat_2"))
+    sframe_construct("cq", items = c("cq_1", "cq_2", "cq_3")),
+    sframe_construct("sa", items = c("sa_1", "sa_2", "sa_3"))
   ),
-  paths = list(sframe_path("sq", "sat"))
+  paths = list(sframe_path("cq", "sa"))
 )
 diag <- sframe_validate_model(m, instrument = demo$instrument)
 diag

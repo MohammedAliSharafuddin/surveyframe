@@ -73,7 +73,7 @@ print.sf_component_list <- function(x, ...) {
 
 #' Explore a surveyframe object
 #'
-#' Accessors for the parts of an instrument, a codebook, or a report. They
+#' Accessors for the parts of an instrument, a codebook or a report. They
 #' replace reaching into the object with `$`, which ties user code to the
 #' internal layout.
 #'
@@ -104,7 +104,6 @@ print.sf_component_list <- function(x, ...) {
 #'   [sf_component_list] for the component accessors on an instrument, and a
 #'   data frame for any of them on a codebook. See the table above.
 #' @name sframe_accessors
-#' @aliases sf_accessors
 #' @seealso [as_sframe()], [sframe_problems()], [sframe_validation]
 #'
 #' @examples
@@ -125,7 +124,7 @@ NULL
 
 #' Get survey metadata
 #'
-#' Reads the title, version, description, language, validation state, and other
+#' Reads the title, version, description, language, validation state and other
 #' metadata without depending on the object's internal list layout.
 #'
 #' @param x A surveyframe object.
@@ -133,7 +132,7 @@ NULL
 #' @return A list of instrument or codebook metadata.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_meta(sframe_demo("tourism_services")$instrument)
+#' sframe_meta(sframe_demo("two_group")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_meta <- function(x, ...) UseMethod("sframe_meta")
@@ -147,7 +146,7 @@ sframe_meta <- function(x, ...) UseMethod("sframe_meta")
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_items(sframe_demo("tourism_services")$instrument)
+#' sframe_get_items(sframe_demo("two_group")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
@@ -162,7 +161,7 @@ sframe_get_items <- function(x, ...) UseMethod("sframe_get_items")
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_scales(sframe_demo("tourism_services")$instrument)
+#' sframe_get_scales(sframe_demo("likert_scale")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
@@ -177,7 +176,7 @@ sframe_get_scales <- function(x, ...) UseMethod("sframe_get_scales")
 #'   for a codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_choice_sets(sframe_demo("tourism_services")$instrument)
+#' sframe_get_choice_sets(sframe_demo("two_group")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
@@ -190,7 +189,7 @@ sframe_get_choice_sets <- function(x, ...) UseMethod("sframe_get_choice_sets")
 #' @return An [sf_component_list] of branching rules.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_branches(sframe_demo("tourism_services")$instrument)
+#' sframe_get_branches(sframe_demo("branching")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_get_branches <- function(x, ...) UseMethod("sframe_get_branches")
@@ -210,14 +209,14 @@ sframe_get_attention_checks <- function(x, ...) UseMethod("sframe_get_attention_
 
 #' Get model specifications
 #'
-#' Returns declared CFA, SEM, PLS-SEM, mediation, and related model objects.
+#' Returns declared CFA, SEM, PLS-SEM, mediation and related model objects.
 #'
 #' @inheritParams sframe_meta
 #' @return An [sf_component_list] for an instrument or a model data frame for a
 #'   codebook.
 #' @seealso [sframe_accessors]
 #' @examples
-#' sframe_get_models(sframe_demo("tourism_services")$instrument)
+#' sframe_get_models(sframe_demo("sem_pls")$instrument)
 #' @export
 #' @family Inspect functions
 sframe_get_models <- function(x, ...) UseMethod("sframe_get_models")
@@ -358,11 +357,13 @@ sframe_plan.sframe_codebook <- function(x, ...) x$plan_table
 
 #' The ID and label of an instrument component
 #'
+#' `sframe_id()` returns the ID of an item, scale, check, branch or other
+#' component, and `sframe_label()` returns its label.
+#'
 #'
 #' @return A single character string. `sframe_label()` returns `""` when the
 #'   component carries no label.
 #' @name sframe_identity
-#' @aliases sf_identity
 #'
 #' @examples
 #' item <- sframe_item("q1", "How satisfied are you?", type = "likert",
@@ -458,7 +459,6 @@ sframe_label.sf_model <- sframe_component_label
 #'   character vector, empty when the object is valid. `sframe_object()` returns
 #'   the validated object.
 #' @name sframe_validation_accessors
-#' @aliases sf_validation_accessors
 #' @seealso [validate_sframe()], [sframe_validation], [as_sframe()]
 #'
 #' @examples
@@ -480,7 +480,7 @@ NULL
 #' @return A single logical value.
 #' @seealso [sframe_validation_accessors], [validate_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("two_group")$instrument, strict = FALSE)
 #' sframe_is_valid(v)
 #' @export
 #' @family Inspect functions
@@ -494,7 +494,7 @@ sframe_is_valid <- function(x, ...) UseMethod("sframe_is_valid")
 #' @return A character vector, empty when validation passed.
 #' @seealso [sframe_validation_accessors], [validate_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("two_group")$instrument, strict = FALSE)
 #' sframe_problems(v)
 #' @export
 #' @family Inspect functions
@@ -509,7 +509,7 @@ sframe_problems <- function(x, ...) UseMethod("sframe_problems")
 #' @return The object held by a validation result.
 #' @seealso [sframe_validation_accessors], [as_sframe()]
 #' @examples
-#' v <- validate_sframe(sframe_demo("tourism_services")$instrument, strict = FALSE)
+#' v <- validate_sframe(sframe_demo("two_group")$instrument, strict = FALSE)
 #' sframe_object(v)
 #' @export
 #' @family Inspect functions
@@ -607,10 +607,9 @@ as_sframe.sframe_validation <- function(x, ...) {
 #'   `sframe_flagged()` returns an integer vector of row positions, sorted, each
 #'   row once.
 #' @name sframe_report_accessors
-#' @aliases sf_report_accessors
 #'
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("first_survey")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' head(sframe_flagged(qr))
 #' @family Inspect functions
@@ -638,7 +637,7 @@ sframe_apa <- function(x, ...) UseMethod("sframe_apa")
 
 #' Get rows flagged by response-quality checks
 #'
-#' Pools failed attention checks, straight-lining, excess missingness, timing,
+#' Pools failed attention checks, straight-lining, excess missingness, timing
 #' and duplicate checks into one set of response-row positions.
 #'
 #' @param x An `sframe_quality_report` object.
@@ -646,7 +645,7 @@ sframe_apa <- function(x, ...) UseMethod("sframe_apa")
 #' @return A sorted integer vector of unique response-row positions.
 #' @seealso [sframe_report_accessors], [sframe_quality_results()]
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("first_survey")
 #' qr <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_flagged(qr)
 #' @export
@@ -696,7 +695,7 @@ sframe_apa.sframe_assumption_report <- sframe_report_apa
 #' @seealso [sframe_quality_results()], [sframe_flagged()]
 #'
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("first_survey")
 #' qr   <- sframe_quality_results(demo$responses, demo$instrument)
 #' sframe_missing_columns(qr)
 #' @family Inspect functions

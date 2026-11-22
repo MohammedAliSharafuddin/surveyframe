@@ -18,6 +18,7 @@ This function does not return. It signals an error of class
 \code{sframe_import_error}.
 }
 \description{
-Abort with an import error
+Stops with an error of class \code{sframe_import_error} when a file cannot be
+read as an instrument, and records the file's path.
 }
 \keyword{internal}

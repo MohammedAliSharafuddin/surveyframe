@@ -24,7 +24,7 @@ and \code{pct}.
 }
 \description{
 Tokenises \code{text} via the same tokeniser as \code{\link[=sframe_term_frequency]{sframe_term_frequency()}} (whitespace
-splitting, lower-casing, punctuation stripping, and stop-word removal),
+splitting, lower-casing, punctuation stripping and stop-word removal),
 then slides a window of \code{n} tokens across each response's token vector
 and counts how often each resulting n-gram occurs. \code{n = 2} (the default)
 gives bigrams, and \code{n = 3} gives trigrams.
@@ -36,8 +36,8 @@ filtered, "clean but not comfortable" yields no bigram at all, because
 the output phrases respondents actually wrote.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-cleaned <- sframe_clean_text(demo$responses, "comments")
+demo <- sframe_demo("open_text")
+cleaned <- sframe_clean_text(demo$responses, "what_worked")
 head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
 }
 \seealso{

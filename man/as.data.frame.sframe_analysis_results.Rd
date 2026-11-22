@@ -21,7 +21,7 @@ A data frame with one row per analysis block.
 }
 \description{
 Returns one row per analysis block, including its research question, method,
-APA summary, and any error.
+APA summary and any error.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=run_analysis_plan]{run_analysis_plan()}}

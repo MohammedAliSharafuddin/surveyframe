@@ -23,7 +23,7 @@ with the suggested factor count marked.
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("factor_structure")
   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
   sframe_plot_efa_scree(er)
 }

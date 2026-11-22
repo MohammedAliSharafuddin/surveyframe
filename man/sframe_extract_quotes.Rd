@@ -8,7 +8,7 @@ sframe_extract_quotes(model, text, n_quotes = 3L)
 }
 \arguments{
 \item{model}{A \code{stm_topics} result list from \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}}
-(i.e. \code{result}, not \code{result$fit} and not the raw \code{stm} object).}
+(the whole \code{result} list, which holds the fitted model in \code{result$fit}).}
 
 \item{text}{The response vector the topic model was fit on: either the
 raw vector (one entry per original data row, indexed 1:1 by row
@@ -38,14 +38,14 @@ one back to its original respondent row via the mapping
 \donttest{
 if (requireNamespace("stm", quietly = TRUE) &&
     requireNamespace("tidytext", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("open_text")
   sframe_plan(demo$instrument) <- list(list(
-    id = "RQ1", research_question = "What themes appear in the comments?",
+    id = "RQ1", research_question = "What themes appear in what worked?",
     family = "text_analysis", method = "stm_topics",
-    roles = list(item = "comments"), options = list(k = 3, seed = 42)
+    roles = list(item = "what_worked"), options = list(k = 3, seed = 42)
   ))
   res <- run_analysis_plan(demo$responses, demo$instrument)
-  quotes <- sframe_extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
+  quotes <- sframe_extract_quotes(res$RQ1, demo$responses$what_worked, n_quotes = 2)
   quotes
 }
 }

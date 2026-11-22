@@ -108,9 +108,9 @@
 #' Clean open-ended text responses for analysis
 #'
 #' Extracts one text/textarea item's responses from a response data frame and
-#' applies light, configurable cleaning: lower-casing, punctuation removal,
-#' and optional number stripping. Blank and missing responses are dropped
-#' rather than kept as empty strings, since they carry no term-frequency
+#' applies light, configurable cleaning: lower-casing, punctuation removal
+#' and optional number stripping. Blank and missing responses are dropped,
+#' since they carry no term-frequency
 #' signal and would otherwise inflate downstream response counts.
 #'
 #' @param data A data.frame of responses.
@@ -126,8 +126,8 @@
 #'   `data`, so quotes extracted later can cite a respondent.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' demo <- sframe_demo("open_text")
+#' cleaned <- sframe_clean_text(demo$responses, "what_worked")
 #' head(cleaned)
 #' attr(cleaned, "respondent")[1:5]
 #' @family Text analysis functions
@@ -180,8 +180,8 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 
 #' Term frequency for open-ended text
 #'
-#' Tokenises `text` (splitting on whitespace, lower-casing, and stripping
-#' punctuation), removes stop words, and counts term frequency. Ships a
+#' Tokenises `text` (splitting on whitespace, lower-casing and stripping
+#' punctuation), removes stop words and counts term frequency. Ships a
 #' small built-in English stop-word list so this works with zero optional
 #' packages. Pass `stop_words = character(0)` to disable filtering, or a
 #' custom vector to override it.
@@ -193,11 +193,11 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 #' @param top_n Integer. Maximum number of terms to return, most frequent
 #'   first. Default `30`.
 #'
-#' @return A data.frame with columns `term`, `n`, and `pct`.
+#' @return A data.frame with columns `term`, `n` and `pct`.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' demo <- sframe_demo("open_text")
+#' cleaned <- sframe_clean_text(demo$responses, "what_worked")
 #' head(sframe_term_frequency(cleaned, top_n = 10))
 #' @family Text analysis functions
 sframe_term_frequency <- function(text, stop_words = NULL, top_n = 30L) {
@@ -430,16 +430,15 @@ sframe_run_co_occurrence <- function(data, roles, options, instrument) {
 #' Fit an LDA topic model on open-ended text
 #'
 #' Cleans the text item via [sframe_clean_text()], tokenises with the
-#' package's shared internal tokeniser (reused rather than a second
-#' tidytext-based tokeniser, so LDA and `sframe_term_frequency()` can never
-#' drift on cleaning/stop-word rules), casts the token counts to a
+#' tokeniser that [sframe_term_frequency()] uses, so both apply the same
+#' cleaning and stop-word rules, casts the token counts to a
 #' document-term matrix with `tidytext::cast_dtm()`, and fits
 #' `topicmodels::LDA()`.
 #'
 #' @param data A data.frame of responses.
 #' @param roles A list with `item`, the text/textarea item id.
 #' @param options A list with `k` (topic count, default `4L`, which is a demonstration
-#'   value and not a recommendation: see `vignette("text-analysis")`'s topic-
+#'   value to tune for real data: see `vignette("text-analysis")`'s topic-
 #'   modelling section for `topicmodels::perplexity()`-based selection),
 #'   `seed` (default `42L`), `stop_words` (passed through to the tokeniser).
 #' @param instrument Optional `sframe` instrument, passed to
@@ -530,8 +529,8 @@ sframe_run_topic_model_lda <- function(data, roles, options, instrument) {
 #' Fit a structural topic model (STM) on open-ended text
 #'
 #' Cleans the text item via [sframe_clean_text()], tokenises with
-#' `tidytext::unnest_tokens()` (tidyeval column names via `rlang::sym()` and
-#' `!!`, not bare symbols, as the source comment at the tokenising step explains), casts to a document-term matrix, converts it to `stm`'s corpus
+#' `tidytext::unnest_tokens()`, casts to a document-term matrix, converts it
+#' to `stm`'s corpus
 #' format with `stm::readCorpus(type = "slam")` and `stm::prepDocuments()`,
 #' and fits `stm::stm()` after a fixed `set.seed()` (stm's own fit is not
 #' otherwise seed-stable).
@@ -657,7 +656,7 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #' [sframe_run_stm_topics()] stored on `result$fit`.
 #'
 #' @param model A `stm_topics` result list from [sframe_run_stm_topics()]
-#'   (i.e. `result`, not `result$fit` and not the raw `stm` object).
+#'   (the whole `result` list, which holds the fitted model in `result$fit`).
 #' @param text The response vector the topic model was fit on: either the
 #'   raw vector (one entry per original data row, indexed 1:1 by row
 #'   number) or the [sframe_clean_text()]-cleaned vector, which drops
@@ -677,14 +676,14 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 #' \donttest{
 #' if (requireNamespace("stm", quietly = TRUE) &&
 #'     requireNamespace("tidytext", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("open_text")
 #'   sframe_plan(demo$instrument) <- list(list(
-#'     id = "RQ1", research_question = "What themes appear in the comments?",
+#'     id = "RQ1", research_question = "What themes appear in what worked?",
 #'     family = "text_analysis", method = "stm_topics",
-#'     roles = list(item = "comments"), options = list(k = 3, seed = 42)
+#'     roles = list(item = "what_worked"), options = list(k = 3, seed = 42)
 #'   ))
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
-#'   quotes <- sframe_extract_quotes(res$RQ1, demo$responses$comments, n_quotes = 2)
+#'   quotes <- sframe_extract_quotes(res$RQ1, demo$responses$what_worked, n_quotes = 2)
 #'   quotes
 #' }
 #' }
@@ -748,7 +747,7 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
 #' N-gram frequency for open-ended text
 #'
 #' Tokenises `text` via the same tokeniser as [sframe_term_frequency()] (whitespace
-#' splitting, lower-casing, punctuation stripping, and stop-word removal),
+#' splitting, lower-casing, punctuation stripping and stop-word removal),
 #' then slides a window of `n` tokens across each response's token vector
 #' and counts how often each resulting n-gram occurs. `n = 2` (the default)
 #' gives bigrams, and `n = 3` gives trigrams.
@@ -770,8 +769,8 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
 #'   and `pct`.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' cleaned <- sframe_clean_text(demo$responses, "comments")
+#' demo <- sframe_demo("open_text")
+#' cleaned <- sframe_clean_text(demo$responses, "what_worked")
 #' head(sframe_ngram_frequency(cleaned, n = 2, top_n = 10))
 #' @family Text analysis functions
 sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L) {
@@ -816,15 +815,13 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #'
 #' Finds every case-insensitive, whole-word match of `term` in `text` and
 #' returns the words immediately before and after each match, so a reader
-#' can judge how a term is actually being used rather than reading a bare
-#' frequency count. Matching is on whole words only, so searching for
+#' can judge how a term is used in context. Matching is on whole words only, so searching for
 #' "room" does not match "roomy". `text` is expected to already have been
 #' run through [sframe_clean_text()] (its `respondent` attribute is used
 #' to cite the original row index for each match, and when absent, positions
 #' `seq_along(text)` are used instead). Tokenisation here is a plain
-#' whitespace split, not the internal stop-word-stripping tokeniser behind
-#' [sframe_term_frequency()]: stop words are part of a match's context and
-#' stripping them would corrupt the very thing a concordance is for.
+#' whitespace split that keeps stop words, because they are part of a
+#' match's context.
 #'
 #' @param text Character vector of responses, ideally already cleaned by
 #'   [sframe_clean_text()].
@@ -838,9 +835,9 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #'   `after`.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' cleaned <- sframe_clean_text(demo$responses, "comments")
-#' sframe_term_context(cleaned, "service", window = 4)
+#' demo <- sframe_demo("open_text")
+#' cleaned <- sframe_clean_text(demo$responses, "what_worked")
+#' sframe_term_context(cleaned, "speakers", window = 4)
 #' @family Text analysis functions
 sframe_term_context <- function(text, term, window = 6L, max_matches = 20L) {
   if (!is.character(term) || length(term) != 1L || is.na(term) || !nzchar(term)) {

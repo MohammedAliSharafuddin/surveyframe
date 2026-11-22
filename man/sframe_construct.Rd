@@ -14,14 +14,14 @@ sframe_construct(
 }
 \arguments{
 \item{id}{Construct identifier. Must start with a letter and contain only
-letters, numbers, and \verb{_} characters.}
+letters, numbers and \verb{_} characters.}
 
 \item{label}{Human-readable construct label.}
 
 \item{items}{Character vector of indicator item IDs.}
 
 \item{mode}{Measurement mode. One of \code{"reflective"}, \code{"composite"},
-\code{"formative"}, or \code{"single_item"}.}
+\code{"formative"} or \code{"single_item"}.}
 
 \item{weights}{Optional indicator weights for later PLS-SEM planning.}
 }
@@ -29,7 +29,8 @@ letters, numbers, and \verb{_} characters.}
 An object of class \code{sf_construct}.
 }
 \description{
-Define a latent or composite construct
+Names a construct and the items that measure it, with its measurement mode.
+A construct is the building block of \code{\link[=sframe_model_spec]{sframe_model_spec()}}.
 }
 \examples{
 sq <- sframe_construct("sq", "Service Quality",

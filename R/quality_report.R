@@ -158,12 +158,12 @@ sframe_timing_report <- function(
 #' Evaluates collected response data against the instrument specification and
 #' produces a structured quality report. The report covers attention check
 #' performance, completion time, straight-lining within scale blocks,
-#' item-level missingness, respondent-level missingness, and duplicate
+#' item-level missingness, respondent-level missingness and duplicate
 #' respondent IDs where supplied.
 #'
 #' Timing analysis is available when the data contain a submission timestamp
 #' column and either an explicit `started_at` column or one of the recognised
-#' defaults: `started_at`, `start_time`, `started`, or `.started_at`.
+#' defaults: `started_at`, `start_time`, `started` or `.started_at`.
 #'
 #' @param data A `tibble` or `data.frame` of responses, typically produced by
 #'   [read_responses()].
@@ -206,11 +206,11 @@ sframe_timing_report <- function(
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "first_survey.sframe",
 #'               package = "surveyframe")
 #' )
 #' responses <- read_responses(
-#'   system.file("extdata", "tourism_services_responses.csv",
+#'   system.file("extdata", "demos", "first_survey_responses.csv",
 #'               package = "surveyframe"),
 #'   instr,
 #'   respondent_id = "respondent_id",
@@ -222,8 +222,7 @@ sframe_timing_report <- function(
 #'   instr,
 #'   respondent_id = "respondent_id",
 #'   submitted_at = "submitted_at",
-#'   started_at = "started_at",
-#'   straightline_scales = FALSE
+#'   started_at = "started_at"
 #' )
 #' print(qr)
 #' @family Responses functions

@@ -18,9 +18,9 @@ A ggplot2 object, or \code{NULL} when the result carries no table.
 Tile heatmap of pairwise within-response term co-occurrence counts for a
 \code{co_occurrence} result. The result's edge list (\code{term_a}, \code{term_b}, \code{n})
 is pivoted into a full symmetric term-by-term grid before plotting, so
-each pair's tile appears twice, once on either side of the diagonal, the
-way the other tile heatmaps in this file (\code{sframe_plot_correlation_matrix()},
-\code{sframe_plot_efa_loadings()}) read as a full grid rather than a triangle.
+each pair's tile appears twice, once on either side of the diagonal, and
+the chart reads as a full grid, as \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}} and
+\code{\link[=sframe_plot_efa_loadings]{sframe_plot_efa_loadings()}} do.
 }
 \examples{
 \donttest{

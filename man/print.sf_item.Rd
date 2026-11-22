@@ -15,7 +15,8 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_item object
+Prints the item's ID, type and question label, with its choice set and
+scale when it has them.
 }
 \examples{
 it <- sframe_item("q1", "How satisfied are you?", type = "likert",

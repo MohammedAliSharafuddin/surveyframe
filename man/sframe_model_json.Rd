@@ -15,7 +15,8 @@ sframe_model_json(model, pretty = TRUE)
 A JSON string.
 }
 \description{
-Serialise a model specification to JSON
+Writes a model specification as the JSON that a \code{.sframe} file stores, so
+it can be read, compared or shared outside R.
 }
 \examples{
 m <- sframe_model_spec("cb1", type = "cb_sem",

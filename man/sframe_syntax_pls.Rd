@@ -19,7 +19,8 @@ sframe_syntax_pls(model, data_name = "data", nboot = NULL, seed = 123)
 An R syntax string for \code{seminr}.
 }
 \description{
-Generate seminr PLS-SEM syntax
+Writes the seminr code for a partial least squares model: the measurement
+and structural parts, estimation and bootstrapping.
 }
 \examples{
 m <- sframe_model_spec(

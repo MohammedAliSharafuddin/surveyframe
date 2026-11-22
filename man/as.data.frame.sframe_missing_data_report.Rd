@@ -20,7 +20,8 @@ build a frame. Ignored by the methods that return a stored table.}
 The item-level missingness table from a missing-data report.
 }
 \description{
-Extract item missingness results
+Returns the missingness table, 1 row per item with its count, proportion
+and percentage of missing answers.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_missing_data_results]{sframe_missing_data_results()}}

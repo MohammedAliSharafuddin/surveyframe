@@ -3548,16 +3548,12 @@ server <- function(input, output, session) {
         tags$tr(tags$td("N"), tags$td(scale$n))
       )
       if (!is.null(scale$alpha)) {
-        rows <- c(rows, list(tags$tr(tags$td("Cronbach alpha"),
-                                     tags$td(sprintf("%.3f", scale$alpha)))))
-      }
-      if (!is.null(scale$omega_h)) {
-        rows <- c(rows, list(tags$tr(tags$td("Omega h"),
-                                     tags$td(sprintf("%.3f", scale$omega_h)))))
+        rows <- c(rows, list(tags$tr(tags$td("Cronbach's alpha"),
+                                     tags$td(sub("^0\\.", ".", sprintf("%.2f", scale$alpha))))))
       }
       if (!is.null(scale$omega_t)) {
-        rows <- c(rows, list(tags$tr(tags$td("Omega total"),
-                                     tags$td(sprintf("%.3f", scale$omega_t)))))
+        rows <- c(rows, list(tags$tr(tags$td("McDonald's omega"),
+                                     tags$td(sub("^0\\.", ".", sprintf("%.2f", scale$omega_t))))))
       }
 
       tags$div(class = "card",

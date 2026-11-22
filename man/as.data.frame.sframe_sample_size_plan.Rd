@@ -18,10 +18,11 @@ build a frame. Ignored by the methods that return a stored table.}
 }
 \value{
 A one-row data frame containing the analysis type, estimated sample
-size, alpha, and power.
+size, alpha and power.
 }
 \description{
-Coerce a sample-size plan to a data frame
+Collects the analysis type, estimated sample size, alpha and power into 1
+row.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_sample_size_plan]{sframe_sample_size_plan()}}

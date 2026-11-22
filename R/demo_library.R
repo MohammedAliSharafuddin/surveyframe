@@ -189,7 +189,7 @@ sframe_demo_dir <- function() {
 #' Load one bundled demo
 #'
 #' One of the 25-item teaching library: 19 analysis examples, 3
-#' presentation examples, and 3 provenance examples. Or 1 of the 2 reference
+#' presentation examples and 3 provenance examples. Or 1 of the 2 reference
 #' datasets: `"tourism_services"`, a realistic multi-scale instrument, and
 #' `"input_types"`, which uses every input type SurveyBuilder and
 #' SurveyStudio support in a single instrument.
@@ -216,7 +216,7 @@ sframe_demo_dir <- function() {
 #'   same data through another package. The 2 reference datasets omit
 #'   codebook or results table, so those 2 paths are `NA`.
 #' @section How the demos may be used:
-#' The demos' responses are simulated, not collected from participants. Each
+#' The demos' responses are simulated. Each
 #' respondent id starts with `DEMO-`, and a `data_status` column says
 #' "Demonstration data, not collected from participants". Every output made
 #' from data that carries it says so too: each APA sentence from
@@ -417,11 +417,11 @@ sframe_demo_screens <- function(title) {
 #' The standard demo branding
 #'
 #' The `render` block [sframe_demo()] splices in when `branded = TRUE`. Read
-#' it, change a colour, and paste it into your own instrument.
+#' it, change a colour and paste it into your own instrument.
 #'
 #' @return A named list of class `sframe_branding`, suitable for
 #'   `sframe_instrument(render = )`: the display `mode`, the `theme` colour, the
-#'   `submit_label`, and the `welcome`, `thankyou` and `header` blocks.
+#'   `submit_label` and the `welcome`, `thankyou` and `header` blocks.
 #'   Printing it shows each setting as a respondent meets it.
 #'   [sframe_instrument()] and [sframe_demo()] store it as a plain list.
 #' @noRd
@@ -769,7 +769,7 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
       class = "sframe_error")
   }
   writeLines(txt, dest)
-  message("Notebook written to: ", dest)
+  message(sframe_path_line("Notebook written", dest))
   invisible(dest)
 }
 
@@ -791,7 +791,7 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #'   instrument's title.
 #' @param overwrite Logical. Overwrite existing files of the same name.
 #'
-#' @return A list with `qmd`, `sframe`, and `csv` paths, invisibly.
+#' @return A list with `qmd`, `sframe` and `csv` paths, invisibly.
 #' @export
 #' @seealso [sframe_demo_qmd()], [write_sframe()], [read_responses()]
 #' @examples
@@ -863,7 +863,7 @@ sframe_analysis_qmd <- function(instrument, data, dir = ".", basename = NULL,
   writeLines(txt, qmd_path)
 
   message(
-    "Notebook written to: ", qmd_path, "\n",
+    sframe_path_line("Notebook written", qmd_path), "\n",
     "Instrument and responses written alongside it: ",
     paste0(slug, ".sframe"), ", ", paste0(slug, "_responses.csv"), "\n",
     "Keep all 3 files together, then open and render the notebook."

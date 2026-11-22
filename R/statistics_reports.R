@@ -334,9 +334,9 @@ sframe_require_columns <- function(data, cols, method) {
 
 #' Descriptive statistics report
 #'
-#' Computes survey descriptives for numeric, Likert, and scale-score columns,
+#' Computes survey descriptives for numeric, Likert and scale-score columns,
 #' including missingness, mean, standard deviation, median, IQR, range,
-#' skewness, kurtosis, standard error, and confidence intervals.
+#' skewness, kurtosis, standard error and confidence intervals.
 #'
 #' @param data A data.frame of responses. A blank answer (an empty string, or
 #'   only spaces) counts as missing, and a factor's unused levels are dropped.
@@ -354,9 +354,9 @@ sframe_require_columns <- function(data, cols, method) {
 #'   every numeric column, since a mean or standard deviation does not apply.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"),
-#'                            split_by = "visit_type")
+#' demo <- sframe_demo("two_group")
+#' dr <- sframe_descriptives_results(demo$responses, variables = "sessions_attended",
+#'                            split_by = "format")
 #' dr$table
 #' @family Analyse functions
 sframe_descriptives_results <- function(
@@ -462,12 +462,12 @@ sframe_descriptives_results <- function(
 #' @return An object of class `sframe_missing_data_report`. Its
 #'   `item_missing` and `respondent_missing` tables give `missing_prop`, a
 #'   proportion between 0 and 1. Their `missing_pct` column, the name before
-#'   0.4.3 kept for 1 release, is the same proportion, not a percentage. The
+#'   0.4.3 kept for 1 release, holds the same proportion from 0 to 1. The
 #'   `patterns` table gives each pattern's `n`, its `percent` from 0 to 100
 #'   and its `prop` between 0 and 1.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("first_survey")
 #' mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #' mr$item_missing
 #' @family Responses functions
@@ -593,7 +593,8 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
 #' Flag univariate and multivariate outliers
 #'
 #' Uses transparent screening rules for numeric survey response variables. The
-#' report supports data review before modelling, not automatic deletion.
+#' report supports data review before modelling, and what to remove stays
+#' the researcher's decision.
 #'
 #' @param data A data.frame.
 #' @param variables Character vector of numeric variables to screen. When
@@ -607,14 +608,14 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
 #' @param p_cut Probability cutoff for `"mahalanobis"`. Defaults to `0.975`.
 #'
 #' @return An object of class `sframe_outlier_report` with the method, screened
-#'   variables, a result table, flagged row numbers, and a reporting prompt.
+#'   variables, a result table, flagged row numbers and a reporting prompt.
 #' @export
 #'
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("correlation_regression")
 #' outliers <- sframe_outlier_results(
 #'   demo$responses,
-#'   variables = c("dm_1", "dm_2", "sat_1"),
+#'   variables = c("sessions_attended", "networking_minutes", "overall_value"),
 #'   method = "zscore"
 #' )
 #' outliers$flagged_rows
@@ -754,7 +755,7 @@ sframe_small_sample_advisory <- function(n, test) {
 #' Performs common assumption checks for survey analyses using base R where
 #' possible: Shapiro-Wilk tests, skewness/kurtosis screening, Levene and
 #' Brown-Forsythe tests, regression residual checks, VIF, Cook's distance,
-#' expected-count checks, and sparse-cell warnings.
+#' expected-count checks and sparse-cell warnings.
 #'
 #' @param data A data.frame.
 #' @param variables Numeric variables for normality screening.
@@ -769,9 +770,9 @@ sframe_small_sample_advisory <- function(n, test) {
 #'   needs.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
-#'                          group = "visit_type")
+#' demo <- sframe_demo("two_group")
+#' ar <- sframe_assumption_results(demo$responses, variables = "sessions_attended",
+#'                          group = "format")
 #' print(ar)
 #' @family Analyse functions
 sframe_assumption_results <- function(
@@ -971,9 +972,13 @@ print.sframe_assumption_report <- function(x, ...) {
 
 #' Post-hoc and pairwise comparison report
 #'
+#' Follows a significant omnibus test with pairwise comparisons: group pairs
+#' after ANOVA or Kruskal-Wallis, cell residuals and proportion tests after
+#' chi-square, and McNemar tests after Cochran's Q.
+#'
 #' @param data A data.frame.
 #' @param method Comparison family. Supports `"anova"`, `"kruskal_wallis"`,
-#'   `"chi_square"`, and `"cochran_q"`.
+#'   `"chi_square"` and `"cochran_q"`.
 #' @param outcome Outcome variable for group comparisons.
 #' @param group Grouping variable for group comparisons.
 #' @param table_vars 2 categorical variables for chi-square residuals and
@@ -984,9 +989,9 @@ print.sframe_assumption_report <- function(x, ...) {
 #' @return An object of class `sframe_posthoc_report`.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("multi_group")
 #' pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
-#'                       outcome = "sat_1", group = "visit_type")
+#'                       outcome = "sessions_attended", group = "attendee_role")
 #' pr$tables$pairwise_wilcox
 #' @family Analyse functions
 sframe_posthoc_results <- function(
@@ -2236,8 +2241,12 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 
 #' Validity report for construct models
 #'
+#' Reports composite reliability and average variance extracted from
+#' standardised loadings, with the Fornell-Larcker criterion and HTMT when
+#' construct scores or item responses are given.
+#'
 #' @param loadings A data.frame with columns `construct`, `item`, and
-#'   `loading`, or a named list of loading vectors by construct.
+#'   `loading` or a named list of loading vectors by construct.
 #' @param construct_scores Optional data.frame of construct scores for
 #'   Fornell-Larcker and inter-construct correlations.
 #' @param items_by_construct Optional named list, one element per construct,
@@ -2433,7 +2442,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #' `"sem"` returns no estimate. Both say so in the returned warnings.
 #'
 #' @param type Planning target: `"proportion"`, `"mean"`, `"correlation"`,
-#'   `"t_test"`, `"anova"`, `"regression"`, or `"sem"`.
+#'   `"t_test"`, `"anova"`, `"regression"` or `"sem"`.
 #' @param margin_error Margin of error for mean/proportion planning.
 #' @param sd Standard deviation for mean planning.
 #' @param p Expected proportion.

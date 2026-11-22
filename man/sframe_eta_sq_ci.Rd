@@ -21,7 +21,7 @@ the interval uses no resampling.}
 \value{
 A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with the
 attributes \code{level} and \code{method} (\code{"noncentral F"}). The bounds are \code{NA}
-with fewer than 3 complete observations, fewer than 2 groups, or no
+with fewer than 3 complete observations, fewer than 2 groups or no
 variation within the groups.
 }
 \description{

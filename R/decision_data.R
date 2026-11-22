@@ -155,10 +155,10 @@ sframe_decision_item <- function(instrument, item_id, types) {
 #'
 #' Builds one square judgement matrix per respondent from the pair columns of
 #' a `"pairwise_comparison"` item. A `"saaty"` item stores one signed integer
-#' per unordered pair, so the reciprocal half of each matrix is reconstructed
-#' here rather than stored (a collected value of +5 becomes `m[a, b] = 5` and
+#' per unordered pair, so the reciprocal half of each matrix is rebuilt
+#' from it here (a collected value of +5 becomes `m[a, b] = 5` and
 #' `m[b, a] = 1/5`, and the diagonal is 1). An `"influence"` item stores one
-#' unsigned integer per ordered pair, fills the directed cell only, and has a
+#' unsigned integer per ordered pair, fills the directed cell only and has a
 #' zero diagonal, because the influence of a on b says nothing about the
 #' influence of b on a.
 #'
@@ -171,7 +171,7 @@ sframe_decision_item <- function(instrument, item_id, types) {
 #' @param item_id Character. The id of a `"pairwise_comparison"` item.
 #' @return A list with `matrices` (a list of square numeric matrices with
 #'   dimnames), `n_respondents`, `n_dropped`, `dropped` (a data frame of row
-#'   number and reason), `items`, and `scale`.
+#'   number and reason), `items` and `scale`.
 #' @export
 #' @seealso [sframe_aggregate_judgements()], [sframe_collected_weights()]
 #' @examples
@@ -369,7 +369,7 @@ sframe_align_judgement_matrices <- function(matrices) {
 #'   consistency ratio at or above 0.10 are dropped before aggregation.
 #'   Applies to reciprocal matrices only. Default `FALSE`.
 #' @return A list with `matrix`, `method`, `n_respondents`, `n_dropped`,
-#'   `n_dropped_consistency`, and `consistency` (the per-respondent CR
+#'   `n_dropped_consistency` and `consistency` (the per-respondent CR
 #'   distribution, or `NULL` for a non-reciprocal set).
 #' @export
 #' @seealso [sframe_assemble_pairwise()]
@@ -469,7 +469,7 @@ sframe_aggregate_judgements <- function(matrices,
 #' `"criteria_weight"` item is renormalised to sum 1 per respondent before the
 #' arithmetic mean is taken, so a respondent who allocated 90 points in total
 #' carries the same influence as one who allocated exactly 100. A
-#' `"pairwise_comparison"` item is assembled, aggregated geometrically, and
+#' `"pairwise_comparison"` item is assembled, aggregated geometrically and
 #' reduced to its principal eigenvector.
 #'
 #' @param data A data frame of responses.
@@ -585,7 +585,7 @@ sframe_collected_weights <- function(data, instrument, item_id,
 #'   the result notes each pairing.
 #' @param statistic `"mean"` or `"median"`.
 #' @return A list with `matrix` (alternatives x criteria, with dimnames), `n`,
-#'   `sd`, `alternatives`, `criteria`, and `statistic`.
+#'   `sd`, `alternatives`, `criteria` and `statistic`.
 #' @export
 #' @seealso [sframe_collected_weights()]
 #' @examples
@@ -680,12 +680,12 @@ sframe_rated_matrix <- function(data, instrument, items,
 #' of numeric row vectors with its dimnames dropped, so it is stored as
 #' `options$matrix` plus the `options$alternatives` and `options$criteria`
 #' label vectors and rebuilt here. Every length agreement between the matrix,
-#' its labels, the weights, and the criterion types is checked once, in one
+#' its labels, the weights and the criterion types is checked once, in one
 #' place, with the exact mismatch named.
 #'
 #' @section PROMETHEE preference functions:
 #' A PROMETHEE block takes `options$preference_function`, one of `"usual"`,
-#' `"linear"`, or `"level"`, and `options$thresholds` for the 2 that need
+#' `"linear"` or `"level"`, and `options$thresholds` for the 2 that need
 #' them. The default is `"usual"`, Brans and Vincke's type I step function,
 #' which needs no thresholds and so adds no researcher degrees of freedom.
 #'

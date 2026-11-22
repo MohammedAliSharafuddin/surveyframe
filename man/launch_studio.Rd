@@ -21,7 +21,7 @@ launch_studio(
 \arguments{
 \item{instrument}{An \code{sframe} object or NULL.}
 
-\item{responses}{A data.frame, tibble, CSV file path, or NULL.}
+\item{responses}{A data.frame, tibble, CSV file path or NULL.}
 
 \item{respondent_id}{Character or NULL. Response ID column when \code{responses}
 is a CSV path.}
@@ -62,7 +62,7 @@ Opens the SurveyStudio Shiny application, the visual interface for working
 with an instrument. Its sidebar follows the study: open an instrument,
 then Build (design it, plan its analysis and preview it), Collect (set up
 collection and load the responses), Analyse (check their quality, explore
-them, inspect reliability and run the plan), Report, and Record (its
+them, inspect reliability and run the plan), Report and Record (its
 references and amendments).
 }
 \details{
@@ -76,7 +76,7 @@ launch_studio()
 # A demo, opened on the preview screen
 launch_studio(demo = "two_group", screen = "preview")
 
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("two_group")
 launch_studio(instrument = demo$instrument, launch.browser = FALSE)
 
 launch_studio(

@@ -15,7 +15,7 @@ sframe_plot_quality(x, palette = c("web", "print"))
 A ggplot2 object.
 }
 \description{
-Quality report plot: straight-lining flag rate by scale
+Draws the share of respondents flagged for straight-lining in each scale.
 }
 \examples{
 \donttest{

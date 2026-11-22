@@ -21,7 +21,8 @@ A one-row data frame containing readiness measures and the suggested
 number of factors.
 }
 \description{
-Coerce an EFA readiness report to a data frame
+Collects the readiness measures and the suggested number of factors into 1
+row, so reports from 2 or more samples stack with \code{rbind()}.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_efa_readiness_results]{sframe_efa_readiness_results()}}

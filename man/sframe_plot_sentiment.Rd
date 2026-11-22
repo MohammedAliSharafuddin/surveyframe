@@ -17,11 +17,9 @@ A ggplot2 object, or \code{NULL} when the result carries no table.
 \description{
 A ggplot2 diverging bar for a \code{tidy_sentiment} result by default:
 positive counts extend one direction, negative counts the other, so bar
-position (not colour alone) carries the primary polarity signal, the
-same convention \code{sframe_draw_likert_diverging()} uses for Likert
-agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
-than called directly, since that helper is base-graphics and
-Likert-scale-specific. Facets by group when \code{result$table} carries a
+position carries the polarity, so the chart reads without colour. Likert
+charts follow the same convention, with a darker shade toward each pole.
+Facets by group when \code{result$table} carries a
 \code{group} column, mirroring \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s grouped
 branch.
 }

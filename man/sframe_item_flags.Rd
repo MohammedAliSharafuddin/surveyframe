@@ -27,7 +27,7 @@ scale, factor, construct or construct pair), \code{item}, \code{statistic},
 Lists the items, or for validity the constructs, whose statistics cross
 the cut-off usually applied to them, with the value, the rule, its source
 and a ready reason, such as "org_4: loading .21 in RQ3, below .40". A flag
-is a prompt to review the item, not a rule to drop it: its content,
+is a prompt to review the item: its content,
 wording, reverse keying and the purpose of the model still decide. Drop
 an item with \code{\link[=sframe_drop_items]{sframe_drop_items()}} and record it with \code{\link[=amend_sframe]{amend_sframe()}}.
 }
@@ -91,7 +91,7 @@ Kaiser, H. F. (1974). An index of factorial simplicity. \emph{Psychometrika,
 Nunnally, J. C., & Bernstein, I. H. (1994). \emph{Psychometric theory} (3rd ed.).
 McGraw-Hill.
 
-Revelle, W. (2025). \emph{psych: Procedures for psychological, psychometric, and
+Revelle, W. (2025). \emph{psych: Procedures for psychological, psychometric and
 personality research} (R package). Northwestern University.
 \url{https://CRAN.R-project.org/package=psych}
 }

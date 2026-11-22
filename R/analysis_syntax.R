@@ -303,8 +303,8 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #'
 #' Returns the statistical call that produced a result, as R code a reader can
 #' copy and run. This is what lets a report show `t.test()` or `cor.test()` with
-#' the variables and options resolved, rather than only the
-#' [run_analysis_plan()] call that dispatched it.
+#' the variables and options filled in, the call that [run_analysis_plan()]
+#' made on the reader's behalf.
 #'
 #' The code is built from the same resolved specification the runner executed:
 #' the variables in the order it resolved them, and the options after defaults

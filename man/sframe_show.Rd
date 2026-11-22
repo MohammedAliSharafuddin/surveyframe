@@ -22,8 +22,8 @@ opened.}
 Opens a file in the viewer of RStudio, Positron or VS Code when it is an
 HTML page, and otherwise in the web browser or the program the system
 opens it with. It opens files only in an interactive session. In a script,
-a knitr or Quarto render, or under \verb{R CMD check} it opens nothing and
-prints 1 line with the file's path, so a file written to the temporary
+a knitr or Quarto render or under \verb{R CMD check} it opens nothing and
+prints the file's path on a line of its own, so a file written to the temporary
 folder is never left unseen. The examples that write a file end with it.
 }
 \examples{

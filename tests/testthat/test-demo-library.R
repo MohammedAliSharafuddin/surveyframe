@@ -137,12 +137,12 @@ test_that("sframe_demo_qmd() and sframe_analysis_qmd() report where they wrote t
   dir <- tempfile("qmd-msg-"); dir.create(dir)
   on.exit(unlink(dir, recursive = TRUE), add = TRUE)
 
-  expect_message(sframe_demo_qmd("two_group", dir = dir), "written to.*two_group\\.qmd")
+  expect_message(sframe_demo_qmd("two_group", dir = dir), "Notebook written:\n.*two_group\\.qmd")
 
   demo <- sframe_demo("likert_scale")
   expect_message(
     sframe_analysis_qmd(demo$instrument, demo$responses, dir = dir),
-    "written to.*\\.qmd"
+    "Notebook written:\n.*\\.qmd"
   )
 })
 

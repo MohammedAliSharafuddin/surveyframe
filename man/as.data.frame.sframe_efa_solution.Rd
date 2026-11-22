@@ -20,7 +20,7 @@ build a frame. Ignored by the methods that return a stored table.}
 The solution's long-form factor-loading data frame.
 }
 \description{
-Extract the loading table from an EFA solution
+Returns the factor loadings in long form, 1 row for each item and factor.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_efa_solution]{sframe_efa_solution()}}

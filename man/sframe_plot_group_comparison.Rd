@@ -22,7 +22,7 @@ unavailable.
 \description{
 Boxplot with jittered points, shared across every runner whose result
 carries \code{vars = c(group_column, outcome_column)}: \code{t_test_ind},
-\code{mann_whitney}, \code{kruskal_wallis}, and \code{anova_one}. 1 function instead of
+\code{mann_whitney}, \code{kruskal_wallis} and \code{anova_one}. 1 function serves all
 4, since the underlying comparison (an outcome split by a grouping
 factor) and the data shape needed to plot it are identical across all
 4 tests, and only the inferential statistic differs.
@@ -30,9 +30,9 @@ factor) and the data shape needed to plot it are identical across all
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("two_group")
   res <- run_analysis_plan(demo$responses, demo$instrument)
-  sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
+  sframe_plot_group_comparison(res$RQ1, demo$responses)
 }
 }
 }

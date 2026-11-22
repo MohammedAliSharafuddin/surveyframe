@@ -26,9 +26,8 @@ available in \code{result$table}.
 }
 \details{
 Clusters beyond the first 8 (ranked largest first) are folded into a
-single "Other" bucket rather than cycling or interpolating a new hue,
-per the dataviz skill's categorical-colour guidance, as
-\code{.sframe_cluster_palette()}.
+single "Other" group with 1 colour, so every colour on the chart stays
+distinct.
 }
 \examples{
 \donttest{

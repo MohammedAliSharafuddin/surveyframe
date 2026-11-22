@@ -12,7 +12,7 @@ sframe_run_topic_model_lda(data, roles, options, instrument)
 \item{roles}{A list with \code{item}, the text/textarea item id.}
 
 \item{options}{A list with \code{k} (topic count, default \code{4L}, which is a demonstration
-value and not a recommendation: see \code{vignette("text-analysis")}'s topic-
+value to tune for real data: see \code{vignette("text-analysis")}'s topic-
 modelling section for \code{topicmodels::perplexity()}-based selection),
 \code{seed} (default \code{42L}), \code{stop_words} (passed through to the tokeniser).}
 
@@ -28,9 +28,8 @@ failure: \verb{list(test = "topic_model_lda", error = <message>)}.
 }
 \description{
 Cleans the text item via \code{\link[=sframe_clean_text]{sframe_clean_text()}}, tokenises with the
-package's shared internal tokeniser (reused rather than a second
-tidytext-based tokeniser, so LDA and \code{sframe_term_frequency()} can never
-drift on cleaning/stop-word rules), casts the token counts to a
+tokeniser that \code{\link[=sframe_term_frequency]{sframe_term_frequency()}} uses, so both apply the same
+cleaning and stop-word rules, casts the token counts to a
 document-term matrix with \code{tidytext::cast_dtm()}, and fits
 \code{topicmodels::LDA()}.
 }

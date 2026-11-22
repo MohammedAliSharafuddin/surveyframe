@@ -10,8 +10,8 @@
 #' Opens a file in the viewer of RStudio, Positron or VS Code when it is an
 #' HTML page, and otherwise in the web browser or the program the system
 #' opens it with. It opens files only in an interactive session. In a script,
-#' a knitr or Quarto render, or under `R CMD check` it opens nothing and
-#' prints 1 line with the file's path, so a file written to the temporary
+#' a knitr or Quarto render or under `R CMD check` it opens nothing and
+#' prints the file's path on a line of its own, so a file written to the temporary
 #' folder is never left unseen. The examples that write a file end with it.
 #'
 #' @param path Character. The file to show.
@@ -34,7 +34,7 @@ sframe_show <- function(path, quiet = FALSE, option = NULL) {
   shown <- sframe_is_interactive() && !isTRUE(getOption("knitr.in.progress")) &&
     (is.null(option) || !isFALSE(getOption(option)))
   if (!shown) {
-    if (!isTRUE(quiet)) cat("Written: ", normalizePath(path), "\n", sep = "")
+    if (!isTRUE(quiet)) cat(sframe_path_line("Written", path), "\n", sep = "")
     return(invisible(FALSE))
   }
   path <- normalizePath(path)
@@ -55,4 +55,19 @@ sframe_show <- function(path, quiet = FALSE, option = NULL) {
     utils::browseURL(paste0("file://", path))
   }
   invisible(TRUE)
+}
+
+# A path as a message shows it: absolute, with forward slashes on every
+# system, so it can be copied into R or a file manager as printed. A label
+# such as "<text>", for an instrument read from a string, stays as it is.
+sframe_show_path <- function(path) {
+  if (!file.exists(path)) return(path)
+  normalizePath(path, winslash = "/")
+}
+
+# A label and a path on 2 lines. The path stands on its own line, because a
+# Windows temporary folder alone runs to about 60 characters and a path in
+# the middle of a sentence ran past the console's edge.
+sframe_path_line <- function(label, path) {
+  paste0(label, ":\n", sframe_show_path(path))
 }

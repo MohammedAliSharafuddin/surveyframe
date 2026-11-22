@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sf_scale object as a string
+Gives the scale's ID and number of items as 1 line, the line that \code{print()}
+starts with.
 }
 \seealso{
 Other printing formatting and summary methods:

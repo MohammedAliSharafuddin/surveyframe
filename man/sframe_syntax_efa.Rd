@@ -27,7 +27,8 @@ sframe_syntax_efa(
 A character string with R syntax.
 }
 \description{
-Generate EFA planning syntax
+Writes the R code for an exploratory factor analysis of the given items
+with psych, ready to copy into a script.
 }
 \examples{
 syntax <- sframe_syntax_efa(c("sq_1", "sq_2", "sq_3"), nfactors = 1)

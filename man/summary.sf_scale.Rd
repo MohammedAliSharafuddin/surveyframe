@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_scale object
+Prints the scale's 1-line format, then its scoring method and how many
+answered items a score needs.
 }
 \seealso{
 Other printing formatting and summary methods:

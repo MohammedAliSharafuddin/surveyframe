@@ -15,13 +15,14 @@ sframe_plot_reliability(x, palette = c("web", "print"))
 A ggplot2 object.
 }
 \description{
-Reliability plot: alpha and omega by scale
+Draws Cronbach's alpha and McDonald's omega for each scale side by side,
+against the usual .70 threshold.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("likert_scale")
   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   sframe_plot_reliability(rr)
 }

@@ -17,7 +17,7 @@ sframe_covariance(from, to, label = NULL)
 An object of class \code{sf_covariance}.
 }
 \description{
-Define a covariance between constructs
+Declares that 2 constructs vary together, with no direction between them.
 }
 \examples{
 cov <- sframe_covariance("sq", "sus", label = "cov1")

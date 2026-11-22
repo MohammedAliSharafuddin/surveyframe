@@ -2,7 +2,6 @@
 % Please edit documentation in R/accessors.R
 \name{sframe_validation_accessors}
 \alias{sframe_validation_accessors}
-\alias{sf_validation_accessors}
 \title{Read a validation diagnostic}
 \value{
 \code{sframe_is_valid()} returns a single logical. \code{sframe_problems()} returns a

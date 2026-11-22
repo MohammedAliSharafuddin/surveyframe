@@ -11,7 +11,7 @@
 #'
 #' Takes one result from [run_analysis_plan()] and returns what the report
 #' shows for it: the formatted table with its caption and note, any second
-#' table `sframe_result_supplement()` gives, the APA line, and the chart the
+#' table `sframe_result_supplement()` gives, the APA line and the chart the
 #' report picks for that method, with the instrument's labels. The table, the
 #' chart and their choice per method come from the code [render_report()]
 #' uses, so a host rendering results one at a time and the report agree.
@@ -135,6 +135,12 @@ sframe_format_result <- function(result, data, instrument = NULL,
       # Numbered as the first table and figure of a document of its own (CX-22).
       out$html <- sframe_apa_number_floats(paste0(
         "<section class=\"sf-result\">", paste(parts, collapse = "\n"), "</section>"))
+      # A decision rule or note may cite a source as [@key]. The report resolves
+      # those with its References list, and this fragment does the same with
+      # the instrument's references, so no raw key reaches the page.
+      if (!is.null(instrument)) {
+        out$html <- sframe_resolve_citations_html(out$html, sframe_reference_index(instrument))
+      }
     }
   }
   out

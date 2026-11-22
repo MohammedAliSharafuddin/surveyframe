@@ -16,7 +16,8 @@ list only the references cited there.}
 A list of \code{sf_reference} objects, named by id.
 }
 \description{
-List an instrument's references
+Returns the references stored in an instrument, all of them or only those
+cited at 1 target such as a scale.
 }
 \examples{
 instr <- sframe_demo("likert_scale")$instrument

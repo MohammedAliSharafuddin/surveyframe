@@ -17,10 +17,10 @@ build a frame. Ignored by the methods that return a stored table.}
 \item{...}{Ignored. Present for S3 consistency.}
 }
 \value{
-A data frame naming each assumption family, variable, and statistic.
+A data frame naming each assumption family, variable and statistic.
 }
 \description{
-Combines the available normality, homogeneity, and regression checks into a
+Combines the available normality, homogeneity and regression checks into a
 long-form summary.
 }
 \seealso{

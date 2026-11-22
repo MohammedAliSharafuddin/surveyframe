@@ -19,6 +19,7 @@ This function does not return. It signals an error of class
 \code{sframe_validation_error}.
 }
 \description{
-Abort with a validation error
+Stops with an error of class \code{sframe_validation_error}, the class every
+instrument check raises, so a caller can catch it apart from other errors.
 }
 \keyword{internal}

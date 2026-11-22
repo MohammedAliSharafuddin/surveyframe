@@ -32,17 +32,18 @@ flags rows above the chi-square cutoff for the selected variables.}
 }
 \value{
 An object of class \code{sframe_outlier_report} with the method, screened
-variables, a result table, flagged row numbers, and a reporting prompt.
+variables, a result table, flagged row numbers and a reporting prompt.
 }
 \description{
 Uses transparent screening rules for numeric survey response variables. The
-report supports data review before modelling, not automatic deletion.
+report supports data review before modelling, and what to remove stays
+the researcher's decision.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("correlation_regression")
 outliers <- sframe_outlier_results(
   demo$responses,
-  variables = c("dm_1", "dm_2", "sat_1"),
+  variables = c("sessions_attended", "networking_minutes", "overall_value"),
   method = "zscore"
 )
 outliers$flagged_rows

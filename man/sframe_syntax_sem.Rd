@@ -17,7 +17,9 @@ sframe_syntax_sem(model, instrument = NULL, standardised = TRUE)
 A lavaan syntax string.
 }
 \description{
-Generate lavaan CB-SEM syntax
+Writes the lavaan model syntax for a covariance-based structural equation
+model: its measurement part, structural paths, covariances and indirect
+effects.
 }
 \examples{
 m <- sframe_model_spec(

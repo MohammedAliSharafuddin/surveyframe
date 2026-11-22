@@ -45,16 +45,16 @@ cumulative_var).
 }
 \description{
 Runs \code{psych::fa()} on selected item columns and returns loadings,
-communalities, uniqueness, variance summaries, and simple item retention
+communalities, uniqueness, variance summaries and simple item retention
 flags. The \code{psych} package is optional and is only required when this
 function is called.
 }
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("factor_structure")
   fit <- sframe_efa_solution(demo$responses, demo$instrument,
-                       scales = "service_quality", nfactors = 1)
+                       scales = c("organisation", "content"), nfactors = 2)
   fit$loadings
 }
 }

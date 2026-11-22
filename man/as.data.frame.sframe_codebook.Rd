@@ -20,7 +20,8 @@ build a frame. Ignored by the methods that return a stored table.}
 The codebook report's item table as a data frame.
 }
 \description{
-Extract the item table from a codebook report
+Returns the codebook's item table, 1 row per item, ready to filter, join or
+write to a file.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_codebook]{sframe_codebook()}}

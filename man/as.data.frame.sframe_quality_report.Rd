@@ -17,11 +17,12 @@ build a frame. Ignored by the methods that return a stored table.}
 \item{...}{Ignored. Present for S3 consistency.}
 }
 \value{
-A one-row data frame summarising respondents, items, and quality
+A one-row data frame summarising respondents, items and quality
 flags.
 }
 \description{
-Coerce a response-quality report to a data frame
+Collects the counts of respondents and items and the quality flags into 1
+row.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_quality_results]{sframe_quality_results()}}

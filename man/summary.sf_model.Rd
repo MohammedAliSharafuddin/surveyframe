@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_model object
+Prints the model's 1-line format, then its estimation engine and number of
+structural paths.
 }
 \seealso{
 Other printing formatting and summary methods:

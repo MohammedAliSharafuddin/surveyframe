@@ -78,7 +78,7 @@ sframe_with_chrome_tmp <- function(code) {
 #' Generate a survey codebook from an instrument object
 #'
 #' Produces a structured codebook listing all items, their types, choice sets,
-#' scale membership, and reverse-coding status. The codebook can be rendered
+#' scale membership and reverse-coding status. The codebook can be rendered
 #' as HTML or Markdown.
 #'
 #' @param instrument An `sframe` object.
@@ -215,7 +215,7 @@ sframe_codebook_markdown <- function(cb) {
 #' @noRd
 #' @seealso [sframe_codebook()]
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("two_group")
 #' cb <- sframe_codebook(demo$instrument)
 #' head(sframe_codebook_items_display(cb))
 #' @family SurveyStudio helpers
@@ -260,7 +260,7 @@ print.sframe_codebook <- function(x, ...) {
 #' Render a reproducible survey report
 #'
 #' Generates an HTML report that includes the instrument codebook, data
-#' quality summary, reliability diagnostics, and analysis-plan content.
+#' quality summary, reliability diagnostics and analysis-plan content.
 #' Quarto is the report engine. Without Quarto, surveyframe writes a short
 #' plain results page with the numbers, tables, charts and APA result lines,
 #' under a banner that links to the Quarto installation page. That page gets
@@ -289,7 +289,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   information, the questionnaire in order with its branching in words,
 #'   the scales and their scoring, each research question with its
 #'   hypotheses, method in words, reference, variables, significance level
-#'   and decision rule, the models and amendments, the references, and a
+#'   and decision rule, the models and amendments, the references and a
 #'   section, "To complete before submission", that prompts for what a
 #'   preregistration asks and the instrument does not hold. Quarto writes it
 #'   in every format, and the built-in engine writes a plain HTML version.
@@ -307,7 +307,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   built-in HTML page through [pagedown::chrome_print()], which needs the
 #'   pagedown package (in Suggests) and a local Chrome or Chromium. The
 #'   returned path's `"converter"` attribute names the route:
-#'   `"quarto-latex"`, `"quarto-typst"`, `"pagedown"`, or `"quarto"` for
+#'   `"quarto-latex"`, `"quarto-typst"`, `"pagedown"` or `"quarto"` for
 #'   Word and OpenDocument. Every route renders offline.
 #'   `"qmd"` writes the Quarto source of the report as a folder, named by
 #'   `output_file` (a trailing `.qmd` is dropped), which must be new or empty:
@@ -331,14 +331,14 @@ print.sframe_codebook <- function(x, ...) {
 #' @param include_models Logical. Whether to include saved model JSON and
 #'   generated syntax blocks. Defaults to `TRUE`.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen reading)
-#'   or `"print"` (black, grey, and white, for a journal-ready or
+#'   or `"print"` (black, grey and white, for a journal-ready or
 #'   print-friendly report). Applied to every chart the report embeds.
 #'   See `sframe_brand()`.
 #' @param show_code Logical. Whether each result carries a folded "Show R code"
 #'   block with the statistical call that produced it, built by
 #'   [sframe_syntax_result()] from the same resolved specification the analysis ran.
 #'   Defaults to `TRUE`. A method [sframe_syntax_result()] does not cover shows no
-#'   block, rather than a guess at the call.
+#'   block.
 #' @param references Optional further [sframe_reference()] records, for example
 #'   the works a host cites in the written interpretations, which are cited
 #'   in text as `[@id]`. The instrument's own references
@@ -349,7 +349,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   the title. Defaults to the instrument's authors, and is left out when
 #'   there are none.
 #' @param figures List or `NULL`. Size, resolution and format for every figure
-#'   in the report: any of `width` and `height` in inches, `dpi`, and `format`,
+#'   in the report: any of `width` and `height` in inches, `dpi` and `format`,
 #'   `"png"` or `"svg"` inside the report. For example
 #'   `list(width = 6.5, height = 4, dpi = 300)`. Absent entries keep each
 #'   engine's own default. Defaults to the `surveyframe.figures` option, so a
@@ -400,7 +400,7 @@ print.sframe_codebook <- function(x, ...) {
 #' section at the top of the report gives the instrument hash and whether
 #' [read_sframe()] verified it, the number of amendments, the responses sha256
 #' and the results record's sha256. The responses are hashed as JSON by
-#' column, so the hash belongs to the values, not to a file.
+#' column, so the same values give the same hash in any file format.
 #'
 #' @section References:
 #' The Quarto report cites in text, author and year, and lists every work it
@@ -423,11 +423,11 @@ print.sframe_codebook <- function(x, ...) {
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "two_group.sframe",
 #'               package = "surveyframe")
 #' )
 #' responses <- read_responses(
-#'   system.file("extdata", "tourism_services_responses.csv",
+#'   system.file("extdata", "demos", "two_group_responses.csv",
 #'               package = "surveyframe"),
 #'   instr,
 #'   respondent_id = "respondent_id",
@@ -508,8 +508,8 @@ render_report <- function(
                         width = figures$width %||% 7, height = figures$height %||% 4.5,
                         dpi = figures$dpi %||% 300, format = figures$format %||% "png")
     rlang::inform(paste0("Saved ", length(saved), " chart file",
-                         if (length(saved) == 1) "" else "s", " in ",
-                         normalizePath(figure_dir, mustWork = FALSE), "."),
+                         if (length(saved) == 1) "" else "s", " in:\n",
+                         sframe_show_path(figure_dir)),
                   class = "sframe_report_progress")
   }
 
@@ -610,8 +610,8 @@ render_report <- function(
     rlang::inform(
       paste0("Report rendered with the ",
              if (identical(content_engine, "quarto")) "Quarto" else "built-in HTML",
-             " engine and printed to PDF with pagedown: ",
-             normalizePath(dest, mustWork = FALSE)),
+             " engine and printed to PDF with pagedown:\n",
+             sframe_show_path(dest)),
       class = "sframe_report_engine"
     )
     return(invisible(dest))
@@ -668,8 +668,8 @@ render_report <- function(
       style = csl_style, bibliography_extra = bibliography_extra,
       interpretations = interpretations)
     folder <- normalizePath(folder, mustWork = FALSE)
-    rlang::inform(paste0("Report source written to ", folder,
-                         ". Open report.qmd in RStudio or Positron and render it."),
+    rlang::inform(paste0(sframe_path_line("Report source written", folder),
+                         "\nOpen report.qmd in RStudio or Positron and render it."),
                   class = "sframe_report_engine")
     attr(folder, "engine") <- "qmd"
     return(invisible(folder))
@@ -999,7 +999,7 @@ sframe_report_result <- function(dest, engine, open = FALSE,
   rlang::inform(
     paste0("Report rendered with the ",
            if (identical(engine, "quarto")) "Quarto" else "built-in HTML",
-           " engine: ", normalizePath(dest, mustWork = FALSE)),
+           " engine:\n", sframe_show_path(dest)),
     class = "sframe_report_engine"
   )
   if (isTRUE(open)) sframe_show(dest, quiet = TRUE)
@@ -1221,16 +1221,15 @@ sframe_clean_interpretations <- function(interpretations) {
               Scale = paste0(scale$label, " (", scale$scale_id, ")"),
               Items = scale$n_items,
               N = scale$n,
-              Alpha = if (!is.null(scale$alpha)) sprintf("%.3f", scale$alpha) else "n/a",
-              Omega_h = if (!is.null(scale$omega_h)) sprintf("%.3f", scale$omega_h) else "n/a",
-              Omega_t = if (!is.null(scale$omega_t)) sprintf("%.3f", scale$omega_t) else "n/a",
+              Alpha = if (!is.null(scale$alpha)) sframe_apa_number(scale$alpha, 2, bounded = TRUE) else "n/a",
+              Omega = if (!is.null(scale$omega_t)) sframe_apa_number(scale$omega_t, 2, bounded = TRUE) else "n/a",
               stringsAsFactors = FALSE
             )
           })
         )
         paste(
           "<h2>Reliability</h2>",
-          "<p>Cronbach alpha and McDonald's omega by scale.</p>",
+          "<p>Cronbach's alpha and McDonald's omega total by scale. Omega above alpha means the items load unequally on their scale.</p>",
           .render_report_table(rel_tbl, "Scale reliability"),
           sframe_scale_sources_html(instrument, vapply(rr, function(s) s$scale_id, character(1))),
           collapse = "\n"

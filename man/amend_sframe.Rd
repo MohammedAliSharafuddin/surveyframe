@@ -41,7 +41,7 @@ asking for \code{"pipeline"} on one is an error.}
 \item{author}{Character or \code{NULL}. Who made the change.}
 
 \item{deviation_report}{Character or \code{NULL}. Required when \code{tier} is
-\code{"design"}: what changed in the research question, method, or model, and
+\code{"design"}: what changed in the research question, method or model, and
 why. Ignored (may be \code{NULL}) for \code{"pipeline"} amendments.}
 
 \item{second_signoff}{Character or \code{NULL}. A second reviewer's name or
@@ -63,7 +63,7 @@ amendment log. Call \code{\link[=write_sframe]{write_sframe()}} to persist it.
 \description{
 Appends a structured, disclosed-revision entry to an instrument's
 amendment log, comparing \code{previous} against \code{instrument} to record what
-changed and why: a data-entry correction, bot-response removal, or a
+changed and why: a data-entry correction, bot-response removal or a
 documented model respecification. The record is kept inside the file,
 beside the content it explains.
 }

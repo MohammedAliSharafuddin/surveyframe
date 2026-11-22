@@ -2,6 +2,10 @@
 % Please edit documentation in R/superseded.R
 \name{superseded}
 \alias{superseded}
+\alias{sf_accessors}
+\alias{sf_identity}
+\alias{sf_report_accessors}
+\alias{sf_validation_accessors}
 \alias{sf_instrument}
 \alias{sf_item}
 \alias{sf_choices}
@@ -291,7 +295,12 @@ warning. Set \code{options(surveyframe.warn_superseded = TRUE)} to get 1
 warning per old name per session, naming its replacement.
 }
 \details{
-\tabular{ll}{
+The old help topics \code{sf_accessors}, \code{sf_identity}, \code{sf_report_accessors}
+and \code{sf_validation_accessors} open this page. Their pages are now
+\link{sframe_accessors}, \link{sframe_identity}, \link{sframe_report_accessors} and
+\link{sframe_validation_accessors}.
+
+Each old name in the table opens this page, as \code{?sf_item} does.\tabular{ll}{
    Old name \tab New name \cr
    \code{sf_instrument()} \tab \code{\link[=sframe_instrument]{sframe_instrument()}} \cr
    \code{sf_item()} \tab \code{\link[=sframe_item]{sframe_item()}} \cr
@@ -382,3 +391,4 @@ identical(sf_item("q1", "Question 1", type = "text"),
           sframe_item("q1", "Question 1", type = "text"))
 }
 \concept{superseded}
+\keyword{internal}

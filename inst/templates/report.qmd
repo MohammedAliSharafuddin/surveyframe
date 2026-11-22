@@ -593,13 +593,12 @@ if (is.null(rr)) {
   rel_df <- do.call(rbind, lapply(rr, function(s)
     data.frame(Scale=paste0(s$label," (",s$scale_id,")"),
       N_items=s$n_items, N=s$n,
-      Alpha   = if (!is.null(s$alpha))   sprintf("%.2f", s$alpha)   else "n/a",
-      Omega_h = if (!is.null(s$omega_h)) sprintf("%.2f", s$omega_h) else "n/a",
-      Omega_t = if (!is.null(s$omega_t)) sprintf("%.2f", s$omega_t) else "n/a",
+      Alpha = if (!is.null(s$alpha))   sub("^0\\.", ".", sprintf("%.2f", s$alpha))   else "n/a",
+      Omega = if (!is.null(s$omega_t)) sub("^0\\.", ".", sprintf("%.2f", s$omega_t)) else "n/a",
       stringsAsFactors=FALSE)))
   print(apa_kable(rel_df,
-    col.names=c("Scale","Items","N","Alpha","Omega h","Omega total"),
-    align=c("l","c","c","r","r","r"),
+    col.names=c("Scale","Items","N","Alpha","Omega"),
+    align=c("l","c","c","r","r"),
     caption="Scale reliability statistics"))
   # The sources of each scale, under its table (8b-R).
   if (use_citations) {

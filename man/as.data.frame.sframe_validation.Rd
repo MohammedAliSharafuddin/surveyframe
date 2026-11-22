@@ -20,7 +20,8 @@ A data frame with one row per validation problem and columns
 \code{check} and \code{problem}.
 }
 \description{
-Coerce validation problems to a data frame
+Lists every problem a validation found, 1 row each, with the check that
+raised it.
 }
 \seealso{
 \link{sframe_validation}, \code{\link[=sframe_problems]{sframe_problems()}}

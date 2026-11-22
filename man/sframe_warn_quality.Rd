@@ -18,6 +18,7 @@ sframe_warn_quality(message, respondent_ids = NULL, ...)
 \code{sframe_quality_warning}.
 }
 \description{
-Warn about a data quality issue
+Signals a warning of class \code{sframe_quality_warning} and records the
+respondents it concerns.
 }
 \keyword{internal}

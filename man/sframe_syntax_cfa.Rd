@@ -47,9 +47,9 @@ this one and \code{\link[=sframe_syntax_sem]{sframe_syntax_sem()}} write lavaan,
 seminr, and \code{\link[=sframe_syntax_efa]{sframe_syntax_efa()}} writes an exploratory plan.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("sem_pls")
 syntax <- sframe_syntax_cfa(demo$instrument,
-                             scales = c("satisfaction", "behavioural_intention"))
+                             scales = c("content_quality", "satisfaction"))
 cat(syntax)
 }
 \seealso{

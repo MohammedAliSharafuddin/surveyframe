@@ -20,7 +20,7 @@ controls.}
 triggers this rule.}
 
 \item{operator}{Character. The comparison operator. One of \code{"=="}, \code{"!="},
-\code{"\%in\%"}, \code{">"}, \code{">="}, \code{"<"}, or \code{"<="}.}
+\code{"\%in\%"}, \code{">"}, \code{">="}, \code{"<"} or \code{"<="}.}
 
 \item{value}{The value to compare against the response to \code{depends_on}.
 For \code{"\%in\%"}, supply a character or numeric vector.}

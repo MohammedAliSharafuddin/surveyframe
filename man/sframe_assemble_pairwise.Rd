@@ -16,15 +16,15 @@ sframe_assemble_pairwise(data, instrument, item_id)
 \value{
 A list with \code{matrices} (a list of square numeric matrices with
 dimnames), \code{n_respondents}, \code{n_dropped}, \code{dropped} (a data frame of row
-number and reason), \code{items}, and \code{scale}.
+number and reason), \code{items} and \code{scale}.
 }
 \description{
 Builds one square judgement matrix per respondent from the pair columns of
 a \code{"pairwise_comparison"} item. A \code{"saaty"} item stores one signed integer
-per unordered pair, so the reciprocal half of each matrix is reconstructed
-here rather than stored (a collected value of +5 becomes \code{m[a, b] = 5} and
+per unordered pair, so the reciprocal half of each matrix is rebuilt
+from it here (a collected value of +5 becomes \code{m[a, b] = 5} and
 \code{m[b, a] = 1/5}, and the diagonal is 1). An \code{"influence"} item stores one
-unsigned integer per ordered pair, fills the directed cell only, and has a
+unsigned integer per ordered pair, fills the directed cell only and has a
 zero diagonal, because the influence of a on b says nothing about the
 influence of b on a.
 }

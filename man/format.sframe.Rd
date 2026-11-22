@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sframe instrument object as a string
+Gives the instrument's title and version with a count of each kind of
+component as 1 line, the line that \code{print()} starts with.
 }
 \seealso{
 Other printing formatting and summary methods:

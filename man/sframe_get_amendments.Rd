@@ -12,7 +12,7 @@ sframe_get_amendments(instrument)
 \value{
 A data frame with columns \code{timestamp}, \code{reason_code},
 \code{reason_text}, \code{tier}, \code{author}, \code{deviation_report}, \code{signoff},
-\code{previous_hash}, \code{new_hash}, and \code{changed_fields} (a comma-joined
+\code{previous_hash}, \code{new_hash} and \code{changed_fields} (a comma-joined
 string). Zero rows if the instrument has no recorded amendments.
 Export with \code{write.csv()} for an external audit trail.
 }

@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_check object
+Prints the check's 1-line format, then what happens to a response that
+fails it.
 }
 \seealso{
 Other printing formatting and summary methods:

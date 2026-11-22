@@ -17,7 +17,8 @@ sframe_path(from, to, label = NULL)
 An object of class \code{sf_path}.
 }
 \description{
-Define a structural path between constructs
+Declares that 1 construct predicts another, the arrow from \code{from} to \code{to}
+in a structural model.
 }
 \examples{
 p <- sframe_path("sq", "sat", label = "H1")

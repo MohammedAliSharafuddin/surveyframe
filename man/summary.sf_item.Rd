@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_item object
+Prints the item's 1-line format, then whether an answer is required and
+whether the item is reverse-scored.
 }
 \seealso{
 Other printing formatting and summary methods:

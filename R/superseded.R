@@ -10,6 +10,13 @@
 #' warning. Set `options(surveyframe.warn_superseded = TRUE)` to get 1
 #' warning per old name per session, naming its replacement.
 #'
+#' The old help topics `sf_accessors`, `sf_identity`, `sf_report_accessors`
+#' and `sf_validation_accessors` open this page. Their pages are now
+#' [sframe_accessors], [sframe_identity], [sframe_report_accessors] and
+#' [sframe_validation_accessors].
+#'
+#' Each old name in the table opens this page, as `?sf_item` does.
+#'
 #' | Old name | New name |
 #' |---|---|
 #' | `sf_instrument()` | [sframe_instrument()] |
@@ -110,6 +117,8 @@
 #'           sframe_item("q1", "Question 1", type = "text"))
 #' @name superseded
 #' @family superseded
+#' @aliases sf_accessors sf_identity sf_report_accessors sf_validation_accessors
+#' @keywords internal
 NULL
 
 #' @rdname superseded

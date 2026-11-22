@@ -19,15 +19,15 @@ A named list of 4 ggplot2 objects (\code{residuals_fitted}, \code{qq},
 \description{
 The 4 standard diagnostic panels (residuals vs fitted, normal Q-Q,
 scale-location, residuals vs leverage), built from the plain data frame
-\code{\link[=run_analysis_plan]{run_analysis_plan()}} attaches to a \code{regression_linear} result rather than
-the \code{lm} object itself, so the result stays JSON-serialisable.
+\code{\link[=run_analysis_plan]{run_analysis_plan()}} attaches to a \code{regression_linear} result, which keeps
+the result JSON-serialisable.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("correlation_regression")
   res <- run_analysis_plan(demo$responses, demo$instrument)
-  panels <- sframe_plot_regression_diagnostics(res$rq_predict_sat)
+  panels <- sframe_plot_regression_diagnostics(res$RQ5)
   panels$residuals_fitted
 }
 }

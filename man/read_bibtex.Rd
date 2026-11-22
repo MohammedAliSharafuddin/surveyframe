@@ -9,8 +9,8 @@ read_bibtex(file = NULL, text = NULL, cited_by = NULL)
 \arguments{
 \item{file}{Path to a \code{.bib} file.}
 
-\item{text}{BibTeX as a character string, used instead of \code{file}, for
-example an entry pasted from Google Scholar.}
+\item{text}{BibTeX as a character string, the other way to supply it, for
+example an entry pasted from a reference database.}
 
 \item{cited_by}{Optional \code{cited_by} targets given to every entry read, see
 \code{\link[=sframe_reference]{sframe_reference()}}.}

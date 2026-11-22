@@ -61,7 +61,7 @@ sframe_new_validation <- function(log, roster, subject, title = NULL,
 #'
 #' `sframe_validation` is the diagnostic object returned by
 #' [validate_sframe()] and [sframe_validate_model()]. It records whether the object
-#' passed, every problem found, and every check that ran, including the checks
+#' passed, every problem found and every check that ran, including the checks
 #' that found nothing.
 #'
 #' Use [sframe_is_valid()] for the pass or fail flag, [sframe_problems()] for the
@@ -149,6 +149,9 @@ summary.sframe_validation <- function(object, ...) {
 }
 
 #' Coerce validation problems to a data frame
+#'
+#' Lists every problem a validation found, 1 row each, with the check that
+#' raised it.
 #'
 #' @param x An [sframe_validation] object.
 #' @param row.names Passed to [base::as.data.frame()].

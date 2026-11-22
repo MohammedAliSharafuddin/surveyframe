@@ -46,7 +46,7 @@ sframe_apa_text <- function(x) {
 .sframe_apa_bounded_cols <- c(
   "r", "r_s", "rs", "rho", "tau", "phi", "cramer_v", "cramers_v", "cramer's v",
   "r2", "r_squared", "r.squared", "adj_r2", "adj.r.squared", "eta2", "eta_sq",
-  "partial_eta2", "omega2", "alpha", "omega", "cronbach_alpha"
+  "partial_eta2", "omega2", "alpha", "alpha (std.)", "omega", "cronbach_alpha"
 )
 
 # floor_pct, ceiling_pct and missing_pct were renamed _prop in 0.4.3 and kept

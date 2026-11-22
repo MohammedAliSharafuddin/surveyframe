@@ -222,6 +222,9 @@ as.data.frame.sf_choices <- function(x, row.names = NULL, optional = FALSE, ...)
 
 #' Extract the item table from a codebook report
 #'
+#' Returns the codebook's item table, 1 row per item, ready to filter, join or
+#' write to a file.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return The codebook report's item table as a data frame.
 #' @seealso [sframe_as_data_frame], [sframe_codebook()]
@@ -308,6 +311,9 @@ as.data.frame.sframe_item_report <- function(x, row.names = NULL,
 
 #' Coerce an EFA readiness report to a data frame
 #'
+#' Collects the readiness measures and the suggested number of factors into 1
+#' row, so reports from 2 or more samples stack with `rbind()`.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return A one-row data frame containing readiness measures and the suggested
 #'   number of factors.
@@ -332,6 +338,8 @@ as.data.frame.sframe_efa_report <- function(x, row.names = NULL,
 
 #' Extract the loading table from an EFA solution
 #'
+#' Returns the factor loadings in long form, 1 row for each item and factor.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return The solution's long-form factor-loading data frame.
 #' @seealso [sframe_as_data_frame], [sframe_efa_solution()]
@@ -348,6 +356,8 @@ as.data.frame.sframe_efa_solution <- function(x, row.names = NULL,
 
 #' Extract the descriptives results table
 #'
+#' Returns the table of descriptive statistics that the report prints.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return The primary table from a descriptives report.
 #' @seealso [sframe_as_data_frame], [sframe_descriptives_results()]
@@ -359,6 +369,9 @@ as.data.frame.sframe_descriptives_report <- function(x, row.names = NULL,
 }
 
 #' Extract item missingness results
+#'
+#' Returns the missingness table, 1 row per item with its count, proportion
+#' and percentage of missing answers.
 #'
 #' @inheritParams as.data.frame.sframe
 #' @return The item-level missingness table from a missing-data report.
@@ -372,6 +385,8 @@ as.data.frame.sframe_missing_data_report <- function(x, row.names = NULL,
 
 #' Extract reliability evidence from a validity report
 #'
+#' Returns the reliability table of a validity report, 1 row per construct.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return The reliability table stored in a validity report.
 #' @seealso [sframe_as_data_frame], [sframe_validity_results()]
@@ -384,11 +399,11 @@ as.data.frame.sframe_validity_report <- function(x, row.names = NULL,
 
 #' Coerce an assumption report to a data frame
 #'
-#' Combines the available normality, homogeneity, and regression checks into a
+#' Combines the available normality, homogeneity and regression checks into a
 #' long-form summary.
 #'
 #' @inheritParams as.data.frame.sframe
-#' @return A data frame naming each assumption family, variable, and statistic.
+#' @return A data frame naming each assumption family, variable and statistic.
 #' @seealso [sframe_as_data_frame], [sframe_assumption_results()]
 #' @exportS3Method as.data.frame sframe_assumption_report
 #' @family Inspect functions
@@ -425,9 +440,12 @@ as.data.frame.sframe_assumption_report <- function(x, row.names = NULL,
 
 #' Coerce a sample-size plan to a data frame
 #'
+#' Collects the analysis type, estimated sample size, alpha and power into 1
+#' row.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return A one-row data frame containing the analysis type, estimated sample
-#'   size, alpha, and power.
+#'   size, alpha and power.
 #' @seealso [sframe_as_data_frame], [sframe_sample_size_plan()]
 #' @exportS3Method as.data.frame sframe_sample_size_plan
 #' @family Inspect functions
@@ -445,8 +463,11 @@ as.data.frame.sframe_sample_size_plan <- function(x, row.names = NULL,
 
 #' Coerce a response-quality report to a data frame
 #'
+#' Collects the counts of respondents and items and the quality flags into 1
+#' row.
+#'
 #' @inheritParams as.data.frame.sframe
-#' @return A one-row data frame summarising respondents, items, and quality
+#' @return A one-row data frame summarising respondents, items and quality
 #'   flags.
 #' @seealso [sframe_as_data_frame], [sframe_quality_results()]
 #' @exportS3Method as.data.frame sframe_quality_report
@@ -465,6 +486,9 @@ as.data.frame.sframe_quality_report <- function(x, row.names = NULL,
 
 #' Extract a sensitivity-analysis results table
 #'
+#' Returns 1 row for each weight change tried, with whether it changed the
+#' ranking and whether it changed the top option.
+#'
 #' @inheritParams as.data.frame.sframe
 #' @return The primary results table from a sensitivity analysis.
 #' @seealso [sframe_as_data_frame]
@@ -478,7 +502,7 @@ as.data.frame.sframe_sensitivity <- function(x, row.names = NULL,
 #' Summarise analysis-plan results as a data frame
 #'
 #' Returns one row per analysis block, including its research question, method,
-#' APA summary, and any error.
+#' APA summary and any error.
 #'
 #' @inheritParams as.data.frame.sframe
 #' @return A data frame with one row per analysis block.

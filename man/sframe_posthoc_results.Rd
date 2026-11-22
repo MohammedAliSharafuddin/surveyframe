@@ -18,7 +18,7 @@ sframe_posthoc_results(
 \item{data}{A data.frame.}
 
 \item{method}{Comparison family. Supports \code{"anova"}, \code{"kruskal_wallis"},
-\code{"chi_square"}, and \code{"cochran_q"}.}
+\code{"chi_square"} and \code{"cochran_q"}.}
 
 \item{outcome}{Outcome variable for group comparisons.}
 
@@ -35,12 +35,14 @@ pairwise proportion tests.}
 An object of class \code{sframe_posthoc_report}.
 }
 \description{
-Post-hoc and pairwise comparison report
+Follows a significant omnibus test with pairwise comparisons: group pairs
+after ANOVA or Kruskal-Wallis, cell residuals and proportion tests after
+chi-square, and McNemar tests after Cochran's Q.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("multi_group")
 pr <- sframe_posthoc_results(demo$responses, method = "kruskal_wallis",
-                      outcome = "sat_1", group = "visit_type")
+                      outcome = "sessions_attended", group = "attendee_role")
 pr$tables$pairwise_wilcox
 }
 \seealso{

@@ -34,14 +34,14 @@ codebook or results table, so those 2 paths are \code{NA}.
 }
 \description{
 One of the 25-item teaching library: 19 analysis examples, 3
-presentation examples, and 3 provenance examples. Or 1 of the 2 reference
+presentation examples and 3 provenance examples. Or 1 of the 2 reference
 datasets: \code{"tourism_services"}, a realistic multi-scale instrument, and
 \code{"input_types"}, which uses every input type SurveyBuilder and
 SurveyStudio support in a single instrument.
 }
 \section{How the demos may be used}{
 
-The demos' responses are simulated, not collected from participants. Each
+The demos' responses are simulated. Each
 respondent id starts with \verb{DEMO-}, and a \code{data_status} column says
 "Demonstration data, not collected from participants". Every output made
 from data that carries it says so too: each APA sentence from

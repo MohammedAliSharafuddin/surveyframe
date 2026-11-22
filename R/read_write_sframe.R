@@ -659,7 +659,7 @@ sframe_hash_value <- function(instrument) {
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "two_group.sframe",
 #'               package = "surveyframe")
 #' )
 #' out <- write_sframe(instr, tempfile(fileext = ".sframe"))
@@ -1043,7 +1043,7 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "two_group.sframe",
 #'               package = "surveyframe")
 #' )
 #' print(instr)
@@ -1122,8 +1122,8 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
     computed_hash <- tryCatch(
       sframe_hash_payload(parsed, parsed = TRUE),
       sframe_canonical_error = function(e) {
-        sframe_abort_import(paste0("Integrity check failed for '", path, "'. ",
-                                   conditionMessage(e)), path = path)
+        sframe_abort_import(paste0(sframe_path_line("Integrity check failed for", path),
+                                   "\n", conditionMessage(e)), path = path)
       })
     hash_ok <- identical(stored_hash, computed_hash)
     # Hashed before hash.canonical existed: RFC 8785 as at 4bd8aba, the 0.4.3
@@ -1148,10 +1148,10 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
   } else if (!hash_ok) {
     sframe_abort_import(
       paste0(
-        "Integrity check failed for '", path, "'. ",
-        "The file may have been modified after it was written. ",
-        "Expected hash: ", computed_hash, ". ",
-        "Stored hash: ", stored_hash, "."
+        sframe_path_line("Integrity check failed for", path), "\n",
+        "The file may have been modified after it was written.\n",
+        "Expected hash: ", computed_hash, "\n",
+        "Stored hash:   ", stored_hash
       ),
       path = path
     )

@@ -30,7 +30,7 @@ with a letter, digit or underscore, as pandoc requires.}
 
 \item{title}{Character. The work's title.}
 
-\item{author}{Character vector of names written \code{"Family, Given"}, or a
+\item{author}{Character vector of names written \code{"Family, Given"} or a
 single organisation name written \code{"{R Core Team}"} in braces. \code{NULL} when the
 work has no named author.}
 
@@ -43,7 +43,7 @@ work has no named author.}
 \item{container}{Character. The journal, or the book a chapter is in.}
 
 \item{volume, issue, pages}{Character. Volume, issue and page range, for
-example \code{"591-611"}, or an article number.}
+example \code{"591-611"} or an article number.}
 
 \item{publisher}{Character. Publisher, or for a thesis the institution.}
 

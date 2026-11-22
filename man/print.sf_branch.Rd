@@ -15,7 +15,8 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_branch object
+Prints the question a branching rule controls and the rule itself: its
+action, the question it depends on, the operator and the value.
 }
 \examples{
 br <- sframe_branch("q2", depends_on = "q1", operator = "==",

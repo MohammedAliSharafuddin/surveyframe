@@ -10,23 +10,24 @@ sframe_plot_efa_loadings(x, palette = c("web", "print"))
 \item{x}{An \code{sframe_efa_solution} object from \code{\link[=sframe_efa_solution]{sframe_efa_solution()}}.}
 
 \item{palette}{One of \code{"web"} (diverging red/teal gradient) or \code{"print"}
-(white-to-black gradient by magnitude, with sign conveyed by the
-printed label rather than colour, so it stays legible in monochrome). See
+(white-to-black gradient by magnitude, with the sign shown by the
+printed label, so it stays legible in monochrome). See
 \code{sframe_brand()}.}
 }
 \value{
 A ggplot2 object.
 }
 \description{
-Loadings heatmap from a fitted EFA solution
+Draws each item's loading on each factor as a tile, so the item groups
+behind each factor stand out.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("factor_structure")
   fit <- sframe_efa_solution(demo$responses, demo$instrument,
-                       scales = "service_quality", nfactors = 1)
+                       scales = c("organisation", "content"), nfactors = 2)
   sframe_plot_efa_loadings(fit)
 }
 }

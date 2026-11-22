@@ -17,7 +17,7 @@
 \description{
 Displays a compact summary of an \code{sframe} instrument object, showing
 the title, version, item count, scale count, and validation status. The
-status comes from \code{\link[=validate_sframe]{validate_sframe()}} run on \code{x}, not from a stored flag.
+status comes from running \code{\link[=validate_sframe]{validate_sframe()}} on \code{x} as it prints.
 }
 \examples{
 item <- sframe_item("q1", "How satisfied are you?", type = "likert",

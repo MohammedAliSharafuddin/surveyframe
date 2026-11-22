@@ -30,10 +30,10 @@ notes. Does not affect the diagnostics themselves. Defaults to
 }
 \value{
 An object of class \code{sframe_efa_report} with elements \code{kmo},
-\code{bartlett}, \code{parallel}, and \code{suggested_nfactors}.
+\code{bartlett}, \code{parallel} and \code{suggested_nfactors}.
 }
 \description{
-Reports KMO sampling adequacy, Bartlett's test of sphericity, and a
+Reports KMO sampling adequacy, Bartlett's test of sphericity and a
 parallel analysis scree plot to inform factor number selection. The
 suggested number of factors from parallel analysis is returned in
 \verb{$suggested_nfactors}. The report
@@ -51,7 +51,7 @@ another package when you want a method surveyframe leaves out.
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("factor_structure")
   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
   print(er)
 }

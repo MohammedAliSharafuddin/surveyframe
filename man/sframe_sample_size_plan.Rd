@@ -22,7 +22,7 @@ sframe_sample_size_plan(
 }
 \arguments{
 \item{type}{Planning target: \code{"proportion"}, \code{"mean"}, \code{"correlation"},
-\code{"t_test"}, \code{"anova"}, \code{"regression"}, or \code{"sem"}.}
+\code{"t_test"}, \code{"anova"}, \code{"regression"} or \code{"sem"}.}
 
 \item{margin_error}{Margin of error for mean/proportion planning.}
 

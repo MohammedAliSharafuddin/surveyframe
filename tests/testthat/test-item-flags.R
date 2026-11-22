@@ -152,3 +152,14 @@ test_that("(d) a plan block result gives its block id in the reason", {
   expect_true(nrow(f) > 0)
   expect_true(all(nzchar(f$block)))
 })
+
+test_that("a reason never prints its value as the cut-off it falls below", {
+  r <- surveyframe:::sframe_item_flag_reason("absolute_primary_loading", "con_4", "content",
+                                             0.3977, 0.40, "RQ2", NULL)
+  expect_identical(r, "con_4: loading .398 in RQ2, below .40")
+  r <- surveyframe:::sframe_item_flag_reason("absolute_primary_loading", "org_4", "organisation",
+                                             0.21, 0.40, "RQ3", NULL)
+  expect_identical(r, "org_4: loading .21 in RQ3, below .40")
+  r <- surveyframe:::sframe_item_flag_reason("HTMT", NA, "a__b", 0.8504, 0.85, "", NULL)
+  expect_identical(r, "a and b: HTMT .8504, above .85")
+})

@@ -36,13 +36,15 @@ and \code{"seminr"} for PLS-SEM.}
 \item{indirect}{List of \code{\link[=sframe_indirect_effect]{sframe_indirect_effect()}} objects.}
 
 \item{options}{List of model options, such as \code{estimator}, \code{missing},
-\code{bootstrap}, or \code{standardised}.}
+\code{bootstrap} or \code{standardised}.}
 }
 \value{
 An object of class \code{sf_model}.
 }
 \description{
-Create a surveyframe model specification
+Puts constructs, paths, covariances and indirect effects together as 1
+model of a given type, ready to add to an instrument and to turn into
+lavaan or seminr syntax.
 }
 \examples{
 m <- sframe_model_spec(

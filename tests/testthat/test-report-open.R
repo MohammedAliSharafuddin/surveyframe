@@ -11,7 +11,7 @@ test_that("the report's message names its full path", {
   writeLines("<html></html>", out)
   old <- setwd(tempdir()); on.exit(setwd(old))
   expect_message(surveyframe:::sframe_report_result("open-test.html", "html"),
-                 normalizePath(out), fixed = TRUE)
+                 normalizePath(out, winslash = "/"), fixed = TRUE)
 })
 
 test_that("open = TRUE shows the report, and a script leaves it alone", {

@@ -16,15 +16,20 @@
 #'   `TRUE`.
 #'
 #' @return An object of class `sframe_reliability_report`, a list with one
-#'   element per scale. Each element is a list of statistics and a summary
-#'   tibble.
+#'   element per scale. Each element holds `scale_id`, `label`, `n_items`,
+#'   `n`, `alpha`, `alpha_std` and `alpha_if_deleted`, and with `omega =
+#'   TRUE`, `omega_t`, McDonald's omega total from a 1-factor model. Every
+#'   display reports alpha and `omega_t`. `omega_h` is kept for code that
+#'   reads it: in a 1-factor model there are no group factors, so it carries
+#'   no hierarchical meaning and can come out a rounding step above
+#'   `omega_t`.
 #' @export
 #' @seealso [sframe_scale()], [sframe_item_results()]
 #'
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("likert_scale")
 #'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   print(rr)
 #' }
@@ -126,9 +131,9 @@ print.sframe_reliability_report <- function(x, ...) {
   for (s in x) {
     cat(sprintf("Scale: %s (%s)\n", s$scale_id, s$label))
     cat(sprintf("  Items: %d   N: %d\n", s$n_items, s$n))
-    if (!is.null(s$alpha))   cat(sprintf("  Alpha:   %.3f\n", s$alpha))
-    if (!is.null(s$omega_h)) cat(sprintf("  Omega h: %.3f\n", s$omega_h))
-    if (!is.null(s$omega_t)) cat(sprintf("  Omega t: %.3f\n", s$omega_t))
+    if (!is.null(s$alpha))   cat("  Cronbach's alpha: ", sframe_apa_number(s$alpha, 2, bounded = TRUE), "\n", sep = "")
+    if (!is.null(s$omega_t)) cat("  McDonald's omega: ", sframe_apa_number(s$omega_t, 2, bounded = TRUE), "\n", sep = "")
+    if (!is.null(s$omega_note)) cat("  Omega: ", s$omega_note, "\n", sep = "")
     cat("\n")
   }
   invisible(x)
@@ -251,7 +256,7 @@ print.sframe_item_report <- function(x, ...) {
 
 #' Prepare a survey instrument for exploratory factor analysis
 #'
-#' Reports KMO sampling adequacy, Bartlett's test of sphericity, and a
+#' Reports KMO sampling adequacy, Bartlett's test of sphericity and a
 #' parallel analysis scree plot to inform factor number selection. The
 #' suggested number of factors from parallel analysis is returned in
 #' `$suggested_nfactors`. The report
@@ -270,7 +275,7 @@ print.sframe_item_report <- function(x, ...) {
 #'   `"oblimin"`.
 #'
 #' @return An object of class `sframe_efa_report` with elements `kmo`,
-#'   `bartlett`, `parallel`, and `suggested_nfactors`.
+#'   `bartlett`, `parallel` and `suggested_nfactors`.
 #' @section Fitting the solution:
 #' This report says whether the data suit a factor analysis and how many
 #' factors to extract. [sframe_efa_solution()] then fits that solution and returns
@@ -282,7 +287,7 @@ print.sframe_item_report <- function(x, ...) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("factor_structure")
 #'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   print(er)
 #' }
@@ -363,5 +368,3 @@ print.sframe_efa_report <- function(x, ...) {
   cat("\nNote: estimate the EFA solution with a dedicated modelling package.\n")
   invisible(x)
 }
-
-

@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sf_branch object as a string
+Gives a branching rule as 1 line: the question it controls, the question it
+depends on, the operator and the value.
 }
 \seealso{
 Other printing formatting and summary methods:

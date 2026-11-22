@@ -30,7 +30,7 @@ regression overlay for correlation and linear-regression blocks.
 Defaults to \code{FALSE}.}
 
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen use) or
-\code{"print"} (black, grey, and white, for journal-ready print figures).
+\code{"print"} (black, grey and white, for journal-ready print figures).
 Applied to every plot attached when \code{plots = TRUE}. See \code{sframe_brand()}.}
 
 \item{seed}{Integer or \code{NULL}. The random seed the analysis runs under.
@@ -55,7 +55,7 @@ holds \code{blocks}, \code{succeeded}, \code{failed}, \code{failed_blocks} and \
 outcome of scoring scales before analysis. A normal return can hold
 failed blocks, so check \code{attr(results, "status")$failed} or use
 \code{strict = TRUE}. Each element contains the test result,
-APA string, interpretation prompt, and reporting-reference metadata.
+APA string, interpretation prompt and reporting-reference metadata.
 Inferential blocks also carry a \verb{$table} data frame suitable for
 \code{knitr::kable()}. Pass to \code{\link[=render_results]{render_results()}} to generate a formatted
 report.
@@ -65,7 +65,7 @@ Executes every analysis block defined in the instrument's \code{analysis_plan}
 slot against the supplied response data. Each block corresponds to one
 research question defined during instrument design in the SurveyBuilder.
 Results include APA-formatted statistics, effect sizes, interpretation
-prompts, and reporting references.
+prompts and reporting references.
 }
 \section{Cross-tabulations}{
 
@@ -81,8 +81,8 @@ draws the percentages.
 \section{Weights}{
 
 A frequency, descriptives, cross-tabulation or chi-square block may name a
-case-weight column in its \code{weights} role. A design weight is set by the
-researcher, not asked of respondents, so it may be a column that is not an
+case-weight column in its \code{weights} role. The researcher sets a design
+weight, so it may be a column that is not an
 item: \code{\link[=validate_sframe]{validate_sframe()}} notes it, and it must then be in the responses,
 read with \code{read_responses(meta_cols = )}. A block whose weight column is
 missing, or holds a negative, non-finite or non-numeric value, fails with

@@ -35,7 +35,7 @@
 #'   text). Never shown to respondents. See [sframe_get_study()].
 #'
 #' @return An object of class `sframe` with slots `meta`, `items`, `choices`,
-#'   `scales`, `branching`, `checks`, `analysis_plan`, `models`, and `render`.
+#'   `scales`, `branching`, `checks`, `analysis_plan`, `models` and `render`.
 #' @export
 #' @seealso [sframe_item()], [sframe_choice_set()], [sframe_scale()], [sframe_branch()],
 #'   [sframe_attention_check()], [validate_sframe()], [write_sframe()]

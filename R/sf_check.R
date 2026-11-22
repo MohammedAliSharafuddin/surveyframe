@@ -2,7 +2,7 @@
 
 #' Define a design-time survey check
 #'
-#' Specifies an attention, instructional, or trap check item at instrument
+#' Specifies an attention, instructional or trap check item at instrument
 #' design time. The check is stored in the instrument object and evaluated
 #' against collected response data by [sframe_quality_results()]. This function only
 #' defines the check. Evaluation happens later in [sframe_quality_results()].

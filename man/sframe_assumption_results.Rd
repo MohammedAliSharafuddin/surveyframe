@@ -36,12 +36,12 @@ needs.
 Performs common assumption checks for survey analyses using base R where
 possible: Shapiro-Wilk tests, skewness/kurtosis screening, Levene and
 Brown-Forsythe tests, regression residual checks, VIF, Cook's distance,
-expected-count checks, and sparse-cell warnings.
+expected-count checks and sparse-cell warnings.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-ar <- sframe_assumption_results(demo$responses, variables = c("sat_1", "sat_2"),
-                         group = "visit_type")
+demo <- sframe_demo("two_group")
+ar <- sframe_assumption_results(demo$responses, variables = "sessions_attended",
+                         group = "format")
 print(ar)
 }
 \seealso{

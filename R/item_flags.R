@@ -35,7 +35,7 @@ sframe_flag_num <- function(x, digits = 2) {
 #' Lists the items, or for validity the constructs, whose statistics cross
 #' the cut-off usually applied to them, with the value, the rule, its source
 #' and a ready reason, such as "org_4: loading .21 in RQ3, below .40". A flag
-#' is a prompt to review the item, not a rule to drop it: its content,
+#' is a prompt to review the item: its content,
 #' wording, reverse keying and the purpose of the model still decide. Drop
 #' an item with [sframe_drop_items()] and record it with [amend_sframe()].
 #'
@@ -102,7 +102,7 @@ sframe_flag_num <- function(x, digits = 2) {
 #' Nunnally, J. C., & Bernstein, I. H. (1994). *Psychometric theory* (3rd ed.).
 #' McGraw-Hill.
 #'
-#' Revelle, W. (2025). *psych: Procedures for psychological, psychometric, and
+#' Revelle, W. (2025). *psych: Procedures for psychological, psychometric and
 #' personality research* (R package). Northwestern University.
 #' \url{https://CRAN.R-project.org/package=psych}
 #'
@@ -221,30 +221,37 @@ sframe_item_flags <- function(result, htmt = 0.85, all = FALSE, block = NULL) {
 sframe_item_flag_reason <- function(statistic, item, group, value, cutoff, block, detail) {
   where <- if (nzchar(block)) paste0(" in ", block) else ""
   cut <- sframe_flag_num(cutoff, if (identical(statistic, "absolute_outer_loading")) 3 else 2)
+  # The value with 1 more decimal while it would print as the cut-off, so a
+  # reason never reads "loading .40, below .40" for a loading of .398.
+  shown <- function(v, d = 2) {
+    while (d < 4 && !isTRUE(v == cutoff) &&
+           formatC(v, format = "f", digits = d) == formatC(cutoff, format = "f", digits = d)) d <- d + 1
+    sframe_flag_num(v, d)
+  }
   switch(statistic,
     alpha_if_item_deleted_minus_alpha = sprintf(paste0(
       "%s: alpha if deleted %s%s, above the scale's %s. Check its item-total ",
       "correlation and wording before dropping it."), item,
       sframe_flag_num(detail[1]), where, sframe_flag_num(detail[2])),
     corrected_item_total_r = sprintf("%s: corrected item-total correlation %s%s, below %s",
-      item, sframe_flag_num(value), where, cut),
+      item, shown(value), where, cut),
     KMO_MSA_item = sprintf("%s: sampling adequacy (MSA) %s%s, below %s",
-      item, sframe_flag_num(value), where, cut),
+      item, shown(value), where, cut),
     absolute_primary_loading = sprintf("%s: loading %s%s, below %s",
-      item, sframe_flag_num(value), where, cut),
+      item, shown(value), where, cut),
     primary_minus_cross_loading = sprintf("%s: loadings %s and %s%s, %s apart, below %s",
       item, sframe_flag_num(detail[1]), sframe_flag_num(detail[2]), where,
-      sframe_flag_num(value), cut),
+      shown(value), cut),
     absolute_standardised_loading = sprintf("%s: standardised loading %s%s, below %s",
-      item, sframe_flag_num(value), where, cut),
-    AVE = sprintf("%s: AVE %s%s, below %s", group, sframe_flag_num(value), where, cut),
+      item, shown(value), where, cut),
+    AVE = sprintf("%s: AVE %s%s, below %s", group, shown(value), where, cut),
     HTMT = sprintf("%s: HTMT %s%s, above %s", sub("__", " and ", group, fixed = TRUE),
-      sframe_flag_num(value), where, cut),
+      shown(value), where, cut),
     absolute_outer_loading = if (value < 0.40) {
       sprintf("%s: outer loading %s%s, below .40, a strong candidate for removal",
-              item, sframe_flag_num(value, 3), where)
+              item, shown(value, 3), where)
     } else {
       sprintf(paste0("%s: outer loading %s%s, below %s. Check AVE and composite ",
-                     "reliability before removing it."), item, sframe_flag_num(value, 3), where, cut)
+                     "reliability before removing it."), item, shown(value, 3), where, cut)
     })
 }

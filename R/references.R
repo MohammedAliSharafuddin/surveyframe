@@ -43,7 +43,7 @@ sframe_reference_types <- c(
 #' @param id Character. The citation key, for example `"cohen_1988"`. Starts
 #'   with a letter, digit or underscore, as pandoc requires.
 #' @param title Character. The work's title.
-#' @param author Character vector of names written `"Family, Given"`, or a
+#' @param author Character vector of names written `"Family, Given"` or a
 #'   single organisation name written `"{R Core Team}"` in braces. `NULL` when the
 #'   work has no named author.
 #' @param year Integer or character. Year of publication.
@@ -52,7 +52,7 @@ sframe_reference_types <- c(
 #'   `"webpage"`, `"software"`, `"dataset"`, `"manuscript"` or `"document"`.
 #' @param container Character. The journal, or the book a chapter is in.
 #' @param volume,issue,pages Character. Volume, issue and page range, for
-#'   example `"591-611"`, or an article number.
+#'   example `"591-611"` or an article number.
 #' @param publisher Character. Publisher, or for a thesis the institution.
 #' @param edition Character. Edition, for example `"2"`.
 #' @param editor Character vector of editor names, written as for `author`.
@@ -210,8 +210,8 @@ sframe_reference_targets <- function(x, id) {
 #' letters written as LaTeX commands are converted. Base R alone.
 #'
 #' @param file Path to a `.bib` file.
-#' @param text BibTeX as a character string, used instead of `file`, for
-#'   example an entry pasted from Google Scholar.
+#' @param text BibTeX as a character string, the other way to supply it, for
+#'   example an entry pasted from a reference database.
 #' @param cited_by Optional `cited_by` targets given to every entry read, see
 #'   [sframe_reference()].
 #'
@@ -525,6 +525,9 @@ sframe_flatten_references <- function(x) {
 }
 
 #' List an instrument's references
+#'
+#' Returns the references stored in an instrument, all of them or only those
+#' cited at 1 target such as a scale.
 #'
 #' @param instrument An `sframe` object.
 #' @param cited_by Optional target, for example `"scale:satisfaction"`, to

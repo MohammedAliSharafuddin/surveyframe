@@ -15,7 +15,8 @@ sframe_plot_validity(x, palette = c("web", "print"))
 A ggplot2 object.
 }
 \description{
-Validity report plot: composite reliability and AVE by construct
+Draws composite reliability and average variance extracted for each
+construct, against their usual thresholds of .70 and .50.
 }
 \examples{
 \donttest{

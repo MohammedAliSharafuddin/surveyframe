@@ -15,7 +15,7 @@
 A single character string.
 }
 \description{
-Format an sf_check object as a string
+Gives the check's ID, type and item as 1 line.
 }
 \seealso{
 Other printing formatting and summary methods:

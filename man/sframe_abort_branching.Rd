@@ -18,6 +18,7 @@ This function does not return. It signals an error of class
 \code{sframe_branching_error}.
 }
 \description{
-Abort with a branching error
+Stops with an error of class \code{sframe_branching_error} when a skip rule is
+broken, and records the item it belongs to.
 }
 \keyword{internal}

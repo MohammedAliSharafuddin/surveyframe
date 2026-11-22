@@ -28,7 +28,7 @@ a ranking runner never has to know which one the researcher used. A
 \code{"criteria_weight"} item is renormalised to sum 1 per respondent before the
 arithmetic mean is taken, so a respondent who allocated 90 points in total
 carries the same influence as one who allocated exactly 100. A
-\code{"pairwise_comparison"} item is assembled, aggregated geometrically, and
+\code{"pairwise_comparison"} item is assembled, aggregated geometrically and
 reduced to its principal eigenvector.
 }
 \examples{

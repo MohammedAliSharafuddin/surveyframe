@@ -590,9 +590,9 @@ sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
 #' Tile heatmap of pairwise within-response term co-occurrence counts for a
 #' `co_occurrence` result. The result's edge list (`term_a`, `term_b`, `n`)
 #' is pivoted into a full symmetric term-by-term grid before plotting, so
-#' each pair's tile appears twice, once on either side of the diagonal, the
-#' way the other tile heatmaps in this file (`sframe_plot_correlation_matrix()`,
-#' `sframe_plot_efa_loadings()`) read as a full grid rather than a triangle.
+#' each pair's tile appears twice, once on either side of the diagonal, and
+#' the chart reads as a full grid, as [sframe_plot_correlation_matrix()] and
+#' [sframe_plot_efa_loadings()] do.
 #'
 #' @param result A `co_occurrence` result list from [run_analysis_plan()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
@@ -749,23 +749,17 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #' including from the Quarto report template, which runs in its own
 #' `library(surveyframe)` session and cannot see unexported functions.
 #' `counts` is a named numeric vector in scale order (names are the response
-#' labels, e.g. "Strongly disagree" .. "Strongly agree"), not sorted
-#' alphabetically or by frequency. The middle category of an odd-length
+#' labels, e.g. "Strongly disagree" to "Strongly agree"), from 1 pole to the
+#' other. The middle category of an odd-length
 #' scale is treated as neutral and split evenly across the zero line. An
 #' even-length scale has no neutral category. This is the standard
-#' survey-report convention (Pew Research, SurveyMonkey) for visualising an
-#' ordered agree/disagree scale, and reads in one glance which way opinion
-#' leans, unlike a plain frequency bar.
+#' survey-report convention for an ordered agree/disagree scale, and shows
+#' at a glance which way opinion leans.
 #'
-#' Kept horizontal deliberately: this is the one chart in the package where
-#' the horizontal orientation is the domain convention, not an accident, and
-#' a vertical diverging stack is materially harder to read for this specific
-#' shape (see the file-level note in the roxygen docs of the ggplot2
-#' equivalents above). Position (left of zero vs right of zero) carries the
-#' primary signal either way, so it also satisfies "do not rely on colour
-#' alone" regardless of palette. In print mode, the two poles are further
-#' distinguished by a diagonal hatch on the "disagree" side, not colour tone
-#' alone.
+#' The bars run horizontally, the convention for this chart, which reads more
+#' easily than a vertical diverging stack. Position, left or right of zero,
+#' carries the main signal, so the chart reads without colour in either
+#' palette. In print mode a diagonal hatch also marks the "disagree" side.
 #'
 #' @param counts Named numeric vector of response counts, in scale order.
 #' @param theme_color Character. Hex colour for the "agree" pole.
@@ -1046,10 +1040,10 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' *Separate* Likert items that make up one [sframe_scale()] (unlike a
 #' `"matrix"` item's rows, which are one question) are, by default, each
 #' reported as their own single-item diverging chart. That scatters a
-#' related batch of items (a satisfaction scale's 2-3 items, say) across
-#' separate charts instead of showing them the way a Likert matrix or a
-#' typical multi-item satisfaction grid is reported: one grouped chart, one
-#' diverging bar per item, sharing an x scale and a legend. Applies only
+#' related batch of items (a satisfaction scale's 2 or 3 items, say) across
+#' separate charts. This function draws them the way a Likert matrix is
+#' reported: 1 grouped chart, 1 diverging bar per item, sharing an x scale
+#' and a legend. Applies only
 #' when every item in the scale shares the same choice set. Scales that mix
 #' response scales fall back to one chart per item.
 #'
@@ -1223,11 +1217,11 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
 #'
 #' The shared chart for every MCDM ranking method: one horizontal bar per
 #' alternative, ordered best first, with the leading alternative picked out.
-#' It is generic over the method rather than tied to one, so AHP criterion
+#' It works for any method, so AHP criterion
 #' weights and any ranking method's scores all draw through it. The score
 #' column is whatever the method reports as its headline quantity (a
-#' closeness coefficient, a net flow, a priority weight), so the axis is
-#' labelled from the result rather than hard-coded.
+#' closeness coefficient, a net flow, a priority weight), so the axis takes
+#' its label from the result.
 #'
 #' @param result A decision-family result list from [run_analysis_plan()],
 #'   carrying either `scores` and `alternatives` or a ranking `table`.
@@ -1334,8 +1328,8 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #'
 #' The 4 standard diagnostic panels (residuals vs fitted, normal Q-Q,
 #' scale-location, residuals vs leverage), built from the plain data frame
-#' [run_analysis_plan()] attaches to a `regression_linear` result rather than
-#' the `lm` object itself, so the result stays JSON-serialisable.
+#' [run_analysis_plan()] attaches to a `regression_linear` result, which keeps
+#' the result JSON-serialisable.
 #'
 #' @param result A `regression_linear` result list containing a `diagnostics`
 #'   data frame (as produced internally by [run_analysis_plan()]).
@@ -1347,9 +1341,9 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("correlation_regression")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
-#'   panels <- sframe_plot_regression_diagnostics(res$rq_predict_sat)
+#'   panels <- sframe_plot_regression_diagnostics(res$RQ5)
 #'   panels$residuals_fitted
 #' }
 #' }
@@ -1422,7 +1416,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("factor_structure")
 #'   er <- sframe_efa_readiness_results(demo$responses, demo$instrument)
 #'   sframe_plot_efa_scree(er)
 #' }
@@ -1458,10 +1452,13 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 
 #' Loadings heatmap from a fitted EFA solution
 #'
+#' Draws each item's loading on each factor as a tile, so the item groups
+#' behind each factor stand out.
+#'
 #' @param x An `sframe_efa_solution` object from [sframe_efa_solution()].
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
-#'   (white-to-black gradient by magnitude, with sign conveyed by the
-#'   printed label rather than colour, so it stays legible in monochrome). See
+#'   (white-to-black gradient by magnitude, with the sign shown by the
+#'   printed label, so it stays legible in monochrome). See
 #'   `sframe_brand()`.
 #' @return A ggplot2 object.
 #' @export
@@ -1470,9 +1467,9 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("factor_structure")
 #'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
-#'                        scales = "service_quality", nfactors = 1)
+#'                        scales = c("organisation", "content"), nfactors = 2)
 #'   sframe_plot_efa_loadings(fit)
 #' }
 #' }
@@ -1518,6 +1515,9 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 
 #' Reliability plot: alpha and omega by scale
 #'
+#' Draws Cronbach's alpha and McDonald's omega for each scale side by side,
+#' against the usual .70 threshold.
+#'
 #' @param x An `sframe_reliability_report` object from [sframe_reliability_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
@@ -1527,7 +1527,7 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
 #'     requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("likert_scale")
 #'   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
 #'   sframe_plot_reliability(rr)
 #' }
@@ -1642,9 +1642,10 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("correlation_regression")
 #'   sframe_plot_correlation_matrix(demo$responses,
-#'                                  c("sq_1", "sq_2", "sq_3", "sat_1", "sat_2"))
+#'                                  c("sessions_attended", "networking_minutes",
+#'                                    "overall_value", "age"))
 #' }
 #' }
 #' @family Chart functions
@@ -1682,6 +1683,8 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
 }
 
 #' Quality report plot: straight-lining flag rate by scale
+#'
+#' Draws the share of respondents flagged for straight-lining in each scale.
 #'
 #' @param x An `sframe_quality_report` object from [sframe_quality_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
@@ -1759,6 +1762,9 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 
 #' Validity report plot: composite reliability and AVE by construct
 #'
+#' Draws composite reliability and average variance extracted for each
+#' construct, against their usual thresholds of .70 and .50.
+#'
 #' @param x An `sframe_validity_report` object from [sframe_validity_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object.
@@ -1810,17 +1816,19 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 
 #' Missing-data report plot: missingness rate by item
 #'
+#' Draws the share of missing answers for each item, highest first.
+#'
 #' @param x An `sframe_missing_data_report` object from
 #'   [sframe_missing_data_results()].
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object. When no item has missing values, this is a
-#'   short "no missing responses" message rather than an empty bar chart.
+#'   short "no missing responses" message.
 #' @export
 #' @seealso [sframe_missing_data_results()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("first_survey")
 #'   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
 #'   sframe_plot_missingness(mr)
 #' }
@@ -1929,7 +1937,7 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #'
 #' Used by the SurveyStudio Explore screen (`inst/shiny/app.R`). Callers
 #' fall back to their own base graphics when this returns `NULL` (ggplot2 not
-#' installed, unsupported item type, or no data), so the screen keeps working
+#' installed, unsupported item type or no data), so the screen keeps working
 #' without ggplot2.
 #'
 #' @param item A list with at least `type` and `label` (an sframe item).
@@ -1943,10 +1951,10 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
-#'   item <- Filter(function(i) i$id == "sat_1", demo$instrument$items)[[1]]
+#'   demo <- sframe_demo("likert_scale")
+#'   item <- Filter(function(i) i$id == "org_1", demo$instrument$items)[[1]]
 #'   cs   <- Filter(function(c) c$id == item$choice_set, demo$instrument$choices)[[1]]
-#'   sframe_plot_item_chart(item, demo$responses$sat_1, cs)
+#'   sframe_plot_item_chart(item, demo$responses$org_1, cs)
 #' }
 #' }
 #' @family SurveyStudio helpers
@@ -1997,9 +2005,9 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("likert_scale")
 #'   scored <- score_scales(demo$responses, demo$instrument)
-#'   sframe_plot_scale_chart(scored$satisfaction, "Satisfaction")
+#'   sframe_plot_scale_chart(scored$organisation, "Organisation")
 #' }
 #' }
 #' @family SurveyStudio helpers
@@ -2023,9 +2031,9 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' Distribution shape by variable, standardised
 #'
 #' One violin per variable in a [sframe_descriptives_results()] table, built from
-#' the underlying response data rather than from the summary skewness and
-#' kurtosis numbers, so the reader sees the actual shape (asymmetry,
-#' multimodality, tails) instead of reading it off a bar height. Each
+#' the underlying response data, so the reader sees the shape that the
+#' skewness and kurtosis numbers summarise: asymmetry, multimodality and
+#' tails. Each
 #' variable is standardised (z-scored) before plotting so variables on
 #' different original scales (a 5-point Likert item next to a 0-100 slider)
 #' share one comparable y-axis. Standardising is a linear transform and does
@@ -2034,8 +2042,9 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' output (one row per variable per `split_by` group) is faceted by group.
 #'
 #' @param x An `sframe_descriptives_report` object from [sframe_descriptives_results()].
-#' @param data The same data.frame passed to [sframe_descriptives_results()]. Required:
-#'   `x` only carries the summary table, not the raw values the violins need.
+#' @param data The same data.frame passed to [sframe_descriptives_results()].
+#'   Required, because the violins need the raw values and `x` carries the
+#'   summary table.
 #' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
 #' @return A ggplot2 object, or `NULL` if none of the report's variables have
 #'   enough data to draw.
@@ -2044,8 +2053,9 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
-#'   dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
+#'   demo <- sframe_demo("likert_scale")
+#'   dr <- sframe_descriptives_results(demo$responses,
+#'                                     variables = c("org_1", "org_2", "org_3", "org_4"))
 #'   sframe_plot_descriptives(dr, demo$responses)
 #' }
 #' }
@@ -2125,7 +2135,7 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #'
 #' Boxplot with jittered points, shared across every runner whose result
 #' carries `vars = c(group_column, outcome_column)`: `t_test_ind`,
-#' `mann_whitney`, `kruskal_wallis`, and `anova_one`. 1 function instead of
+#' `mann_whitney`, `kruskal_wallis` and `anova_one`. 1 function serves all
 #' 4, since the underlying comparison (an outcome split by a grouping
 #' factor) and the data shape needed to plot it are identical across all
 #' 4 tests, and only the inferential statistic differs.
@@ -2142,9 +2152,9 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("two_group")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
-#'   sframe_plot_group_comparison(res$rq_visit_bi, demo$responses)
+#'   sframe_plot_group_comparison(res$RQ1, demo$responses)
 #' }
 #' }
 #' @family Chart functions
@@ -2202,9 +2212,9 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("paired")
 #'   res <- run_analysis_plan(demo$responses, demo$instrument)
-#'   sframe_plot_paired_comparison(res$rq_ttest_pair, demo$responses)
+#'   sframe_plot_paired_comparison(res$RQ1, demo$responses)
 #' }
 #' }
 #' @family Chart functions
@@ -2507,12 +2517,12 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
     theme_surveyframe(palette = palette)
 }
 
-#' Raw-variable distribution panels: histogram, boxplot, and Q-Q
+#' Raw-variable distribution panels: histogram, boxplot and Q-Q
 #'
 #' Unlike [sframe_plot_descriptives()], which summarises skewness and
 #' kurtosis *across* the variables in a [sframe_descriptives_results()] table, this
-#' operates on one variable's raw values directly (the report table only
-#' stores summary statistics, not the underlying vector), matching the
+#' operates on one variable's raw values directly (the report table holds
+#' summary statistics alone), matching the
 #' pattern [sframe_plot_correlation_matrix()] already uses for
 #' report-independent, data-driven plots.
 #'
@@ -2526,8 +2536,8 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
-#'   panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
+#'   demo <- sframe_demo("two_group")
+#'   panels <- sframe_plot_variable_distribution(demo$responses, "sessions_attended")
 #'   panels$histogram
 #' }
 #' }
@@ -2703,9 +2713,8 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
 #' available in `result$table`.
 #'
 #' Clusters beyond the first 8 (ranked largest first) are folded into a
-#' single "Other" bucket rather than cycling or interpolating a new hue,
-#' per the dataviz skill's categorical-colour guidance, as
-#' `.sframe_cluster_palette()`.
+#' single "Other" group with 1 colour, so every colour on the chart stays
+#' distinct.
 #'
 #' @param result A `co_occurrence_network` result list from
 #'   [run_analysis_plan()], carrying `table` and `edges`.
@@ -2841,11 +2850,9 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #'
 #' A ggplot2 diverging bar for a `tidy_sentiment` result by default:
 #' positive counts extend one direction, negative counts the other, so bar
-#' position (not colour alone) carries the primary polarity signal, the
-#' same convention `sframe_draw_likert_diverging()` uses for Likert
-#' agreement (dark ramp toward the pole) rebuilt here in ggplot2 rather
-#' than called directly, since that helper is base-graphics and
-#' Likert-scale-specific. Facets by group when `result$table` carries a
+#' position carries the polarity, so the chart reads without colour. Likert
+#' charts follow the same convention, with a darker shade toward each pole.
+#' Facets by group when `result$table` carries a
 #' `group` column, mirroring [sframe_plot_term_frequency()]'s grouped
 #' branch.
 #'

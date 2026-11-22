@@ -27,7 +27,7 @@ instrument's title.}
 \item{overwrite}{Logical. Overwrite existing files of the same name.}
 }
 \value{
-A list with \code{qmd}, \code{sframe}, and \code{csv} paths, invisibly.
+A list with \code{qmd}, \code{sframe} and \code{csv} paths, invisibly.
 }
 \description{
 Unlike \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}, which only works for one of the bundled demo

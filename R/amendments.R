@@ -422,7 +422,7 @@ sframe_amendment_preview <- function(previous, instrument) {
 #'
 #' Appends a structured, disclosed-revision entry to an instrument's
 #' amendment log, comparing `previous` against `instrument` to record what
-#' changed and why: a data-entry correction, bot-response removal, or a
+#' changed and why: a data-entry correction, bot-response removal or a
 #' documented model respecification. The record is kept inside the file,
 #' beside the content it explains.
 #'
@@ -502,7 +502,7 @@ sframe_amendment_preview <- function(previous, instrument) {
 #'   asking for `"pipeline"` on one is an error.
 #' @param author Character or `NULL`. Who made the change.
 #' @param deviation_report Character or `NULL`. Required when `tier` is
-#'   `"design"`: what changed in the research question, method, or model, and
+#'   `"design"`: what changed in the research question, method or model, and
 #'   why. Ignored (may be `NULL`) for `"pipeline"` amendments.
 #' @param second_signoff Character or `NULL`. A second reviewer's name or
 #'   identifier (an ethics board reference, a co-author). When omitted, the
@@ -704,7 +704,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
 #'
 #' @return A data frame with columns `timestamp`, `reason_code`,
 #'   `reason_text`, `tier`, `author`, `deviation_report`, `signoff`,
-#'   `previous_hash`, `new_hash`, and `changed_fields` (a comma-joined
+#'   `previous_hash`, `new_hash` and `changed_fields` (a comma-joined
 #'   string). Zero rows if the instrument has no recorded amendments.
 #'   Export with `write.csv()` for an external audit trail.
 #' @export

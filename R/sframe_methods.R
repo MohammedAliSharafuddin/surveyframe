@@ -18,7 +18,7 @@ sframe_status_text <- function(x, short = FALSE) {
 #'
 #' Displays a compact summary of an `sframe` instrument object, showing
 #' the title, version, item count, scale count, and validation status. The
-#' status comes from [validate_sframe()] run on `x`, not from a stored flag.
+#' status comes from running [validate_sframe()] on `x` as it prints.
 #'
 #' @param x An object of class `sframe`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -56,6 +56,9 @@ print.sframe <- function(x, ...) {
 
 #' Format an sframe instrument object as a string
 #'
+#' Gives the instrument's title and version with a count of each kind of
+#' component as 1 line, the line that `print()` starts with.
+#'
 #' @param x An object of class `sframe`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -77,7 +80,7 @@ format.sframe <- function(x, ...) {
 #' Summarise an sframe instrument object
 #'
 #' Prints a structured summary of an `sframe` object including metadata,
-#' item type counts, scale definitions, branching rules, and check
+#' item type counts, scale definitions, branching rules and check
 #' specifications.
 #'
 #' @param object An object of class `sframe`.

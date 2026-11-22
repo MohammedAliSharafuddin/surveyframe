@@ -11,14 +11,14 @@
 #'
 #' \describe{
 #'   \item{Build}{An item editor with a persistent inspector panel,
-#'     drag-to-reorder, undo/redo, and autosave to browser localStorage.}
+#'     drag-to-reorder, undo/redo and autosave to browser localStorage.}
 #'   \item{Preview}{The deployable survey, the page [export_survey()] writes
 #'     with `preview = TRUE` and SurveyStudio's Preview screen shows.
 #'     Answering, required checks and branching run as a respondent sees
 #'     them, and nothing is collected: the collector endpoint and the
 #'     completion redirect are removed.}
 #'   \item{Plan}{A role-based analysis planner with method-specific
-#'     options, planned outputs, reporting references, and decision rules.}
+#'     options, planned outputs, reporting references and decision rules.}
 #' }
 #'
 #' The builder includes a pure-JavaScript SHA-256 fallback for browsers or
@@ -37,8 +37,8 @@
 #' @param instrument Optional. An `sframe` instrument. The builder then opens
 #'   from a temporary copy with this instrument loaded, as if it had been
 #'   opened with the builder's Open button, so its study, designs,
-#'   amendments and references are kept on the next save. Supply `demo` or
-#'   `instrument`, not both.
+#'   amendments and references are kept on the next save. Supply 1 of `demo`
+#'   and `instrument`.
 #'
 #' @return The path to the builder HTML file, invisibly: the bundled file, or
 #'   the temporary copy when `demo` or `instrument` is given.

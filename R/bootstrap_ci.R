@@ -73,7 +73,7 @@ sframe_with_seed <- function(seed, expr) {
 
 #' Percentile bootstrap confidence interval for a statistic
 #'
-#' Resamples `x` with replacement `R` times, applies `FUN` to each resample,
+#' Resamples `x` with replacement `R` times, applies `FUN` to each resample
 #' and returns the percentile interval of the resampled statistics together
 #' with the observed value.
 #'
@@ -269,7 +269,7 @@ sframe_cramers_v <- function(tbl) {
 #'
 #' @return A named numeric vector: `estimate`, `lower`, `upper`, with the
 #'   attributes `level` and `method` (`"noncentral F"`). The bounds are `NA`
-#'   with fewer than 3 complete observations, fewer than 2 groups, or no
+#'   with fewer than 3 complete observations, fewer than 2 groups or no
 #'   variation within the groups.
 #' @export
 #' @seealso [sframe_cramers_v_ci()], [sframe_bootstrap_ci()]

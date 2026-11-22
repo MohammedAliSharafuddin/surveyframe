@@ -20,6 +20,7 @@ sframe_warn_missing(message, item_id = NULL, rate = NULL, ...)
 \code{sframe_missing_data_warning}.
 }
 \description{
-Warn about missing data
+Signals a warning of class \code{sframe_missing_data_warning} and records the
+item and its missing rate.
 }
 \keyword{internal}

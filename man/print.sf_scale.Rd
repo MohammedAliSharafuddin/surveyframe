@@ -15,7 +15,7 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_scale object
+Prints the scale's ID, label, items and scoring method.
 }
 \examples{
 sc <- sframe_scale("sat", "Satisfaction", items = c("q1", "q2", "q3"))

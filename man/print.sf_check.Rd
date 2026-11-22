@@ -15,7 +15,8 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_check object
+Prints the check's ID and type, the item it reads and the answers that pass
+it.
 }
 \examples{
 ck <- sframe_attention_check("attn1", item_id = "q5", type = "attention",

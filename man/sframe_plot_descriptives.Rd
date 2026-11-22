@@ -9,8 +9,9 @@ sframe_plot_descriptives(x, data, palette = c("web", "print"))
 \arguments{
 \item{x}{An \code{sframe_descriptives_report} object from \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}.}
 
-\item{data}{The same data.frame passed to \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}. Required:
-\code{x} only carries the summary table, not the raw values the violins need.}
+\item{data}{The same data.frame passed to \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}.
+Required, because the violins need the raw values and \code{x} carries the
+summary table.}
 
 \item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
 }
@@ -20,9 +21,9 @@ enough data to draw.
 }
 \description{
 One violin per variable in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, built from
-the underlying response data rather than from the summary skewness and
-kurtosis numbers, so the reader sees the actual shape (asymmetry,
-multimodality, tails) instead of reading it off a bar height. Each
+the underlying response data, so the reader sees the shape that the
+skewness and kurtosis numbers summarise: asymmetry, multimodality and
+tails. Each
 variable is standardised (z-scored) before plotting so variables on
 different original scales (a 5-point Likert item next to a 0-100 slider)
 share one comparable y-axis. Standardising is a linear transform and does
@@ -33,8 +34,9 @@ output (one row per variable per \code{split_by} group) is faceted by group.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
-  dr <- sframe_descriptives_results(demo$responses, variables = c("sat_1", "sat_2"))
+  demo <- sframe_demo("likert_scale")
+  dr <- sframe_descriptives_results(demo$responses,
+                                    variables = c("org_1", "org_2", "org_3", "org_4"))
   sframe_plot_descriptives(dr, demo$responses)
 }
 }

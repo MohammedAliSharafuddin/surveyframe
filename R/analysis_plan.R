@@ -1785,7 +1785,7 @@ sframe_result_table <- function(result) {
     },
     reliability_omega = {
       rr <- sframe_runtime(result, "report")
-      if (is.null(rr)) NULL else sframe_reliability_table(rr, c(omega_h = "Omega (h)", omega_t = "Omega (t)"))
+      if (is.null(rr)) NULL else sframe_reliability_table(rr, c(alpha = "Alpha", omega_t = "Omega"))
     },
     item_diagnostics = {
       ir <- sframe_runtime(result, "report")
@@ -1830,13 +1830,44 @@ sframe_reliability_table <- function(rr, columns) {
       check.names = FALSE, stringsAsFactors = FALSE
     )
     for (field in names(columns)) {
-      row[[columns[[field]]]] <- round(s[[field]] %||% NA_real_, 3)
+      # Unrounded: the table cell rounds once, as the APA sentence does, so
+      # the 2 never differ by a double-rounding step (.8049 read .81 and .80).
+      row[[columns[[field]]]] <- s[[field]] %||% NA_real_
     }
     row
   })
   rows <- Filter(Negate(is.null), rows)
   if (!length(rows)) return(NULL)
+  # The scale label stays as the row name: the reference results file keys
+  # each value by it, as in "Perceived organisation: Alpha".
   do.call(rbind, rows)
+}
+
+# The APA sentence of a reliability block, 1 clause per scale. The omega
+# block gives alpha beside omega, since the gap between them is the point:
+# omega above alpha says the items load unequally on the scale, which alpha
+# assumes away (McDonald, 1999).
+sframe_reliability_apa <- function(result) {
+  rr <- sframe_runtime(result, "report")
+  if (is.null(rr) || !length(rr)) return(result)
+  num <- function(v) sprintf("%.2f", v)
+  parts <- vapply(rr, function(s) {
+    if (!is.list(s) || is.null(s$scale_id)) return("")
+    what <- sprintf("%s (%d items, N = %d)", s$label %||% s$scale_id, s$n_items, s$n)
+    if (identical(result$test, "reliability_alpha")) {
+      if (is.null(s$alpha)) return("")
+      return(sprintf("Cronbach's \u03b1 = %s for %s", num(s$alpha), what))
+    }
+    if (is.null(s$omega_t)) {
+      return(sprintf("McDonald's \u03c9 was not computed for %s, %s", what,
+                     s$omega_note %||% "omega could not be computed"))
+    }
+    alpha <- if (is.null(s$alpha)) "" else sprintf(", against \u03b1 = %s", num(s$alpha))
+    sprintf("McDonald's \u03c9 = %s for %s%s", num(s$omega_t), what, alpha)
+  }, character(1))
+  parts <- parts[nzchar(parts)]
+  if (length(parts)) result$apa <- paste0(paste(parts, collapse = "; "), ".")
+  result
 }
 
 # sframe_item_results() is keyed by scale id, each holding its own item-level
@@ -1963,8 +1994,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
       missing_data       = sframe_run_missing_result(data, instrument, roles),
       quality            = sframe_result_from_report(sframe_run_quality(data, instrument, roles, options), "quality"),
       scale_descriptives = sframe_run_descriptives_result(data, list(variables = vapply(instrument$scales, function(s) s$id, character(1))), options),
-      reliability_alpha  = sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), omega = FALSE), "reliability_alpha"),
-      reliability_omega  = sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), alpha = FALSE, omega = TRUE), "reliability_omega"),
+      reliability_alpha  = sframe_reliability_apa(sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), omega = FALSE), "reliability_alpha")),
+      reliability_omega  = sframe_reliability_apa(sframe_result_from_report(sframe_reliability_results(data, instrument, scales = sframe_block_scales(roles, instrument), omega = TRUE), "reliability_omega")),
       item_diagnostics   = sframe_result_from_report(sframe_item_results(data, instrument, scales = sframe_block_scales(roles, instrument)), "item_diagnostics"),
       efa_readiness      = sframe_result_from_report(sframe_efa_readiness_results(data, instrument, scales = sframe_block_scales(roles, instrument), nfactors = options$nfactors), "efa_readiness"),
       efa_solution       = sframe_result_from_report(sframe_efa_solution(data, instrument, items = sframe_role_values(roles, c("items", "variables")), nfactors = options$nfactors %||% 1L), "efa_solution"),
@@ -2138,7 +2169,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' slot against the supplied response data. Each block corresponds to one
 #' research question defined during instrument design in the SurveyBuilder.
 #' Results include APA-formatted statistics, effect sizes, interpretation
-#' prompts, and reporting references.
+#' prompts and reporting references.
 #'
 #' @param data A `tibble` or `data.frame` of responses, typically produced by
 #'   [read_responses()] or [read_sheet_responses()].
@@ -2161,7 +2192,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   stream is restored afterwards, so seeding here does not affect anything
 #'   that runs later.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
-#'   `"print"` (black, grey, and white, for journal-ready print figures).
+#'   `"print"` (black, grey and white, for journal-ready print figures).
 #'   Applied to every plot attached when `plots = TRUE`. See `sframe_brand()`.
 #'
 #' @param strict Logical. When `TRUE`, an error is raised if any block fails
@@ -2174,7 +2205,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   outcome of scoring scales before analysis. A normal return can hold
 #'   failed blocks, so check `attr(results, "status")$failed` or use
 #'   `strict = TRUE`. Each element contains the test result,
-#'   APA string, interpretation prompt, and reporting-reference metadata.
+#'   APA string, interpretation prompt and reporting-reference metadata.
 #'   Inferential blocks also carry a `$table` data frame suitable for
 #'   `knitr::kable()`. Pass to [render_results()] to generate a formatted
 #'   report.
@@ -2188,8 +2219,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #' draws the percentages.
 #' @section Weights:
 #' A frequency, descriptives, cross-tabulation or chi-square block may name a
-#' case-weight column in its `weights` role. A design weight is set by the
-#' researcher, not asked of respondents, so it may be a column that is not an
+#' case-weight column in its `weights` role. The researcher sets a design
+#' weight, so it may be a column that is not an
 #' item: [validate_sframe()] notes it, and it must then be in the responses,
 #' read with `read_responses(meta_cols = )`. A block whose weight column is
 #' missing, or holds a negative, non-finite or non-numeric value, fails with
@@ -2396,7 +2427,7 @@ sframe_md_em <- function(x) {
 #'
 #' Generates a self-contained HTML report from the output of
 #' [run_analysis_plan()]. Each section corresponds to one research question
-#' and includes the APA-formatted statistical result, an interpretation space,
+#' and includes the APA-formatted statistical result, an interpretation space
 #' and a reference list.
 #'
 #' @param results An `sframe_analysis_results` object from [run_analysis_plan()].
@@ -2423,11 +2454,11 @@ sframe_md_em <- function(x) {
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "two_group.sframe",
 #'               package = "surveyframe")
 #' )
 #' responses <- read_responses(
-#'   system.file("extdata", "tourism_services_responses.csv",
+#'   system.file("extdata", "demos", "two_group_responses.csv",
 #'               package = "surveyframe"),
 #'   instr,
 #'   respondent_id = "respondent_id",

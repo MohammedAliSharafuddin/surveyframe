@@ -77,7 +77,7 @@ shows the response as recorded. Resolving to anything else shows it as sent
 and unconfirmed, and a rejection shows the failure screen with a retry.
 
 The thank-you screen states delivery itself, one line for each outcome:
-recorded, sent but unconfirmed, not sent, or failed. Write
+recorded, sent but unconfirmed, not sent or failed. Write
 \code{render$thankyou$message} as thanks, a debrief or contact details, and do
 not state delivery in it. It appears below the status line in every case
 except a failed send, and defaults to "Thank you for participating."
@@ -90,7 +90,7 @@ a respondent who closes the tab is offered to resume on return. The draft
 is cleared once the response is submitted, and kept when delivery fails.
 
 The exported file works offline. It can be hosted on GitHub Pages,
-Netlify, any static file server, or e-mailed as an attachment for
+Netlify, any static file server or e-mailed as an attachment for
 opening directly from disk.
 }
 

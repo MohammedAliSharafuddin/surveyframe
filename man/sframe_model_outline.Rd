@@ -15,7 +15,9 @@ sframe_model_outline(model, include_json = TRUE)
 A character string.
 }
 \description{
-Create a model reporting template
+Writes a Markdown outline for reporting a model: its type and engine, its
+constructs and their items, its structural paths and reporting notes, with
+the model's JSON when \code{include_json = TRUE}.
 }
 \examples{
 m <- sframe_model_spec("cb1", type = "cb_sem",

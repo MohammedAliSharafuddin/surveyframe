@@ -25,7 +25,7 @@ full report.
 }
 \description{
 Produces a structured codebook listing all items, their types, choice sets,
-scale membership, and reverse-coding status. The codebook can be rendered
+scale membership and reverse-coding status. The codebook can be rendered
 as HTML or Markdown.
 }
 \examples{

@@ -2,14 +2,14 @@
 % Please edit documentation in R/accessors.R
 \name{sframe_identity}
 \alias{sframe_identity}
-\alias{sf_identity}
 \title{The ID and label of an instrument component}
 \value{
 A single character string. \code{sframe_label()} returns \code{""} when the
 component carries no label.
 }
 \description{
-The ID and label of an instrument component
+\code{sframe_id()} returns the ID of an item, scale, check, branch or other
+component, and \code{sframe_label()} returns its label.
 }
 \examples{
 item <- sframe_item("q1", "How satisfied are you?", type = "likert",

@@ -29,8 +29,12 @@ When NULL (default), all scales in the instrument are included.}
 }
 \value{
 An object of class \code{sframe_reliability_report}, a list with one
-element per scale. Each element is a list of statistics and a summary
-tibble.
+element per scale. Each element holds \code{scale_id}, \code{label}, \code{n_items},
+\code{n}, \code{alpha}, \code{alpha_std} and \code{alpha_if_deleted}, and with \code{omega = TRUE}, \code{omega_t}, McDonald's omega total from a 1-factor model. Every
+display reports alpha and \code{omega_t}. \code{omega_h} is kept for code that
+reads it: in a 1-factor model there are no group factors, so it carries
+no hierarchical meaning and can come out a rounding step above
+\code{omega_t}.
 }
 \description{
 Produces Cronbach's alpha and McDonald's omega for each scale defined in
@@ -39,7 +43,7 @@ the instrument, along with the number of items and sample size.
 \examples{
 \donttest{
 if (requireNamespace("psych", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("likert_scale")
   rr <- sframe_reliability_results(demo$responses, demo$instrument, omega = FALSE)
   print(rr)
 }

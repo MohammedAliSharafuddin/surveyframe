@@ -15,7 +15,8 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_model object
+Prints the model's ID, type and number of constructs, then its label and
+estimation engine.
 }
 \seealso{
 Other printing formatting and summary methods:

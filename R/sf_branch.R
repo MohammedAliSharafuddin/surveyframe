@@ -31,7 +31,7 @@ sframe_branch_in_values <- function(value) {
 #' @param depends_on Character. The `id` of the item whose response value
 #'   triggers this rule.
 #' @param operator Character. The comparison operator. One of `"=="`, `"!="`,
-#'   `"%in%"`, `">"`, `">="`, `"<"`, or `"<="`.
+#'   `"%in%"`, `">"`, `">="`, `"<"` or `"<="`.
 #' @param value The value to compare against the response to `depends_on`.
 #'   For `"%in%"`, supply a character or numeric vector.
 #' @param action Character. What to do when the condition is met. Either

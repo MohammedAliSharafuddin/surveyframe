@@ -27,9 +27,9 @@ which a plain bar-of-means would hide.
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
+  demo <- sframe_demo("paired")
   res <- run_analysis_plan(demo$responses, demo$instrument)
-  sframe_plot_paired_comparison(res$rq_ttest_pair, demo$responses)
+  sframe_plot_paired_comparison(res$RQ1, demo$responses)
 }
 }
 }

@@ -112,82 +112,80 @@ these changes. If you are upgrading from an earlier version, also read the
   SurveyStudio, the report template and `sframe_syntax_result()` write
   uses the new names. `?superseded` lists the old names:
 
-  | Old name | New name |
-  |---|---|
-  | `sf_instrument()` | `sframe_instrument()` |
-  | `sf_item()` | `sframe_item()` |
-  | `sf_choices()` | `sframe_choice_set()` |
-  | `sf_scale()` | `sframe_scale()` |
-  | `sf_branch()` | `sframe_branch()` |
-  | `sf_check()` | `sframe_attention_check()` |
-  | `sf_conjoint_design()` | `sframe_conjoint_design()` |
-  | `sf_construct()` | `sframe_construct()` |
-  | `sf_path()` | `sframe_path()` |
-  | `sf_covariance()` | `sframe_covariance()` |
-  | `sf_indirect()` | `sframe_indirect_effect()` |
-  | `sf_model()` | `sframe_model_spec()` |
-  | `add_model()` | `sframe_add_model()` |
-  | `validate_model()` | `sframe_validate_model()` |
-  | `model_json()` | `sframe_model_json()` |
-  | `model_report_template()` | `sframe_model_outline()` |
-  | `sf_items()` | `sframe_get_items()` |
-  | `sf_scales()` | `sframe_get_scales()` |
-  | `sf_checks()` | `sframe_get_attention_checks()` |
-  | `sf_models()` | `sframe_get_models()` |
-  | `sf_branches()` | `sframe_get_branches()` |
-  | `sf_choice_sets()` | `sframe_get_choice_sets()` |
-  | `sf_meta()` | `sframe_meta()` |
-  | `sf_plan()` | `sframe_plan()` |
-  | `sf_id()` | `sframe_id()` |
-  | `sf_label()` | `sframe_label()` |
-  | `sf_apa()` | `sframe_apa()` |
-  | `sf_flagged()` | `sframe_flagged()` |
-  | `sf_problems()` | `sframe_problems()` |
-  | `sf_is_valid()` | `sframe_is_valid()` |
-  | `sf_object()` | `sframe_object()` |
-  | `sf_missing_columns()` | `sframe_missing_columns()` |
-  | `sample_size_plan()` | `sframe_sample_size_plan()` |
-  | `sf_reference()` | `sframe_reference()` |
-  | `add_references()` | `sframe_add_references()` |
-  | `sframe_references()` | `sframe_get_references()` |
-  | `link_git_commit()` | `sframe_link_git_commit()` |
-  | `amendment_log()` | `sframe_get_amendments()` |
-  | `render_survey()` | `run_survey()` |
-  | `export_static_survey()` | `export_survey()` |
-  | `survey_module_ui()` | `sframe_survey_ui()` |
-  | `survey_module_server()` | `sframe_survey_server()` |
-  | `sframe_export_labelled()` | `export_responses()` |
-  | `quality_report()` | `sframe_quality_results()` |
-  | `missing_data_report()` | `sframe_missing_data_results()` |
-  | `outlier_report()` | `sframe_outlier_results()` |
-  | `reliability_report()` | `sframe_reliability_results()` |
-  | `item_report()` | `sframe_item_results()` |
-  | `efa_report()` | `sframe_efa_readiness_results()` |
-  | `efa_solution()` | `sframe_efa_solution()` |
-  | `validity_report()` | `sframe_validity_results()` |
-  | `descriptives_report()` | `sframe_descriptives_results()` |
-  | `assumption_report()` | `sframe_assumption_results()` |
-  | `posthoc_report()` | `sframe_posthoc_results()` |
-  | `bootstrap_ci()` | `sframe_bootstrap_ci()` |
-  | `cohens_d_ci()` | `sframe_cohens_d_ci()` |
-  | `cramers_v_ci()` | `sframe_cramers_v_ci()` |
-  | `eta_sq_ci()` | `sframe_eta_sq_ci()` |
-  | `cfa_lavaan_syntax()` | `sframe_syntax_cfa()` |
-  | `cfa_syntax()` | `sframe_syntax_cfa()` |
-  | `sem_lavaan_syntax()` | `sframe_syntax_sem()` |
-  | `seminr_syntax()` | `sframe_syntax_pls()` |
-  | `efa_syntax()` | `sframe_syntax_efa()` |
-  | `analysis_syntax()` | `sframe_syntax_result()` |
-  | `clean_text_responses()` | `sframe_clean_text()` |
-  | `term_frequency()` | `sframe_term_frequency()` |
-  | `ngram_frequency()` | `sframe_ngram_frequency()` |
-  | `term_context()` | `sframe_term_context()` |
-  | `extract_quotes()` | `sframe_extract_quotes()` |
-  | `sensitivity_analysis()` | `sframe_sensitivity_analysis()` |
-  | `render_result()` | `sframe_format_result()` |
-  | `codebook_report()` | `sframe_codebook()` |
-  | `sframe_demos()` | `sframe_list_demos()` |
-  | `sf_plan(x) <- value` | `sframe_plan(x) <- value` |
+  * `sf_instrument()` becomes `sframe_instrument()`
+  * `sf_item()` becomes `sframe_item()`
+  * `sf_choices()` becomes `sframe_choice_set()`
+  * `sf_scale()` becomes `sframe_scale()`
+  * `sf_branch()` becomes `sframe_branch()`
+  * `sf_check()` becomes `sframe_attention_check()`
+  * `sf_conjoint_design()` becomes `sframe_conjoint_design()`
+  * `sf_construct()` becomes `sframe_construct()`
+  * `sf_path()` becomes `sframe_path()`
+  * `sf_covariance()` becomes `sframe_covariance()`
+  * `sf_indirect()` becomes `sframe_indirect_effect()`
+  * `sf_model()` becomes `sframe_model_spec()`
+  * `add_model()` becomes `sframe_add_model()`
+  * `validate_model()` becomes `sframe_validate_model()`
+  * `model_json()` becomes `sframe_model_json()`
+  * `model_report_template()` becomes `sframe_model_outline()`
+  * `sf_items()` becomes `sframe_get_items()`
+  * `sf_scales()` becomes `sframe_get_scales()`
+  * `sf_checks()` becomes `sframe_get_attention_checks()`
+  * `sf_models()` becomes `sframe_get_models()`
+  * `sf_branches()` becomes `sframe_get_branches()`
+  * `sf_choice_sets()` becomes `sframe_get_choice_sets()`
+  * `sf_meta()` becomes `sframe_meta()`
+  * `sf_plan()` becomes `sframe_plan()`
+  * `sf_id()` becomes `sframe_id()`
+  * `sf_label()` becomes `sframe_label()`
+  * `sf_apa()` becomes `sframe_apa()`
+  * `sf_flagged()` becomes `sframe_flagged()`
+  * `sf_problems()` becomes `sframe_problems()`
+  * `sf_is_valid()` becomes `sframe_is_valid()`
+  * `sf_object()` becomes `sframe_object()`
+  * `sf_missing_columns()` becomes `sframe_missing_columns()`
+  * `sample_size_plan()` becomes `sframe_sample_size_plan()`
+  * `sf_reference()` becomes `sframe_reference()`
+  * `add_references()` becomes `sframe_add_references()`
+  * `sframe_references()` becomes `sframe_get_references()`
+  * `link_git_commit()` becomes `sframe_link_git_commit()`
+  * `amendment_log()` becomes `sframe_get_amendments()`
+  * `render_survey()` becomes `run_survey()`
+  * `export_static_survey()` becomes `export_survey()`
+  * `survey_module_ui()` becomes `sframe_survey_ui()`
+  * `survey_module_server()` becomes `sframe_survey_server()`
+  * `sframe_export_labelled()` becomes `export_responses()`
+  * `quality_report()` becomes `sframe_quality_results()`
+  * `missing_data_report()` becomes `sframe_missing_data_results()`
+  * `outlier_report()` becomes `sframe_outlier_results()`
+  * `reliability_report()` becomes `sframe_reliability_results()`
+  * `item_report()` becomes `sframe_item_results()`
+  * `efa_report()` becomes `sframe_efa_readiness_results()`
+  * `efa_solution()` becomes `sframe_efa_solution()`
+  * `validity_report()` becomes `sframe_validity_results()`
+  * `descriptives_report()` becomes `sframe_descriptives_results()`
+  * `assumption_report()` becomes `sframe_assumption_results()`
+  * `posthoc_report()` becomes `sframe_posthoc_results()`
+  * `bootstrap_ci()` becomes `sframe_bootstrap_ci()`
+  * `cohens_d_ci()` becomes `sframe_cohens_d_ci()`
+  * `cramers_v_ci()` becomes `sframe_cramers_v_ci()`
+  * `eta_sq_ci()` becomes `sframe_eta_sq_ci()`
+  * `cfa_lavaan_syntax()` becomes `sframe_syntax_cfa()`
+  * `cfa_syntax()` becomes `sframe_syntax_cfa()`
+  * `sem_lavaan_syntax()` becomes `sframe_syntax_sem()`
+  * `seminr_syntax()` becomes `sframe_syntax_pls()`
+  * `efa_syntax()` becomes `sframe_syntax_efa()`
+  * `analysis_syntax()` becomes `sframe_syntax_result()`
+  * `clean_text_responses()` becomes `sframe_clean_text()`
+  * `term_frequency()` becomes `sframe_term_frequency()`
+  * `ngram_frequency()` becomes `sframe_ngram_frequency()`
+  * `term_context()` becomes `sframe_term_context()`
+  * `extract_quotes()` becomes `sframe_extract_quotes()`
+  * `sensitivity_analysis()` becomes `sframe_sensitivity_analysis()`
+  * `render_result()` becomes `sframe_format_result()`
+  * `codebook_report()` becomes `sframe_codebook()`
+  * `sframe_demos()` becomes `sframe_list_demos()`
+  * `sf_plan(x) <- value` becomes `sframe_plan(x) <- value`
 
 * The 2 larger demo datasets load through `sframe_demo()`.
   `sframe_demo("tourism_services")` replaces `sframe_demo_data()`, and
@@ -965,6 +963,24 @@ ordered and labelled before and after the arithmetic.
 
 ## Reports
 
+* Reliability reads the same everywhere: Cronbach's alpha and McDonald's
+  omega total, to 2 decimals with no leading zero, in the plan's tables,
+  both report engines, SurveyStudio, the console and the reliability
+  vignette. The omega block reports alpha beside omega, in its table and in
+  a new APA sentence, "McDonald's ω = .82 for Perceived organisation (4
+  items, N = 50), against α = .81", and the alpha block gets 1 of its own.
+  The tables showed an "Omega (h)" beside omega total. From a 1-factor
+  model it has no group factors to separate and no hierarchical meaning,
+  and on `likert_scale` it read .818 against an omega total of .817. The
+  `omega_h` field stays in the result for code that reads it. A table cell
+  rounded a value already rounded to 3 decimals, so a table could show
+  alpha .81 where the sentence gave .80. It now rounds once.
+* An item flag's reason shows 1 more decimal when its value would print as
+  the cut-off it falls below. A loading of .398 read "loading .40, below
+  .40" and now reads "loading .398, below .40".
+* `sframe_format_result()` resolves a `[@key]` citation in a decision rule
+  or note against the instrument's references, as the report does. It left
+  the raw key on the page.
 * The missing-data patterns table gives a percentage under "Percent".
   `sframe_missing_data_results()` stored each pattern's share as a
   proportion in `patterns$percent`, so both report engines printed "Complete
@@ -1400,8 +1416,8 @@ ordered and labelled before and after the arithmetic.
   interactive session an HTML page goes to the viewer of RStudio, Positron
   or VS Code, else the browser, and any other file to the program the
   system opens it with. In a script, a knitr or Quarto render, or under
-  `R CMD check` it opens nothing and prints 1 line, `Written: <path>`, so a
-  file in the temporary folder is never left unseen. The 11 examples that
+  `R CMD check` it opens nothing and prints `Written:` with the path on the
+  line below, so a file in the temporary folder is never left unseen. The 11 examples that
   write a file end with it: `render_report()`, `render_results()`,
   `export_survey()`, `preview_survey()`, `launch_builder()`,
   `sframe_analysis_qmd()`, `sframe_demo_qmd()`, `sframe_save_figures()`,
@@ -1409,6 +1425,18 @@ ordered and labelled before and after the arithmetic.
   examples of `export_survey()`, `sframe_analysis_qmd()` and
   `sframe_demo_qmd()` run a second time in the same session, where they
   stopped on the file they had written the first time.
+* A message that names a file gives its label on 1 line and the full path
+  on the next, with forward slashes on every system: `export_survey()`,
+  `sframe_show()`, `sframe_analysis_qmd()`, `sframe_demo_qmd()`,
+  `export_google_sheet()`, `render_report()` and the integrity check of
+  `read_sframe()`, whose expected and stored hashes also take a line each.
+  A Windows temporary folder alone runs to about 60 characters, and a path
+  inside a sentence ran past the edge of the console.
+* The help index lists each page once. The superseded page held 82 old
+  names, each listed in the index under the same title, and it now opens
+  from any old name, as `?sf_item` does, outside the index. 55 pages whose
+  Description repeated the title now say what the function does, and the
+  chart and text-analysis pages lose the notes meant for developers.
 * Every example ends with something to look at, in 40 console lines or
   fewer. The examples of `sframe_item()`, `sframe_scale()`,
   `sframe_branch()`, `sframe_choice_set()` and `sframe_attention_check()`
@@ -2045,6 +2073,15 @@ ordered and labelled before and after the arithmetic.
 
 ## Demos
 
+* The Likert answers of 6 demos lean towards agreement, as real answers
+  do: `likert_scale`, `factor_structure`, `sem_pls`, `citing_sources`,
+  `weighted_survey` and the satisfaction item of `logistic`. Each item now
+  peaks at "Agree", with a mean near 3.6 and an SD near 1, and a reverse
+  worded item leans the other way. The generator cut its latent scores into
+  5 equal shares, so every point held about 20 per cent of the answers and
+  every bar chart came out flat. The instruments and their hashes are
+  unchanged, the effects each demo teaches hold, and the reference results
+  are regenerated.
 * The all-types demo's text block says what a text block does: "A text block gives respondents information, such as
   an instruction or a consent statement. It collects no answer." It read as
   placeholder text in SurveyStudio's question list. The file has a new hash.
@@ -2139,33 +2176,31 @@ ordered and labelled before and after the arithmetic.
   with their items, choices and scales as they were. They named the
   package's author before, and now name "Demo author":
 
-  | File | Old hash | New hash |
-  |---|---|---|
-  | `tourism_services_demo` | `ba6ab6936979` | `36942fb1db8b` |
-  | `surveyframe_input_types_demo` | `b1fe65aa8754` | `e2130477ce1f` |
-  | `branching` | `7b2575c5a289` | `242e5f4f304b` |
-  | `branded_survey` | `9a5eac4fe2df` | `92d5a5a19692` |
-  | `categorical` | `94458440eef2` | `ce13e678eee5` |
-  | `conversational_branching` | `32e8a2c8dc3f` | `de073a6a0771` |
-  | `conversational_survey` | `d299da187c34` | `63f938716b5c` |
-  | `correlation_regression` | `773eca25fd5e` | `1aa72dd4712f` |
-  | `factor_structure` | `1e2a8325f7a7` | `200f6f4f4fc9` |
-  | `first_survey` | `1d3995afbed6` | `3db2149ca3c3` |
-  | `instrument_revision` | `fcef5c7a8912` | `4706c4e7c1be` |
-  | `likert_scale` | `50106060b9ff` | `dccd03b03c96` |
-  | `logistic` | `f393034ee0f9` | `eba433d9f51f` |
-  | `matrix_likert` | `5b7980fd7fb9` | `a73460703147` |
-  | `mcdm_choice` | `d515e4b6bc39` | `9afe289123c2` |
-  | `multi_group` | `0b95571d0000` | `6790bf18453a` |
-  | `multi_response` | `b5fd4a52dd01` | `d8582159112b` |
-  | `open_text` | `0138438b70ac` | `8b7793fd1757` |
-  | `paired` | `32e5ffff5144` | `a434cf312406` |
-  | `repeated` | `3ea5a812ae86` | `7c4ac50ad8db` |
-  | `sem_pls` | `25ded3bee644` | `8300c52d07c8` |
-  | `small_sample` | `1c138723088f` | `06390f6257a5` |
-  | `two_group` | `7d53e872d328` | `3907d53280ea` |
-  | `verification` | `1d3995afbed6` | `3db2149ca3c3` |
-  | `verification_tampered` | `1d3995afbed6` | `3db2149ca3c3` |
+  * `tourism_services_demo`: `ba6ab6936979` to `36942fb1db8b`
+  * `surveyframe_input_types_demo`: `b1fe65aa8754` to `e2130477ce1f`
+  * `branching`: `7b2575c5a289` to `242e5f4f304b`
+  * `branded_survey`: `9a5eac4fe2df` to `92d5a5a19692`
+  * `categorical`: `94458440eef2` to `ce13e678eee5`
+  * `conversational_branching`: `32e8a2c8dc3f` to `de073a6a0771`
+  * `conversational_survey`: `d299da187c34` to `63f938716b5c`
+  * `correlation_regression`: `773eca25fd5e` to `1aa72dd4712f`
+  * `factor_structure`: `1e2a8325f7a7` to `200f6f4f4fc9`
+  * `first_survey`: `1d3995afbed6` to `3db2149ca3c3`
+  * `instrument_revision`: `fcef5c7a8912` to `4706c4e7c1be`
+  * `likert_scale`: `50106060b9ff` to `dccd03b03c96`
+  * `logistic`: `f393034ee0f9` to `eba433d9f51f`
+  * `matrix_likert`: `5b7980fd7fb9` to `a73460703147`
+  * `mcdm_choice`: `d515e4b6bc39` to `9afe289123c2`
+  * `multi_group`: `0b95571d0000` to `6790bf18453a`
+  * `multi_response`: `b5fd4a52dd01` to `d8582159112b`
+  * `open_text`: `0138438b70ac` to `8b7793fd1757`
+  * `paired`: `32e5ffff5144` to `a434cf312406`
+  * `repeated`: `3ea5a812ae86` to `7c4ac50ad8db`
+  * `sem_pls`: `25ded3bee644` to `8300c52d07c8`
+  * `small_sample`: `1c138723088f` to `06390f6257a5`
+  * `two_group`: `7d53e872d328` to `3907d53280ea`
+  * `verification`: `1d3995afbed6` to `3db2149ca3c3`
+  * `verification_tampered`: `1d3995afbed6` to `3db2149ca3c3`
 
 * `sframe_demo()` prints a short card and shows the survey. At the
   console a demo printed every response, 125 to 1,112 lines. It is now a

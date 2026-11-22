@@ -62,7 +62,7 @@ from it: \code{\link[=amend_sframe]{amend_sframe()}} refuses it.
 
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 print(instr)

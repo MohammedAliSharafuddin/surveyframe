@@ -67,21 +67,21 @@ and \code{duplicates}. Use \code{print()} for a formatted summary.
 Evaluates collected response data against the instrument specification and
 produces a structured quality report. The report covers attention check
 performance, completion time, straight-lining within scale blocks,
-item-level missingness, respondent-level missingness, and duplicate
+item-level missingness, respondent-level missingness and duplicate
 respondent IDs where supplied.
 }
 \details{
 Timing analysis is available when the data contain a submission timestamp
 column and either an explicit \code{started_at} column or one of the recognised
-defaults: \code{started_at}, \code{start_time}, \code{started}, or \code{.started_at}.
+defaults: \code{started_at}, \code{start_time}, \code{started} or \code{.started_at}.
 }
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "first_survey.sframe",
               package = "surveyframe")
 )
 responses <- read_responses(
-  system.file("extdata", "tourism_services_responses.csv",
+  system.file("extdata", "demos", "first_survey_responses.csv",
               package = "surveyframe"),
   instr,
   respondent_id = "respondent_id",
@@ -93,8 +93,7 @@ qr <- sframe_quality_results(
   instr,
   respondent_id = "respondent_id",
   submitted_at = "submitted_at",
-  started_at = "started_at",
-  straightline_scales = FALSE
+  started_at = "started_at"
 )
 print(qr)
 }

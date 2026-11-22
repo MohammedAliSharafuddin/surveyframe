@@ -67,7 +67,7 @@ change.
 
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 script <- export_google_sheet(

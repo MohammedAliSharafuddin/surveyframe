@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sf_choices object as a string
+Gives the choice set's ID and number of options as 1 line, the line that
+\code{print()} starts with.
 }
 \seealso{
 Other printing formatting and summary methods:

@@ -39,7 +39,7 @@ instrument's hash and how to verify it, the study, the participant
 information, the questionnaire in order with its branching in words,
 the scales and their scoring, each research question with its
 hypotheses, method in words, reference, variables, significance level
-and decision rule, the models and amendments, the references, and a
+and decision rule, the models and amendments, the references and a
 section, "To complete before submission", that prompts for what a
 preregistration asks and the instrument does not hold. Quarto writes it
 in every format, and the built-in engine writes a plain HTML version.}
@@ -60,7 +60,7 @@ through the Typst Quarto bundles otherwise, and without Quarto prints the
 built-in HTML page through \code{\link[pagedown:chrome_print]{pagedown::chrome_print()}}, which needs the
 pagedown package (in Suggests) and a local Chrome or Chromium. The
 returned path's \code{"converter"} attribute names the route:
-\code{"quarto-latex"}, \code{"quarto-typst"}, \code{"pagedown"}, or \code{"quarto"} for
+\code{"quarto-latex"}, \code{"quarto-typst"}, \code{"pagedown"} or \code{"quarto"} for
 Word and OpenDocument. Every route renders offline.
 \code{"qmd"} writes the Quarto source of the report as a folder, named by
 \code{output_file} (a trailing \code{.qmd} is dropped), which must be new or empty:
@@ -92,7 +92,7 @@ when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
 generated syntax blocks. Defaults to \code{TRUE}.}
 
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen reading)
-or \code{"print"} (black, grey, and white, for a journal-ready or
+or \code{"print"} (black, grey and white, for a journal-ready or
 print-friendly report). Applied to every chart the report embeds.
 See \code{sframe_brand()}.}
 
@@ -108,7 +108,7 @@ report content only and are never written into the instrument.}
 block with the statistical call that produced it, built by
 \code{\link[=sframe_syntax_result]{sframe_syntax_result()}} from the same resolved specification the analysis ran.
 Defaults to \code{TRUE}. A method \code{\link[=sframe_syntax_result]{sframe_syntax_result()}} does not cover shows no
-block, rather than a guess at the call.}
+block.}
 
 \item{references}{Optional further \code{\link[=sframe_reference]{sframe_reference()}} records, for example
 the works a host cites in the written interpretations, which are cited
@@ -134,7 +134,7 @@ the title. Defaults to the instrument's authors, and is left out when
 there are none.}
 
 \item{figures}{List or \code{NULL}. Size, resolution and format for every figure
-in the report: any of \code{width} and \code{height} in inches, \code{dpi}, and \code{format},
+in the report: any of \code{width} and \code{height} in inches, \code{dpi} and \code{format},
 \code{"png"} or \code{"svg"} inside the report. For example
 \code{list(width = 6.5, height = 4, dpi = 300)}. Absent entries keep each
 engine's own default. Defaults to the \code{surveyframe.figures} option, so a
@@ -156,7 +156,7 @@ The output file path, invisibly.
 }
 \description{
 Generates an HTML report that includes the instrument codebook, data
-quality summary, reliability diagnostics, and analysis-plan content.
+quality summary, reliability diagnostics and analysis-plan content.
 Quarto is the report engine. Without Quarto, surveyframe writes a short
 plain results page with the numbers, tables, charts and APA result lines,
 under a banner that links to the Quarto installation page. That page gets
@@ -207,7 +207,7 @@ its recorded hash, while the results record still does. The Provenance
 section at the top of the report gives the instrument hash and whether
 \code{\link[=read_sframe]{read_sframe()}} verified it, the number of amendments, the responses sha256
 and the results record's sha256. The responses are hashed as JSON by
-column, so the hash belongs to the values, not to a file.
+column, so the same values give the same hash in any file format.
 }
 
 \section{References}{
@@ -222,11 +222,11 @@ Quarto is unavailable, lists the methods' references the same way.
 
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 responses <- read_responses(
-  system.file("extdata", "tourism_services_responses.csv",
+  system.file("extdata", "demos", "two_group_responses.csv",
               package = "surveyframe"),
   instr,
   respondent_id = "respondent_id",

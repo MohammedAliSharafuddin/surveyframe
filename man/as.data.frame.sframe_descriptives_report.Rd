@@ -20,7 +20,7 @@ build a frame. Ignored by the methods that return a stored table.}
 The primary table from a descriptives report.
 }
 \description{
-Extract the descriptives results table
+Returns the table of descriptive statistics that the report prints.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}}

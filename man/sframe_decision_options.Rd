@@ -18,13 +18,13 @@ A researcher-supplied performance matrix round-trips through JSON as a list
 of numeric row vectors with its dimnames dropped, so it is stored as
 \code{options$matrix} plus the \code{options$alternatives} and \code{options$criteria}
 label vectors and rebuilt here. Every length agreement between the matrix,
-its labels, the weights, and the criterion types is checked once, in one
+its labels, the weights and the criterion types is checked once, in one
 place, with the exact mismatch named.
 }
 \section{PROMETHEE preference functions}{
 
 A PROMETHEE block takes \code{options$preference_function}, one of \code{"usual"},
-\code{"linear"}, or \code{"level"}, and \code{options$thresholds} for the 2 that need
+\code{"linear"} or \code{"level"}, and \code{options$thresholds} for the 2 that need
 them. The default is \code{"usual"}, Brans and Vincke's type I step function,
 which needs no thresholds and so adds no researcher degrees of freedom.
 

@@ -19,7 +19,7 @@ committed at HEAD.}
 \value{
 A list with \code{linked} (logical), and when \code{linked} is \code{TRUE},
 \code{commit} (the full commit SHA), \code{message} (the commit's subject line),
-\code{path}, and \code{verified} (logical). \code{reason} explains an unlinked result
+\code{path} and \code{verified} (logical). \code{reason} explains an unlinked result
 (\code{"git not found"} or \code{"not a git repository"}) or an unverified one.
 }
 \description{
@@ -36,7 +36,7 @@ what the commit itself records.
 
 Git is entirely optional. When \code{repo_path} is not inside a Git
 repository, or the \code{git} executable is not on the \code{PATH}, this returns a
-clear, non-error result with \code{linked = FALSE} rather than aborting. The rest of surveyframe never requires Git.
+result with \code{linked = FALSE}, and the call still succeeds. The rest of surveyframe never requires Git.
 }
 \examples{
 item  <- sframe_item("q1", "How satisfied are you?", type = "text")

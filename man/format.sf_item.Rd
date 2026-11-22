@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sf_item object as a string
+Gives the item's ID and type as 1 line, the line that \code{print()} starts
+with.
 }
 \seealso{
 Other printing formatting and summary methods:

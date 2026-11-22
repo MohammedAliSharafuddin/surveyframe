@@ -35,7 +35,7 @@
 #' Test how far a decision ranking moves when the weights are perturbed
 #'
 #' Perturbs each criterion weight up and down by `delta`, renormalises the
-#' weight vector to sum to 1, reruns the same ranking method, and compares
+#' weight vector to sum to 1, reruns the same ranking method and compares
 #' the perturbed ranking against the base ranking. A ranking that survives
 #' this unchanged is one a reviewer can be told is robust to the weights. A
 #' ranking whose leader changes under a 5 percent nudge is not.
@@ -50,7 +50,7 @@
 #' @param criteria_types Character vector of `"benefit"` or `"cost"`, one per
 #'   criterion.
 #' @param method Ranking method. One of `"topsis"`, `"vikor"`, `"moora"`,
-#'   `"smart"`, `"waspas"`, `"promethee"`, or `"electre"`.
+#'   `"smart"`, `"waspas"`, `"promethee"` or `"electre"`.
 #' @param delta Perturbation size as a proportion of the weight, default
 #'   `0.05`. A weight of 0.40 with `delta = 0.05` is tested at 0.42 and 0.38
 #'   before renormalisation.
@@ -61,7 +61,7 @@
 #'
 #' @return An object of class `sframe_sensitivity`, a list with `$table` (one
 #'   row per criterion and direction, carrying `criterion`, `direction`,
-#'   `rho`, `rank_changed`, and `top_changed`), `$base_ranks`, `$method`,
+#'   `rho`, `rank_changed` and `top_changed`), `$base_ranks`, `$method`,
 #'   `$delta`, `$stable`, `$degenerate`, `$n_perturbations`, `$n_effective`
 #'   and `$n_failed`. `$stable` is `TRUE` when at least one perturbation moved
 #'   the weights and none of those that did changed the ranking. A

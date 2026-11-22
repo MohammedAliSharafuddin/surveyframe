@@ -78,7 +78,7 @@ place, and record the change with \code{\link[=amend_sframe]{amend_sframe()}}.
 
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 out <- write_sframe(instr, tempfile(fileext = ".sframe"))

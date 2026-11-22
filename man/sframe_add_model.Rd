@@ -21,12 +21,13 @@ ID. Defaults to \code{TRUE}.}
 The updated \code{sframe} object.
 }
 \description{
-Add a model specification to an instrument
+Stores a model in the instrument's \code{models} list, after checking that every
+item it names is in the instrument.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-m <- sframe_model_spec("cb1", type = "cb_sem",
-              constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
+demo <- sframe_demo("factor_structure")
+m <- sframe_model_spec("cfa1", type = "cfa",
+              constructs = list(sframe_construct("org", items = c("org_1", "org_2", "org_3"))))
 instr <- sframe_add_model(demo$instrument, m)
 length(instr$models)
 }

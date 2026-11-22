@@ -54,7 +54,7 @@ sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
 #' and unconfirmed, and a rejection shows the failure screen with a retry.
 #'
 #' The thank-you screen states delivery itself, one line for each outcome:
-#' recorded, sent but unconfirmed, not sent, or failed. Write
+#' recorded, sent but unconfirmed, not sent or failed. Write
 #' `render$thankyou$message` as thanks, a debrief or contact details, and do
 #' not state delivery in it. It appears below the status line in every case
 #' except a failed send, and defaults to "Thank you for participating."
@@ -67,7 +67,7 @@ sframe_survey_render_fields <- c("header", "mode", "save_draft", "submit_label",
 #' is cleared once the response is submitted, and kept when delivery fails.
 #'
 #' The exported file works offline. It can be hosted on GitHub Pages,
-#' Netlify, any static file server, or e-mailed as an attachment for
+#' Netlify, any static file server or e-mailed as an attachment for
 #' opening directly from disk.
 #'
 #' @param instrument An `sframe` object.
@@ -246,8 +246,7 @@ export_survey <- function(
 
   size_kb <- round(file.size(output_path) / 1024, 1)
   rlang::inform(
-    paste0("Static survey written to '", output_path,
-           "' (", size_kb, " KB).")
+    sframe_path_line(paste0("Static survey written (", size_kb, " KB)"), output_path)
   )
 
   if (isTRUE(open)) {

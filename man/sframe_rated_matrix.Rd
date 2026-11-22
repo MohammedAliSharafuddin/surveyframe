@@ -22,7 +22,7 @@ the result notes each pairing.}
 }
 \value{
 A list with \code{matrix} (alternatives x criteria, with dimnames), \code{n},
-\code{sd}, \code{alternatives}, \code{criteria}, and \code{statistic}.
+\code{sd}, \code{alternatives}, \code{criteria} and \code{statistic}.
 }
 \description{
 The third collection path: respondents rate every alternative on every

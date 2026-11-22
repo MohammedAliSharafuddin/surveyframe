@@ -60,7 +60,7 @@
 #'
 #' @examples
 #' instr <- read_sframe(
-#'   system.file("extdata", "tourism_services_demo.sframe",
+#'   system.file("extdata", "demos", "two_group.sframe",
 #'               package = "surveyframe")
 #' )
 #' script <- export_google_sheet(
@@ -128,7 +128,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   writeLines(script, out_path)
 
   message(
-    "Apps Script written to: ", out_path, "\n",
+    sframe_path_line("Apps Script written", out_path), "\n",
     "Follow the setup instructions inside the file to deploy it."
   )
   sframe_next_stage("Once deployed, answers arrive in the sheet.",

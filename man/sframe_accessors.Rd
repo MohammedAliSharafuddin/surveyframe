@@ -2,7 +2,6 @@
 % Please edit documentation in R/accessors.R
 \name{sframe_accessors}
 \alias{sframe_accessors}
-\alias{sf_accessors}
 \title{Explore a surveyframe object}
 \value{
 A list for \code{sframe_meta()} and \code{sframe_plan()} on an instrument, an
@@ -10,7 +9,7 @@ A list for \code{sframe_meta()} and \code{sframe_plan()} on an instrument, an
 data frame for any of them on a codebook. See the table above.
 }
 \description{
-Accessors for the parts of an instrument, a codebook, or a report. They
+Accessors for the parts of an instrument, a codebook or a report. They
 replace reaching into the object with \code{$}, which ties user code to the
 internal layout.
 }

@@ -75,13 +75,12 @@ rel_df <- data.frame(
   Scale   = paste0(rr_df$label, " (", rr_df$scale_id, ")"),
   Items   = rr_df$n_items,
   N       = rr_df$n,
-  Alpha   = ifelse(is.na(rr_df$alpha),   "n/a", sprintf("%.2f", rr_df$alpha)),
-  Omega_h = ifelse(is.na(rr_df$omega_h), "n/a", sprintf("%.2f", rr_df$omega_h)),
-  Omega_t = ifelse(is.na(rr_df$omega_t), "n/a", sprintf("%.2f", rr_df$omega_t)),
+  Alpha = ifelse(is.na(rr_df$alpha),   "n/a", sub("^0\\.", ".", sprintf("%.2f", rr_df$alpha))),
+  Omega = ifelse(is.na(rr_df$omega_t), "n/a", sub("^0\\.", ".", sprintf("%.2f", rr_df$omega_t))),
   stringsAsFactors = FALSE)
 kable(rel_df, row.names = FALSE,
-      col.names = c("Scale", "Items", "N", "Alpha", "Omega h", "Omega total"),
-      align = c("l", "c", "c", "r", "r", "r"),
+      col.names = c("Scale", "Items", "N", "Alpha", "Omega"),
+      align = c("l", "c", "c", "r", "r"),
       caption = "Scale reliability statistics")
 ```
 

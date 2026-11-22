@@ -152,7 +152,7 @@ sframe_write_report_source <- function(dir, instrument, data, front,
 #'
 #' The first chunk of the `report.qmd` that `render_report(format = "qmd")`
 #' writes calls this function. It reads the folder's `.sframe` and responses,
-#' recomputes the analysis plan, and compares what it finds with the folder's
+#' recomputes the analysis plan and compares what it finds with the folder's
 #' `manifest.json`. The report's Provenance section then states the
 #' instrument hash and whether [read_sframe()] verified it, the amendments,
 #' whether the responses file is the one exported, whether the analysis plan
@@ -176,7 +176,7 @@ sframe_write_report_source <- function(dir, instrument, data, front,
 #'   plan results.
 #' @param plot_palette `"web"` or `"print"`, as in [render_report()].
 #' @return A list the template reads: paths to the inputs it renders from, the
-#'   instrument hash, the analysis seed, and `check`, a list of the verdicts
+#'   instrument hash, the analysis seed and `check`, a list of the verdicts
 #'   (`numbers_match`, `results_file_match`, `references_match`,
 #'   `interpretations_match`, `source_edited`, `responses_match`, with the
 #'   recorded and recomputed hashes).

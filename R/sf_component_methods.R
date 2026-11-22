@@ -8,6 +8,9 @@
 
 #' Print an sf_choices object
 #'
+#' Prints the choice set's ID and number of options, then a table of each
+#' option's value and label.
+#'
 #' @param x An object of class `sf_choices`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -31,6 +34,9 @@ print.sf_choices <- function(x, ...) {
 
 #' Format an sf_choices object as a string
 #'
+#' Gives the choice set's ID and number of options as 1 line, the line that
+#' `print()` starts with.
+#'
 #' @param x An object of class `sf_choices`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -42,6 +48,9 @@ format.sf_choices <- function(x, ...) {
 }
 
 #' Summarise an sf_choices object
+#'
+#' Prints the choice set's 1-line format, then whether it offers an "Other"
+#' answer and whether it shows its options in random order.
 #'
 #' @param object An object of class `sf_choices`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -59,6 +68,9 @@ summary.sf_choices <- function(object, ...) {
 # sf_item --------------------------------------------------------------------
 
 #' Print an sf_item object
+#'
+#' Prints the item's ID, type and question label, with its choice set and
+#' scale when it has them.
 #'
 #' @param x An object of class `sf_item`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -80,6 +92,9 @@ print.sf_item <- function(x, ...) {
 
 #' Format an sf_item object as a string
 #'
+#' Gives the item's ID and type as 1 line, the line that `print()` starts
+#' with.
+#'
 #' @param x An object of class `sf_item`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -91,6 +106,9 @@ format.sf_item <- function(x, ...) {
 }
 
 #' Summarise an sf_item object
+#'
+#' Prints the item's 1-line format, then whether an answer is required and
+#' whether the item is reverse-scored.
 #'
 #' @param object An object of class `sf_item`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -108,6 +126,8 @@ summary.sf_item <- function(object, ...) {
 # sf_scale -------------------------------------------------------------------
 
 #' Print an sf_scale object
+#'
+#' Prints the scale's ID, label, items and scoring method.
 #'
 #' @param x An object of class `sf_scale`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -128,6 +148,9 @@ print.sf_scale <- function(x, ...) {
 
 #' Format an sf_scale object as a string
 #'
+#' Gives the scale's ID and number of items as 1 line, the line that `print()`
+#' starts with.
+#'
 #' @param x An object of class `sf_scale`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -139,6 +162,9 @@ format.sf_scale <- function(x, ...) {
 }
 
 #' Summarise an sf_scale object
+#'
+#' Prints the scale's 1-line format, then its scoring method and how many
+#' answered items a score needs.
 #'
 #' @param object An object of class `sf_scale`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -157,6 +183,9 @@ summary.sf_scale <- function(object, ...) {
 # sf_branch ------------------------------------------------------------------
 
 #' Print an sf_branch object
+#'
+#' Prints the question a branching rule controls and the rule itself: its
+#' action, the question it depends on, the operator and the value.
 #'
 #' @param x An object of class `sf_branch`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -179,6 +208,9 @@ print.sf_branch <- function(x, ...) {
 
 #' Format an sf_branch object as a string
 #'
+#' Gives a branching rule as 1 line: the question it controls, the question it
+#' depends on, the operator and the value.
+#'
 #' @param x An object of class `sf_branch`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -192,6 +224,9 @@ format.sf_branch <- function(x, ...) {
 }
 
 #' Summarise an sf_branch object
+#'
+#' Prints a branching rule's 1-line format, which holds every part of the
+#' rule.
 #'
 #' @param object An object of class `sf_branch`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -207,6 +242,9 @@ summary.sf_branch <- function(object, ...) {
 # sf_check -------------------------------------------------------------------
 
 #' Print an sf_check object
+#'
+#' Prints the check's ID and type, the item it reads and the answers that pass
+#' it.
 #'
 #' @param x An object of class `sf_check`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -229,6 +267,8 @@ print.sf_check <- function(x, ...) {
 
 #' Format an sf_check object as a string
 #'
+#' Gives the check's ID, type and item as 1 line.
+#'
 #' @param x An object of class `sf_check`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -240,6 +280,9 @@ format.sf_check <- function(x, ...) {
 }
 
 #' Summarise an sf_check object
+#'
+#' Prints the check's 1-line format, then what happens to a response that
+#' fails it.
 #'
 #' @param object An object of class `sf_check`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -256,6 +299,9 @@ summary.sf_check <- function(object, ...) {
 # sf_model -------------------------------------------------------------------
 
 #' Print an sf_model object
+#'
+#' Prints the model's ID, type and number of constructs, then its label and
+#' estimation engine.
 #'
 #' @param x An object of class `sf_model`.
 #' @param ... Ignored. Present for S3 consistency.
@@ -274,6 +320,9 @@ print.sf_model <- function(x, ...) {
 
 #' Format an sf_model object as a string
 #'
+#' Gives the model's ID, type and number of constructs as 1 line, the line
+#' that `print()` starts with.
+#'
 #' @param x An object of class `sf_model`.
 #' @param ... Ignored. Present for S3 consistency.
 #'
@@ -286,6 +335,9 @@ format.sf_model <- function(x, ...) {
 }
 
 #' Summarise an sf_model object
+#'
+#' Prints the model's 1-line format, then its estimation engine and number of
+#' structural paths.
 #'
 #' @param object An object of class `sf_model`.
 #' @param ... Ignored. Present for S3 consistency.

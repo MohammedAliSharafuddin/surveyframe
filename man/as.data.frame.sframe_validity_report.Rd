@@ -20,7 +20,7 @@ build a frame. Ignored by the methods that return a stored table.}
 The reliability table stored in a validity report.
 }
 \description{
-Extract reliability evidence from a validity report
+Returns the reliability table of a validity report, 1 row per construct.
 }
 \seealso{
 \link{sframe_as_data_frame}, \code{\link[=sframe_validity_results]{sframe_validity_results()}}

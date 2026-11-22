@@ -15,7 +15,8 @@
 \code{x}, invisibly.
 }
 \description{
-Print an sf_choices object
+Prints the choice set's ID and number of options, then a table of each
+option's value and label.
 }
 \examples{
 cs <- sframe_choice_set("agree5", 1:5,

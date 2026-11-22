@@ -45,16 +45,16 @@ The output file path, invisibly.
 \description{
 Generates a self-contained HTML report from the output of
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}. Each section corresponds to one research question
-and includes the APA-formatted statistical result, an interpretation space,
+and includes the APA-formatted statistical result, an interpretation space
 and a reference list.
 }
 \examples{
 instr <- read_sframe(
-  system.file("extdata", "tourism_services_demo.sframe",
+  system.file("extdata", "demos", "two_group.sframe",
               package = "surveyframe")
 )
 responses <- read_responses(
-  system.file("extdata", "tourism_services_responses.csv",
+  system.file("extdata", "demos", "two_group_responses.csv",
               package = "surveyframe"),
   instr,
   respondent_id = "respondent_id",

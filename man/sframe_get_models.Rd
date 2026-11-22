@@ -16,10 +16,10 @@ An \link{sf_component_list} for an instrument or a model data frame for a
 codebook.
 }
 \description{
-Returns declared CFA, SEM, PLS-SEM, mediation, and related model objects.
+Returns declared CFA, SEM, PLS-SEM, mediation and related model objects.
 }
 \examples{
-sframe_get_models(sframe_demo("tourism_services")$instrument)
+sframe_get_models(sframe_demo("sem_pls")$instrument)
 }
 \seealso{
 \link{sframe_accessors}

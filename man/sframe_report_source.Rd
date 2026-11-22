@@ -17,7 +17,7 @@ plan results.}
 }
 \value{
 A list the template reads: paths to the inputs it renders from, the
-instrument hash, the analysis seed, and \code{check}, a list of the verdicts
+instrument hash, the analysis seed and \code{check}, a list of the verdicts
 (\code{numbers_match}, \code{results_file_match}, \code{references_match},
 \code{interpretations_match}, \code{source_edited}, \code{responses_match}, with the
 recorded and recomputed hashes).
@@ -25,7 +25,7 @@ recorded and recomputed hashes).
 \description{
 The first chunk of the \code{report.qmd} that \code{render_report(format = "qmd")}
 writes calls this function. It reads the folder's \code{.sframe} and responses,
-recomputes the analysis plan, and compares what it finds with the folder's
+recomputes the analysis plan and compares what it finds with the folder's
 \code{manifest.json}. The report's Provenance section then states the
 instrument hash and whether \code{\link[=read_sframe]{read_sframe()}} verified it, the amendments,
 whether the responses file is the one exported, whether the analysis plan

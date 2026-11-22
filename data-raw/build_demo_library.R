@@ -36,8 +36,16 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 # cases whatever gets blanked.
 
 #' A latent normal cut into k ordered bands, which is what a Likert item is.
+#'
+#' The 5-point cuts lean towards agreement, as answers to a positively worded
+#' item do: about 4, 11, 22, 44 and 20 per cent from "Strongly disagree" to
+#' "Strongly agree" on a standard normal latent, a mean near 3.7 and an SD
+#' near 1. Equal-probability cuts, used before 2026-11-23, gave every point
+#' the same 20 per cent, a flat bar chart no real survey shows. A reverse
+#' worded item, written as 6 minus the band, leans towards disagreement.
 lik <- function(latent, k = 5) {
-  cuts <- stats::qnorm(seq(0, 1, length.out = k + 1))
+  cuts <- if (k == 5) c(-Inf, -1.75, -1.05, -0.35, 0.85, Inf) else
+    stats::qnorm(seq(0, 1, length.out = k + 1))
   as.integer(cut(latent, breaks = cuts, labels = FALSE, include.lowest = TRUE))
 }
 

@@ -12,7 +12,7 @@ sframe_validity_results(
 }
 \arguments{
 \item{loadings}{A data.frame with columns \code{construct}, \code{item}, and
-\code{loading}, or a named list of loading vectors by construct.}
+\code{loading} or a named list of loading vectors by construct.}
 
 \item{construct_scores}{Optional data.frame of construct scores for
 Fornell-Larcker and inter-construct correlations.}
@@ -32,7 +32,9 @@ element records which was computed.}
 An object of class \code{sframe_validity_report}.
 }
 \description{
-Validity report for construct models
+Reports composite reliability and average variance extracted from
+standardised loadings, with the Fornell-Larcker criterion and HTMT when
+construct scores or item responses are given.
 }
 \examples{
 loadings <- list(

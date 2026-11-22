@@ -48,7 +48,7 @@ sframe_git_run <- function(args, repo_path) {
 #'
 #' Git is entirely optional. When `repo_path` is not inside a Git
 #' repository, or the `git` executable is not on the `PATH`, this returns a
-#' clear, non-error result with `linked = FALSE` rather than aborting. The rest of surveyframe never requires Git.
+#' result with `linked = FALSE`, and the call still succeeds. The rest of surveyframe never requires Git.
 #'
 #' @param instrument An `sframe` object.
 #' @param repo_path Character. Path to check for a Git repository. Defaults
@@ -59,7 +59,7 @@ sframe_git_run <- function(args, repo_path) {
 #'
 #' @return A list with `linked` (logical), and when `linked` is `TRUE`,
 #'   `commit` (the full commit SHA), `message` (the commit's subject line),
-#'   `path`, and `verified` (logical). `reason` explains an unlinked result
+#'   `path` and `verified` (logical). `reason` explains an unlinked result
 #'   (`"git not found"` or `"not a git repository"`) or an unverified one.
 #' @export
 #' @seealso [amend_sframe()], [write_sframe()]

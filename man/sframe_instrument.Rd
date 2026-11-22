@@ -56,7 +56,7 @@ text). Never shown to respondents. See \code{\link[=sframe_get_study]{sframe_get
 }
 \value{
 An object of class \code{sframe} with slots \code{meta}, \code{items}, \code{choices},
-\code{scales}, \code{branching}, \code{checks}, \code{analysis_plan}, \code{models}, and \code{render}.
+\code{scales}, \code{branching}, \code{checks}, \code{analysis_plan}, \code{models} and \code{render}.
 }
 \description{
 Assembles a survey instrument from its component objects. This is

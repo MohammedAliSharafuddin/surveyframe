@@ -11,7 +11,7 @@ character string. \code{summary()} returns the check table as a data frame.
 \description{
 \code{sframe_validation} is the diagnostic object returned by
 \code{\link[=validate_sframe]{validate_sframe()}} and \code{\link[=sframe_validate_model]{sframe_validate_model()}}. It records whether the object
-passed, every problem found, and every check that ran, including the checks
+passed, every problem found and every check that ran, including the checks
 that found nothing.
 }
 \details{

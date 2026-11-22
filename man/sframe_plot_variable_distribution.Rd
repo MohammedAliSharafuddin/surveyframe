@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{sframe_plot_variable_distribution}
 \alias{sframe_plot_variable_distribution}
-\title{Raw-variable distribution panels: histogram, boxplot, and Q-Q}
+\title{Raw-variable distribution panels: histogram, boxplot and Q-Q}
 \usage{
 sframe_plot_variable_distribution(data, variable, palette = c("web", "print"))
 }
@@ -20,16 +20,16 @@ A named list of 3 ggplot2 objects (\code{histogram}, \code{boxplot},
 \description{
 Unlike \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}, which summarises skewness and
 kurtosis \emph{across} the variables in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, this
-operates on one variable's raw values directly (the report table only
-stores summary statistics, not the underlying vector), matching the
+operates on one variable's raw values directly (the report table holds
+summary statistics alone), matching the
 pattern \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}} already uses for
 report-independent, data-driven plots.
 }
 \examples{
 \donttest{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  demo <- sframe_demo("tourism_services")
-  panels <- sframe_plot_variable_distribution(demo$responses, "sat_1")
+  demo <- sframe_demo("two_group")
+  panels <- sframe_plot_variable_distribution(demo$responses, "sessions_attended")
   panels$histogram
 }
 }

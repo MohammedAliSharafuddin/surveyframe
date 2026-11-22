@@ -15,7 +15,8 @@
 A single character string.
 }
 \description{
-Format an sf_model object as a string
+Gives the model's ID, type and number of constructs as 1 line, the line
+that \code{print()} starts with.
 }
 \seealso{
 Other printing formatting and summary methods:

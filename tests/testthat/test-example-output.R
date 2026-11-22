@@ -73,7 +73,7 @@ test_that("the examples that write a file end with sframe_show(), and open nothi
              "export_responses", "export_google_sheet")
   for (page in pages) {
     out <- example_output(file.path(man, paste0(page, ".Rd")))
-    expect_true(any(grepl("^Written: ", out)), info = page)
+    expect_true(any(grepl("^Written:$", out)), info = page)
   }
   expect_equal(opened, 0)
 })

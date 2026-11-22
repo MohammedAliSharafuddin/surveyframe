@@ -50,7 +50,7 @@ or rationale of this check.}
 An object of class \code{sf_check} (a named list).
 }
 \description{
-Specifies an attention, instructional, or trap check item at instrument
+Specifies an attention, instructional or trap check item at instrument
 design time. The check is stored in the instrument object and evaluated
 against collected response data by \code{\link[=sframe_quality_results]{sframe_quality_results()}}. This function only
 defines the check. Evaluation happens later in \code{\link[=sframe_quality_results]{sframe_quality_results()}}.

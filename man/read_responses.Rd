@@ -52,14 +52,14 @@ frames.}
 A \code{data.frame} with columns ordered as: metadata columns first, then
 item columns in instrument order, each item followed by its expansion
 columns, then any undeclared columns kept under \code{strict = FALSE}. To keep
-an extra column under \code{strict = TRUE}, name it in \code{meta_cols}, or select
+an extra column under \code{strict = TRUE}, name it in \code{meta_cols} or select
 the columns you need before reading.
 }
 \description{
 Loads survey response data and checks that it conforms to the instrument
 specification. Column names in the response file must match item IDs defined
 in the instrument. Non-item columns are allowed only when declared through
-\code{respondent_id}, \code{submitted_at}, or \code{meta_cols}.
+\code{respondent_id}, \code{submitted_at} or \code{meta_cols}.
 }
 \section{Columns}{
 A single-answer item has 1 column named by its ID. A matrix, ranking,
@@ -102,17 +102,17 @@ same responses read the same.
 
 \examples{
 responses <- read_responses(
-  x = system.file("extdata", "tourism_services_responses.csv",
+  x = system.file("extdata", "demos", "two_group_responses.csv",
                   package = "surveyframe"),
   instrument = read_sframe(
-    system.file("extdata", "tourism_services_demo.sframe",
+    system.file("extdata", "demos", "two_group.sframe",
                 package = "surveyframe")
   ),
   respondent_id = "respondent_id",
   submitted_at = "submitted_at",
   meta_cols = "started_at"
 )
-head(responses[, c("respondent_id", "visit_type", "dm_1")])
+head(responses[, c("respondent_id", "format", "sessions_attended")])
 }
 \seealso{
 \code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}}

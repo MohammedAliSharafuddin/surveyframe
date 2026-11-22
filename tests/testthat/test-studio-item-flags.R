@@ -26,7 +26,7 @@ test_that("a flagged EFA item is dropped from the scale holding it", {
   p <- surveyframe:::sframe_studio_drop_proposal(x$instrument, x$flags)
   content <- Filter(function(s) s$id == "content", p$after$scales)[[1]]
   expect_false("con_4" %in% content$items)
-  expect_match(p$defaults$reason_text, "con_4: loading .39 in RQ2, below .40",
+  expect_match(p$defaults$reason_text, "con_4: loading .398 in RQ2, below .40",
                fixed = TRUE)
   expect_match(p$start_label, "Drop con_4 from content", fixed = TRUE)
 })

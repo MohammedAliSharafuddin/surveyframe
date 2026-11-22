@@ -2,7 +2,6 @@
 % Please edit documentation in R/accessors.R
 \name{sframe_report_accessors}
 \alias{sframe_report_accessors}
-\alias{sf_report_accessors}
 \title{Read the reportable parts of an analysis or quality result}
 \value{
 \code{sframe_apa()} returns a character vector: one element per block, named
@@ -34,7 +33,7 @@ failed attention checks, straight-lining, excess missingness, timing and
 duplicates. Read the report itself for which check flagged a row.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
+demo <- sframe_demo("first_survey")
 qr <- sframe_quality_results(demo$responses, demo$instrument)
 head(sframe_flagged(qr))
 }

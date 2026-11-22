@@ -16,7 +16,7 @@
 }
 \description{
 Prints a structured summary of an \code{sframe} object including metadata,
-item type counts, scale definitions, branching rules, and check
+item type counts, scale definitions, branching rules and check
 specifications.
 }
 \examples{

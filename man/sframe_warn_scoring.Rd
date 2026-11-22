@@ -18,6 +18,7 @@ sframe_warn_scoring(message, scale_id = NULL, ...)
 \code{sframe_scoring_warning}.
 }
 \description{
-Warn about a scoring issue
+Signals a warning of class \code{sframe_scoring_warning} and records the scale
+it concerns.
 }
 \keyword{internal}

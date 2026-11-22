@@ -75,6 +75,9 @@ sframe_require_logistf <- function(reason) {
 
 #' Abort with a validation error
 #'
+#' Stops with an error of class `sframe_validation_error`, the class every
+#' instrument check raises, so a caller can catch it apart from other errors.
+#'
 #' @param message Character. The error message.
 #' @param instrument_title Character or NULL. Title of the instrument being
 #'   validated, included in the condition metadata when supplied.
@@ -93,6 +96,9 @@ sframe_abort_validation <- function(message, instrument_title = NULL, ...) {
 
 #' Abort with an import error
 #'
+#' Stops with an error of class `sframe_import_error` when a file cannot be
+#' read as an instrument, and records the file's path.
+#'
 #' @param message Character. The error message.
 #' @param path Character or NULL. The file path that failed to import.
 #' @param ... Additional named fields passed to `rlang::abort()`.
@@ -109,6 +115,9 @@ sframe_abort_import <- function(message, path = NULL, ...) {
 }
 
 #' Abort with a branching error
+#'
+#' Stops with an error of class `sframe_branching_error` when a skip rule is
+#' broken, and records the item it belongs to.
 #'
 #' @param message Character. The error message.
 #' @param item_id Character or NULL. The item ID involved in the broken rule.
@@ -127,6 +136,9 @@ sframe_abort_branching <- function(message, item_id = NULL, ...) {
 
 #' Warn about a data quality issue
 #'
+#' Signals a warning of class `sframe_quality_warning` and records the
+#' respondents it concerns.
+#'
 #' @param message Character. The warning message.
 #' @param respondent_ids Character vector or NULL. IDs of affected respondents.
 #' @param ... Additional named fields passed to `rlang::warn()`.
@@ -143,6 +155,9 @@ sframe_warn_quality <- function(message, respondent_ids = NULL, ...) {
 }
 
 #' Warn about missing data
+#'
+#' Signals a warning of class `sframe_missing_data_warning` and records the
+#' item and its missing rate.
 #'
 #' @param message Character. The warning message.
 #' @param item_id Character or NULL. The item ID with missing data.
@@ -183,6 +198,9 @@ sframe_warn_design <- function(message, item_id = NULL, ...) {
 }
 
 #' Warn about a scoring issue
+#'
+#' Signals a warning of class `sframe_scoring_warning` and records the scale
+#' it concerns.
 #'
 #' @param message Character. The warning message.
 #' @param scale_id Character or NULL. The scale ID affected.

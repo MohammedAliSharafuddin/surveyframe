@@ -34,14 +34,14 @@ A character vector of cleaned responses, with an integer
 }
 \description{
 Extracts one text/textarea item's responses from a response data frame and
-applies light, configurable cleaning: lower-casing, punctuation removal,
-and optional number stripping. Blank and missing responses are dropped
-rather than kept as empty strings, since they carry no term-frequency
+applies light, configurable cleaning: lower-casing, punctuation removal
+and optional number stripping. Blank and missing responses are dropped,
+since they carry no term-frequency
 signal and would otherwise inflate downstream response counts.
 }
 \examples{
-demo <- sframe_demo("tourism_services")
-cleaned <- sframe_clean_text(demo$responses, "comments")
+demo <- sframe_demo("open_text")
+cleaned <- sframe_clean_text(demo$responses, "what_worked")
 head(cleaned)
 attr(cleaned, "respondent")[1:5]
 }

@@ -26,8 +26,8 @@ not cover. For more than 1 block, a named list of such vectors.
 \description{
 Returns the statistical call that produced a result, as R code a reader can
 copy and run. This is what lets a report show \code{t.test()} or \code{cor.test()} with
-the variables and options resolved, rather than only the
-\code{\link[=run_analysis_plan]{run_analysis_plan()}} call that dispatched it.
+the variables and options filled in, the call that \code{\link[=run_analysis_plan]{run_analysis_plan()}}
+made on the reader's behalf.
 }
 \details{
 The code is built from the same resolved specification the runner executed:

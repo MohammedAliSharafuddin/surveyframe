@@ -15,7 +15,8 @@
 \code{object}, invisibly.
 }
 \description{
-Summarise an sf_branch object
+Prints a branching rule's 1-line format, which holds every part of the
+rule.
 }
 \seealso{
 Other printing formatting and summary methods:

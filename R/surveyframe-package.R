@@ -10,15 +10,15 @@
 #' \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
 #' surveyframe defines a survey instrument as a first-class R object and
 #' supports a complete workflow from questionnaire design through data
-#' collection, quality checking, scoring, psychometric diagnostics, and
+#' collection, quality checking, scoring, psychometric diagnostics and
 #' reproducible reporting. The package covers static HTML survey export,
 #' an embeddable Shiny survey module, an interactive response dashboard,
 #' a role-based analysis planner with pre-declared research questions, common
 #' survey statistics with small-sample alternatives (Hodges-Lehmann,
-#' pseudomedian, exact odds-ratio, and Firth logistic regression), multi-
+#' pseudomedian, exact odds-ratio and Firth logistic regression), multi-
 #' criteria decision analysis (AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
-#' WASPAS, PROMETHEE, ELECTRE, and TOPSIS), and model syntax planning for
-#' EFA, CFA, CB-SEM, and PLS-SEM.
+#' WASPAS, PROMETHEE, ELECTRE and TOPSIS), and model syntax planning for
+#' EFA, CFA, CB-SEM and PLS-SEM.
 #'
 #' ## Start here
 #'
@@ -93,7 +93,7 @@
 #'
 #' The workflow runs on an `sframe` object. It is the single source of truth
 #' for item definitions, scale structure, reverse-coding keys, branching
-#' rules, check specifications, analysis plans, and optional model
+#' rules, check specifications, analysis plans and optional model
 #' specifications. Accessors such as [sframe_meta()], [sframe_get_items()], [sframe_get_scales()],
 #' [sframe_plan()], and [sframe_get_models()] read its parts without reaching into the
 #' object directly.

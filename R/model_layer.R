@@ -140,12 +140,15 @@ sframe_lavaan_safe_label <- function(label) {
 
 #' Define a latent or composite construct
 #'
+#' Names a construct and the items that measure it, with its measurement mode.
+#' A construct is the building block of [sframe_model_spec()].
+#'
 #' @param id Construct identifier. Must start with a letter and contain only
-#'   letters, numbers, and `_` characters.
+#'   letters, numbers and `_` characters.
 #' @param label Human-readable construct label.
 #' @param items Character vector of indicator item IDs.
 #' @param mode Measurement mode. One of `"reflective"`, `"composite"`,
-#'   `"formative"`, or `"single_item"`.
+#'   `"formative"` or `"single_item"`.
 #' @param weights Optional indicator weights for later PLS-SEM planning.
 #'
 #' @return An object of class `sf_construct`.
@@ -181,6 +184,9 @@ sframe_construct <- function(
 
 #' Define a structural path between constructs
 #'
+#' Declares that 1 construct predicts another, the arrow from `from` to `to`
+#' in a structural model.
+#'
 #' @param from Source construct ID.
 #' @param to Target construct ID.
 #' @param label Optional lavaan label for the path.
@@ -203,6 +209,8 @@ sframe_path <- function(from, to, label = NULL) {
 
 #' Define a covariance between constructs
 #'
+#' Declares that 2 constructs vary together, with no direction between them.
+#'
 #' @param from First construct ID.
 #' @param to Second construct ID.
 #' @param label Optional label.
@@ -224,6 +232,9 @@ sframe_covariance <- function(from, to, label = NULL) {
 }
 
 #' Define an indirect effect path
+#'
+#' Declares an effect that runs from 1 construct through 1 or more mediators
+#' to another, so the syntax generators estimate it as a defined parameter.
 #'
 #' @param from Source construct ID.
 #' @param through Character vector of mediator construct IDs.
@@ -249,6 +260,10 @@ sframe_indirect_effect <- function(from, through, to, label = NULL) {
 
 #' Create a surveyframe model specification
 #'
+#' Puts constructs, paths, covariances and indirect effects together as 1
+#' model of a given type, ready to add to an instrument and to turn into
+#' lavaan or seminr syntax.
+#'
 #' @param id Model identifier.
 #' @param label Human-readable model label.
 #' @param type Model type. One of `"efa"`, `"cfa"`, `"cb_sem"`, or
@@ -260,7 +275,7 @@ sframe_indirect_effect <- function(from, through, to, label = NULL) {
 #' @param covariances List of [sframe_covariance()] objects.
 #' @param indirect List of [sframe_indirect_effect()] objects.
 #' @param options List of model options, such as `estimator`, `missing`,
-#'   `bootstrap`, or `standardised`.
+#'   `bootstrap` or `standardised`.
 #'
 #' @return An object of class `sf_model`.
 #' @export
@@ -319,7 +334,7 @@ sframe_model_spec <- function(
 #' Validate a surveyframe model specification
 #'
 #' Checks model IDs, construct IDs, indicators, structural path endpoints,
-#' duplicate paths, indirect paths, and engine/type compatibility.
+#' duplicate paths, indirect paths and engine/type compatibility.
 #'
 #' @param model An [sframe_model_spec()] object or compatible list.
 #' @param instrument Optional `sframe` object. When supplied, model indicators
@@ -339,14 +354,14 @@ sframe_model_spec <- function(
 #' @export
 #' @seealso [sframe_validation], [sframe_problems()], [sframe_is_valid()]
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("sem_pls")
 #' m <- sframe_model_spec(
 #'   "cb1", type = "cb_sem",
 #'   constructs = list(
-#'     sframe_construct("sq", items = c("sq_1", "sq_2", "sq_3")),
-#'     sframe_construct("sat", items = c("sat_1", "sat_2"))
+#'     sframe_construct("cq", items = c("cq_1", "cq_2", "cq_3")),
+#'     sframe_construct("sa", items = c("sa_1", "sa_2", "sa_3"))
 #'   ),
-#'   paths = list(sframe_path("sq", "sat"))
+#'   paths = list(sframe_path("cq", "sa"))
 #' )
 #' diag <- sframe_validate_model(m, instrument = demo$instrument)
 #' diag
@@ -534,6 +549,9 @@ sframe_model_validation_checks <- c(
 
 #' Serialise a model specification to JSON
 #'
+#' Writes a model specification as the JSON that a `.sframe` file stores, so
+#' it can be read, compared or shared outside R.
+#'
 #' @param model An [sframe_model_spec()] object.
 #' @param pretty Logical. Whether to pretty-print the JSON.
 #'
@@ -552,6 +570,9 @@ sframe_model_json <- function(model, pretty = TRUE) {
 
 #' Add a model specification to an instrument
 #'
+#' Stores a model in the instrument's `models` list, after checking that every
+#' item it names is in the instrument.
+#'
 #' @param instrument An `sframe` object.
 #' @param model An [sframe_model_spec()] object.
 #' @param validate Logical. Whether to validate the model against the
@@ -562,9 +583,9 @@ sframe_model_json <- function(model, pretty = TRUE) {
 #' @return The updated `sframe` object.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
-#' m <- sframe_model_spec("cb1", type = "cb_sem",
-#'               constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
+#' demo <- sframe_demo("factor_structure")
+#' m <- sframe_model_spec("cfa1", type = "cfa",
+#'               constructs = list(sframe_construct("org", items = c("org_1", "org_2", "org_3"))))
 #' instr <- sframe_add_model(demo$instrument, m)
 #' length(instr$models)
 #' @family Models and syntax functions
@@ -595,7 +616,7 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #' Estimate an exploratory factor solution
 #'
 #' Runs `psych::fa()` on selected item columns and returns loadings,
-#' communalities, uniqueness, variance summaries, and simple item retention
+#' communalities, uniqueness, variance summaries and simple item retention
 #' flags. The `psych` package is optional and is only required when this
 #' function is called.
 #'
@@ -619,9 +640,9 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #' @examples
 #' \donttest{
 #' if (requireNamespace("psych", quietly = TRUE)) {
-#'   demo <- sframe_demo("tourism_services")
+#'   demo <- sframe_demo("factor_structure")
 #'   fit <- sframe_efa_solution(demo$responses, demo$instrument,
-#'                        scales = "service_quality", nfactors = 1)
+#'                        scales = c("organisation", "content"), nfactors = 2)
 #'   fit$loadings
 #' }
 #' }
@@ -767,6 +788,9 @@ print.sframe_efa_solution <- function(x, ...) {
 
 #' Generate EFA planning syntax
 #'
+#' Writes the R code for an exploratory factor analysis of the given items
+#' with psych, ready to copy into a script.
+#'
 #' @param items Character vector of item IDs.
 #' @param nfactors Number of factors.
 #' @param extraction Extraction method.
@@ -824,9 +848,9 @@ sframe_syntax_efa <- function(
 #' @return A lavaan syntax string.
 #' @export
 #' @examples
-#' demo <- sframe_demo("tourism_services")
+#' demo <- sframe_demo("sem_pls")
 #' syntax <- sframe_syntax_cfa(demo$instrument,
-#'                              scales = c("satisfaction", "behavioural_intention"))
+#'                              scales = c("content_quality", "satisfaction"))
 #' cat(syntax)
 #' @family Models and syntax functions
 sframe_syntax_cfa <- function(
@@ -910,6 +934,10 @@ sframe_syntax_cfa <- function(
 }
 
 #' Generate lavaan CB-SEM syntax
+#'
+#' Writes the lavaan model syntax for a covariance-based structural equation
+#' model: its measurement part, structural paths, covariances and indirect
+#' effects.
 #'
 #' @param model An [sframe_model_spec()] object of type `"cb_sem"`.
 #' @param instrument Optional `sframe` object for indicator validation.
@@ -1043,6 +1071,9 @@ sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
 }
 
 #' Generate seminr PLS-SEM syntax
+#'
+#' Writes the seminr code for a partial least squares model: the measurement
+#' and structural parts, estimation and bootstrapping.
 #'
 #' @param model An [sframe_model_spec()] object of type `"pls_sem"`.
 #' @param data_name Name of the data object in generated R code.
@@ -1288,6 +1319,10 @@ sframe_pls_report_notes <- function(constructs, has_indirect) {
 sframe_bullets <- function(...) paste0("- ", c(...))
 
 #' Create a model reporting template
+#'
+#' Writes a Markdown outline for reporting a model: its type and engine, its
+#' constructs and their items, its structural paths and reporting notes, with
+#' the model's JSON when `include_json = TRUE`.
 #'
 #' @param model An [sframe_model_spec()] object.
 #' @param include_json Logical. Whether to include the JSON schema block.
