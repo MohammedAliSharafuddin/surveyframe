@@ -20,7 +20,7 @@ test_that("Drop from scale and Put back go through the 1 amendment dialog", {
   ui2_js(b, "if ($('input[name=analysis_stage]').length) Shiny.setInputValue('analysis_stage', 'Run'); true")
   drop_btn <- "$('#screen-analysis .flag-list[data-block=\"RQ2\"] button:contains(\"Drop from scale\")')"
   expect_true(ui2_wait(b, paste0(drop_btn, ".length === 1"), 90))
-  expect_match(ui1_text(b, "screen-analysis"), "con_4: loading .39 in RQ2, below .40",
+  expect_match(ui1_text(b, "screen-analysis"), "con_4: loading .398 in RQ2, below .40",
                fixed = TRUE)
 
   ui2_js(b, paste0(drop_btn, ".click(); true"))
