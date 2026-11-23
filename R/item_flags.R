@@ -228,11 +228,19 @@ sframe_item_flag_reason <- function(statistic, item, group, value, cutoff, block
            formatC(v, format = "f", digits = d) == formatC(cutoff, format = "f", digits = d)) d <- d + 1
     sframe_flag_num(v, d)
   }
+  # 2 coefficients compared with each other, at the precision that tells
+  # them apart, so "alpha if deleted .80, above the scale's .80" cannot print.
+  pair <- if (length(detail) >= 2 && all(is.finite(detail[1:2]))) {
+    d <- 2
+    while (d < 4 && detail[1] != detail[2] &&
+           formatC(detail[1], format = "f", digits = d) == formatC(detail[2], format = "f", digits = d)) d <- d + 1
+    c(sframe_flag_num(detail[1], d), sframe_flag_num(detail[2], d))
+  } else c("", "")
   switch(statistic,
     alpha_if_item_deleted_minus_alpha = sprintf(paste0(
       "%s: alpha if deleted %s%s, above the scale's %s. Check its item-total ",
       "correlation and wording before dropping it."), item,
-      sframe_flag_num(detail[1]), where, sframe_flag_num(detail[2])),
+      pair[1], where, pair[2]),
     corrected_item_total_r = sprintf("%s: corrected item-total correlation %s%s, below %s",
       item, shown(value), where, cut),
     KMO_MSA_item = sprintf("%s: sampling adequacy (MSA) %s%s, below %s",
@@ -240,7 +248,7 @@ sframe_item_flag_reason <- function(statistic, item, group, value, cutoff, block
     absolute_primary_loading = sprintf("%s: loading %s%s, below %s",
       item, shown(value), where, cut),
     primary_minus_cross_loading = sprintf("%s: loadings %s and %s%s, %s apart, below %s",
-      item, sframe_flag_num(detail[1]), sframe_flag_num(detail[2]), where,
+      item, pair[1], pair[2], where,
       shown(value), cut),
     absolute_standardised_loading = sprintf("%s: standardised loading %s%s, below %s",
       item, shown(value), where, cut),

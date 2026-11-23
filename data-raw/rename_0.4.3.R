@@ -102,12 +102,12 @@ custom <- list(
   ),
   sframe_demo_data = c(
     "",
-    "sframe_demo(\"tourism_services\")",
+    "sframe_demo(\"tourism_services\", preview = FALSE)",
     "sframe_demo(\"tourism_services\")"
   ),
   sframe_input_types_demo_data = c(
     "",
-    "sframe_demo(\"input_types\")",
+    "sframe_demo(\"input_types\", preview = FALSE)",
     "sframe_demo(\"input_types\")"
   ),
   # launch_builder() returns the path alone, so the wrapper rebuilds the list
@@ -116,7 +116,7 @@ custom <- list(
     "open = TRUE",
     paste(
       "path <- launch_builder(open = open, demo = \"input_types\")",
-      "  demo <- sframe_demo(\"input_types\")",
+      "  demo <- sframe_demo(\"input_types\", preview = FALSE)",
       "  invisible(list(builder_path = path, demo_file = demo$instrument_path,",
       "                 responses_path = demo$responses_path))",
       sep = "\n"),
@@ -254,7 +254,11 @@ files <- setdiff(files, c(
   "tests/testthat/test-demo-reference-datasets.R",
   "tests/testthat/test-launch-builder-demo.R",
   "tests/testthat/test-launch-studio-demo.R",
-  "tests/testthat/test-preview-survey.R"
+  "tests/testthat/test-preview-survey.R",
+  # Old names kept on purpose: the demo generator reproduces the committed
+  # demo files byte for byte, and the demo-card test calls sframe_demo_data()
+  # to prove an old-name caller opens no preview.
+  "data-raw/build_demo_library.R", "tests/testthat/test-demo-card.R"
 ))
 
 changed <- character()

@@ -163,3 +163,12 @@ test_that("a reason never prints its value as the cut-off it falls below", {
   r <- surveyframe:::sframe_item_flag_reason("HTMT", NA, "a__b", 0.8504, 0.85, "", NULL)
   expect_identical(r, "a and b: HTMT .8504, above .85")
 })
+
+test_that("alpha if deleted and the scale's alpha print at a precision that tells them apart", {
+  r <- surveyframe:::sframe_item_flag_reason("alpha_if_item_deleted_minus_alpha", "item", "scale",
+                                             0.0005, 0, "block", c(0.8049, 0.8044))
+  expect_match(r, "alpha if deleted .805 in block, above the scale's .804", fixed = TRUE)
+  r <- surveyframe:::sframe_item_flag_reason("alpha_if_item_deleted_minus_alpha", "item", "scale",
+                                             0.05, 0, "block", c(0.85, 0.80))
+  expect_match(r, "alpha if deleted .85 in block, above the scale's .80", fixed = TRUE)
+})

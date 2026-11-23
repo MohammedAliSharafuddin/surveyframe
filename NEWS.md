@@ -976,8 +976,10 @@ ordered and labelled before and after the arithmetic.
   rounded a value already rounded to 3 decimals, so a table could show
   alpha .81 where the sentence gave .80. It now rounds once.
 * An item flag's reason shows 1 more decimal when its value would print as
-  the cut-off it falls below. A loading of .398 read "loading .40, below
-  .40" and now reads "loading .398, below .40".
+  the cut-off it falls below, or as the coefficient it is compared with. A
+  loading of .398 read "loading .40, below .40" and now reads "loading
+  .398, below .40", and an alpha if deleted of .8049 against .8044 reads
+  ".805, above the scale's .804".
 * `sframe_format_result()` resolves a `[@key]` citation in a decision rule
   or note against the instrument's references, as the report does. It left
   the raw key on the page.
