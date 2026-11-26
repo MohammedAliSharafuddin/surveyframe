@@ -409,6 +409,12 @@ screenshots of SurveyStudio.
 
   These methods test whether 2 categorical answers go together.
 
+- [Choose a
+  method](https://surveyframe.org/articles/docs/methods/choose-a-method.md):
+
+  From the research question to the analysis method a plan stores, in 4
+  charts.
+
 - [Measure how answers go
   together](https://surveyframe.org/articles/docs/methods/correlations.md):
 

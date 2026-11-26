@@ -15,6 +15,7 @@ articles:
   articles/guides/change-a-questionnaire-mid-study-on-the-record: guides/change-a-questionnaire-mid-study-on-the-record.html
   articles/guides/check-whether-a-likert-scale-holds-together: guides/check-whether-a-likert-scale-holds-together.html
   articles/guides/check-whether-your-items-measure-the-factors-you-assumed: guides/check-whether-your-items-measure-the-factors-you-assumed.html
+  articles/docs/methods/choose-a-method: docs/methods/choose-a-method.html
   articles/guides/choose-between-options-on-multiple-criteria: guides/choose-between-options-on-multiple-criteria.html
   articles/learn/choosing-a-survey-tool: learn/choosing-a-survey-tool.html
   articles/guides/cite-the-sources-of-a-scale-and-a-method: guides/cite-the-sources-of-a-scale-and-a-method.html
@@ -91,7 +92,7 @@ articles:
   text-analysis: text-analysis.html
   articles/templates/training-evaluation-before-and-after: templates/training-evaluation-before-and-after.html
   articles/guides/weight-a-survey-sample-to-its-population: guides/weight-a-survey-sample-to-its-population.html
-last_built: 2026-11-26T20:11Z
+last_built: 2026-11-26T21:21Z
 urls:
   reference: https://surveyframe.org/reference
   article: https://surveyframe.org/articles

@@ -36,6 +36,10 @@ guide](https://surveyframe.org/articles/guides.md).
 
 ## Methods (10 pages)
 
+Not sure which? [Choose a
+method](https://surveyframe.org/articles/docs/methods/choose-a-method.md)
+goes from the research question to the method.
+
 - [Compare
   groups](https://surveyframe.org/articles/docs/methods/group-comparisons.md)
 - [Compare the same people over
