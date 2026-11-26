@@ -10,7 +10,7 @@ pdf_instrument <- function() {
 }
 
 test_that("An HTML report records its engine", {
-  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
+  rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   out <- tempfile(fileext = ".html")
   res <- suppressMessages(render_report(pdf_instrument(), output_file = out,

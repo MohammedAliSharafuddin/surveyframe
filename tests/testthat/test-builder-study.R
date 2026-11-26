@@ -170,7 +170,7 @@ test_that("with no study objectives the field is hidden and nothing is written",
   expect_null(plan_objective(ctx))
 })
 
-# -- An empty study on save (found by session V, 2026-11-04) -----------------
+# -- An empty study on save ---------------------------------------------------
 
 empty_study_ctx <- function(study_json) {
   src <- tempfile(fileext = ".sframe")

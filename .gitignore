@@ -3,29 +3,20 @@
 .RData
 .Ruserdata
 *.Rproj
+.vscode/
 inst/doc
 /docs/
-*.sframe
-!inst/extdata/*.sframe
-# The negation above does not recurse, so the demo library's instruments
-# need their own line. Without it all 23 .sframe files were ignored and
-# the library shipped as data with no instruments.
-!inst/extdata/demos/*.sframe
-# The hash.canonical verdict fixtures of test-hash-canonical.R (CF-A). Ignored
-# by the rule above, so the test passed only in the working tree that made
-# them, and failed in a clean checkout (closing suite at bfccb31).
-!tests/testthat/fixtures/canonical/hash_canonical/*.sframe
+Rplots.pdf
 *.tar.gz
 *.zip
 *.Rcheck/
-.local-bin/
-.local-debs/
-.local-tidy/
-.codex
-surveyframe_v0.2/
-surveyframe_V0.3/
-surveyframe_v_0.3.1/
-cran-comments.md
+# Instruments made while working are not tracked; the shipped demo
+# instruments and the test fixtures are. A negation does not recurse, so
+# each folder needs its own line.
+*.sframe
+!inst/extdata/*.sframe
+!inst/extdata/demos/*.sframe
+!tests/testthat/fixtures/canonical/hash_canonical/*.sframe
 data-raw/*
 !data-raw/inline_static_template.R
 !data-raw/inline_role_aliases.R
@@ -39,54 +30,7 @@ data-raw/*
 !data-raw/input_types_comparison_items.R
 !data-raw/reference_demo_status.R
 !data-raw/capture_study_screenshots.R
-roadmap.md
-todo.md
-revision_todo_0.3.md
-dogfeed.todo.md
-todo_0.3.5.md
-todo_0.4.md
-todo_0.4.1.md
-todo_text_analysis.md
-todo_sem_execution.md
-todo_provenance_part1.md
-todo_provenance_part2.md
-todo_integration_launch.md
-todo_master_0.4.md
-kimi_review_034.md
-qwen_review_034.md
-todo_rstudio_addin.md
-todo_review_defects.md
-HANDOVER_0.4.2_BUILD.md
-HANDOVER_*.md
-REVIEW_*.md
-Rplots.pdf
 tests/testthat/file*.html
-CLAUDE.md
-jss-paper/
-.positai
-tests/testthat/fixtures/aic_rsam_pilot.sframe
-tests/testthat/test-aic-rsam-fixture.R
-tests/testthat/test-aic-rsam-branching.R
-.vscode/
-mas_review_033.html
-mas_review_034.html
-mas_review_040.qmd
-mas_review_040.html
-review_040/
-review_050/
-review_041/
-mas_review_032.md
-mas_review_032.qmd
-mas_review_033.md
-mas_review_033.qmd
-mas_review_034.md
-mas_review_034.qmd
-OPEN_ISSUE_sframe_format.md
-mas_full_report.html
-report_interp.html
-TESTING.md
-bsr_paper_template.docx
-review_032_functions.R
 tests/testthat/_problems/
 tests/testthat/testthat-problems.rds
 pkgdown/assets/templates/*/preview.html

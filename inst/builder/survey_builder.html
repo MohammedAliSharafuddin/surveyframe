@@ -4840,7 +4840,7 @@ function sframePayload(){
   var carry=S._carry||{};Object.keys(carry).forEach(function(k){payload[k]=carry[k];});
   // An empty study, objectives or sampling is refused by the sframe-schema
   // profile and by validate_sframe(), and an instrument with no study has no
-  // study field. One opened as {} was saved as {} again (found by session V).
+  // study field. One opened as {} was saved as {} again.
   if(payload.hasOwnProperty('study')){var st=studyPlain(payload.study);if(st)payload.study=st;else delete payload.study;}
   if(S.references&&S.references.length)payload.references=S.references;
   return payload;
