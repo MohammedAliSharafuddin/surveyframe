@@ -10,7 +10,8 @@ sframe_plot_decision_ranking(result, palette = c("web", "print"))
 \item{result}{A decision-family result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}},
 carrying either \code{scores} and \code{alternatives} or a ranking \code{table}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no ranking.

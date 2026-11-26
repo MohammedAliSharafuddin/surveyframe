@@ -17,15 +17,15 @@ that found nothing.
 \details{
 Use \code{\link[=sframe_is_valid]{sframe_is_valid()}} for the pass or fail flag, \code{\link[=sframe_problems]{sframe_problems()}} for the
 messages, \code{as.data.frame()} for a problem-per-row table, \code{summary()} for
-the full check roster, and \code{\link[=as_sframe]{as_sframe()}} to recover the validated
+the full check roster and \code{\link[=as_sframe]{as_sframe()}} to recover the validated
 instrument.
 }
 \examples{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-item  <- sframe_item("sat_1", "The service met my expectations.",
-                 type = "likert", choice_set = "ag5", scale_id = "sat")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+item <- sframe_item("sat_1", "The service met my expectations.",
+                    type = "likert", choice_set = "ag5", scale_id = "sat")
 scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 

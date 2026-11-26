@@ -450,7 +450,6 @@ reference:
       - sframe_collected_weights
       - sframe_rated_matrix
       - sframe_decision_options
-      - sframe_dematel_compute
 
   - title: "Text analysis"
     desc: >

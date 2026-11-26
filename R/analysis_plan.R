@@ -267,11 +267,72 @@ sframe_alpha <- function(options = list()) {
   if (!is.numeric(a) || length(a) != 1 || !is.finite(a) || a <= 0 || a >= 1) 0.05 else a
 }
 
+# The advisory for an inferential result from fewer than 30 cases, or NULL.
+# A parametric method is pointed to its small-sample alternative. A method
+# already suited to small samples (exact, rank-based or penalised) is named
+# as suited, with the caution that power is low. Before 0.4.3 no result
+# carried an advisory at all, so a block of 18 cases said nothing (J10).
+sframe_result_small_sample_advisory <- function(result) {
+  test <- as.character(result$test %||% "")[1]
+  alternative <- c(
+    t_test_ind = "the Mann-Whitney U test",
+    t_test_pair = "the Wilcoxon signed-rank test",
+    anova_one = "the Kruskal-Wallis test",
+    repeated_anova = "the Friedman test",
+    correlation_pearson = "Spearman's rho or Kendall's tau",
+    crosstab = "Fisher's exact test",
+    chi_square = "Fisher's exact test",
+    regression_logistic_binary = "Firth's penalised logistic regression",
+    regression_linear = "bootstrap confidence intervals for the coefficients",
+    anova_two = "bootstrap confidence intervals, after checking the residuals",
+    ancova = "bootstrap confidence intervals, after checking the residuals",
+    regression_logistic_ordinal = "merging sparse outcome categories",
+    regression_logistic_multinomial = "merging sparse outcome categories")
+  suited <- c(
+    mann_whitney = "The Mann-Whitney U test", wilcoxon_pair = "The Wilcoxon signed-rank test",
+    kruskal_wallis = "The Kruskal-Wallis test", friedman = "The Friedman test",
+    fisher_exact = "Fisher's exact test", mcnemar = "McNemar's test",
+    correlation_spearman = "Spearman's rho", correlation_kendall = "Kendall's tau",
+    firth_logistic = "Firth's penalised logistic regression")
+  if (!test %in% c(names(alternative), names(suited))) return(NULL)
+  n <- if (is.numeric(result$n1) && is.numeric(result$n2)) {
+    result$n1 + result$n2
+  } else if (is.numeric(result$n) && length(result$n) >= 1) {
+    max(result$n, na.rm = TRUE)
+  } else NA_real_
+  if (length(n) != 1 || !is.finite(n) || n >= 30) return(NULL)
+  if (test %in% names(alternative)) {
+    sprintf(paste0("Small sample (N = %d): the p value of this %s rests on ",
+                   "large-sample assumptions, so check it against %s."),
+            as.integer(n), sframe_method_label(test), alternative[[test]])
+  } else {
+    sprintf(paste0("Small sample (N = %d): %s suits a sample this size, but ",
+                   "its power is low, so read the effect size and its ",
+                   "interval rather than p alone."),
+            as.integer(n), suited[[test]])
+  }
+}
+
 # ", higher in <group>" for a signed two-group effect, empty when the effect
 # is zero or missing.
 sframe_higher_group <- function(effect, groups) {
   if (is.na(effect) || effect == 0 || length(groups) < 2) return("")
   paste0(", higher in ", if (effect > 0) groups[1] else groups[2])
+}
+
+# A paired measure as the "higher in" phrase names it: its label when that is
+# short (40 characters or fewer), otherwise its column name in words ("confidence_after" reads
+# "confidence after"). A paired line quoted a whole question, as in 'higher
+# in "After the training, how confident are you applying this skill? (0 to
+# 100)"' (J3).
+sframe_short_var <- function(id) {
+  lab <- sframe_text_var(id)
+  vapply(seq_along(id), function(k) {
+    l <- lab[k]
+    plain <- gsub('^"|"$', "", l)
+    if (!is.na(l) && nchar(plain) <= 40) return(l)
+    gsub("_+", " ", id[k])
+  }, character(1))
 }
 
 sframe_effect_label <- function(d, type = "d") {
@@ -927,7 +988,7 @@ sframe_run_t_test_pair <- function(data, vars) {
       "t(%d) = %.2f, p %s, d_z = %.2f%s%s",
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value), dz, sframe_ci_string(d_ci),
-      sframe_higher_group(dz, sframe_text_var(vars))
+      sframe_higher_group(dz, sframe_short_var(vars))
     ),
     prompt = sprintf(
       "The paired-samples t-test %s a significant mean difference between %s (M = %.2f) and %s (M = %.2f), t(%d) = %.2f, p %s, d_z = %.2f%s (%s effect%s). Interpret the direction and practical significance of the change.",
@@ -936,7 +997,7 @@ sframe_run_t_test_pair <- function(data, vars) {
       unname(tt$parameter), unname(tt$statistic),
       sframe_p_string(tt$p.value),
       dz, sframe_ci_string(d_ci), sframe_effect_label(abs(dz), "d"),
-      sframe_higher_group(dz, sframe_text_var(vars))
+      sframe_higher_group(dz, sframe_short_var(vars))
     )
   )
 }
@@ -999,7 +1060,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
       "V = %.0f, z = %.2f, p %s, r = %.2f%s, pseudomedian = %.2f%s%s",
       V, z, sframe_p_string(p), r,
       sframe_ci_string(r_ci), pseudomedian, sframe_ci_string(pm_ci_named),
-      sframe_higher_group(r, sframe_text_var(vars))
+      sframe_higher_group(r, sframe_short_var(vars))
     ),
     prompt = sprintf(
       "The Wilcoxon signed-rank test %s a significant difference between %s (Mdn = %.2f) and %s (Mdn = %.2f), V = %.0f, z = %.2f, p %s, r = %.2f%s (%s effect%s). Discuss the direction and practical significance.",
@@ -1009,7 +1070,7 @@ sframe_run_wilcoxon_pair <- function(data, vars) {
       V, z,
       sframe_p_string(p),
       r, sframe_ci_string(r_ci), sframe_effect_label(r, "r"),
-      sframe_higher_group(r, sframe_text_var(vars))
+      sframe_higher_group(r, sframe_short_var(vars))
     )
   )
 }
@@ -1584,6 +1645,14 @@ sframe_result_table <- function(result) {
     x <- as.numeric(x)
     ifelse(!is.na(x) & x != 0 & abs(x) < .01, fmt(x, 3), fmt(x))
   }
+  # An odds ratio past 999 comes from separation, not from data, and its
+  # digits mean nothing (an OR of 25475448.66, J6): it prints as >999, and
+  # its reciprocal as <0.001.
+  or_fmt <- function(x) {
+    x <- as.numeric(x)
+    ifelse(!is.na(x) & x > 999, ">999",
+           ifelse(!is.na(x) & x < 0.001, "<0.001", fmt(x)))
+  }
   test <- result$test %||% ""
   switch(
     test,
@@ -1727,11 +1796,12 @@ sframe_result_table <- function(result) {
         b = coef_fmt(b),
         SE = coef_fmt(s),
         z = fmt(b / s),
-        # Numeric, so the APA layer prints it as .032 or <.001 (CX-15).
+        # Numeric, so the APA layer prints it as .032 or <.001 (CX-15), and
+        # SurveyStudio's table does too (J6).
         p = 2 * stats::pnorm(-abs(b / s)),
-        OR = fmt(exp(b)),
-        `CI low` = fmt(exp(b - crit * s)),
-        `CI high` = fmt(exp(b + crit * s)),
+        OR = or_fmt(exp(b)),
+        `CI low` = or_fmt(exp(b - crit * s)),
+        `CI high` = or_fmt(exp(b + crit * s)),
         check.names = FALSE, stringsAsFactors = FALSE, row.names = NULL
       )
     },
@@ -1851,12 +1921,17 @@ sframe_reliability_apa <- function(result) {
   rr <- sframe_runtime(result, "report")
   if (is.null(rr) || !length(rr)) return(result)
   num <- function(v) sprintf("%.2f", v)
+  # Alpha with its Feldt interval where one was computed (L2).
+  ci <- function(s) {
+    if (length(s$alpha_ci) != 2 || any(!is.finite(s$alpha_ci))) return("")
+    sprintf(", 95%% CI [%s, %s],", num(s$alpha_ci[[1]]), num(s$alpha_ci[[2]]))
+  }
   parts <- vapply(rr, function(s) {
     if (!is.list(s) || is.null(s$scale_id)) return("")
     what <- sprintf("%s (%d items, N = %d)", s$label %||% s$scale_id, s$n_items, s$n)
     if (identical(result$test, "reliability_alpha")) {
       if (is.null(s$alpha)) return("")
-      return(sprintf("Cronbach's \u03b1 = %s for %s", num(s$alpha), what))
+      return(sprintf("Cronbach's \u03b1 = %s%s for %s", num(s$alpha), ci(s), what))
     }
     if (is.null(s$omega_t)) {
       return(sprintf("McDonald's \u03c9 was not computed for %s, %s", what,
@@ -2100,6 +2175,18 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (is.null(result$table)) {
     result$table <- tryCatch(sframe_result_table(result), error = function(e) NULL)
   }
+  # A small sample gets an advisory naming what suits it (J10).
+  if (is.null(result$error) && is.null(result$advisory)) {
+    result$advisory <- sframe_result_small_sample_advisory(result)
+  }
+  # A multinomial model fits in nnet, a package a reader may not know, so it
+  # carries the R that refits it, as the syntax methods do (CX-14).
+  if (identical(result$test, "regression_logistic_multinomial") &&
+      is.null(result$error) && is.null(result$syntax)) {
+    result$syntax <- tryCatch(
+      paste(sframe_syntax_result(result), collapse = "\n"),
+      error = function(e) NULL)
+  }
   # The runners above compute on the raw response codes (item ids, coded
   # choice values), so the table they build carries those, not what a
   # reader sees. Substitute labels here, once, for every test type, rather
@@ -2128,6 +2215,19 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   }
   result$totals <- relabel_levels(result$totals)
   result$percent_table <- relabel_levels(result$percent_table)
+  # A two-group table's Group column holds the group item's codes, which the
+  # lookup above leaves alone when several choice sets share them (1 and 2),
+  # so it read "1" and "2" beside a sentence naming "Returning guest" (G1).
+  # It is relabelled from the group item's own choice set.
+  if (result$test %in% c("t_test_ind", "mann_whitney") &&
+      is.data.frame(result$table) && "Group" %in% names(result$table) &&
+      length(result$vars) >= 1) {
+    labs <- sframe_item_value_labels(instrument, result$vars[1])
+    g <- as.character(result$table$Group)
+    hit <- !is.na(g) & g %in% names(labs)
+    g[hit] <- unname(labs[g[hit]])
+    result$table$Group <- g
+  }
   # Charts name variables by their instrument labels, as the tables do.
   plot_labels <- if (isTRUE(plots)) sframe_label_lookup(instrument) else character(0)
   if (isTRUE(plots) && is.null(result$plot)) {
@@ -2193,7 +2293,8 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
 #'   that runs later.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen use) or
 #'   `"print"` (black, grey and white, for journal-ready print figures).
-#'   Applied to every plot attached when `plots = TRUE`. See `sframe_brand()`.
+#'   Applied to every plot attached when `plots = TRUE`. See
+#'   [theme_surveyframe()].
 #'
 #' @param strict Logical. When `TRUE`, an error is raised if any block fails
 #'   or scale scoring fails, listing each failure. When `FALSE`, the default,
@@ -2410,7 +2511,9 @@ print.sframe_analysis_results <- function(x, ...) {
       cat(sprintf("  Error: %s\n\n", r$error))
     } else {
       cat(sprintf("  Test: %s\n", r$test))
-      cat(sprintf("  APA:  %s\n\n", r$apa %||% ""))
+      cat(sprintf("  APA:  %s\n", r$apa %||% ""))
+      if (!is.null(r$advisory)) cat(sprintf("  Note: %s\n", r$advisory))
+      cat("\n")
     }
   }
   invisible(x)

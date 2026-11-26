@@ -183,9 +183,9 @@ sframe_timing_report <- function(
 #' @param straightline_min_items Integer. The minimum number of items a scale
 #'   must have before it is checked for straight-lining. Defaults to `4`. A
 #'   respondent who gives the identical response to every item in a 2-item
-#'   scale has done exactly what a genuinely consistent respondent does,
-#'   this is not evidence of inattention on its own, and checking scales
-#'   that short flags a large share of honest respondents (see the worked
+#'   scale has done exactly what a genuinely consistent respondent does, so
+#'   this is not evidence of inattention on its own. Checking scales that
+#'   short flags a large share of honest respondents (see the worked
 #'   example in `vignette("surveyframe")`, where 3 scales of 2 items alone
 #'   drove a 91 percent flag rate before this threshold existed). Set to
 #'   `2` to restore the previous, more permissive behaviour.
@@ -199,7 +199,7 @@ sframe_timing_report <- function(
 #'   above which a respondent is flagged. Defaults to `0.2`.
 #'
 #' @return An object of class `sframe_quality_report`, a named list with
-#'   elements: `summary`, `attention`, `timing`, `straightline`, `missing`,
+#'   elements: `summary`, `attention`, `timing`, `straightline`, `missing`
 #'   and `duplicates`. Use `print()` for a formatted summary.
 #' @export
 #' @seealso [sframe_attention_check()], [read_responses()], [score_scales()]

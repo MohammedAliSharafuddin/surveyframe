@@ -20,8 +20,8 @@ A named numeric vector: \code{estimate}, \code{lower}, \code{upper}, with
 attributes \code{resamples}, \code{valid_resamples} and, when the interval is
 withheld, \code{reason}. The bounds are \code{NA} when fewer than 90\% of resamples
 give a value, or when every resample gives the same value, since neither
-leaves a sampling distribution to read. The bounds
-are \code{NA} when either group has fewer than 3 finite values.
+leaves a sampling distribution to read. They
+are also \code{NA} when either group has fewer than 3 finite values.
 }
 \description{
 Percentile bootstrap for the standardised mean difference between 2

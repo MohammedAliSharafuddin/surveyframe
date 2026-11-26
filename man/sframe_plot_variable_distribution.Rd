@@ -11,19 +11,18 @@ sframe_plot_variable_distribution(data, variable, palette = c("web", "print"))
 
 \item{variable}{Character. Column name of the variable to plot.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A named list of 3 ggplot2 objects (\code{histogram}, \code{boxplot},
 \code{qq}), or \code{NULL} if fewer than 2 complete values remain.
 }
 \description{
-Unlike \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}}, which summarises skewness and
-kurtosis \emph{across} the variables in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, this
-operates on one variable's raw values directly (the report table holds
-summary statistics alone), matching the
-pattern \code{\link[=sframe_plot_correlation_matrix]{sframe_plot_correlation_matrix()}} already uses for
-report-independent, data-driven plots.
+Draws a histogram, a boxplot and a normal Q-Q plot of one variable's raw
+values. \code{\link[=sframe_plot_descriptives]{sframe_plot_descriptives()}} compares the shape of several
+variables from a descriptives report, and this looks at one variable in
+detail, from the response data itself.
 }
 \examples{
 \donttest{

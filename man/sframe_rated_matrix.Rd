@@ -18,7 +18,7 @@ block also collects weights through a \code{weights_item} whose criterion names
 differ from these ids, the items pair with its criteria in this order, and
 the result notes each pairing.}
 
-\item{statistic}{\code{"mean"} or \code{"median"}.}
+\item{statistic}{\code{"mean"} (the default) or \code{"median"}.}
 }
 \value{
 A list with \code{matrix} (alternatives x criteria, with dimnames), \code{n},
@@ -32,11 +32,11 @@ aggregate. No new item type is needed. Per-cell counts and standard
 deviations are kept so the report can show how firm each cell is.
 }
 \examples{
-q5    <- sframe_choice_set("q5", 1:5,
-           c("Very poor", "Poor", "Fair", "Good", "Excellent"))
+q5 <- sframe_choice_set("q5", 1:5,
+                        c("Very poor", "Poor", "Fair", "Good", "Excellent"))
 price <- sframe_item("rate_price", "Rate each supplier: value",
-                 type = "matrix", matrix_items = c("Alpha", "Basilica"),
-                 choice_set = "q5")
+                     type = "matrix", matrix_items = c("Alpha", "Basilica"),
+                     choice_set = "q5")
 study <- sframe_instrument("Supplier selection", components = list(q5, price))
 responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 rm <- sframe_rated_matrix(responses, study, "rate_price")
@@ -50,7 +50,6 @@ Other Decision analysis functions:
 \code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}},
 \code{\link[=sframe_collected_weights]{sframe_collected_weights()}},
 \code{\link[=sframe_decision_options]{sframe_decision_options()}},
-\code{\link[=sframe_dematel_compute]{sframe_dematel_compute()}},
 \code{\link[=sframe_sensitivity_analysis]{sframe_sensitivity_analysis()}}
 }
 \concept{Decision analysis functions}

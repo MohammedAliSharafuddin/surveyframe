@@ -9,7 +9,8 @@ sframe_model_outline(model, include_json = TRUE)
 \arguments{
 \item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object.}
 
-\item{include_json}{Logical. Whether to include the JSON schema block.}
+\item{include_json}{Logical. Whether to include the JSON schema block.
+Defaults to \code{TRUE}.}
 }
 \value{
 A character string.

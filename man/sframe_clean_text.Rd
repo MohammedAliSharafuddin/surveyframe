@@ -18,11 +18,11 @@ sframe_clean_text(
 
 \item{item_id}{Character. The text/textarea item's column name.}
 
-\item{lowercase}{Logical. Lower-case the text. Default \code{TRUE}.}
+\item{lowercase}{Logical. Lower-case the text. Defaults to \code{TRUE}.}
 
-\item{remove_punct}{Logical. Strip punctuation. Default \code{TRUE}.}
+\item{remove_punct}{Logical. Strip punctuation. Defaults to \code{TRUE}.}
 
-\item{strip_numbers}{Logical. Strip digits. Default \code{FALSE}.}
+\item{strip_numbers}{Logical. Strip digits. Defaults to \code{FALSE}.}
 
 \item{instrument}{Optional \code{sframe} instrument. When supplied, \code{item_id}
 is validated as a \code{"text"} or \code{"textarea"} item before cleaning.}

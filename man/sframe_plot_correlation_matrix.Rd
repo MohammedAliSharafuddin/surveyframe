@@ -16,21 +16,22 @@ sframe_plot_correlation_matrix(
 
 \item{vars}{Character vector of column names to correlate.}
 
-\item{method}{One of \code{"pearson"}, \code{"spearman"}, \code{"kendall"}.}
+\item{method}{One of \code{"pearson"} (the default), \code{"spearman"} or
+\code{"kendall"}.}
 
 \item{palette}{One of \code{"web"} (diverging red/teal gradient) or \code{"print"}
 (white-to-black gradient by magnitude, signed label). See
-\code{sframe_brand()}.}
+\code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object.
 }
 \description{
-Computes and plots a full pairwise correlation matrix, independent of
-\code{\link[=run_analysis_plan]{run_analysis_plan()}}'s pairwise \code{correlation_pearson}/\verb{_spearman}/
-\verb{_kendall} runners (which plot one variable pair at a time via
-\code{sframe_plot_correlation()}). Useful directly, and as the visual
-companion to \code{\link[=sframe_validity_results]{sframe_validity_results()}}'s discriminant-validity checks.
+Computes and plots a full pairwise correlation matrix of the chosen
+columns. A correlation block of \code{\link[=run_analysis_plan]{run_analysis_plan()}} charts 1 pair of
+variables, and this chart shows every pair at once. It is also the visual
+companion to the discriminant-validity checks of
+\code{\link[=sframe_validity_results]{sframe_validity_results()}}.
 }
 \examples{
 \donttest{

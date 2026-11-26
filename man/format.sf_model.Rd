@@ -19,7 +19,7 @@ Gives the model's ID, type and number of constructs as 1 line, the line
 that \code{print()} starts with.
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
@@ -41,4 +41,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_scale]{summary.sf_scale()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

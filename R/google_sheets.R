@@ -81,10 +81,6 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 
   # Fix C2: matrix items post one column per sub-item (item_id__sub); expand headers
   # 0.3.3: display-only items collect no data, so they get no sheet column
-  response_items <- Filter(
-    function(i) !identical(i$type %in% c("section_break", "text_block"), TRUE),
-    instrument$items
-  )
   # 0.4.0: this was the 4th place deriving the same expansion columns, after
   # read_responses() and validate_sframe(), and those 2 had already drifted
   # apart once, which is what made a real builder export fail validation.
@@ -95,10 +91,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
   #
   # The fallback to the bare item id is kept. An expandable item with no
   # usable choice set still needs one column rather than none.
-  item_headers <- unlist(lapply(response_items, function(i) {
-    sframe_item_response_columns(instrument, i)
-  }), use.names = FALSE)
-  col_headers <- c("respondent_id", "started_at", "submitted_at", item_headers)
+  col_headers <- sframe_response_template_columns(instrument)
   headers_js <- jsonlite::toJSON(col_headers, auto_unbox = TRUE)
   sheet_url_js <- jsonlite::toJSON(sheet_url %||% "", auto_unbox = TRUE)
   sheet_url_comment <- gsub("[\r\n]+", " ", sheet_url %||% "", perl = TRUE)
@@ -156,7 +149,7 @@ export_google_sheet <- function(instrument, sheet_url, output_dir = ".") {
 #'   included.
 #'
 #' @return A `data.frame` validated against the instrument, ready for
-#'   [sframe_quality_results()], [score_scales()], and [sframe_reliability_results()].
+#'   [sframe_quality_results()], [score_scales()] and [sframe_reliability_results()].
 #' @export
 #' @seealso [export_google_sheet()], [read_responses()], [sframe_quality_results()]
 #'

@@ -51,19 +51,17 @@ number of items, and weights that are not positive finite numbers
 \code{values} and \code{labels} differ in length, a branching rule whose operator
 is unknown or missing or that depends on its own item, and a plan block
 whose \code{alpha} or \code{options$alpha} is not a number between 0 and 1
+\item Analysis plan roles referencing missing variables or models
+\item Model specifications referencing missing indicators or constructs
 }
 
-These are reported as notes, which \code{\link[=sframe_notes]{sframe_notes()}} returns and which leave
+The following are reported as notes, which \code{\link[=sframe_notes]{sframe_notes()}} returns and which leave
 the instrument valid, since SurveyBuilder saved them before 0.4.3: branching
 rules that depend on each other in a cycle, a check whose pass values are
 not codes of its item's choice set, an item whose \code{scale_id} names a
 scale that does not list it, and a scale item's choice set with numeric
 codes outside 1 evenly spaced run (1 to 5 and 99 for "do not know"), which
 \code{\link[=score_scales]{score_scales()}} reads as missing.
-\itemize{
-\item Analysis plan roles referencing missing variables or models
-\item Model specifications referencing missing indicators or constructs
-}
 }
 \section{Changed in 0.4.0}{
 
@@ -79,11 +77,11 @@ in \code{\link[=as_sframe]{as_sframe()}}.
 
 \examples{
 # Build a minimal valid instrument and validate it
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-item  <- sframe_item("sat_1", "The service met my expectations.",
-                 type = "likert", choice_set = "ag5", scale_id = "sat")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+item <- sframe_item("sat_1", "The service met my expectations.",
+                    type = "likert", choice_set = "ag5", scale_id = "sat")
 scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 

@@ -187,8 +187,7 @@ sframe_series_fill_colours <- function(k, palette = c("web", "print")) {
 #' @param base_family Character. Base font family. Defaults to `""` (the
 #'   device default).
 #' @param palette One of `"web"` (brand colours, for on-screen use) or
-#'   `"print"` (black/grey/white only, for journal-ready figures). See
-#'   `sframe_brand()` for the verified contrast ratios behind each.
+#'   `"print"` (black, grey and white only, for journal-ready figures).
 #'
 #' @return A ggplot2 theme object.
 #' @export
@@ -421,11 +420,11 @@ sframe_plot_frequency <- function(result, palette = c("web", "print")) {
 #'
 #' Top terms from a `term_freq` result as a horizontal bar chart, or a word
 #' cloud when `result$options$wordcloud` is `TRUE` (opt-in, default
-#' `FALSE`). Facets by group when the result carries a `group` role
-#' (todo_text_analysis.md section 1a).
+#' `FALSE`). Facets by group when the result carries a `group` role.
 #'
 #' @param result A `term_freq` result list from [run_analysis_plan()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
 #' @seealso [run_analysis_plan()], [sframe_term_frequency()]
@@ -556,13 +555,13 @@ sframe_plot_term_frequency <- function(result, palette = c("web", "print")) {
 
 #' N-gram-frequency plot: horizontal bar
 #'
-#' Top 20 n-grams from an `ngram_freq` result as a horizontal bar chart.
-#' Shares its bar-building logic with [sframe_plot_term_frequency()]'s bar
-#' path via the internal `.sframe_plot_term_bar()` helper. Unlike that
-#' function, there is no word-cloud mode and no group faceting for this id.
+#' Top 20 n-grams from an `ngram_freq` result as a horizontal bar chart, drawn
+#' as the bar chart of [sframe_plot_term_frequency()] is. Unlike that
+#' function, it has no word-cloud mode and no faceting by group.
 #'
 #' @param result An `ngram_freq` result list from [run_analysis_plan()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
 #' @seealso [run_analysis_plan()], [sframe_ngram_frequency()]
@@ -595,7 +594,8 @@ sframe_plot_ngram_frequency <- function(result, palette = c("web", "print")) {
 #' [sframe_plot_efa_loadings()] do.
 #'
 #' @param result A `co_occurrence` result list from [run_analysis_plan()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
 #' @seealso [run_analysis_plan()], [sframe_term_frequency()]
@@ -650,12 +650,18 @@ sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
   brand <- sframe_brand(palette)
   long <- as.data.frame(as.table(as.matrix(tbl)), stringsAsFactors = FALSE)
   names(long) <- c("Row", "Column", "Count")
+  # Both axes keep the table's order, the order the instrument declares its
+  # options in, so a Likert legend reads Strongly disagree to Strongly agree
+  # and not alphabetically (K3).
+  long$Row <- factor(long$Row, levels = unique(rownames(tbl)))
+  long$Column <- factor(long$Column, levels = unique(colnames(tbl)))
   y_label <- "Count"
   # With percent set, the bars show the percentages, totals left out.
   pct <- result$percent_table
   if (is.data.frame(pct) && !is.null(result$percent)) {
     body <- pct[pct[[1]] != "Total", setdiff(names(pct), "Total"), drop = FALSE]
-    long$Count <- mapply(function(r, c) body[match(r, body[[1]]), c], long$Row, long$Column)
+    long$Count <- mapply(function(r, c) body[match(r, body[[1]]), c],
+                         as.character(long$Row), as.character(long$Column))
     y_label <- c(row = "Percent of row", column = "Percent of column",
                  total = "Percent of total")[[result$percent]]
   }
@@ -763,7 +769,8 @@ sframe_plot_regression <- function(result, data, palette = c("web", "print")) {
 #'
 #' @param counts Named numeric vector of response counts, in scale order.
 #' @param theme_color Character. Hex colour for the "agree" pole.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
 #' @noRd
@@ -987,12 +994,11 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #' Grouped diverging chart for a Likert matrix question
 #'
 #' A matrix question asks 2 or more rows against one shared response scale
-#' (a "grid" of Likert items). Plotting each row as its own separate
-#' `sframe_draw_likert_diverging()` chart loses the grouping the question
-#' was designed with, so this draws every row as one diverging bar inside a
-#' single chart, sharing one x scale and one legend, the standard way a
-#' Likert matrix is reported (compare a typical multi-item satisfaction
-#' grid). Same diverging-stack convention as the single-item chart: the
+#' (a "grid" of Likert items). A chart per row would lose the grouping the
+#' question was designed with, so this draws every row as one diverging bar
+#' inside a single chart, sharing one x scale and one legend, the standard
+#' way a Likert matrix is reported. It follows the single-item chart's
+#' diverging-stack convention: the
 #' middle category of an odd-length scale is neutral and split evenly
 #' across the zero line, and colour saturation increases toward each pole.
 #'
@@ -1003,7 +1009,8 @@ sframe_draw_likert_diverging <- function(counts, theme_color = "#16B3B1",
 #'   [read_responses()].
 #' @param choice_set The item's choice set object (`values`, `labels`),
 #'   typically looked up from `instrument$choices` by `item$choice_set`.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if no row has response data.
 #' @export
 #' @examples
@@ -1052,7 +1059,8 @@ sframe_plot_likert_matrix <- function(item, data, choice_set, palette = c("web",
 #' @param data The response data.frame, with one column per item id.
 #' @param choice_set The shared choice set object (`values`, `labels`).
 #' @param title Chart title, typically the scale's label.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if no item has response data.
 #' @export
 #' @seealso [sframe_plot_likert_matrix()], [sframe_scale()]
@@ -1225,7 +1233,8 @@ sframe_plot_for_result <- function(result, data, palette = c("web", "print")) {
 #'
 #' @param result A decision-family result list from [run_analysis_plan()],
 #'   carrying either `scores` and `alternatives` or a ranking `table`.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no ranking.
 #' @export
 #' @seealso [run_analysis_plan()]
@@ -1333,7 +1342,8 @@ sframe_plot_sensitivity <- function(result, palette = c("web", "print")) {
 #'
 #' @param result A `regression_linear` result list containing a `diagnostics`
 #'   data frame (as produced internally by [run_analysis_plan()]).
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A named list of 4 ggplot2 objects (`residuals_fitted`, `qq`,
 #'   `scale_location`, `leverage`), or `NULL` if diagnostics are unavailable.
 #' @export
@@ -1408,7 +1418,8 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
 #' with the suggested factor count marked.
 #'
 #' @param x An `sframe_efa_report` object from [sframe_efa_readiness_results()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_efa_readiness_results()]
@@ -1459,7 +1470,7 @@ sframe_plot_efa_scree <- function(x, palette = c("web", "print")) {
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
 #'   (white-to-black gradient by magnitude, with the sign shown by the
 #'   printed label, so it stays legible in monochrome). See
-#'   `sframe_brand()`.
+#'   [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_efa_solution()]
@@ -1519,7 +1530,8 @@ sframe_plot_efa_loadings <- function(x, palette = c("web", "print")) {
 #' against the usual .70 threshold.
 #'
 #' @param x An `sframe_reliability_report` object from [sframe_reliability_results()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_reliability_results()]
@@ -1584,7 +1596,8 @@ sframe_plot_reliability <- function(x, palette = c("web", "print")) {
 #'
 #' @param result A `crosstab`/`chi_square` result list with a contingency
 #'   `table`.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return Invisibly `NULL`, called for its plotting side effect on the
 #'   current graphics device.
 #' @noRd
@@ -1624,18 +1637,19 @@ sframe_draw_mosaic <- function(result, palette = c("web", "print")) {
 
 #' Correlation matrix heatmap
 #'
-#' Computes and plots a full pairwise correlation matrix, independent of
-#' [run_analysis_plan()]'s pairwise `correlation_pearson`/`_spearman`/
-#' `_kendall` runners (which plot one variable pair at a time via
-#' `sframe_plot_correlation()`). Useful directly, and as the visual
-#' companion to [sframe_validity_results()]'s discriminant-validity checks.
+#' Computes and plots a full pairwise correlation matrix of the chosen
+#' columns. A correlation block of [run_analysis_plan()] charts 1 pair of
+#' variables, and this chart shows every pair at once. It is also the visual
+#' companion to the discriminant-validity checks of
+#' [sframe_validity_results()].
 #'
 #' @param data A data frame of survey responses.
 #' @param vars Character vector of column names to correlate.
-#' @param method One of `"pearson"`, `"spearman"`, `"kendall"`.
+#' @param method One of `"pearson"` (the default), `"spearman"` or
+#'   `"kendall"`.
 #' @param palette One of `"web"` (diverging red/teal gradient) or `"print"`
 #'   (white-to-black gradient by magnitude, signed label). See
-#'   `sframe_brand()`.
+#'   [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_validity_results()]
@@ -1687,7 +1701,8 @@ sframe_plot_correlation_matrix <- function(data, vars, method = "pearson",
 #' Draws the share of respondents flagged for straight-lining in each scale.
 #'
 #' @param x An `sframe_quality_report` object from [sframe_quality_results()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_quality_results()]
@@ -1766,7 +1781,8 @@ plot.sframe_efa_solution <- function(x, ..., palette = c("web", "print")) {
 #' construct, against their usual thresholds of .70 and .50.
 #'
 #' @param x An `sframe_validity_report` object from [sframe_validity_results()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object.
 #' @export
 #' @seealso [sframe_validity_results()]
@@ -1820,7 +1836,8 @@ plot.sframe_validity_report <- function(x, ..., palette = c("web", "print")) {
 #'
 #' @param x An `sframe_missing_data_report` object from
 #'   [sframe_missing_data_results()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object. When no item has missing values, this is a
 #'   short "no missing responses" message.
 #' @export
@@ -1944,7 +1961,8 @@ plot.sframe_analysis_results <- function(x, ..., which = NULL) {
 #' @param col_data The response column for this item.
 #' @param choice_set A list with `values` and `labels` (an sframe choice
 #'   set), or `NULL` if the item has none.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if this item type/data is unsupported.
 #' @keywords internal
 #' @noRd
@@ -1997,7 +2015,8 @@ sframe_plot_item_chart <- function(item, col_data, choice_set = NULL,
 #'
 #' @param scores Numeric vector of scale scores (already averaged/summed).
 #' @param label Character. Scale label, used as the x-axis title.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if ggplot2 is unavailable or `scores`
 #'   is empty.
 #' @keywords internal
@@ -2030,22 +2049,23 @@ sframe_plot_scale_chart <- function(scores, label, palette = c("web", "print")) 
 
 #' Distribution shape by variable, standardised
 #'
-#' One violin per variable in a [sframe_descriptives_results()] table, built from
+#' One violin per variable in an [sframe_descriptives_results()] table, built from
 #' the underlying response data, so the reader sees the shape that the
 #' skewness and kurtosis numbers summarise: asymmetry, multimodality and
 #' tails. Each
 #' variable is standardised (z-scored) before plotting so variables on
 #' different original scales (a 5-point Likert item next to a 0-100 slider)
 #' share one comparable y-axis. Standardising is a linear transform and does
-#' not change skewness. Each violin's subtitle-free panel keeps the
-#' variable's skewness value in its axis label. Grouped `sframe_descriptives_results()`
+#' not change skewness. Each variable's axis label gives its skewness.
+#' Grouped `sframe_descriptives_results()`
 #' output (one row per variable per `split_by` group) is faceted by group.
 #'
 #' @param x An `sframe_descriptives_report` object from [sframe_descriptives_results()].
 #' @param data The same data.frame passed to [sframe_descriptives_results()].
 #'   Required, because the violins need the raw values and `x` carries the
 #'   summary table.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if none of the report's variables have
 #'   enough data to draw.
 #' @export
@@ -2133,17 +2153,16 @@ plot.sframe_descriptives_report <- function(x, data, ..., palette = c("web", "pr
 
 #' Group-comparison boxplot
 #'
-#' Boxplot with jittered points, shared across every runner whose result
-#' carries `vars = c(group_column, outcome_column)`: `t_test_ind`,
-#' `mann_whitney`, `kruskal_wallis` and `anova_one`. 1 function serves all
-#' 4, since the underlying comparison (an outcome split by a grouping
-#' factor) and the data shape needed to plot it are identical across all
-#' 4 tests, and only the inferential statistic differs.
+#' Boxplot with jittered points for a `t_test_ind`, `mann_whitney`,
+#' `kruskal_wallis` or `anova_one` block, whose result carries
+#' `vars = c(group_column, outcome_column)`. The 4 tests compare the same
+#' thing, an outcome split by a grouping factor, so 1 chart serves them all.
 #'
-#' @param result A result list from one of the 4 runners above, with
+#' @param result A result list from one of the 4 methods above, with
 #'   `vars = c(group_column, outcome_column)`.
 #' @param data The response data frame the result was computed from.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if the columns are missing, fewer
 #'   than 2 groups remain after removing missing values, or ggplot2 is
 #'   unavailable.
@@ -2204,7 +2223,8 @@ sframe_plot_group_comparison <- function(result, data, palette = c("web", "print
 #' @param result A result list from `t_test_pair`/`wilcoxon_pair`, with
 #'   `vars = c(x_column, y_column)`.
 #' @param data The response data frame the result was computed from.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` if fewer than 2 complete pairs
 #'   remain, or ggplot2 is unavailable.
 #' @export
@@ -2519,16 +2539,15 @@ sframe_plot_item_diagnostics <- function(result, palette = c("web", "print")) {
 
 #' Raw-variable distribution panels: histogram, boxplot and Q-Q
 #'
-#' Unlike [sframe_plot_descriptives()], which summarises skewness and
-#' kurtosis *across* the variables in a [sframe_descriptives_results()] table, this
-#' operates on one variable's raw values directly (the report table holds
-#' summary statistics alone), matching the
-#' pattern [sframe_plot_correlation_matrix()] already uses for
-#' report-independent, data-driven plots.
+#' Draws a histogram, a boxplot and a normal Q-Q plot of one variable's raw
+#' values. [sframe_plot_descriptives()] compares the shape of several
+#' variables from a descriptives report, and this looks at one variable in
+#' detail, from the response data itself.
 #'
 #' @param data A data frame of survey responses.
 #' @param variable Character. Column name of the variable to plot.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A named list of 3 ggplot2 objects (`histogram`, `boxplot`,
 #'   `qq`), or `NULL` if fewer than 2 complete values remain.
 #' @export
@@ -2591,19 +2610,20 @@ sframe_plot_variable_distribution <- function(data, variable, palette = c("web",
 
 #' Topic-model top-terms plot: faceted bars, one facet per topic
 #'
-#' Serves both [sframe_run_topic_model_lda()] and [sframe_run_stm_topics()]
-#' results with no dispatch on `result$test`: both runners emit a `$table`
-#' with the same `topic`/`term`/`beta` columns (LDA's beta from
+#' Draws the top terms of each topic from a `topic_model_lda` or
+#' `stm_topics` block of [run_analysis_plan()]. Both methods give a `$table`
+#' with the same `topic`, `term` and `beta` columns (LDA's beta from
 #' `tidytext::tidy()`, STM's from its fitted word-topic distribution), so
-#' this function reads that shared shape directly.
+#' the plot reads either one the same way.
 #'
 #' @param result A `topic_model_lda` or `stm_topics` result list from
 #'   [run_analysis_plan()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no usable
 #'   table.
 #' @export
-#' @seealso [sframe_run_topic_model_lda()], [sframe_run_stm_topics()]
+#' @seealso [run_analysis_plan()], [sframe_extract_quotes()]
 #' @examples
 #' \donttest{
 #' if (requireNamespace("ggplot2", quietly = TRUE) &&
@@ -2718,7 +2738,8 @@ sframe_plot_topics <- function(result, palette = c("web", "print")) {
 #'
 #' @param result A `co_occurrence_network` result list from
 #'   [run_analysis_plan()], carrying `table` and `edges`.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
 #' @seealso [run_analysis_plan()]
@@ -2849,8 +2870,8 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #' Sentiment plot: diverging bar, or a positive/negative comparison cloud
 #'
 #' A ggplot2 diverging bar for a `tidy_sentiment` result by default:
-#' positive counts extend one direction, negative counts the other, so bar
-#' position carries the polarity, so the chart reads without colour. Likert
+#' positive counts extend one direction and negative counts the other, so bar
+#' position carries the polarity and the chart reads without colour. Likert
 #' charts follow the same convention, with a darker shade toward each pole.
 #' Facets by group when `result$table` carries a
 #' `group` column, mirroring [sframe_plot_term_frequency()]'s grouped
@@ -2860,13 +2881,14 @@ sframe_plot_cooccurrence_network <- function(result, palette = c("web", "print")
 #' matching [sframe_plot_term_frequency()]'s own word-cloud toggle),
 #' draws a comparison cloud instead: negative-sentiment words above the
 #' centre line, positive-sentiment words below it, each word sized by how
-#' often it occurred, using the internal `tidy_sentiment` runner's
-#' `$word_sentiment` word-by-sentiment counts. Answers a different
+#' often it occurred, from the word-by-sentiment counts the result holds in
+#' `$word_sentiment`. Answers a different
 #' question from the diverging bar: not "how many responses leaned
 #' positive," but "which *words* drove that."
 #'
 #' @param result A `tidy_sentiment` result list from [run_analysis_plan()].
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
 #' @return A ggplot2 object, or `NULL` when the result carries no table.
 #' @export
 #' @seealso [run_analysis_plan()]

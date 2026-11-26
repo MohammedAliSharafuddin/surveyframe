@@ -86,7 +86,8 @@ Requires \code{data}. Defaults to \code{TRUE}.}
 statistics. Requires \code{data}. Defaults to \code{TRUE}.}
 
 \item{include_analysis}{Logical. Whether to include analysis-plan results
-when \code{data} are supplied and the instrument has an \code{analysis_plan}.}
+when \code{data} are supplied and the instrument has an \code{analysis_plan}.
+Defaults to \code{TRUE}.}
 
 \item{include_models}{Logical. Whether to include saved model JSON and
 generated syntax blocks. Defaults to \code{TRUE}.}
@@ -94,7 +95,7 @@ generated syntax blocks. Defaults to \code{TRUE}.}
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen reading)
 or \code{"print"} (black, grey and white, for a journal-ready or
 print-friendly report). Applied to every chart the report embeds.
-See \code{sframe_brand()}.}
+See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 
 \item{interpretations}{Named list or NULL. Written interpretations keyed
 by analysis-plan block id, added after the results are known. Each
@@ -123,8 +124,8 @@ https://www.zotero.org/styles. Styles are never fetched from the network.
 The style's name and sha256 go into the results record and the
 manifest, and a \code{.qmd} report folder holds a copy named for it, so a
 rerun uses that copy. The built-in engine formats APA 7 only and says so
-when another style is asked for. An unknown name stops with the list of
-the 5.}
+when another style is asked for. An unknown name stops with a message
+listing the 5 bundled names.}
 
 \item{title}{Character or \code{NULL}. The report's title. Defaults to the
 instrument's title.}
@@ -144,7 +145,7 @@ host can set it once with \code{options(surveyframe.figures = list(dpi = 300))}.
 plan chart into as its own file, through \code{\link[=sframe_save_figures]{sframe_save_figures()}}, at the
 size, resolution and format in \code{figures}, where \code{format} may also be
 \code{"tiff"}, \code{"jpeg"} or \code{"pdf"}. Needs \code{data}. Defaults to 300 dpi at
-7 by 4.5 inches where \code{figures} names none.}
+6.5 by 4 inches where \code{figures} names none.}
 
 \item{open}{Logical. Whether to show the finished report: in the viewer
 pane of RStudio, Positron or VS Code, and in the web browser otherwise.

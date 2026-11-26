@@ -36,9 +36,9 @@ sframe_box_collections <- function(component, fields) {
   component
 }
 
-#' The `.sframe` format version, written into every file as `sframe_format`.
+#' The .sframe format version
 #'
-#' Tracks the shape of the serialised object. The package version and the
+#' The version written into every file as `sframe_format`. It tracks the shape of the serialised object. The package version and the
 #' instrument's own version are separate. Bump it only when the file's structure
 #' changes in a way a consumer must react to. `sframe-schema` conformance
 #' profiles are keyed to this value.
@@ -600,8 +600,8 @@ sframe_hash_value <- function(instrument) {
 #' Write an instrument to a .sframe file
 #'
 #' Serialises an `sframe` instrument object to a UTF-8 JSON file with a
-#' SHA-256 integrity hash. The instrument is always validated before writing,
-#' and writes an instrument that passes validation. The hash is computed over the content
+#' SHA-256 integrity hash. The instrument is always validated first, and only
+#' an instrument that passes validation is written. The hash is computed over the content
 #' with `hash.value` set to an empty string, in the canonical form of RFC 8785,
 #' the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
 #' and whitespace removed. It identifies content independently of the exact bytes, and

@@ -58,7 +58,7 @@ An object of class \code{sf_scale} (a named list).
 \description{
 Creates a scale definition that groups items and specifies how composite
 scores are computed. The scale carries scoring rules used by \code{\link[=score_scales]{score_scales()}}
-and measurement structure used by \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, \code{\link[=sframe_item_results]{sframe_item_results()}},
+and measurement structure used by \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}, \code{\link[=sframe_item_results]{sframe_item_results()}}
 and \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}.
 }
 \examples{

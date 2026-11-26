@@ -87,7 +87,9 @@ sframe_with_chrome_tmp <- function(code) {
 #'   `markdown`, and `print()` writes that text.
 #'
 #' @return An object of class `sframe_codebook`, a list with elements
-#'   `instrument_meta`, `items_table`, `choices_table`, `scales_table`,
+#'   `instrument_meta`, `items_table` (1 row per item: `id`, `label`,
+#'   `type`, `choice_set`, `scale_id`, `reverse`, `required` and `help`),
+#'   `choices_table`, `scales_table`,
 #'   `plan_table`, `models_table` and `format`, and with `format = "md"`,
 #'   `markdown`: one character string holding the whole codebook as Markdown,
 #'   with a pipe table per component. Save it with
@@ -98,13 +100,13 @@ sframe_with_chrome_tmp <- function(code) {
 #' @seealso [render_report()]
 #'
 #' @examples
-#' cs    <- sframe_choice_set("ag5", 1:5,
-#'            c("Strongly disagree", "Disagree", "Neutral",
-#'              "Agree", "Strongly agree"))
-#' i1    <- sframe_item("sat_1", "Item 1", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
-#' i2    <- sframe_item("sat_2", "Item 2", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
+#' cs <- sframe_choice_set("ag5", 1:5,
+#'                         c("Strongly disagree", "Disagree", "Neutral",
+#'                           "Agree", "Strongly agree"))
+#' i1 <- sframe_item("sat_1", "Item 1", type = "likert",
+#'                   choice_set = "ag5", scale_id = "sat")
+#' i2 <- sframe_item("sat_2", "Item 2", type = "likert",
+#'                   choice_set = "ag5", scale_id = "sat")
 #' scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
 #' instr <- sframe_instrument("Demo Survey", components = list(cs, i1, i2, scale))
 #'
@@ -328,12 +330,13 @@ print.sframe_codebook <- function(x, ...) {
 #'   statistics. Requires `data`. Defaults to `TRUE`.
 #' @param include_analysis Logical. Whether to include analysis-plan results
 #'   when `data` are supplied and the instrument has an `analysis_plan`.
+#'   Defaults to `TRUE`.
 #' @param include_models Logical. Whether to include saved model JSON and
 #'   generated syntax blocks. Defaults to `TRUE`.
 #' @param plot_palette One of `"web"` (brand colours, for on-screen reading)
 #'   or `"print"` (black, grey and white, for a journal-ready or
 #'   print-friendly report). Applied to every chart the report embeds.
-#'   See `sframe_brand()`.
+#'   See [theme_surveyframe()].
 #' @param show_code Logical. Whether each result carries a folded "Show R code"
 #'   block with the statistical call that produced it, built by
 #'   [sframe_syntax_result()] from the same resolved specification the analysis ran.
@@ -358,7 +361,7 @@ print.sframe_codebook <- function(x, ...) {
 #'   plan chart into as its own file, through [sframe_save_figures()], at the
 #'   size, resolution and format in `figures`, where `format` may also be
 #'   `"tiff"`, `"jpeg"` or `"pdf"`. Needs `data`. Defaults to 300 dpi at
-#'   7 by 4.5 inches where `figures` names none.
+#'   6.5 by 4 inches where `figures` names none.
 #' @param open Logical. Whether to show the finished report: in the viewer
 #'   pane of RStudio, Positron or VS Code, and in the web browser otherwise.
 #'   Defaults to `TRUE` in an interactive session and `FALSE` in a script.
@@ -371,8 +374,8 @@ print.sframe_codebook <- function(x, ...) {
 #'   The style's name and sha256 go into the results record and the
 #'   manifest, and a `.qmd` report folder holds a copy named for it, so a
 #'   rerun uses that copy. The built-in engine formats APA 7 only and says so
-#'   when another style is asked for. An unknown name stops with the list of
-#'   the 5.
+#'   when another style is asked for. An unknown name stops with a message
+#'   listing the 5 bundled names.
 #'
 #' @section Markdown in text fields:
 #' A research question, H0, H1, decision rule, interpretation, study problem
@@ -505,7 +508,7 @@ render_report <- function(
     chart_results <- run_analysis_plan(data, instrument, plots = TRUE,
                                        plot_palette = plot_palette)
     saved <- sframe_save_figures(chart_results, figure_dir,
-                        width = figures$width %||% 7, height = figures$height %||% 4.5,
+                        width = figures$width %||% 6.5, height = figures$height %||% 4,
                         dpi = figures$dpi %||% 300, format = figures$format %||% "png")
     rlang::inform(paste0("Saved ", length(saved), " chart file",
                          if (length(saved) == 1) "" else "s", " in:\n",
@@ -817,7 +820,11 @@ render_report <- function(
     out_ext <- if (identical(format, "html")) "html" else format
     rendered <- file.path(render_dir, paste0("report.", out_ext))
     # Quarto prints nothing while it works, which for a minute looks like a hang.
-    rlang::inform("Rendering the report with Quarto. This usually takes under a minute.",
+    # Names the version, which decides what the report can do (L1).
+    q_version <- quarto$version %||% NA_character_
+    rlang::inform(paste0("Rendering the report with Quarto",
+                         if (!is.na(q_version) && nzchar(q_version)) paste0(" ", q_version) else "",
+                         ". This usually takes under a minute."),
                   class = "sframe_report_progress")
     quarto_log <- character(0)
     quarto_ok <- tryCatch({
@@ -1089,7 +1096,7 @@ sframe_clean_interpretations <- function(interpretations) {
         "<h2>Codebook</h2>",
         .render_report_table(sframe_codebook_items_display(cb), "Survey items",
           col.names = c("ID", "Label", "Type", "Response options", "Scale",
-                        "Reverse", "Required"))
+                        "Reverse", "Required", "Help text"))
       )
       if (nrow(cb$scales_table) > 0) {
         codebook_parts <- c(
@@ -1534,6 +1541,9 @@ sframe_clean_interpretations <- function(interpretations) {
           sprintf("<p class=\"apa\"><strong>Result:</strong> %s</p>",
                   if (!is.null(result$apa)) sframe_apa_html(result$apa)
                   else htmltools_escape(result$error %||% "")),
+          if (!is.null(result$advisory) && is.null(result$error))
+            sprintf("<p class=\"sf-advisory\"><strong>Note:</strong> %s</p>",
+                    sframe_apa_html(result$advisory)),
           table_html,
           plot_html,
           syntax_html,
@@ -1699,7 +1709,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
   items_d$reverse  <- ifelse(items_d$reverse,  "Yes", "")
   items_d$required <- ifelse(items_d$required, "Yes", "")
   names(items_d) <- c("ID", "Label", "Type", "Response options", "Scale",
-                      "Reverse", "Required")
+                      "Reverse", "Required", "Help text")
   # render_report() passes the results it computed once for both engines.
   if (inherits(results, "error")) results <- conditionMessage(results)
   if (is.null(results) && !is.null(data) && isTRUE(include_analysis) &&
@@ -1721,6 +1731,10 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       r$caption_html <- htmltools_escape(title)
       r$caption_text <- title
       r$research_question_md <- sframe_field_md_line(r$research_question, keys)
+      # The result sentence and its advisory with italic symbols in every
+      # engine (L2, CX-24).
+      if (!is.null(r$apa)) r$apa_md <- sframe_apa_markdown(r$apa)
+      if (!is.null(r$advisory)) r$advisory_md <- sframe_apa_markdown(r$advisory)
       r$exploratory <- sframe_result_exploratory(r)
       r$exploratory_label <- sframe_exploratory_label
       r$figure_open <- sframe_apa_figure_open(title, paste("Chart of the result for", title))

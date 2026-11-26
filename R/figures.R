@@ -94,8 +94,9 @@ sframe_check_svg <- function() {
 #' @param results The list [run_analysis_plan()] returns, run with
 #'   `plots = TRUE`.
 #' @param dir Directory to write into. Created when absent.
-#' @param width,height Size in inches. Default 7 by 4.5.
-#' @param dpi Resolution in dots per inch, for the raster formats. Default 300.
+#' @param width,height Size in inches. Defaults to 6.5 by 4, the size the charts
+#'   are fitted to.
+#' @param dpi Resolution in dots per inch, for the raster formats. Defaults to 300.
 #' @param format One of `"png"` (default), `"tiff"`, `"jpeg"`, `"pdf"` or
 #'   `"svg"`.
 #'
@@ -117,7 +118,7 @@ sframe_check_svg <- function() {
 #' }
 #' }
 #' @family Report functions
-sframe_save_figures <- function(results, dir, width = 7, height = 4.5, dpi = 300,
+sframe_save_figures <- function(results, dir, width = 6.5, height = 4, dpi = 300,
                                 format = c("png", "tiff", "jpeg", "pdf", "svg")) {
   rlang::check_installed("ggplot2", reason = "to save charts as files.")
   format <- rlang::arg_match(format)
@@ -186,6 +187,14 @@ sframe_fit_plot <- function(p, width = NULL) {
       new[[nm]] <- sframe_wrap_text(v, chars_for(size[[nm]], nm == "title"))
     }
   }
+  # A legend title is a question's full wording as often as not. It sits on
+  # its own line above the keys (below), so it wraps to the full width.
+  for (nm in intersect(c("fill", "colour"), names(labs))) {
+    v <- labs[[nm]]
+    if (is.character(v) && length(v) == 1L && !is.na(v)) {
+      new[[nm]] <- sframe_wrap_text(v, chars_for(11, TRUE))
+    }
+  }
   b <- tryCatch(ggplot2::ggplot_build(p), error = function(e) NULL)
   axis_wrap <- function(v) sframe_wrap_text(v, 18)
   legend_wrap <- function(v) sframe_wrap_text(v, 30)
@@ -210,7 +219,12 @@ sframe_fit_plot <- function(p, width = NULL) {
       wrapped <- legend_wrap(lim)
       per_key <- max(nchar(unlist(strsplit(wrapped, "\n", fixed = TRUE)))) + 4
       per_row <- max(1L, floor(chars_for(10) / per_key))
-      guide <- ggplot2::guide_legend(nrow = max(1L, ceiling(length(lim) / per_row)))
+      nrow <- max(1L, ceiling(length(lim) / per_row))
+      guide <- if (utils::packageVersion("ggplot2") >= "3.5.0") {
+        ggplot2::guide_legend(nrow = nrow)
+      } else {
+        ggplot2::guide_legend(nrow = nrow, title.position = "top")
+      }
       p <- p + do.call(ggplot2::guides, stats::setNames(list(guide), aes))
       legend_shown <- TRUE
       own <- p$scales$get_scales(aes)
@@ -231,6 +245,12 @@ sframe_fit_plot <- function(p, width = NULL) {
   p <- p + ggplot2::theme(plot.margin = ggplot2::margin(8, 12, 8, 8))
   if (legend_shown) {
     p <- p + ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
+    # The title above the keys, not to their left, where a long title pushed
+    # the keys off the right edge and lost its own start off the left (K3).
+    # ggplot2 before 3.5.0 sets it on the guide, above.
+    if (utils::packageVersion("ggplot2") >= "3.5.0") {
+      p <- p + ggplot2::theme(legend.title.position = "top")
+    }
   }
   p
 }

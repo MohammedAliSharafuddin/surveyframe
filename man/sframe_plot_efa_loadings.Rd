@@ -12,7 +12,7 @@ sframe_plot_efa_loadings(x, palette = c("web", "print"))
 \item{palette}{One of \code{"web"} (diverging red/teal gradient) or \code{"print"}
 (white-to-black gradient by magnitude, with the sign shown by the
 printed label, so it stays legible in monochrome). See
-\code{sframe_brand()}.}
+\code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object.

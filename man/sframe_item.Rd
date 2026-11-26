@@ -41,17 +41,19 @@ respondent.}
 \item{type}{Character. The response type. One of \code{"likert"},
 \code{"single_choice"}, \code{"multiple_choice"}, \code{"numeric"}, \code{"text"},
 \code{"textarea"}, \code{"date"}, \code{"matrix"}, \code{"slider"}, \code{"ranking"}, \code{"rating"},
-\code{"pairwise_comparison"}, \code{"criteria_weight"}, \code{"section_break"}, or
+\code{"pairwise_comparison"}, \code{"criteria_weight"}, \code{"section_break"} or
 \code{"text_block"}.}
 
-\item{required}{Logical. Whether the respondent must answer this item.}
+\item{required}{Logical. Whether the respondent must answer this item.
+Defaults to \code{FALSE}.}
 
 \item{choice_set}{Character or NULL. The \code{id} of a choice set defined with
 \code{\link[=sframe_choice_set]{sframe_choice_set()}}.}
 
 \item{scale_id}{Character or NULL. The \code{id} of the scale this item belongs to.}
 
-\item{reverse}{Logical. Whether this item is reverse-coded within its scale.}
+\item{reverse}{Logical. Whether this item is reverse-coded within its scale.
+Defaults to \code{FALSE}.}
 
 \item{help}{Character or NULL. Help text displayed beneath the question.}
 
@@ -108,7 +110,7 @@ item <- sframe_item(
 )
 
 sec <- sframe_item("sec_1", "Demographic Information", type = "section_break",
-               section_intro = "Please answer the following questions.")
+                   section_intro = "Please answer the following questions.")
 item
 sec
 }

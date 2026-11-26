@@ -207,7 +207,7 @@ sframe_reference_targets <- function(x, id) {
 #' (`@article`, `@book`, `@incollection`, `@inbook`, `@inproceedings`,
 #' `@techreport`, `@phdthesis`, `@mastersthesis`, `@misc`, `@online`,
 #' `@software`, `@dataset`, `@unpublished`) and the common fields. Accented
-#' letters written as LaTeX commands are converted. Base R alone.
+#' letters written as LaTeX commands are converted. It needs base R only.
 #'
 #' @param file Path to a `.bib` file.
 #' @param text BibTeX as a character string, the other way to supply it, for
@@ -473,7 +473,8 @@ sframe_bibtex_to_reference <- function(entry, cited_by = NULL) {
 #' @param instrument An `sframe` object.
 #' @param ... `sf_reference` objects, or lists of them such as
 #'   [read_bibtex()] returns.
-#' @param replace Logical. Replace a reference with the same id.
+#' @param replace Logical. Whether to replace a reference with the same id.
+#'   Defaults to `FALSE`.
 #'
 #' @return The instrument, with the references added.
 #' @export

@@ -2,7 +2,7 @@
 % Please edit documentation in R/statistics_reports.R
 \name{sframe_sample_size_plan}
 \alias{sframe_sample_size_plan}
-\title{Sample-size and power planning helper}
+\title{Plan the sample size for an analysis}
 \usage{
 sframe_sample_size_plan(
   type = c("proportion", "mean", "correlation", "t_test", "anova",
@@ -28,15 +28,16 @@ sframe_sample_size_plan(
 
 \item{sd}{Standard deviation for mean planning.}
 
-\item{p}{Expected proportion.}
+\item{p}{Expected proportion. Defaults to 0.5.}
 
 \item{r}{Expected correlation. Defaults to 0.30 with a warning.}
 
-\item{alpha}{Significance level.}
+\item{alpha}{Significance level. Defaults to 0.05.}
 
-\item{power}{Desired power, for the power calculations.}
+\item{power}{Desired power, for the power calculations. Defaults to 0.8.}
 
-\item{groups}{Number of groups for ANOVA planning. A t test has 2.}
+\item{groups}{Number of groups for ANOVA planning. Defaults to 2, the
+number a t test has.}
 
 \item{predictors}{Number of predictors for regression planning.}
 
@@ -64,7 +65,7 @@ t test uses \code{\link[stats:power.t.test]{stats::power.t.test()}} for 2 indepe
 \code{d}. ANOVA uses \code{\link[stats:power.anova.test]{stats::power.anova.test()}} with Cohen's \code{f}. Correlation
 uses the Fisher z approximation with \code{r}. \code{"regression"} is a power
 calculation when \code{f2} is supplied, from the noncentral F distribution for
-the overall test of \code{predictors} predictors.
+the overall test of all the predictors (their number set by \code{predictors}).
 
 When the effect size is left \code{NULL}, a conventional medium effect is
 assumed (\code{d} 0.5, \code{f} 0.25, \code{r} 0.30) and a warning names it. An

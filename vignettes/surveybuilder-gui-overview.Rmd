@@ -138,16 +138,16 @@ items, drop one, record the drop, write the file, run the plan again and
 report.
 
 ```{r amend-script, eval = requireNamespace("psych", quietly = TRUE)}
-d <- sframe_demo("factor_structure")
+d <- sframe_demo("likert_scale")
 results <- run_analysis_plan(d$responses, d$instrument)
 flags <- sframe_item_flags(results[[2]])
 flags[, c("item", "reason")]
 
-revised <- sframe_drop_items(d$instrument, "con_4", from = "content")
+revised <- sframe_drop_items(d$instrument, "org_4", from = "organisation")
 amended <- amend_sframe(d$instrument, revised,
   reason_code = "model_respecification",
   reason_text = flags$reason[1], tier = "design",
-  deviation_report = "con_4 dropped from content after the EFA flagged it.",
+  deviation_report = "org_4 dropped from organisation after the reliability check flagged it.",
   version = "1.1.0")
 sframe_get_amendments(amended)[, c("tier", "reason_text", "changed_fields")]
 

@@ -63,11 +63,12 @@ sframe_flag_num <- function(x, digits = 2) {
 #' A result from [run_analysis_plan()] for one of these methods is read the
 #' same way, and its reasons name the block.
 #'
-#' @param result A result of one of the kinds above.
+#' @param result A result of one of the kinds listed in Details.
 #' @param htmt The HTMT threshold: `0.85` for conceptually distinct
 #'   constructs (the default) or `0.90` for similar ones. The value applied
 #'   is kept as the attribute `htmt_threshold`.
-#' @param all If `TRUE`, every row is returned, flagged or not.
+#' @param all Logical. If `TRUE`, every row is returned, flagged or not.
+#'   Defaults to `FALSE`.
 #' @param block Character or `NULL`. The plan block named in the reasons. A
 #'   plan result supplies its own.
 #'

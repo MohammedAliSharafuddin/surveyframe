@@ -27,8 +27,8 @@
 #' library(surveyframe)
 #'
 #' cs    <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
-#' item  <- sframe_item("q1", "Rate your experience.", type = "likert",
-#'                  choice_set = "ag5", required = TRUE)
+#' item <- sframe_item("q1", "Rate your experience.", type = "likert",
+#'                     choice_set = "ag5", required = TRUE)
 #' instr <- sframe_instrument("Quick Survey", components = list(cs, item))
 #' store <- file.path(tempdir(), "responses.csv")
 #'

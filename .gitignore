@@ -33,6 +33,8 @@ data-raw/*
 !data-raw/sync_sframe_schema.R
 !data-raw/build_demo_library.R
 !data-raw/demo_stories.R
+!data-raw/demo_calibration.R
+!data-raw/demo_calibration_targets.R
 !data-raw/reference_demo_stories.R
 !data-raw/input_types_comparison_items.R
 !data-raw/reference_demo_status.R

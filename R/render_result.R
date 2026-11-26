@@ -11,7 +11,7 @@
 #'
 #' Takes one result from [run_analysis_plan()] and returns what the report
 #' shows for it: the formatted table with its caption and note, any second
-#' table `sframe_result_supplement()` gives, the APA line and the chart the
+#' table the report prints for the method, the APA line and the chart the
 #' report picks for that method, with the instrument's labels. The table, the
 #' chart and their choice per method come from the code [render_report()]
 #' uses, so a host rendering results one at a time and the report agree.
@@ -29,7 +29,7 @@
 #'   embedded. `"png"` and `"svg"` write the chart to a file as well, and
 #'   return its path in `chart_file`.
 #' @param width,height,dpi The chart's size in inches and its resolution,
-#'   for the embedded or written chart. Defaults 7 by 4.5 at 150 dpi.
+#'   for the embedded or written chart. Defaults to 6.5 by 4 inches at 150 dpi.
 #'
 #' @return A list with `block_id`, `test`, `caption`, `apa`, `table` (a data
 #'   frame), `note`, `supplement` (a list with `table` and `caption`, or
@@ -52,7 +52,7 @@
 sframe_format_result <- function(result, data, instrument = NULL,
                           palette = c("web", "print"),
                           format = c("html", "png", "svg"),
-                          width = 7, height = 4.5, dpi = 150) {
+                          width = 6.5, height = 4, dpi = 150) {
   explicit_palette <- !missing(palette)
   palette <- rlang::arg_match(palette)
   format <- rlang::arg_match(format)

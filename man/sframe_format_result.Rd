@@ -10,8 +10,8 @@ sframe_format_result(
   instrument = NULL,
   palette = c("web", "print"),
   format = c("html", "png", "svg"),
-  width = 7,
-  height = 4.5,
+  width = 6.5,
+  height = 4,
   dpi = 150
 )
 }
@@ -34,7 +34,7 @@ embedded. \code{"png"} and \code{"svg"} write the chart to a file as well, and
 return its path in \code{chart_file}.}
 
 \item{width, height, dpi}{The chart's size in inches and its resolution,
-for the embedded or written chart. Defaults 7 by 4.5 at 150 dpi.}
+for the embedded or written chart. Defaults to 6.5 by 4 inches at 150 dpi.}
 }
 \value{
 A list with \code{block_id}, \code{test}, \code{caption}, \code{apa}, \code{table} (a data
@@ -48,7 +48,7 @@ one. A result that failed carries its
 \description{
 Takes one result from \code{\link[=run_analysis_plan]{run_analysis_plan()}} and returns what the report
 shows for it: the formatted table with its caption and note, any second
-table \code{sframe_result_supplement()} gives, the APA line and the chart the
+table the report prints for the method, the APA line and the chart the
 report picks for that method, with the instrument's labels. The table, the
 chart and their choice per method come from the code \code{\link[=render_report]{render_report()}}
 uses, so a host rendering results one at a time and the report agree.

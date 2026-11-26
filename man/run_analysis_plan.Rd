@@ -31,7 +31,8 @@ Defaults to \code{FALSE}.}
 
 \item{plot_palette}{One of \code{"web"} (brand colours, for on-screen use) or
 \code{"print"} (black, grey and white, for journal-ready print figures).
-Applied to every plot attached when \code{plots = TRUE}. See \code{sframe_brand()}.}
+Applied to every plot attached when \code{plots = TRUE}. See
+\code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 
 \item{seed}{Integer or \code{NULL}. The random seed the analysis runs under.
 Defaults to a fixed value so the same instrument and the same data give

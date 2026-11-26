@@ -9,7 +9,8 @@ sframe_plot_cooccurrence(result, palette = c("web", "print"))
 \arguments{
 \item{result}{A \code{co_occurrence} result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no table.

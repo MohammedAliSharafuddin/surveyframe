@@ -21,7 +21,7 @@ sframe_model_spec(
 
 \item{label}{Human-readable model label.}
 
-\item{type}{Model type. One of \code{"efa"}, \code{"cfa"}, \code{"cb_sem"}, or
+\item{type}{Model type. One of \code{"efa"}, \code{"cfa"}, \code{"cb_sem"} or
 \code{"pls_sem"}.}
 
 \item{engine}{Optional engine name. Defaults to \code{"lavaan"} for CFA/CB-SEM

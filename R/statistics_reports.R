@@ -343,7 +343,8 @@ sframe_require_columns <- function(data, cols, method) {
 #' @param variables Character vector of variables. When `NULL`, numeric-like
 #'   columns are used.
 #' @param split_by Optional grouping variable.
-#' @param conf_level Confidence level for the mean interval.
+#' @param conf_level Confidence level for the mean interval. Defaults to
+#'   0.95.
 #' @param weights Optional case-weight column, such as a design weight the
 #'   researcher set. A named column missing from `data` is an error.
 #'
@@ -356,7 +357,7 @@ sframe_require_columns <- function(data, cols, method) {
 #' @examples
 #' demo <- sframe_demo("two_group")
 #' dr <- sframe_descriptives_results(demo$responses, variables = "sessions_attended",
-#'                            split_by = "format")
+#'                                   split_by = "format")
 #' dr$table
 #' @family Analyse functions
 sframe_descriptives_results <- function(
@@ -461,8 +462,8 @@ sframe_descriptives_results <- function(
 #'
 #' @return An object of class `sframe_missing_data_report`. Its
 #'   `item_missing` and `respondent_missing` tables give `missing_prop`, a
-#'   proportion between 0 and 1. Their `missing_pct` column, the name before
-#'   0.4.3 kept for 1 release, holds the same proportion from 0 to 1. The
+#'   proportion between 0 and 1, and `missing_pct`, the same share as a
+#'   percentage from 0 to 100, as its name says. The
 #'   `patterns` table gives each pattern's `n`, its `percent` from 0 to 100
 #'   and its `prop` between 0 and 1.
 #' @export
@@ -499,9 +500,11 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  # missing_pct, the name before 0.4.3, kept for 1 release
-  item_table$missing_pct <- item_table$missing_prop
-  respondent_table$missing_pct <- respondent_table$missing_prop
+  # missing_pct holds what its name says, a percentage (I5). Tables show
+  # missing_prop alone (sframe_drop_old_share_cols()), so nothing scales it
+  # a second time.
+  item_table$missing_pct <- 100 * item_table$missing_prop
+  respondent_table$missing_pct <- 100 * respondent_table$missing_prop
   pattern_key <- if (length(variables) == 0) {
     rep("", n)
   } else {
@@ -600,7 +603,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
 #' @param variables Character vector of numeric variables to screen. When
 #'   `NULL`, all numeric columns are used.
 #' @param method Outlier rule. `"zscore"` flags absolute z scores above
-#'   `z_cut`, `"iqr"` flags values outside Tukey fences, and `"mahalanobis"`
+#'   `z_cut`, `"iqr"` flags values outside Tukey fences and `"mahalanobis"`
 #'   flags rows above the chi-square cutoff for the selected variables.
 #' @param z_cut Numeric cutoff for `"zscore"`. Defaults to `3`.
 #' @param iqr_multiplier Numeric multiplier for `"iqr"` fences. Defaults to
@@ -772,7 +775,7 @@ sframe_small_sample_advisory <- function(n, test) {
 #' @examples
 #' demo <- sframe_demo("two_group")
 #' ar <- sframe_assumption_results(demo$responses, variables = "sessions_attended",
-#'                          group = "format")
+#'                                 group = "format")
 #' print(ar)
 #' @family Analyse functions
 sframe_assumption_results <- function(
@@ -896,7 +899,11 @@ sframe_assumption_results <- function(
   } else {
     nrow(data)
   }
-  advisory <- sframe_small_sample_advisory(advisory_n, "these assumption checks")
+  advisory <- c(
+    sframe_small_sample_advisory(advisory_n, "these assumption checks"),
+    sframe_assumption_violation_advisory(normality, homogeneity, regression,
+                                         group, expected_counts))
+  advisory <- if (length(advisory)) paste(advisory, collapse = " ") else NULL
   apa <- sframe_assumption_sentence(normality, homogeneity, regression, expected_counts,
                                     group, outcome, predictors)
 
@@ -913,6 +920,64 @@ sframe_assumption_results <- function(
     ),
     class = "sframe_assumption_report"
   )
+}
+
+# What to do when a check clearly fails, naming the alternative test (I6).
+# Normality clearly fails at Shapiro-Wilk p < .001, or at p < .05 with an
+# absolute skewness of 1 or more: with a large sample a trivial departure
+# reaches p < .05 alone, and that is not worth an alternative. NULL when
+# nothing clearly fails.
+sframe_assumption_violation_advisory <- function(normality, homogeneity, regression,
+                                                 group, expected_counts) {
+  out <- character(0)
+  if (nrow(normality) > 0) {
+    p <- normality$shapiro_p
+    sk <- abs(normality$skewness)
+    bad <- !is.na(p) & (p < .001 | (p < .05 & !is.na(sk) & sk >= 1))
+    if (any(bad)) {
+      vars <- sframe_text_var(normality$variable[bad])
+      alt <- if (!is.null(group)) {
+        paste0("compare groups with a rank-based test (Mann-Whitney U for 2 ",
+               "groups, Kruskal-Wallis for more) or with Welch's t test and a ",
+               "bootstrap confidence interval")
+      } else {
+        paste0("use a rank-based method (Spearman's rho, the Wilcoxon ",
+               "signed-rank test) or a bootstrap confidence interval")
+      }
+      out <- c(out, paste0(
+        "Normality clearly fails for ", paste(vars, collapse = ", "),
+        " (Shapiro-Wilk p ", sframe_p_string(min(p[bad])), "), so ", alt, "."))
+    }
+  }
+  if (nrow(homogeneity) > 0) {
+    lev <- homogeneity[homogeneity$test == "Levene" & !is.na(homogeneity$p), ]
+    if (nrow(lev) > 0 && any(lev$p < .05)) {
+      out <- c(out, paste0(
+        "Variances differ across ", sframe_text_var(group), " (Levene p ",
+        sframe_p_string(min(lev$p)), "), so use Welch's t test or Welch's ANOVA, ",
+        "which do not assume equal variances."))
+    }
+  }
+  if (!is.null(regression) && !is.na(regression$residual_shapiro_p) &&
+      regression$residual_shapiro_p < .001) {
+    out <- c(out, paste0(
+      "The regression residuals are not normal (Shapiro-Wilk p ",
+      sframe_p_string(regression$residual_shapiro_p), "), so report ",
+      "heteroscedasticity-robust standard errors or bootstrap confidence intervals."))
+  }
+  if (!is.null(regression) && any(regression$vif > 10, na.rm = TRUE)) {
+    out <- c(out, paste0(
+      "A VIF above 10 (", paste(names(regression$vif)[regression$vif > 10 &
+                                                       !is.na(regression$vif)],
+                               collapse = ", "),
+      ") points to collinear predictors: drop or combine them."))
+  }
+  if (isTRUE(expected_counts$sparse_warning)) {
+    out <- c(out, paste0(
+      "Some expected cell counts are under 5, so use Fisher's exact test or a ",
+      "simulated p value in place of the chi-square approximation."))
+  }
+  if (length(out)) out else NULL
 }
 
 # The sentence of an assumption report: the checks that ran, or that none ran
@@ -981,10 +1046,11 @@ print.sframe_assumption_report <- function(x, ...) {
 #'   `"chi_square"` and `"cochran_q"`.
 #' @param outcome Outcome variable for group comparisons.
 #' @param group Grouping variable for group comparisons.
-#' @param table_vars 2 categorical variables for chi-square residuals and
+#' @param table_vars Two categorical variables for chi-square residuals and
 #'   pairwise proportion tests.
 #' @param measures Repeated binary measures for pairwise McNemar tests.
-#' @param correction Multiple-comparison correction.
+#' @param correction Multiple-comparison correction: `"holm"` (the default),
+#'   `"bonferroni"` or `"BH"`.
 #'
 #' @return An object of class `sframe_posthoc_report`.
 #' @export
@@ -1692,6 +1758,17 @@ sframe_run_partial_correlation <- function(data, roles, options = list()) {
                 error = paste0("Partial correlation supports method 'pearson' or ",
                                "'spearman', not '", method, "'.")))
   }
+  # Without x and y there is nothing to correlate. A block naming its 2
+  # variables under `variables`, as a correlation block may, failed with
+  # "undefined columns selected" (J5).
+  if (is.na(x) || is.na(y) || !nzchar(x) || !nzchar(y)) {
+    named <- setdiff(names(roles %||% list()), c("controls", "covariates", "control"))
+    return(list(test = "partial_correlation", error = paste0(
+      "A partial correlation reads the roles x and y (or predictor and ",
+      "outcome), with the variables to hold constant under controls",
+      if (length(named)) paste0(". The block names ", paste(named, collapse = ", ")) else "",
+      ". Name the 2 variables to correlate as x and y.")))
+  }
   vars <- c(x, y, controls)
   err <- sframe_require_columns(data, vars, "Partial correlation")
   if (!is.null(err)) return(list(test = "partial_correlation", error = err))
@@ -2041,10 +2118,17 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
     NA_real_
   }
 
+  # The likelihood-ratio test of the model against the null on the model's
+  # df, as logistf's summary reports it. The sentence gave the statistic
+  # alone, "likelihood ratio = 0.00", with no df or p (J10).
+  lr_df <- as.numeric(fit$df %||% length(predictors))
+  lr_p <- if (is.finite(lr)) stats::pchisq(lr, lr_df, lower.tail = FALSE) else NA_real_
   list(
     test = "firth_logistic",
     vars = vars,
     n = nrow(df),
+    likelihood_ratio_df = lr_df,
+    likelihood_ratio_p = lr_p,
     conf_level = conf_level,
     coefficients = coefficients,
     conf_int = cbind(lower = as.numeric(fit$ci.lower),
@@ -2055,8 +2139,8 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
     reference_level = coded$reference,
     predictor_coding = coding,
     apa = sframe_with_coding(paste0(sprintf(
-      "Firth logistic regression (n = %d), likelihood ratio = %.2f. ",
-      nrow(df), lr
+      "Firth logistic regression, likelihood-ratio chi-square(%d, N = %d) = %.2f, p %s. ",
+      as.integer(lr_df), nrow(df), lr, sframe_p_string(lr_p)
     ), sframe_event_sentence(outcome, coded)), coding),
     prompt = "Report penalised odds ratios with their profile-likelihood confidence intervals, and state that Firth penalisation was used because of the small sample or separation."
   )
@@ -2114,6 +2198,31 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   zval <- co / se
   pval <- 2 * stats::pnorm(-abs(zval))
   reference <- levels(df[[outcome]])[1]
+  # Separation: a predictor that (almost) perfectly predicts a category sends
+  # its coefficient off towards infinity, giving odds ratios in the millions
+  # with huge standard errors (J6). nnet stops where it is, so it is caught
+  # here, on the size of the coefficient (|b| > 10, an odds ratio beyond
+  # 22,000) or of its standard error.
+  # The intercepts are left out: a large intercept comes from an uncentred
+  # predictor, not from separation.
+  slope <- matrix(colnames(co) != "(Intercept)", nrow(co), ncol(co), byrow = TRUE)
+  sep_cells <- which(slope & (abs(co) > 10 | (!is.na(se) & se > 10) | !is.finite(se)),
+                     arr.ind = TRUE)
+  separation <- if (length(sep_cells)) {
+    terms <- unique(colnames(co)[sep_cells[, 2]])
+    cats <- unique(rownames(co)[sep_cells[, 1]])
+    paste0(
+      "Possible separation: ", paste(terms, collapse = ", "),
+      " (almost) perfectly predicts ",
+      paste(vapply(cats, function(k) sframe_text_value(outcome, k), character(1)),
+            collapse = ", "),
+      ", so those estimates are unbounded and their odds ratios mean nothing. ",
+      "Merge sparse outcome categories, drop or recode the predictor, or use ",
+      "a penalised model.")
+  } else NULL
+  if (!is.null(separation)) {
+    rlang::warn(separation, class = c("sframe_separation_warning", "sframe_warning"))
+  }
   list(
     test = "regression_logistic_multinomial",
     vars = vars,
@@ -2130,7 +2239,9 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
     AIC = stats::AIC(fit),
     pseudo_r2 = pseudo_r2,
     classification_table = as.data.frame.matrix(class_table),
-    apa = sframe_with_coding(sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)), coding),
+    separation = separation,
+    warnings = separation,
+    apa = sframe_with_coding(paste0(sprintf("Multinomial logistic regression was estimated with %d complete cases, against the reference category %s.", nrow(df), sframe_text_value(outcome, reference)), if (!is.null(separation)) paste0(" ", separation) else ""), coding),
     prompt = "Report the reference category, odds ratios, model fit, and classification table where meaningful."
   )
 }
@@ -2245,8 +2356,8 @@ sframe_run_mediation <- function(data, roles, options = list()) {
 #' standardised loadings, with the Fornell-Larcker criterion and HTMT when
 #' construct scores or item responses are given.
 #'
-#' @param loadings A data.frame with columns `construct`, `item`, and
-#'   `loading` or a named list of loading vectors by construct.
+#' @param loadings A data.frame with columns `construct`, `item` and
+#'   `loading`, or a named list of loading vectors by construct.
 #' @param construct_scores Optional data.frame of construct scores for
 #'   Fornell-Larcker and inter-construct correlations.
 #' @param items_by_construct Optional named list, one element per construct,
@@ -2413,7 +2524,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
   htmt
 }
 
-#' Sample-size and power planning helper
+#' Plan the sample size for an analysis
 #'
 #' Estimates a total sample size for a planned analysis. The targets use 3
 #' different methods, and the result says which one applied.
@@ -2426,7 +2537,7 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #' `d`. ANOVA uses [stats::power.anova.test()] with Cohen's `f`. Correlation
 #' uses the Fisher z approximation with `r`. `"regression"` is a power
 #' calculation when `f2` is supplied, from the noncentral F distribution for
-#' the overall test of `predictors` predictors.
+#' the overall test of all the predictors (their number set by `predictors`).
 #'
 #' When the effect size is left `NULL`, a conventional medium effect is
 #' assumed (`d` 0.5, `f` 0.25, `r` 0.30) and a warning names it. An
@@ -2445,11 +2556,12 @@ sframe_henseler_htmt <- function(items_by_construct) {
 #'   `"t_test"`, `"anova"`, `"regression"` or `"sem"`.
 #' @param margin_error Margin of error for mean/proportion planning.
 #' @param sd Standard deviation for mean planning.
-#' @param p Expected proportion.
+#' @param p Expected proportion. Defaults to 0.5.
 #' @param r Expected correlation. Defaults to 0.30 with a warning.
-#' @param alpha Significance level.
-#' @param power Desired power, for the power calculations.
-#' @param groups Number of groups for ANOVA planning. A t test has 2.
+#' @param alpha Significance level. Defaults to 0.05.
+#' @param power Desired power, for the power calculations. Defaults to 0.8.
+#' @param groups Number of groups for ANOVA planning. Defaults to 2, the
+#'   number a t test has.
 #' @param predictors Number of predictors for regression planning.
 #' @param d Expected Cohen's d for a t test. Defaults to 0.5 with a warning.
 #' @param f Expected Cohen's f for ANOVA. Defaults to 0.25 with a warning.

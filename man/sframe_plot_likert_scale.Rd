@@ -22,7 +22,8 @@ display order.}
 
 \item{title}{Chart title, typically the scale's label.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if no item has response data.

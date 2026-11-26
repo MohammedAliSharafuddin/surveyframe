@@ -18,7 +18,6 @@
 ^_pkgdown\.yml$
 ^CONTRIBUTING\.md$
 ^cran-comments\.md$
-^LICENSE\.md$
 ^roadmap\.md$
 ^ROADMAP\.md$
 ^todo\.md$

@@ -7,14 +7,14 @@
 sframe_plot_dematel_influence(result, palette = c("web", "print"))
 }
 \arguments{
-\item{result}{A \code{dematel}-family result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}} or
-\code{sframe_run_dematel()}, carrying \code{prominence}, \code{relation}, and
-\code{criteria}.}
+\item{result}{A \code{dematel} result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}}, carrying
+\code{prominence}, \code{relation} and \code{criteria}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
-A ggplot2 object, or \code{NULL} when the result lacks a DEMATEL
+A ggplot2 object, or \code{NULL} when the result lacks the DEMATEL
 fields to plot.
 }
 \description{

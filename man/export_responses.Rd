@@ -21,7 +21,9 @@ carries an attribute \code{"renamed"}, a data frame with the columns \code{kind}
 \code{new}. An unchanged file returns silently with an empty attribute.
 }
 \description{
-A plain CSV carries codes. \code{dm_1} arrives in SPSS as a column of integers
+Writes response data to an SPSS \code{.sav} or Stata \code{.dta} file, with variable
+and value labels taken from the instrument. A plain CSV carries codes:
+\code{dm_1} arrives in SPSS as a column of integers
 with empty variable and value labels, and the reader has to
 reconstruct all of it from the questionnaire. This attaches both from the
 instrument: the variable label is the item's \code{label}, and the value labels
@@ -49,7 +51,7 @@ characters turned into \verb{_}, a leading \code{v} where the first character is
 a letter, and a number added where 2 names would otherwise match. Variable
 labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
-keeps its full label. 1 message lists each change as old -> new.
+keeps its full label. One message lists each change as old -> new.
 }
 
 \examples{

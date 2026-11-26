@@ -107,11 +107,11 @@ print.sf_component_list <- function(x, ...) {
 #' @seealso [as_sframe()], [sframe_problems()], [sframe_validation]
 #'
 #' @examples
-#' cs    <- sframe_choice_set("ag5", 1:5,
-#'            c("Strongly disagree", "Disagree", "Neutral",
-#'              "Agree", "Strongly agree"))
-#' item  <- sframe_item("sat_1", "The service met my expectations.",
-#'                  type = "likert", choice_set = "ag5", scale_id = "sat")
+#' cs <- sframe_choice_set("ag5", 1:5,
+#'                         c("Strongly disagree", "Disagree", "Neutral",
+#'                           "Agree", "Strongly agree"))
+#' item <- sframe_item("sat_1", "The service met my expectations.",
+#'                     type = "likert", choice_set = "ag5", scale_id = "sat")
 #' scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 #' instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 #'
@@ -367,7 +367,7 @@ sframe_plan.sframe_codebook <- function(x, ...) x$plan_table
 #'
 #' @examples
 #' item <- sframe_item("q1", "How satisfied are you?", type = "likert",
-#'                 choice_set = "agree5")
+#'                     choice_set = "agree5")
 #' sframe_id(item)
 #' sframe_label(item)
 #' @family Inspect functions
@@ -620,7 +620,7 @@ NULL
 #' Returns the report-ready sentence attached to each analysis result.
 #'
 #' @param x An `sframe_analysis_results`, `sframe_descriptives_report`,
-#'   `sframe_missing_data_report`, `sframe_validity_report`, or
+#'   `sframe_missing_data_report`, `sframe_validity_report` or
 #'   `sframe_assumption_report` object.
 #' @param ... Passed to methods.
 #' @return A character vector containing one APA-formatted summary per result.

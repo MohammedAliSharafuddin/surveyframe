@@ -21,10 +21,11 @@ the notebook runs.}
 \item{dir}{Directory to write into. Defaults to the working directory.}
 
 \item{basename}{Character or \code{NULL}. File base name shared by the \code{.qmd},
-\code{.sframe}, and \verb{_responses.csv} files. Defaults to a slug of the
+\code{.sframe} and \verb{_responses.csv} files. Defaults to a slug of the
 instrument's title.}
 
-\item{overwrite}{Logical. Overwrite existing files of the same name.}
+\item{overwrite}{Logical. Whether to overwrite existing files of the same
+name. Defaults to \code{FALSE}.}
 }
 \value{
 A list with \code{qmd}, \code{sframe} and \code{csv} paths, invisibly.

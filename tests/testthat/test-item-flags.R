@@ -5,7 +5,8 @@
 # EFA, CFA, validity or PLS result, with a ready reason. Checked against the
 # Codex T1 oracle (psych, lavaan and seminr called directly, surveyframe not
 # loaded), copied into fixtures/t1_expected_flags.csv with its 6 PLS rows
-# corrected: 4 of 249 rows are flagged.
+# corrected. Rerun on the calibrated demos (2026-11-26): 17 of 264 rows are
+# flagged.
 
 t1 <- function() {
   utils::read.csv(test_path("fixtures", "t1_expected_flags.csv"), stringsAsFactors = FALSE)
@@ -137,7 +138,8 @@ test_that("(d) PLS outer loadings use each item's own construct, with .708 kept"
   f <- sframe_item_flags(fit, all = TRUE)
   o <- t1_rows("sem_pls", "pls", "absolute_outer_loading")
   expect_matches_oracle(f, o, "absolute_outer_loading")
-  expect_false(any(f$flagged))
+  # Calibrated to seminr::mobi (2026-11-26), it_3 is mobi's weak price item.
+  expect_identical(f$item[f$flagged], "it_3")
   expect_true(all(f$cutoff == 0.708))
   # A result of another kind is refused, naming the kinds read.
   expect_error(sframe_item_flags(structure(list(), class = "other")), "reliability", class = "sframe_error")

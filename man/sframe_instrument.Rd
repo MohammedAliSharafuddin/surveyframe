@@ -33,7 +33,7 @@ Defaults to \code{"en"}. Multi-language support is planned for a later release.}
 
 \item{components}{List. A list of component objects created by the
 constructor family: \code{\link[=sframe_item]{sframe_item()}}, \code{\link[=sframe_choice_set]{sframe_choice_set()}}, \code{\link[=sframe_scale]{sframe_scale()}},
-\code{\link[=sframe_branch]{sframe_branch()}}, \code{\link[=sframe_attention_check]{sframe_attention_check()}}, \code{\link[=sframe_conjoint_design]{sframe_conjoint_design()}}, and \code{\link[=sframe_reference]{sframe_reference()}}.
+\code{\link[=sframe_branch]{sframe_branch()}}, \code{\link[=sframe_attention_check]{sframe_attention_check()}}, \code{\link[=sframe_conjoint_design]{sframe_conjoint_design()}} and \code{\link[=sframe_reference]{sframe_reference()}}.
 Components are
 sorted by class automatically, so they can be supplied in any order.}
 
@@ -48,7 +48,7 @@ or imported from a \code{.sframe} file.}
 
 \item{study}{List or \code{NULL}. The study the instrument serves: \code{problem} (1
 short paragraph), \code{objectives} (a list, each with an \code{id} such as \code{"O1"}
-and its \code{text}) and \code{sampling} (\code{population}, \code{method} from
+and its \code{text}), \code{sampling} (\code{population}, \code{method} from
 \code{\link[=sframe_sampling_methods]{sframe_sampling_methods()}} and \code{planned_n}) and \code{preregistration}
 (\code{exclusion_rules}, \code{stopping_rule}, \code{primary_outcomes},
 \code{secondary_outcomes}, \code{multiplicity} and \code{contingency}, each optional
@@ -72,13 +72,13 @@ visitor_cs <- sframe_choice_set("visitor", c("new", "returning"),
                           c("New visitor", "Returning visitor"))
 
 item1 <- sframe_item("sat_1", "The service met my expectations.",
-                 type = "likert", choice_set = "agree5",
-                 scale_id = "sat", required = TRUE)
+                     type = "likert", choice_set = "agree5",
+                     scale_id = "sat", required = TRUE)
 item2 <- sframe_item("sat_2", "I would recommend this service.",
-                 type = "likert", choice_set = "agree5",
-                 scale_id = "sat", required = TRUE)
+                     type = "likert", choice_set = "agree5",
+                     scale_id = "sat", required = TRUE)
 item3 <- sframe_item("visitor_type", "I am a",
-                 type = "single_choice", choice_set = "visitor")
+                     type = "single_choice", choice_set = "visitor")
 
 scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
 

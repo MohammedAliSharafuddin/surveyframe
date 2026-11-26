@@ -338,17 +338,17 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
 #' @seealso [sframe_scale()], [sframe_reliability_results()]
 #'
 #' @examples
-#' cs    <- sframe_choice_set("ag5", 1:5,
-#'            c("Strongly disagree", "Disagree", "Neutral",
-#'              "Agree", "Strongly agree"))
-#' i1    <- sframe_item("sat_1", "Item 1", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
-#' i2    <- sframe_item("sat_2", "Item 2", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat")
-#' i3    <- sframe_item("sat_3", "Item 3 (reverse)", type = "likert",
-#'                  choice_set = "ag5", scale_id = "sat", reverse = TRUE)
+#' cs <- sframe_choice_set("ag5", 1:5,
+#'                         c("Strongly disagree", "Disagree", "Neutral",
+#'                           "Agree", "Strongly agree"))
+#' i1 <- sframe_item("sat_1", "Item 1", type = "likert",
+#'                   choice_set = "ag5", scale_id = "sat")
+#' i2 <- sframe_item("sat_2", "Item 2", type = "likert",
+#'                   choice_set = "ag5", scale_id = "sat")
+#' i3 <- sframe_item("sat_3", "Item 3 (reverse)", type = "likert",
+#'                   choice_set = "ag5", scale_id = "sat", reverse = TRUE)
 #' scale <- sframe_scale("sat", "Satisfaction",
-#'                   items = c("sat_1", "sat_2", "sat_3"), min_valid = 2L)
+#'                       items = c("sat_1", "sat_2", "sat_3"), min_valid = 2L)
 #' instr <- sframe_instrument("Demo", components = list(cs, i1, i2, i3, scale))
 #'
 #' responses <- data.frame(

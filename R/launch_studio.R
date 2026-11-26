@@ -58,13 +58,15 @@ sframe_studio_screen <- function(screen) {
 #'   `"amendments"` (Amendments). `"data"` is accepted for `"responses"`.
 #' @param port TCP port for the Shiny server.
 #' @param host Host address passed to [shiny::runApp()].
-#' @param launch.browser Whether to open the browser automatically.
+#' @param launch.browser Logical. Whether to open the browser automatically.
+#'   Defaults to `interactive()`.
 #' @param demo Optional. A demo name from [sframe_list_demos()]. Studio then
 #'   opens with that demo's instrument and responses loaded, in place of
 #'   `instrument` and `responses`, which must be left out.
 #'   `"input_types"` uses every input type Studio supports.
 #'
-#' @return Called for its side effect.
+#' @return Called for its side effect of running the app. When the app
+#'   closes, the value [shiny::runApp()] returns, invisibly.
 #' @export
 #' @seealso [launch_builder()], [read_sframe()],
 #'   [read_responses()]
@@ -86,7 +88,7 @@ sframe_studio_screen <- function(screen) {
 #'   submitted_at  = "submitted_at"
 #' )
 #' }
-#' @family entry points
+#' @family Entry points
 launch_studio <- function(
     instrument = NULL,
     responses = NULL,
@@ -160,13 +162,15 @@ launch_studio <- function(
     add = TRUE
   )
 
-  shiny::runApp(
+  # runApp() attaches shiny with require(), which printed "Loading required
+  # package: shiny" on every start (N1).
+  suppressPackageStartupMessages(shiny::runApp(
     appDir = sframe_studio_app(),
     port = port,
     host = host,
     launch.browser = launch.browser,
     quiet = TRUE
-  )
+  ))
 }
 
 # Builds SurveyStudio from inst/shiny/app.R, sourced into an environment

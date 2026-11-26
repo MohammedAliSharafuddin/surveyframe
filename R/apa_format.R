@@ -49,8 +49,8 @@ sframe_apa_text <- function(x) {
   "partial_eta2", "omega2", "alpha", "alpha (std.)", "omega", "cronbach_alpha"
 )
 
-# floor_pct, ceiling_pct and missing_pct were renamed _prop in 0.4.3 and kept
-# for 1 release. A table shows the _prop column alone.
+# floor_pct, ceiling_pct and missing_pct hold percentages beside the _prop
+# proportions. A table shows the _prop column alone.
 sframe_drop_old_share_cols <- function(x) {
   old <- c("floor_pct", "ceiling_pct", "missing_pct")
   twin <- c("floor_prop", "ceiling_prop", "missing_prop")
@@ -191,6 +191,27 @@ sframe_apa_html <- function(x) {
             "<em>R</em>", x, perl = TRUE)
   gsub(paste0(before, "(SD|SE|t|F|p|r|d|U|V|W|H|z|M|N|n|Q|b|k)", follows),
        "<em>\\1</em>", x, perl = TRUE)
+}
+
+# A result sentence as Markdown, its statistical symbols in italics as
+# sframe_apa_html() sets them, for the Quarto report, whose Word, PDF and
+# Typst output set the HTML engine's symbols in roman (L2, CX-24). The text
+# is escaped first, so a label's own * or _ stays literal.
+sframe_apa_markdown <- function(x) {
+  if (length(x) == 0) return(character(0))
+  x <- sframe_md_escape(as.character(x))
+  follows <- "(?=(\\([^()]*\\))? (=|\\\\<|\\\\>) )"
+  before <- "(?<![A-Za-z_>\\\\*])"
+  x <- gsub("chi-square(?=\\()", "\u03c7\u00b2", x, perl = TRUE)
+  x <- gsub(paste0(before, "tau", follows), "\u03c4", x, perl = TRUE)
+  x <- gsub(paste0(before, "phi", follows), "\u03c6", x, perl = TRUE)
+  x <- gsub("Cramer's V", "Cram\u00e9r's V", x, fixed = TRUE)
+  x <- gsub(paste0(before, "(r|d)\\\\_([a-z])", follows),
+            "*\\1*~\\2~", x, perl = TRUE)
+  x <- gsub(paste0(before, "R(?=\u00b2", substring(follows, 4)),
+            "*R*", x, perl = TRUE)
+  gsub(paste0(before, "(SD|SE|t|F|p|r|d|U|V|W|H|z|M|N|n|Q|b|k)", follows),
+       "*\\1*", x, perl = TRUE)
 }
 
 # Table headings that are statistical symbols, set as APA 7 sets them. A

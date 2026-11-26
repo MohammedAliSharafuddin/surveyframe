@@ -51,7 +51,7 @@ test_that("Quality counts respondents and rows in words, and no screen shows '(s
   expect_true(ui2_wait(b, "$('#screen-quality').text().indexOf('flagged as too fast') >= 0", 30))
   q <- ui2_js(b, "document.getElementById('screen-quality').innerText")
   expect_match(q, "\\d+ respondents? \\([0-9.]+%\\) flagged as too fast")
-  expect_match(q, "\\d+ duplicate response rows? detected")
+  expect_match(q, "\\d+ duplicate response rows? detected|No duplicate response rows\\.")
   for (screen in sframe_studio_screens()) {
     expect_true(ui1_screen(b, screen), info = screen)
     Sys.sleep(0.5)

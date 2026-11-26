@@ -27,7 +27,7 @@ pages export, into \code{\link[=sframe_reference]{sframe_reference()}} records. 
 (\verb{@article}, \verb{@book}, \verb{@incollection}, \verb{@inbook}, \verb{@inproceedings},
 \verb{@techreport}, \verb{@phdthesis}, \verb{@mastersthesis}, \verb{@misc}, \verb{@online},
 \verb{@software}, \verb{@dataset}, \verb{@unpublished}) and the common fields. Accented
-letters written as LaTeX commands are converted. Base R alone.
+letters written as LaTeX commands are converted. It needs base R only.
 }
 \examples{
 refs <- read_bibtex(text = "@article{cronbach_1951,

@@ -219,8 +219,10 @@ these changes. If you are upgrading from an earlier version, also read the
 * Proportion columns end in `_prop`. `sframe_item_results()` reports
   `floor_prop` and `ceiling_prop`, and `sframe_missing_data_results()`
   reports `missing_prop`, since each holds a proportion between 0 and 1.
-  The `_pct` columns stay as copies for 1 release, and tables show the
-  `_prop` column alone. The demo results files use the new names.
+  The `_pct` columns stay for 1 release and hold the same share as a
+  percentage from 0 to 100, as their names say. Tables show the `_prop`
+  column alone, so nothing is scaled twice. The demo results files use the
+  new names.
 
 ## References, cited where they are used and listed once at the end
 
@@ -721,6 +723,38 @@ style.
   two available item columns." and never named the item. It now fails the
   standard check, as other methods do, naming the item.
 
+* An inferential block run on fewer than 30 cases carries an advisory,
+  printed under its result and in both report engines. A parametric method
+  is pointed to its small-sample alternative, such as the Mann-Whitney U
+  test for an independent t test. A method already suited to small samples,
+  such as Firth's logistic regression, is named as suited, with the caution
+  that its power is low. A block of 18 cases said nothing before.
+* Firth's logistic regression reports its likelihood-ratio test in full,
+  as chi-square with its df, N and p. The sentence
+  read "likelihood ratio = 0.00" with no df or p.
+* `sframe_assumption_results()` advises what to do when a check clearly
+  fails: normality at Shapiro-Wilk p < .001, or at p < .05 with an absolute
+  skew of 1 or more, unequal variances, non-normal regression residuals, a
+  VIF above 10, or sparse expected counts. Its `advisory` was `NULL` even
+  when normality failed badly.
+* The paired t test and Wilcoxon signed-rank sentences name each measure by
+  its label when that is short, and by its column name in words otherwise.
+  They quoted a whole question, as in 'higher in "After the training, how
+  confident are you applying this skill? (0 to 100)"'.
+* A partial correlation block that names its variables under `variables`
+  says it needs `x` and `y`, with the variables to hold constant under
+  `controls`. It failed with "undefined columns selected".
+* The multinomial logistic regression carries the R that refits it in
+  `$syntax`, prints its p values as .032 or <.001 and an odds ratio past 999
+  as ">999", and warns of possible separation, naming the predictor and the
+  category, when a coefficient or its standard error runs past 10. Its table
+  showed p values such as 1.546027e-04 and odds ratios in the millions.
+* `sframe_syntax_sem()` refuses a model of type `"cfa"` and points to
+  `sframe_syntax_cfa()`. It returned measurement-only syntax headed CB-SEM.
+* `sframe_reliability_results()` gives each scale's alpha with Feldt's 95%
+  confidence interval in `alpha_ci`, as `psych::alpha.ci()` computes it, and
+  the alpha sentence reports it.
+
 ### Answers coded and ordered as the instrument declares them
 
 Every statistic in a review of the runners against base R and reference
@@ -967,11 +1001,11 @@ ordered and labelled before and after the arithmetic.
   omega total, to 2 decimals with no leading zero, in the plan's tables,
   both report engines, SurveyStudio, the console and the reliability
   vignette. The omega block reports alpha beside omega, in its table and in
-  a new APA sentence, "McDonald's ω = .82 for Perceived organisation (4
-  items, N = 50), against α = .81", and the alpha block gets 1 of its own.
+  a new APA sentence, "McDonald's ω = .71 for Perceived organisation (4
+  items, N = 50), against α = .69", and the alpha block gets 1 of its own.
   The tables showed an "Omega (h)" beside omega total. From a 1-factor
   model it has no group factors to separate and no hierarchical meaning,
-  and on `likert_scale` it read .818 against an omega total of .817. The
+  and on `likert_scale` it read .716 against an omega total of .715. The
   `omega_h` field stays in the result for code that reads it. A table cell
   rounded a value already rounded to 3 decimals, so a table could show
   alpha .81 where the sentence gave .80. It now rounds once.
@@ -988,8 +1022,7 @@ ordered and labelled before and after the arithmetic.
   proportion in `patterns$percent`, so both report engines printed "Complete
   case | 60 | 1" under "Percent" for 60 complete cases. `percent` now runs
   from 0 to 100 and a new `prop` column holds the proportion. The
-  `missing_pct` columns kept for 1 release hold a proportion, as their help
-  now says.
+  `missing_pct` columns kept for 1 release hold a percentage from 0 to 100.
 
 * Descriptives count a categorical item's answers as valid.
   `sframe_descriptives_results()` turned every value into a number before
@@ -1368,6 +1401,16 @@ ordered and labelled before and after the arithmetic.
 * The Quarto HTML report's captions and margin text are #565c61, 6.8:1
   on white, where Quarto's grey was 4.3:1, below WCAG AA.
 
+* A report section left out with its `include_` flag set to `FALSE`
+  drops its heading too, in the Quarto report and its table of contents.
+  `include_codebook = FALSE` left an empty "Codebook" heading.
+* The codebook's items table has a `help` column with each item's help
+  text, in `sframe_codebook()`, its Markdown and both report engines.
+* Result sentences set t, p, d, N and the other statistical symbols in
+  italics in the Word, PDF and Typst reports, as the HTML report did.
+* The message `render_report()` prints as Quarto starts names the Quarto
+  version it found.
+
 ## Validation
 
 * A plan block's hypotheses must hold text fields named `null` and
@@ -1530,6 +1573,14 @@ ordered and labelled before and after the arithmetic.
   screen said nothing was sent. A preview flag in the page now blocks every
   delivery path, the host's included.
 
+* `run_survey()` writes no column for a section break or a text block,
+  as the static survey and the Google Sheet do. Its CSV had an empty column
+  for each.
+* `read_responses()` recognises a header rewritten by another tool, with
+  its underscores turned into dots or spaces, as well as R's own name
+  repair, and says to re-read the file with `check.names = FALSE` or to put
+  the original column names back.
+
 ## Charts
 
 * `render_result()` draws the chart in the palette you ask for. It
@@ -1555,6 +1606,14 @@ ordered and labelled before and after the arithmetic.
   titles its axes and legend with the items' labels, where it used their
   ids. A sweep of every demo chart now finds no id or code where the
   instrument gives a label.
+
+* The cross-tab chart keeps the order the instrument gives its options,
+  so a Likert legend runs from Strongly disagree to Strongly agree. It
+  sorted them alphabetically. A long legend title wraps and sits above the
+  keys, where it was clipped at both edges.
+* `sframe_save_figures()`, `sframe_format_result()` and the `figures` of
+  `render_report()` default to 6.5 by 4 inches, the size the charts are
+  fitted to and the size their help gave. They wrote 7 by 4.5 inches.
 
 ## SurveyBuilder
 
@@ -1679,6 +1738,32 @@ ordered and labelled before and after the arithmetic.
 * SurveyBuilder's Survey settings dialog scrolls. A tab taller than the
   dialog ran past its bottom edge, with its last controls out of reach. The
   dialog body now shrinks to fit and scrolls.
+
+* Every builder button is at least 44 px tall, the mode switch, undo and
+  redo, and each question row's Move, Duplicate and Delete included. They
+  measured 18 to 40 px.
+* A question row is 1 Tab stop. The right arrow reaches its Move,
+  Duplicate and Delete buttons, the left arrow and Escape go back to the
+  row, and Enter or Space on a button presses it. Each row held 4 Tab stops,
+  and Enter on a focused button opened the question instead.
+* "Describe the method" shows only when the sampling method is Other. The
+  field's layout rule outranked its hidden attribute, so it showed while
+  the method read Not stated.
+* The menu of question types shows whole at 900 px tall. It was cut at
+  460 px and needed scrolling.
+* A single-choice question on an ordered answer set shows ORD in the
+  question list.
+* The Plan dialog suggests a method from 2 variables of any kind, picked
+  under "Not sure which method? Pick 2 variables": Spearman for 2 likert
+  items or a likert and a numeric one, Mann-Whitney or Kruskal-Wallis for
+  a grouping item of 2 or of 3 or more categories with an outcome, a
+  chi-square for 2 grouping items and Pearson for 2 numeric ones, with the
+  method's roles filled in. A survey with text items switched every new
+  plan to term frequency, whose roles list text items alone, so no other
+  suggestion was reached.
+* The amendment dialog starts on the pipeline tier, a wording correction,
+  when a save changed only wording: question text, help, options or the
+  title.
 
 ## SurveyStudio
 
@@ -2073,17 +2158,51 @@ ordered and labelled before and after the arithmetic.
   an option hides from assistive technology (WCAG 4.1.2).
   Enter, Space, the arrow keys and Alt with an arrow work as before.
 
+* "Download a blank CSV for this instrument" on Responses writes a
+  header row with every column the open instrument's responses take, as
+  `read_responses()` reads them and the Google Sheets collector writes
+  them. It always served the bundled input_types demo's responses.
+* `launch_studio()` no longer prints "Loading required package: shiny".
+* An open instrument that passes validation is labelled "Valid" in the
+  sidebar, where it read "Draft ready".
+* Open Instrument names the file you chose when it does not open, not the
+  temporary copy SurveyStudio reads, and tells a file that is not an
+  instrument, such as a .png, from a `.sframe` whose integrity check
+  fails. Both read "Integrity check failed".
+* A response file that does not load leaves its reason on the Responses
+  screen until the next load. It showed only in a notification that closed
+  after a few seconds.
+* Quality never prints "NA%", says "No duplicate response rows." when there
+  are none, and shows its chart above its tables.
+* A result card on Run shows a table's row names, such as a cross-tab's
+  channels, and the table the report sets beside it, such as the counts
+  with the declared row percentages. A two-group table names its groups by
+  their labels, in R as well, where it read "1" and "2".
+* A link inside running text is underlined, as WCAG 1.4.1 asks (axe
+  `link-in-text-block` on Design).
+
 ## Demos
 
-* The Likert answers of 6 demos lean towards agreement, as real answers
-  do: `likert_scale`, `factor_structure`, `sem_pls`, `citing_sources`,
-  `weighted_survey` and the satisfaction item of `logistic`. Each item now
-  peaks at "Agree", with a mean near 3.6 and an SD near 1, and a reverse
-  worded item leans the other way. The generator cut its latent scores into
-  5 equal shares, so every point held about 20 per cent of the answers and
-  every bar chart came out flat. The instruments and their hashes are
-  unchanged, the effects each demo teaches hold, and the reference results
-  are regenerated.
+* The Likert answers of 7 demos are simulated to the shape of published
+  data, so their charts and tables look like a real survey's: `likert_scale`,
+  `matrix_likert`, `factor_structure`, `sem_pls`, `citing_sources`,
+  `weighted_survey` and the satisfaction item of `logistic`. No published
+  data ships. The simulators take each item's category shares, its
+  correlations with the other items of its scale and the size of the paths
+  between constructs from 2 datasets used in many textbooks: the Big Five
+  items of `psych::bfi` (Revelle) and the ECSI mobile phone data of
+  `seminr::mobi`. Items are drawn together at those correlations and cut at
+  those shares, so they come out ordinal, skewed and correlated as real
+  items are. `likert_scale` now carries a weak reverse worded item, as bfi's
+  Agreeableness scale does, with alpha .69 against bfi's own .69,
+  `factor_structure` has the uneven loadings of real items, and in
+  `sem_pls` satisfaction carries nearly all of content quality's effect on
+  intention, with 1 weak intention item ("I would pay to attend again")
+  that the PLS and CFA checks flag. The generator first cut its latent
+  scores into 5 equal shares, which made every bar chart flat. The
+  instruments and their hashes are unchanged, and the responses and
+  reference results are regenerated. The calibration is in the tracked
+  `data-raw/demo_calibration.R`.
 * The all-types demo's text block says what a text block does: "A text block gives respondents information, such as
   an instruction or a consent statement. It collects no answer." It read as
   placeholder text in SurveyStudio's question list. The file has a new hash.

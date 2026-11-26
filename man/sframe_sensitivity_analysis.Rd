@@ -31,8 +31,8 @@ criterion.}
 \item{method}{Ranking method. One of \code{"topsis"}, \code{"vikor"}, \code{"moora"},
 \code{"smart"}, \code{"waspas"}, \code{"promethee"} or \code{"electre"}.}
 
-\item{delta}{Perturbation size as a proportion of the weight, default
-\code{0.05}. A weight of 0.40 with \code{delta = 0.05} is tested at 0.42 and 0.38
+\item{delta}{Perturbation size as a proportion of the weight. Defaults
+to 0.05. A weight of 0.40 with \code{delta = 0.05} is tested at 0.42 and 0.38
 before renormalisation.}
 
 \item{alternatives}{Optional labels for the rows of \code{x}.}
@@ -83,7 +83,6 @@ Other Decision analysis functions:
 \code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}},
 \code{\link[=sframe_collected_weights]{sframe_collected_weights()}},
 \code{\link[=sframe_decision_options]{sframe_decision_options()}},
-\code{\link[=sframe_dematel_compute]{sframe_dematel_compute()}},
 \code{\link[=sframe_rated_matrix]{sframe_rated_matrix()}}
 }
 \concept{Decision analysis functions}

@@ -4,7 +4,7 @@
 #'
 #' Creates a scale definition that groups items and specifies how composite
 #' scores are computed. The scale carries scoring rules used by [score_scales()]
-#' and measurement structure used by [sframe_reliability_results()], [sframe_item_results()],
+#' and measurement structure used by [sframe_reliability_results()], [sframe_item_results()]
 #' and [sframe_syntax_cfa()].
 #'
 #' @param id Character. A unique identifier for this scale. Referenced in the

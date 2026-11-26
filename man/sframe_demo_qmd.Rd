@@ -11,7 +11,8 @@ sframe_demo_qmd(name, dir = ".", overwrite = FALSE)
 
 \item{dir}{Directory to write into. Defaults to the working directory.}
 
-\item{overwrite}{Logical. Overwrite an existing file of the same name.}
+\item{overwrite}{Logical. Whether to overwrite an existing file of the
+same name. Defaults to \code{FALSE}.}
 }
 \value{
 The path written, invisibly.

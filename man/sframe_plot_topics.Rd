@@ -10,18 +10,19 @@ sframe_plot_topics(result, palette = c("web", "print"))
 \item{result}{A \code{topic_model_lda} or \code{stm_topics} result list from
 \code{\link[=run_analysis_plan]{run_analysis_plan()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no usable
 table.
 }
 \description{
-Serves both \code{\link[=sframe_run_topic_model_lda]{sframe_run_topic_model_lda()}} and \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}}
-results with no dispatch on \code{result$test}: both runners emit a \verb{$table}
-with the same \code{topic}/\code{term}/\code{beta} columns (LDA's beta from
+Draws the top terms of each topic from a \code{topic_model_lda} or
+\code{stm_topics} block of \code{\link[=run_analysis_plan]{run_analysis_plan()}}. Both methods give a \verb{$table}
+with the same \code{topic}, \code{term} and \code{beta} columns (LDA's beta from
 \code{tidytext::tidy()}, STM's from its fitted word-topic distribution), so
-this function reads that shared shape directly.
+the plot reads either one the same way.
 }
 \examples{
 \donttest{
@@ -35,7 +36,7 @@ if (requireNamespace("ggplot2", quietly = TRUE) &&
 }
 }
 \seealso{
-\code{\link[=sframe_run_topic_model_lda]{sframe_run_topic_model_lda()}}, \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}}
+\code{\link[=run_analysis_plan]{run_analysis_plan()}}, \code{\link[=sframe_extract_quotes]{sframe_extract_quotes()}}
 
 Other Chart functions:
 \code{\link[=plot.sframe_analysis_results]{plot.sframe_analysis_results()}},

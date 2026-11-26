@@ -30,7 +30,8 @@ When NULL (default), all scales in the instrument are included.}
 \value{
 An object of class \code{sframe_reliability_report}, a list with one
 element per scale. Each element holds \code{scale_id}, \code{label}, \code{n_items},
-\code{n}, \code{alpha}, \code{alpha_std} and \code{alpha_if_deleted}, and with \code{omega = TRUE}, \code{omega_t}, McDonald's omega total from a 1-factor model. Every
+\code{n}, \code{alpha}, \code{alpha_ci} (Feldt's 95\% confidence interval, as \code{lower}
+and \code{upper}), \code{alpha_std} and \code{alpha_if_deleted}, and with \code{omega = TRUE}, \code{omega_t}, McDonald's omega total from a 1-factor model. Every
 display reports alpha and \code{omega_t}. \code{omega_h} is kept for code that
 reads it: in a 1-factor model there are no group factors, so it carries
 no hierarchical meaning and can come out a rounding step above

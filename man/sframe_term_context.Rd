@@ -13,13 +13,13 @@ sframe_term_context(text, term, window = 6L, max_matches = 20L)
 \item{term}{Character. A single keyword to search for.}
 
 \item{window}{Integer. Maximum number of words of context to keep before
-and after each match. Default \code{6}.}
+and after each match. Defaults to 6.}
 
 \item{max_matches}{Integer. Maximum number of matches to return, counted
-across all responses. Default \code{20}.}
+across all responses. Defaults to 20.}
 }
 \value{
-A data.frame with columns \code{respondent}, \code{before}, \code{match}, and
+A data.frame with columns \code{respondent}, \code{before}, \code{match} and
 \code{after}.
 }
 \description{

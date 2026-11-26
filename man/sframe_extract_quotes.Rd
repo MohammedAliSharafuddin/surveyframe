@@ -7,32 +7,30 @@
 sframe_extract_quotes(model, text, n_quotes = 3L)
 }
 \arguments{
-\item{model}{A \code{stm_topics} result list from \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}}
-(the whole \code{result} list, which holds the fitted model in \code{result$fit}).}
+\item{model}{An \code{stm_topics} result from \code{\link[=run_analysis_plan]{run_analysis_plan()}}, the whole
+result list, which holds the fitted model in \code{result$fit}.}
 
-\item{text}{The response vector the topic model was fit on: either the
-raw vector (one entry per original data row, indexed 1:1 by row
-number) or the \code{\link[=sframe_clean_text]{sframe_clean_text()}}-cleaned vector, which drops
-blank/missing rows and is therefore \emph{shorter}, its positions no
-longer equal original row numbers once any earlier row was dropped.
-Both forms work correctly: when \code{text} carries the \code{respondent}
-attribute \code{\link[=sframe_clean_text]{sframe_clean_text()}} sets, that mapping is used to find
-each quote's real position, and otherwise \code{text} is assumed to be the raw,
-1:1-indexed vector.}
+\item{text}{The response vector the topic model was fitted on: either the
+raw vector, 1 entry per original data row, or the vector
+\code{\link[=sframe_clean_text]{sframe_clean_text()}} returns. The cleaned vector drops blank and missing
+rows, so it can be shorter than the data. Both forms work: when \code{text}
+carries the \code{respondent} attribute that \code{\link[=sframe_clean_text]{sframe_clean_text()}} sets, that
+mapping finds each quote's row, and otherwise \code{text} is taken to be the
+raw vector.}
 
-\item{n_quotes}{Integer. Quotes to return per topic. Default \code{3L}.}
+\item{n_quotes}{Integer. Quotes to return per topic. Defaults to 3.}
 }
 \value{
 A data.frame with columns \code{topic}, \code{rank}, \code{respondent} (the
 original row index in the data the model's \code{text} argument came from,
-not a document-matrix or corpus row index), and \code{quote}.
+not a document-matrix or corpus row index) and \code{quote}.
 }
 \description{
-Takes the result of \code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}} (not a raw \code{stm} model
-object) and, for each topic, pulls the top \code{n_quotes} documents by
-topic-document probability using \code{stm::findThoughts()}, then maps each
-one back to its original respondent row via the mapping
-\code{\link[=sframe_run_stm_topics]{sframe_run_stm_topics()}} stored on \code{result$fit}.
+Takes an \code{stm_topics} result from \code{\link[=run_analysis_plan]{run_analysis_plan()}} (not a raw \code{stm}
+model object) and, for each topic, pulls the top \code{n_quotes} documents by
+topic-document probability using \code{stm::findThoughts()}. Each quote is
+mapped back to its original respondent row through the mapping the
+result stores on \code{result$fit}.
 }
 \examples{
 \donttest{

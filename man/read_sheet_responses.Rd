@@ -34,7 +34,7 @@ included.}
 }
 \value{
 A \code{data.frame} validated against the instrument, ready for
-\code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}}, and \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}.
+\code{\link[=sframe_quality_results]{sframe_quality_results()}}, \code{\link[=score_scales]{score_scales()}} and \code{\link[=sframe_reliability_results]{sframe_reliability_results()}}.
 }
 \description{
 Reads response data collected by the surveyframe Google Apps Script

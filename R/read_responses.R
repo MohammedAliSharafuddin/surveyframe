@@ -12,7 +12,7 @@
 #' A single-answer item has 1 column named by its ID. A matrix, ranking,
 #' multiple-choice or decision item has 1 column per row, option, pair or
 #' criterion, named `item__sub`, and each is checked: a battery with some of its
-#' columns absent is reported by name. 2 columns with the same name are
+#' columns absent is reported by name. Two columns with the same name are
 #' refused, since one would otherwise be lost.
 #'
 #' A choice set with `allow_other` ("Other, please specify") adds
@@ -46,7 +46,7 @@
 #' go through the same conversion, so a CSV file and a data frame holding the
 #' same responses read the same.
 #'
-#' @param x A file path to a delimited text file, a `data.frame`, or a `tibble`.
+#' @param x A file path to a delimited text file, a `data.frame` or a `tibble`.
 #' @param instrument An `sframe` object created by [sframe_instrument()].
 #' @param respondent_id Character or NULL. The name of the column containing
 #'   unique respondent identifiers. If NULL, no respondent ID column is
@@ -198,12 +198,6 @@ read_responses <- function(
     }
     length(present) > 0
   }, logical(1))]
-  if (length(partial) > 0) {
-    sframe_warn_missing(paste0(
-      sframe_count_noun(length(partial), "expansion column"),
-      sframe_plural(length(partial), " is", " are"), " absent from the response data ",
-      "for items whose other columns are present: ", paste(partial, collapse = ", ")))
-  }
 
   # Detect R's automatic name repair before reporting the corresponding
   # declared expansion columns as missing. In strict mode the import cannot
@@ -212,16 +206,25 @@ read_responses <- function(
   undeclared <- setdiff(data_cols,
                         c(item_ids, expanded_ids, display_item_ids, declared))
   known <- c(item_ids, expanded_ids, display_item_ids, declared)
-  mangled <- undeclared[make.names(undeclared) == undeclared &
-                          undeclared %in% make.names(known)]
+  # A rewritten header: R's name repair (read.csv() without check.names =
+  # FALSE), or a tool that replaced the underscores or spaces in a name,
+  # leaves a column that matches a declared one once only its letters and
+  # digits are compared (H2).
+  name_key <- function(x) tolower(gsub("[^A-Za-z0-9]", "", x))
+  known_keys <- name_key(known)
+  mangled <- undeclared[(make.names(undeclared) == undeclared &
+                           undeclared %in% make.names(known)) |
+                          (name_key(undeclared) %in% known_keys &
+                             nzchar(name_key(undeclared)))]
   hint <- if (length(mangled) > 0) {
-    originals <- known[make.names(known) %in% mangled]
+    originals <- known[match(name_key(mangled[1]), known_keys)]
     paste0(
-      " ", length(mangled), " of these match a declared column after R's",
-      " name repair (for example '", originals[1], "' became '",
+      " ", length(mangled), " of these match a declared column apart from",
+      " punctuation, as R's name repair leaves them (for example '", originals[1], "' became '",
       mangled[1], "'), so the header was most likely rewritten on import.",
       " Re-read the file with check.names = FALSE, as in",
-      " read.csv(path, check.names = FALSE)."
+      " read.csv(path, check.names = FALSE), or put the original column",
+      " names back."
     )
   } else {
     ""
@@ -232,6 +235,14 @@ read_responses <- function(
       paste(undeclared, collapse = ", "),
       ". Declare them in meta_cols or set strict = FALSE.", hint
     ))
+  }
+
+  # After the name-repair check, so a strict read stops on the cause first.
+  if (length(partial) > 0) {
+    sframe_warn_missing(paste0(
+      sframe_count_noun(length(partial), "expansion column"),
+      sframe_plural(length(partial), " is", " are"), " absent from the response data ",
+      "for items whose other columns are present: ", paste(partial, collapse = ", ")))
   }
 
   # Check required item columns are present.

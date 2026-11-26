@@ -12,7 +12,7 @@ sframe_add_model(instrument, model, validate = TRUE, replace = TRUE)
 \item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object.}
 
 \item{validate}{Logical. Whether to validate the model against the
-instrument before adding it.}
+instrument before adding it. Defaults to \code{TRUE}.}
 
 \item{replace}{Logical. Whether to replace an existing model with the same
 ID. Defaults to \code{TRUE}.}

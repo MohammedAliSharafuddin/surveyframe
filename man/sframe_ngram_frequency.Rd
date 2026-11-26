@@ -10,16 +10,16 @@ sframe_ngram_frequency(text, n = 2L, stop_words = NULL, top_n = 30L)
 \item{text}{Character vector of responses (raw or already cleaned by
 \code{\link[=sframe_clean_text]{sframe_clean_text()}}).}
 
-\item{n}{Integer. N-gram size. Default \code{2} (bigrams).}
+\item{n}{Integer. N-gram size. Defaults to 2 (bigrams).}
 
 \item{stop_words}{Character vector of words to exclude, or \code{NULL} to use
 the built-in English list, or \code{character(0)} for no filtering.}
 
 \item{top_n}{Integer. Maximum number of n-grams to return, most frequent
-first. Default \code{30}.}
+first. Defaults to 30.}
 }
 \value{
-A data.frame with columns \code{term} (the space-joined n-gram), \code{n},
+A data.frame with columns \code{term} (the space-joined n-gram), \code{n}
 and \code{pct}.
 }
 \description{

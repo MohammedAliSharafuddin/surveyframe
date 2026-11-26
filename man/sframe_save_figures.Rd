@@ -7,8 +7,8 @@
 sframe_save_figures(
   results,
   dir,
-  width = 7,
-  height = 4.5,
+  width = 6.5,
+  height = 4,
   dpi = 300,
   format = c("png", "tiff", "jpeg", "pdf", "svg")
 )
@@ -19,9 +19,10 @@ sframe_save_figures(
 
 \item{dir}{Directory to write into. Created when absent.}
 
-\item{width, height}{Size in inches. Default 7 by 4.5.}
+\item{width, height}{Size in inches. Defaults to 6.5 by 4, the size the charts
+are fitted to.}
 
-\item{dpi}{Resolution in dots per inch, for the raster formats. Default 300.}
+\item{dpi}{Resolution in dots per inch, for the raster formats. Defaults to 300.}
 
 \item{format}{One of \code{"png"} (default), \code{"tiff"}, \code{"jpeg"}, \code{"pdf"} or
 \code{"svg"}.}

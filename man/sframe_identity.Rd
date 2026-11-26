@@ -13,7 +13,7 @@ component, and \code{sframe_label()} returns its label.
 }
 \examples{
 item <- sframe_item("q1", "How satisfied are you?", type = "likert",
-                choice_set = "agree5")
+                    choice_set = "agree5")
 sframe_id(item)
 sframe_label(item)
 }

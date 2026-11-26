@@ -17,7 +17,7 @@ sframe_path(from, to, label = NULL)
 An object of class \code{sf_path}.
 }
 \description{
-Declares that 1 construct predicts another, the arrow from \code{from} to \code{to}
+Declares that 1 construct predicts another, the arrow from construct \code{from} to construct \code{to}
 in a structural model.
 }
 \examples{

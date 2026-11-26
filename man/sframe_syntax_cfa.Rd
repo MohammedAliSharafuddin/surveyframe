@@ -22,9 +22,11 @@ scales when \code{model} is not supplied.}
 
 \item{scales}{Optional scale IDs when deriving a model from an instrument.}
 
-\item{ordered}{Logical. Whether to add an ordered-item note.}
+\item{ordered}{Logical. Whether to add an ordered-item note. Defaults to
+\code{FALSE}.}
 
-\item{std_lv}{Logical. Whether to add a \code{std.lv = TRUE} note.}
+\item{std_lv}{Logical. Whether to add a \code{std.lv = TRUE} note. Defaults to
+\code{TRUE}.}
 
 \item{residual_covariances}{Optional list of \code{\link[=sframe_covariance]{sframe_covariance()}} objects for
 correlated residuals.}
@@ -36,10 +38,10 @@ covariances supplied in \code{model}.}
 A lavaan syntax string.
 }
 \description{
-The general entry point for CFA syntax. It takes an instrument, and derives
-the constructs from its scales, or an \code{\link[=sframe_model_spec]{sframe_model_spec()}} declaring constructs that
-cut across them, and it accepts correlated residuals and latent
-covariances.
+The general entry point for CFA syntax. It takes either an instrument,
+deriving the constructs from its scales, or an \code{\link[=sframe_model_spec]{sframe_model_spec()}}
+declaring constructs that cut across them. It accepts correlated residuals
+and latent covariances.
 }
 \details{
 Each generator emits the language its engine reads, so they stay separate:
@@ -49,7 +51,7 @@ seminr, and \code{\link[=sframe_syntax_efa]{sframe_syntax_efa()}} writes an expl
 \examples{
 demo <- sframe_demo("sem_pls")
 syntax <- sframe_syntax_cfa(demo$instrument,
-                             scales = c("content_quality", "satisfaction"))
+                            scales = c("content_quality", "satisfaction"))
 cat(syntax)
 }
 \seealso{

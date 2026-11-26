@@ -17,7 +17,7 @@ from. Defaults to \code{"scored"}, the scored frame the header sets up.}
 
 \item{header}{Logical. Whether to include the lines that load the
 instrument, read the responses and score the scales. \code{TRUE} gives a script
-that runs on its own.}
+that runs on its own. Defaults to \code{FALSE}.}
 }
 \value{
 A character vector of R code lines, or \code{NULL} for a method this does
@@ -38,8 +38,7 @@ the generated code and comparing.
 }
 \section{What it covers}{
 The 2-group, paired, k-group, correlation, regression and categorical
-families, and descriptives. \code{sframe_syntax_methods} lists them. A method
-outside that list returns \code{NULL}: the model families carry their own syntax
+families, and descriptives. A method outside these returns \code{NULL}: the model families carry their own syntax
 already, through \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}} and its neighbours, and for the rest the
 computation has no single base-R equivalent to show honestly.
 }

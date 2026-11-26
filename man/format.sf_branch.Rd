@@ -19,7 +19,7 @@ Gives a branching rule as 1 line: the question it controls, the question it
 depends on, the operator and the value.
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
 \code{\link[=format.sf_item]{format.sf_item()}},
@@ -41,4 +41,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_scale]{summary.sf_scale()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

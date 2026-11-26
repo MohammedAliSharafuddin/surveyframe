@@ -16,7 +16,7 @@
 #'
 #' @param path Character. The file to show.
 #' @param quiet Logical. When `TRUE`, nothing is printed when the file is not
-#'   opened.
+#'   opened. Defaults to `FALSE`.
 #' @param option Character or `NULL`. The name of an option that, set to
 #'   `FALSE`, keeps the file closed, for a function with its own switch.
 #' @return `TRUE` when the file was opened, `FALSE` otherwise, invisibly.

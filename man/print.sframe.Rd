@@ -16,17 +16,17 @@
 }
 \description{
 Displays a compact summary of an \code{sframe} instrument object, showing
-the title, version, item count, scale count, and validation status. The
+the title, version, item count, scale count and validation status. The
 status comes from running \code{\link[=validate_sframe]{validate_sframe()}} on \code{x} as it prints.
 }
 \examples{
 item <- sframe_item("q1", "How satisfied are you?", type = "likert",
-                choice_set = "agree5")
+                    choice_set = "agree5")
 instr <- sframe_instrument("My Survey", components = list(item))
 print(instr)
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
@@ -48,4 +48,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_scale]{summary.sf_scale()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

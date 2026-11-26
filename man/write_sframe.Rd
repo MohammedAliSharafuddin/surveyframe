@@ -36,8 +36,8 @@ The file path, invisibly.
 }
 \description{
 Serialises an \code{sframe} instrument object to a UTF-8 JSON file with a
-SHA-256 integrity hash. The instrument is always validated before writing,
-and writes an instrument that passes validation. The hash is computed over the content
+SHA-256 integrity hash. The instrument is always validated first, and only
+an instrument that passes validation is written. The hash is computed over the content
 with \code{hash.value} set to an empty string, in the canonical form of RFC 8785,
 the JSON Canonicalization Scheme: keys sorted, numbers in their shortest form
 and whitespace removed. It identifies content independently of the exact bytes, and

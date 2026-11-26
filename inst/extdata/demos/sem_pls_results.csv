@@ -1,7 +1,7 @@
 "block","method","quantity","value"
 "RQ1","sem_lavaan_syntax","apa","CB-SEM lavaan syntax generated. (demonstration data)"
 "RQ2","seminr_syntax","apa","PLS-SEM seminr syntax generated. (demonstration data)"
-"RQ3","mediation","apa","Indirect effect = 0.144, 95% bootstrap CI [0.067, 0.233], from 1000 of 1000 resamples. (demonstration data)"
+"RQ3","mediation","apa","Indirect effect = 0.253, 95% bootstrap CI [0.079, 0.449], from 1000 of 1000 resamples. (demonstration data)"
 "RQ4","cfa_lavaan_syntax","apa","CFA lavaan syntax generated. (demonstration data)"
 "RQ5","pls_sem","apa","PLS-SEM seminr syntax generated. (demonstration data)"
 "RQ6","moderation","apa","Moderation was tested with a linear interaction model. (demonstration data)"

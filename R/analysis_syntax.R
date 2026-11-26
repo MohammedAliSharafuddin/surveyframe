@@ -315,8 +315,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #' # What it covers
 #'
 #' The 2-group, paired, k-group, correlation, regression and categorical
-#' families, and descriptives. `sframe_syntax_methods` lists them. A method
-#' outside that list returns `NULL`: the model families carry their own syntax
+#' families, and descriptives. A method outside these returns `NULL`: the model families carry their own syntax
 #' already, through [sframe_syntax_cfa()] and its neighbours, and for the rest the
 #' computation has no single base-R equivalent to show honestly.
 #'
@@ -327,7 +326,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
 #'   from. Defaults to `"scored"`, the scored frame the header sets up.
 #' @param header Logical. Whether to include the lines that load the
 #'   instrument, read the responses and score the scales. `TRUE` gives a script
-#'   that runs on its own.
+#'   that runs on its own. Defaults to `FALSE`.
 #'
 #' @return A character vector of R code lines, or `NULL` for a method this does
 #'   not cover. For more than 1 block, a named list of such vectors.

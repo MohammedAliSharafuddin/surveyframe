@@ -15,13 +15,16 @@ sframe_syntax_efa(
 \arguments{
 \item{items}{Character vector of item IDs.}
 
-\item{nfactors}{Number of factors.}
+\item{nfactors}{Integer. Number of factors. Defaults to 1.}
 
-\item{extraction}{Extraction method.}
+\item{extraction}{Extraction method: \code{"minres"} (the default), \code{"pa"} or
+\code{"ml"}.}
 
-\item{rotation}{Rotation method.}
+\item{rotation}{Rotation method: \code{"oblimin"} (the default), \code{"promax"}
+or \code{"varimax"}.}
 
-\item{data_name}{Name of the data object in generated R code.}
+\item{data_name}{Name of the data object in generated R code. Defaults to
+\code{"data"}.}
 }
 \value{
 A character string with R syntax.

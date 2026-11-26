@@ -31,12 +31,14 @@ least 2 levels.}
 \item{n_profiles}{Number of profiles to keep. Required for \code{"balanced"}
 and \code{"random"}, ignored for \code{"full"}.}
 
-\item{n_alternatives}{Alternatives shown per choice task, default 2.}
+\item{n_alternatives}{Integer. Alternatives shown per choice task. Defaults
+to 2.}
 
 \item{n_tasks}{Choice tasks per block. Defaults to as many whole tasks as
 the profile set supports.}
 
-\item{blocks}{Number of blocks the tasks are split across, default 1.}
+\item{blocks}{Integer. Number of blocks the tasks are split across.
+Defaults to 1.}
 
 \item{seed}{Integer seed. Generated and stored when omitted.}
 
@@ -66,7 +68,7 @@ returns the identical profiles and tasks.
 
 \code{"full"} enumerates every combination, which is exact but grows fast: 4
 attributes at 3 levels each is 81 profiles. \code{"random"} takes a seeded
-random subset of that size. \code{"balanced"} samples repeatedly and keeps the
+random subset of \code{n_profiles} of them. \code{"balanced"} samples repeatedly and keeps the
 subset with the most even level spread and the weakest association between
 attributes.
 

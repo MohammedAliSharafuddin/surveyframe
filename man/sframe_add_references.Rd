@@ -12,7 +12,8 @@ sframe_add_references(instrument, ..., replace = FALSE)
 \item{...}{\code{sf_reference} objects, or lists of them such as
 \code{\link[=read_bibtex]{read_bibtex()}} returns.}
 
-\item{replace}{Logical. Replace a reference with the same id.}
+\item{replace}{Logical. Whether to replace a reference with the same id.
+Defaults to \code{FALSE}.}
 }
 \value{
 The instrument, with the references added.

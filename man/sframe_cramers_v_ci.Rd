@@ -26,11 +26,12 @@ are \code{NA} when the table holds fewer than 3 observations or has fewer than
 The noncentrality interval for the association strength in a contingency
 table, as \code{effectsize::cramers_v(adjust = FALSE, alternative = "two.sided")} computes it: the 2-sided interval for the noncentrality of
 the chi-square statistic, each bound turned into V as
-\eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
+\ifelse{html}{\out{&radic;(&lambda; / (n(k &minus; 1)))}}{\eqn{\sqrt{\lambda / (n (k - 1))}}{sqrt(lambda / (n(k - 1)))}},
+where k is the smaller of the number
 of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
 0 when the test is far from significant. Until 0.4.3 this was a percentile
 bootstrap, whose resampled V is 0 or above, so an exactly independent
-table had the interval [0.05, 0.50] beside V = 0 (FR-24).
+table had the interval [0.05, 0.50] beside V = 0.
 }
 \examples{
 sframe_cramers_v_ci(table(mtcars$am, mtcars$cyl))

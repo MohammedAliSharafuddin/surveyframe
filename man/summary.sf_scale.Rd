@@ -19,7 +19,7 @@ Prints the scale's 1-line format, then its scoring method and how many
 answered items a score needs.
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
@@ -41,4 +41,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_model]{summary.sf_model()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

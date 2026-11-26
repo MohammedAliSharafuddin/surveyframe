@@ -10,27 +10,26 @@ Authors@R: c(
       comment = c(ORCID = "0000-0001-5247-2964")
     )
   )
-Description: Design a questionnaire, declare its analysis plan, seal
-    both in 1 verifiable file, then check responses and report from the
-    plan. An instrument, an analysis plan declared before data collection, and a
-    measurement or structural model are held together in one typed,
+Description: Design a questionnaire, declare its analysis plan and seal
+    both in 1 verifiable file, then check the responses and report from
+    that plan. The instrument, an analysis plan declared before data
+    collection and a measurement or structural model are held in 1 typed,
     integrity-checked object (the 'sframe'), so a study's confirmatory
-    tests are fixed before responses arrive rather than chosen
-    afterward. Includes
-    visual instrument design via a browser-based builder or 'Shiny'
-    studio, export to a self-contained static HTML survey, an embeddable
-    'Shiny' module, SHA-256 integrity-checked serialisation to the
-    '.sframe' format, multi-page survey rendering with branching logic,
-    response quality checking, scale scoring, psychometric diagnostics,
-    analysis-plan execution, model syntax generation for EFA, CFA,
-    CB-SEM, and PLS-SEM, an interactive response dashboard, codebook
-    generation, and reproducible HTML reporting. Also supports
-    multi-criteria decision analysis (AHP, ANP, DEMATEL, TOPSIS, VIKOR,
-    MOORA, SMART, WASPAS, PROMETHEE II, ELECTRE I), small-sample survey
-    helpers, and text and open-ended response analysis (term and n-gram
-    frequency, keyword in context, co-occurrence and co-occurrence
-    networks, sentiment, document-feature matrices, and topic modelling
-    via LDA or structural topic models).
+    tests are fixed before any response arrives. Includes visual
+    instrument design in a browser-based builder or a 'Shiny' studio,
+    export to a self-contained static HTML survey, an embeddable 'Shiny'
+    module, SHA-256 integrity-checked serialisation to the '.sframe'
+    format, multi-page survey rendering with branching logic, response
+    quality checks, scale scoring, psychometric diagnostics,
+    analysis-plan execution, model syntax for EFA, CFA, CB-SEM and
+    PLS-SEM, an interactive response dashboard, codebooks and
+    reproducible reports. Also supports multi-criteria decision analysis
+    (AHP, ANP, DEMATEL, TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE II
+    and ELECTRE I) and small-sample methods (Hodges-Lehmann estimates,
+    exact odds ratios and Firth logistic regression). Open-ended
+    responses are analysed by term and n-gram frequency, keyword in
+    context, co-occurrence networks, sentiment, document-feature
+    matrices and topic models (LDA or structural topic models).
 License: MIT + file LICENSE
 URL: https://surveyframe.org,
     https://github.com/MohammedAliSharafuddin/surveyframe

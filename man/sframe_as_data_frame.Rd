@@ -50,11 +50,11 @@ returns its items, and its choice sets and scales come from
 }
 
 \examples{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-item  <- sframe_item("sat_1", "The service met my expectations.",
-                 type = "likert", choice_set = "ag5", scale_id = "sat")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+item <- sframe_item("sat_1", "The service met my expectations.",
+                    type = "likert", choice_set = "ag5", scale_id = "sat")
 scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 

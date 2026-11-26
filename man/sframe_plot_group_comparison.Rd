@@ -7,12 +7,13 @@
 sframe_plot_group_comparison(result, data, palette = c("web", "print"))
 }
 \arguments{
-\item{result}{A result list from one of the 4 runners above, with
+\item{result}{A result list from one of the 4 methods above, with
 \code{vars = c(group_column, outcome_column)}.}
 
 \item{data}{The response data frame the result was computed from.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if the columns are missing, fewer
@@ -20,12 +21,10 @@ than 2 groups remain after removing missing values, or ggplot2 is
 unavailable.
 }
 \description{
-Boxplot with jittered points, shared across every runner whose result
-carries \code{vars = c(group_column, outcome_column)}: \code{t_test_ind},
-\code{mann_whitney}, \code{kruskal_wallis} and \code{anova_one}. 1 function serves all
-4, since the underlying comparison (an outcome split by a grouping
-factor) and the data shape needed to plot it are identical across all
-4 tests, and only the inferential statistic differs.
+Boxplot with jittered points for a \code{t_test_ind}, \code{mann_whitney},
+\code{kruskal_wallis} or \code{anova_one} block, whose result carries
+\code{vars = c(group_column, outcome_column)}. The 4 tests compare the same
+thing, an outcome split by a grouping factor, so 1 chart serves them all.
 }
 \examples{
 \donttest{

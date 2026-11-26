@@ -155,7 +155,7 @@ sframe_lavaan_safe_label <- function(label) {
 #' @export
 #' @examples
 #' sq <- sframe_construct("sq", "Service Quality",
-#'                     items = c("sq_1", "sq_2", "sq_3"))
+#'                        items = c("sq_1", "sq_2", "sq_3"))
 #' sq$mode
 #' sq$items
 #' @family Models and syntax functions
@@ -184,7 +184,7 @@ sframe_construct <- function(
 
 #' Define a structural path between constructs
 #'
-#' Declares that 1 construct predicts another, the arrow from `from` to `to`
+#' Declares that 1 construct predicts another, the arrow from construct `from` to construct `to`
 #' in a structural model.
 #'
 #' @param from Source construct ID.
@@ -266,7 +266,7 @@ sframe_indirect_effect <- function(from, through, to, label = NULL) {
 #'
 #' @param id Model identifier.
 #' @param label Human-readable model label.
-#' @param type Model type. One of `"efa"`, `"cfa"`, `"cb_sem"`, or
+#' @param type Model type. One of `"efa"`, `"cfa"`, `"cb_sem"` or
 #'   `"pls_sem"`.
 #' @param engine Optional engine name. Defaults to `"lavaan"` for CFA/CB-SEM
 #'   and `"seminr"` for PLS-SEM.
@@ -553,7 +553,8 @@ sframe_model_validation_checks <- c(
 #' it can be read, compared or shared outside R.
 #'
 #' @param model An [sframe_model_spec()] object.
-#' @param pretty Logical. Whether to pretty-print the JSON.
+#' @param pretty Logical. Whether to pretty-print the JSON. Defaults to
+#'   `TRUE`.
 #'
 #' @return A JSON string.
 #' @export
@@ -576,7 +577,7 @@ sframe_model_json <- function(model, pretty = TRUE) {
 #' @param instrument An `sframe` object.
 #' @param model An [sframe_model_spec()] object.
 #' @param validate Logical. Whether to validate the model against the
-#'   instrument before adding it.
+#'   instrument before adding it. Defaults to `TRUE`.
 #' @param replace Logical. Whether to replace an existing model with the same
 #'   ID. Defaults to `TRUE`.
 #'
@@ -624,16 +625,19 @@ sframe_add_model <- function(instrument, model, validate = TRUE, replace = TRUE)
 #' @param instrument An `sframe` object.
 #' @param items Character vector of item IDs. When `NULL`, scale items are used.
 #' @param scales Optional scale IDs used to select item columns.
-#' @param nfactors Number of factors.
-#' @param extraction Extraction method passed to `psych::fa()`.
-#' @param rotation Rotation method passed to `psych::fa()`.
-#' @param min_loading Minimum salient loading.
+#' @param nfactors Integer. Number of factors. Defaults to 1.
+#' @param extraction Extraction method passed to `psych::fa()`: `"minres"`
+#'   (the default), `"pa"` or `"ml"`.
+#' @param rotation Rotation method passed to `psych::fa()`: `"oblimin"`
+#'   (the default), `"promax"` or `"varimax"`.
+#' @param min_loading Minimum salient loading. Defaults to 0.3.
 #' @param cross_loading Maximum secondary loading before a warning is raised.
+#'   Defaults to 0.3.
 #'
 #' @return An object of class `sframe_efa_solution`. Alongside the psych
 #'   objects it carries 3 tidy data frames ready for plotting and
 #'   reporting: `loadings_long` (item_id, factor, loading),
-#'   `communalities_table` (item_id, communality, uniqueness), and
+#'   `communalities_table` (item_id, communality, uniqueness) and
 #'   `variance_table` (factor, ss_loadings, proportion_var,
 #'   cumulative_var).
 #' @export
@@ -792,10 +796,13 @@ print.sframe_efa_solution <- function(x, ...) {
 #' with psych, ready to copy into a script.
 #'
 #' @param items Character vector of item IDs.
-#' @param nfactors Number of factors.
-#' @param extraction Extraction method.
-#' @param rotation Rotation method.
-#' @param data_name Name of the data object in generated R code.
+#' @param nfactors Integer. Number of factors. Defaults to 1.
+#' @param extraction Extraction method: `"minres"` (the default), `"pa"` or
+#'   `"ml"`.
+#' @param rotation Rotation method: `"oblimin"` (the default), `"promax"`
+#'   or `"varimax"`.
+#' @param data_name Name of the data object in generated R code. Defaults to
+#'   `"data"`.
 #'
 #' @return A character string with R syntax.
 #' @export
@@ -825,10 +832,10 @@ sframe_syntax_efa <- function(
 
 #' Generate lavaan CFA syntax from an instrument or a declared model
 #'
-#' The general entry point for CFA syntax. It takes an instrument, and derives
-#' the constructs from its scales, or an [sframe_model_spec()] declaring constructs that
-#' cut across them, and it accepts correlated residuals and latent
-#' covariances.
+#' The general entry point for CFA syntax. It takes either an instrument,
+#' deriving the constructs from its scales, or an [sframe_model_spec()]
+#' declaring constructs that cut across them. It accepts correlated residuals
+#' and latent covariances.
 #'
 #' Each generator emits the language its engine reads, so they stay separate:
 #' this one and [sframe_syntax_sem()] write lavaan, [sframe_syntax_pls()] writes
@@ -838,8 +845,10 @@ sframe_syntax_efa <- function(
 #'   scales when `model` is not supplied.
 #' @param model Optional [sframe_model_spec()] object.
 #' @param scales Optional scale IDs when deriving a model from an instrument.
-#' @param ordered Logical. Whether to add an ordered-item note.
-#' @param std_lv Logical. Whether to add a `std.lv = TRUE` note.
+#' @param ordered Logical. Whether to add an ordered-item note. Defaults to
+#'   `FALSE`.
+#' @param std_lv Logical. Whether to add a `std.lv = TRUE` note. Defaults to
+#'   `TRUE`.
 #' @param residual_covariances Optional list of [sframe_covariance()] objects for
 #'   correlated residuals.
 #' @param latent_covariances Logical. Whether to include model-level latent
@@ -850,7 +859,7 @@ sframe_syntax_efa <- function(
 #' @examples
 #' demo <- sframe_demo("sem_pls")
 #' syntax <- sframe_syntax_cfa(demo$instrument,
-#'                              scales = c("content_quality", "satisfaction"))
+#'                             scales = c("content_quality", "satisfaction"))
 #' cat(syntax)
 #' @family Models and syntax functions
 sframe_syntax_cfa <- function(
@@ -939,9 +948,11 @@ sframe_syntax_cfa <- function(
 #' model: its measurement part, structural paths, covariances and indirect
 #' effects.
 #'
-#' @param model An [sframe_model_spec()] object of type `"cb_sem"`.
+#' @param model An [sframe_model_spec()] object of type `"cb_sem"`. A
+#'   `"cfa"` model is refused: its syntax comes from [sframe_syntax_cfa()].
 #' @param instrument Optional `sframe` object for indicator validation.
-#' @param standardised Logical. Adds a standardised-estimates fitting note.
+#' @param standardised Logical. Whether to add a standardised-estimates
+#'   fitting note. Defaults to `TRUE`.
 #'
 #' @return A lavaan syntax string.
 #' @export
@@ -959,7 +970,16 @@ sframe_syntax_cfa <- function(
 #' cat(sframe_syntax_sem(m))
 #' @family Models and syntax functions
 sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
-  sframe_check_model_type(model, c("cfa", "cb_sem"), "sframe_syntax_sem()",
+  # A CFA model has no structural part, so it is sframe_syntax_cfa()'s to
+  # write. Accepting it here returned measurement-only syntax headed "CB-SEM"
+  # (J8).
+  if (identical((sframe_model_as_list(model)$type %||% "")[1], "cfa")) {
+    sframe_abort_validation(paste0(
+      "sframe_syntax_sem() writes a structural model and needs a model of ",
+      "type 'cb_sem'. This model is of type 'cfa', a measurement model: ",
+      "write its syntax with sframe_syntax_cfa(model = ...)."))
+  }
+  sframe_check_model_type(model, "cb_sem", "sframe_syntax_sem()",
                           "covariance-based")
   if (!is.null(instrument)) {
     sframe_validate_model(model, instrument = instrument, strict = TRUE)
@@ -1076,9 +1096,11 @@ sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
 #' and structural parts, estimation and bootstrapping.
 #'
 #' @param model An [sframe_model_spec()] object of type `"pls_sem"`.
-#' @param data_name Name of the data object in generated R code.
-#' @param nboot Number of bootstrap samples.
-#' @param seed Random seed for bootstrap syntax.
+#' @param data_name Name of the data object in generated R code. Defaults to
+#'   `"data"`.
+#' @param nboot Number of bootstrap samples. When `NULL`, the model's
+#'   `bootstrap` option, or 5000 when it has none.
+#' @param seed Random seed for bootstrap syntax. Defaults to 123.
 #'
 #' @return An R syntax string for `seminr`.
 #' @export
@@ -1326,6 +1348,7 @@ sframe_bullets <- function(...) paste0("- ", c(...))
 #'
 #' @param model An [sframe_model_spec()] object.
 #' @param include_json Logical. Whether to include the JSON schema block.
+#'   Defaults to `TRUE`.
 #'
 #' @return A character string.
 #' @export

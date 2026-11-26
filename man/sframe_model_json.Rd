@@ -9,7 +9,8 @@ sframe_model_json(model, pretty = TRUE)
 \arguments{
 \item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object.}
 
-\item{pretty}{Logical. Whether to pretty-print the JSON.}
+\item{pretty}{Logical. Whether to pretty-print the JSON. Defaults to
+\code{TRUE}.}
 }
 \value{
 A JSON string.

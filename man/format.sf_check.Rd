@@ -18,7 +18,7 @@ A single character string.
 Gives the check's ID, type and item as 1 line.
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
 \code{\link[=format.sf_item]{format.sf_item()}},
@@ -40,4 +40,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_scale]{summary.sf_scale()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

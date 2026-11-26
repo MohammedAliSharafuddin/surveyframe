@@ -116,13 +116,15 @@ sframe_item_config_problems <- function(item) {
 #' @param type Character. The response type. One of `"likert"`,
 #'   `"single_choice"`, `"multiple_choice"`, `"numeric"`, `"text"`,
 #'   `"textarea"`, `"date"`, `"matrix"`, `"slider"`, `"ranking"`, `"rating"`,
-#'   `"pairwise_comparison"`, `"criteria_weight"`, `"section_break"`, or
+#'   `"pairwise_comparison"`, `"criteria_weight"`, `"section_break"` or
 #'   `"text_block"`.
 #' @param required Logical. Whether the respondent must answer this item.
+#'   Defaults to `FALSE`.
 #' @param choice_set Character or NULL. The `id` of a choice set defined with
 #'   [sframe_choice_set()].
 #' @param scale_id Character or NULL. The `id` of the scale this item belongs to.
 #' @param reverse Logical. Whether this item is reverse-coded within its scale.
+#'   Defaults to `FALSE`.
 #' @param help Character or NULL. Help text displayed beneath the question.
 #' @param placeholder Character or NULL. Placeholder text for text inputs.
 #' @param matrix_items Character vector or NULL. Row labels for `"matrix"` type.
@@ -188,7 +190,7 @@ sframe_item_config_problems <- function(item) {
 #' )
 #'
 #' sec <- sframe_item("sec_1", "Demographic Information", type = "section_break",
-#'                section_intro = "Please answer the following questions.")
+#'                    section_intro = "Please answer the following questions.")
 #' item
 #' sec
 #' @family Design functions

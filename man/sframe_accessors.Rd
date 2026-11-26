@@ -37,11 +37,11 @@ part of it. A component list remains a list. For every
 table an instrument can produce, use \code{\link[=sframe_codebook]{sframe_codebook()}}.
 }
 \examples{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-item  <- sframe_item("sat_1", "The service met my expectations.",
-                 type = "likert", choice_set = "ag5", scale_id = "sat")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+item <- sframe_item("sat_1", "The service met my expectations.",
+                    type = "likert", choice_set = "ag5", scale_id = "sat")
 scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 

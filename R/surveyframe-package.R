@@ -1,4 +1,4 @@
-# The \if{latex} line in @description is for the PDF manual. Inline code is
+# The \if{latex} line in @details is for the PDF manual. Inline code is
 # set in a typewriter font that cannot be hyphenated, so a long function name
 # near the end of a line ran past the right margin, 83 times in 0.4.2's
 # manual. This page is typeset first, which is why it is no longer marked
@@ -6,19 +6,8 @@
 # it. HTML help and pkgdown ignore the line.
 #' surveyframe: Design, Plan, Seal and Report Questionnaire Studies
 #'
-#' @description
+#' @details
 #' \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
-#' surveyframe defines a survey instrument as a first-class R object and
-#' supports a complete workflow from questionnaire design through data
-#' collection, quality checking, scoring, psychometric diagnostics and
-#' reproducible reporting. The package covers static HTML survey export,
-#' an embeddable Shiny survey module, an interactive response dashboard,
-#' a role-based analysis planner with pre-declared research questions, common
-#' survey statistics with small-sample alternatives (Hodges-Lehmann,
-#' pseudomedian, exact odds-ratio and Firth logistic regression), multi-
-#' criteria decision analysis (AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
-#' WASPAS, PROMETHEE, ELECTRE and TOPSIS), and model syntax planning for
-#' EFA, CFA, CB-SEM and PLS-SEM.
 #'
 #' ## Start here
 #'
@@ -120,15 +109,15 @@
 #'   the `sframe_syntax_` generators, the plots and the demo library.
 #'
 #' Lister names use the `sframe_get_` prefix, such as `sframe_get_items()`.
-#' The names used before 0.4.3 still work, silently. See
-#' [superseded].
+#' The names used before 0.4.3 still work, silently. The help page
+#' `?superseded` lists each old name with its replacement.
 #'
 #' ## File format
 #'
 #' Instruments are stored as UTF-8 JSON files with the `.sframe` extension.
 #' Each file includes a SHA-256 integrity hash for reproducibility auditing.
 #'
-#' @family entry points
+#' @family Entry points
 "_PACKAGE"
 
 ## usethis namespace: start

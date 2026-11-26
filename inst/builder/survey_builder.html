@@ -224,7 +224,7 @@
   --t1:var(--sf-ink);--t2:var(--sf-text-2);--t3:var(--sf-text-3);
   --sb:var(--sf-nav);--st:var(--sf-nav-text);--sh:var(--sf-nav-hover);--sa:var(--sf-primary-on-dark);
   --font:var(--sf-font);
-  --th:48px;--sw:224px;--iw:320px;
+  --th:56px;--sw:224px;--iw:320px;
   --d1:100ms;--d2:180ms;--ease:cubic-bezier(.16,1,.3,1);
   /* Corrected 2026-08-21: --r was declared 8px and referenced nowhere, while
      every control hardcoded 6px. It now carries the value actually in use, so
@@ -300,7 +300,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .tb-brand span{color:var(--cp)}
 .tb-modes{display:flex;gap:2px;background:var(--cg);border-radius:10px;padding:3px;
   justify-self:center}
-.m-btn{padding:5px 14px;border-radius:var(--r);font-size:12px;font-weight:500;
+.m-btn{min-height:44px;padding:5px 14px;border-radius:var(--r);font-size:12px;font-weight:500;
   color:var(--t2);transition:all var(--d1)}
 .m-btn[aria-pressed=true]{background:var(--cf);color:var(--cp);font-weight:600;
   box-shadow:0 1px 3px color-mix(in srgb,var(--sf-black) 10%,transparent)}
@@ -313,7 +313,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .tb-doc{font-size:13px;font-weight:600;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32ch}
 .tb-sep{width:1px;height:18px;background:var(--cb)}
 .tb-hist{display:flex;gap:2px}
-.tb-hist button{padding:4px 7px;border-radius:5px;color:var(--t3);
+.tb-hist button{min-height:44px;min-width:44px;padding:4px 7px;border-radius:5px;color:var(--t3);
   font-size:11px;transition:all var(--d1)}
 .tb-hist button:hover:not(:disabled){background:var(--cg);color:var(--t1)}
 .tb-hist button:disabled{opacity:.3;cursor:not-allowed}
@@ -324,9 +324,14 @@ input,textarea,select{font-family:inherit;font-size:13px}
 
 /* -- Buttons -------------------------------------------------------------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  /* 44 px targets (M1, WCAG 2.5.5): the buttons measured 18 to 40 px. */
+  min-height:44px;
   padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:500;
   transition:all var(--d1);white-space:nowrap;border:1.5px solid transparent;cursor:pointer}
 .btn:disabled{cursor:not-allowed}
+/* The shared levels in design_tokens.css set 36, 40 and 0 px, which Studio
+   keeps; the builder's own buttons take 44 (M1). */
+.btn.sf-secondary,.btn.sf-primary,.btn.sf-tertiary,.btn.btn-outline,.btn.btn-default{min-height:44px}
 .btn-gear .gear-ic{font-size:15px;line-height:1;display:inline-block}
 .btn-gear:hover .gear-ic{transform:rotate(45deg);transition:transform var(--d1)}
 
@@ -386,7 +391,11 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-footer .btn.sf-tertiary.sb-cfg-link:focus-visible{outline-color:var(--sf-white)}
 .fi:focus-visible{outline:2px solid var(--sf-white);outline-offset:-2px;background:color-mix(in srgb,var(--sf-white) 7%,transparent);color:var(--cf)}
 .fab-menu{display:none;background:var(--sh);border-radius:var(--r);overflow:hidden;
-  border:1px solid color-mix(in srgb,var(--sf-white) 8%,transparent);max-height:min(460px,58vh);
+  border:1px solid color-mix(in srgb,var(--sf-white) 8%,transparent);
+  /* The whole type menu shows without scrolling at 900 px tall (M3): it
+     takes the sidebar's height less its header, the + Add question button
+     and the link below it, where a fixed 460 px cut the list. */
+  max-height:max(240px,calc(100vh - var(--th) - 200px));
   overflow-y:auto;margin-bottom:6px}
 .fab-menu.open{display:block}
 .fab-menu::-webkit-scrollbar{width:3px}
@@ -421,8 +430,8 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .ic-lbl.blk{color:color-mix(in srgb,var(--sf-white) 55%,transparent);font-style:italic}
 .ic-meta{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
 .ic-acts{display:flex;gap:1px;opacity:0;transition:opacity var(--d1);flex-shrink:0}
-.ic:hover .ic-acts{opacity:1}
-.ib{padding:2px 4px;border-radius:3px;color:color-mix(in srgb,var(--sf-white) 55%,transparent);
+.ic:hover .ic-acts,.ic:focus-within .ic-acts{opacity:1}
+.ib{min-height:44px;min-width:24px;display:inline-flex;align-items:center;justify-content:center;padding:2px 4px;border-radius:3px;color:color-mix(in srgb,var(--sf-white) 55%,transparent);
   font-size:11px;transition:all var(--d1)}
 .ib:hover{background:color-mix(in srgb,var(--sf-white) 10%,transparent);color:var(--cf)}
 .ib.del:hover{background:color-mix(in srgb,var(--sf-danger) 25%,transparent);color:var(--b-del)}
@@ -532,6 +541,10 @@ input,textarea,select{font-family:inherit;font-size:13px}
 
 /* -- Form fields ---------------------------------------------------------- */
 .field{display:flex;flex-direction:column;gap:3px}
+/* A hidden field stays hidden: display:flex above outranked the hidden
+   attribute, so "Describe the method *" showed while the method read Not
+   stated (M2). */
+.field[hidden]{display:none}
 .fl{font-size:11px;font-weight:600;color:var(--t2);
   display:flex;align-items:center;gap:3px}
 .fr{color:var(--cd);font-size:10px}
@@ -655,7 +668,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .an-tab:focus-visible{outline:var(--sf-focus-ring);outline-offset:-3px}
 /* In Plan, + Add plan is the primary, so the item panel's Add question
    steps down to an outlined button (UI-3 item 6). */
-body[data-mode=analyse] .sb-footer .btn.sf-primary,body[data-mode=analyse] .sb-top .btn.sf-primary.sb-settings-cta{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:36px}
+body[data-mode=analyse] .sb-footer .btn.sf-primary,body[data-mode=analyse] .sb-top .btn.sf-primary.sb-settings-cta{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:44px}
 body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
 /* Two panes: the left column carries variables, the output summary, and the
    Model Builder in one scroll; the plans pane takes the rest of the width
@@ -680,6 +693,7 @@ body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav
 .vmeta-badges{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
 .vbadge{font-size:9px;font-weight:700;border-radius:var(--r-pill);padding:2px 5px;
   background:var(--vb-bg);color:var(--vb-fg)}
+.badge.b-ord{background:var(--cw-l);color:var(--fsample-fg)}
 .vbadge.nom{background:var(--cd-l);color:var(--cd-t)}.vbadge.ord{background:var(--cw-l);color:var(--fsample-fg)}
 .vbadge.con{background:var(--cp-l);color:var(--cp-t)}.vbadge.id{background:var(--vb-id-bg);color:var(--vb-id-fg)}
 .vbadge.lik{background:var(--cs-l);color:var(--cs-t)}.vbadge.scl{background:var(--vb-scl-bg);color:var(--vb-scl-fg)}
@@ -1253,6 +1267,14 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
     <div class="field" id="rq-obj-field" hidden><label class="fl" for="rq-obj">Objective served</label><div class="fc"><select id="rq-obj"></select></div><span class="fhint">The study objective this research question answers. Objectives are set in Survey settings, Study.</span></div>
     <div class="field"><label class="fl">Variables and roles</label><div class="vcbs" id="rqVarCBs"></div><div class="role-grid" id="rqRoleFields"></div></div>
+    <!-- M5: a method suggested from 2 variables of any kind, before a method
+         is chosen. The role selects above list only what the current method
+         takes, so a likert item could never be picked beside a numeric one
+         under the Mann-Whitney placeholder, and no suggestion but term
+         frequency was ever reached. -->
+    <div class="field" id="rq-sug-field"><label class="fl" for="rq-sug-a">Not sure which method? Pick 2 variables</label>
+      <div class="frow"><div class="fc"><select id="rq-sug-a" aria-label="First variable for a suggestion" onchange="suggestFromPair()"></select></div>
+      <div class="fc"><select id="rq-sug-b" aria-label="Second variable for a suggestion" onchange="suggestFromPair()"></select></div></div></div>
     <!-- Suggestion box: populated and shown by JS when variables are selected -->
     <div id="rqSuggest" class="suggest-box" style="display:none">
       <span class="sb-ic">&#128161;</span>
@@ -4195,6 +4217,7 @@ function studyFill(s){
   sv('s-pop',typeof sp.population==='string'?sp.population:'');
   sv('s-method',typeof sp.method==='string'?sp.method:'');
   sv('s-other',typeof sp.method_other==='string'?sp.method_other:'');
+  studyMethodSync();
   sv('s-n',sp.planned_n!=null?String(sp.planned_n):'');
   var pr=(s.preregistration&&typeof s.preregistration==='object'&&!Array.isArray(s.preregistration))?s.preregistration:{};
   PREREG_FIELDS.forEach(function(f){sv('s-pr-'+f,typeof pr[f]==='string'?pr[f]:'');});
@@ -4673,10 +4696,29 @@ function sframeSuggestVersion(version,tier){
   return {version:n[0]+'.'+n[1]+'.'+(n[2]+1),
     reason:'A pipeline amendment corrects data or wording, so the patch number moves.'};
 }
+// True when a save changed only wording: the text of questions, help,
+// options or the title, with the same items, codes and structure. Such a
+// change is a wording correction, so the dialog starts on the pipeline tier,
+// where it started on design for every instrument revision (M6).
+var SFRAME_WORDING_KEYS=['label','labels','help','placeholder','text','prompt','description','title','instructions','intro','version'];
+function sframeWordingOnly(o,payload,changed){
+  if(!changed.length)return false;
+  if(changed.some(function(k){return['items','choices','meta'].indexOf(k)<0;}))return false;
+  var strip=function(v){
+    if(Array.isArray(v))return v.map(strip);
+    if(v&&typeof v==='object'){var r={};Object.keys(v).forEach(function(k){if(SFRAME_WORDING_KEYS.indexOf(k)<0)r[k]=strip(v[k]);});return r;}
+    return v;
+  };
+  return changed.every(function(k){
+    var before;try{before=JSON.parse(o.fields[k]);}catch(e){return false;}
+    return sframeCanonStr(strip(before))===sframeCanonStr(strip(payload[k]));
+  });
+}
 // What the amendment dialog is told about a changed save.
 function sframeAmendInfo(o,payload){
   var changed=sframeChangedFields(o,payload),design=sframeDesignChanges(o,payload,changed);
   return {title:S.meta.title,version:o.version,changed_fields:changed,
+    wording_only:design.length===0&&sframeWordingOnly(o,payload,changed),
     design_changes:design,design_forced:design.length>0,
     can_amend:!!(o.baseline&&o.anchor),
     suggest_design:sframeSuggestVersion(o.version,'design'),
@@ -4766,7 +4808,8 @@ function amendModeSync(){
 }
 function amendTierSync(){
   var g=function(id){return document.getElementById(id);},info=_amInfo||{};
-  var tier=info.design_forced?'design':sframeDefaultTier(g('am-code').value);
+  var code=g('am-code').value;
+  var tier=info.design_forced?'design':(info.wording_only&&code==='instrument_revision')?'pipeline':sframeDefaultTier(code);
   g('am-tier').value=tier;g('am-tier').disabled=!!info.design_forced;
   amendTierChg();
 }
@@ -4913,6 +4956,9 @@ function renderItemList(){
     var lc='ic-lbl'+(isSec?' sec':isTxt?' blk':'');
     var bgs=[];
     if(!isSec&&!isTxt)bgs.push('<span class="badge '+(TB[item.type]||'b-nu')+'">'+esc(TL[item.type]||item.type)+'</span>');
+    // A single-choice item on an ordered answer set is ordinal, as the Plan
+    // reads it, and says so in the list (M3).
+    if(item.type==='single_choice'&&csOrdered(item.choice_set))bgs.push('<span class="badge b-ord" title="Ordinal: its answer set is ordered">ORD</span>');
     if(item.required)bgs.push('<span class="badge b-req">Required</span>');
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
     if(item.reverse)bgs.push('<span class="badge b-rv">Reverse-scored</span>');
@@ -4921,15 +4967,30 @@ function renderItemList(){
     // it used to be a plain div with a click handler and no keyboard route to
     // selecting a question for editing. Ordering gains explicit named buttons,
     // since drag handlers alone leave a keyboard user with no way to reorder.
-    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" tabindex="0"'+(selId===item.id?' aria-current="true"':'')+' draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'" title="'+esc(item.label||'')+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
+    return pd+'<div class="ic'+(selId===item.id?' sel':'')+'" role="listitem" tabindex="0"'+(selId===item.id?' aria-current="true"':'')+' draggable="true" data-idx="'+ri+'" data-id="'+esc(item.id)+'" onclick="selItem(\''+item.id+'\')" onkeydown="itemRowKey(event,\''+item.id+'\','+ri+')" ondragstart="dStart(event,'+ri+')" ondragover="dOver(event,'+ri+',event)" ondrop="dDrop(event,'+ri+')" ondragleave="this.classList.remove(\'drag-t\',\'drag-b\')"><div class="ic-h" title="Drag to reorder" aria-hidden="true">&#8942;</div><div class="ic-body"><div class="'+lc+'" title="'+esc(item.label||'')+'">'+esc(item.label||'(no label)')+'</div><div class="ic-meta">'+bgs.join('')+'</div></div><div class="ic-acts"><button type="button" tabindex="-1" class="ib" title="Move up" aria-label="Move question up" onclick="event.stopPropagation();moveItemBy('+ri+',-1)">&#8593;</button><button type="button" tabindex="-1" class="ib" title="Move down" aria-label="Move question down" onclick="event.stopPropagation();moveItemBy('+ri+',1)">&#8595;</button><button type="button" tabindex="-1" class="ib" title="Duplicate" aria-label="Duplicate question" onclick="event.stopPropagation();dupItem(\''+item.id+'\')">&#10697;</button><button type="button" tabindex="-1" class="ib del" title="Delete" aria-label="Delete question" onclick="event.stopPropagation();delItem(\''+item.id+'\')">&#128465;</button></div></div>';
   }).join('')+screenRow('__thankyou');
 }
 function selItem(id){selId=id;renderItemList();openInsp(id);}
 // Enter or Space opens a question for editing; Alt with an arrow moves it, so
 // ordering has a keyboard route alongside the drag handlers. A bare arrow
 // walks the list, leaving the browser's own Tab order intact.
+// P1-11: a row is 1 Tab stop. Its Move, Duplicate and Delete buttons sit
+// outside the Tab order (tabindex -1) and are reached with the right arrow
+// from the row; left and right walk them, and Escape or a left arrow past
+// the first goes back to the row. Enter and Space on a button press it.
 function itemRowKey(e,id,idx){
-  var k=e.key;
+  var k=e.key,row=e.currentTarget;
+  var btns=Array.prototype.slice.call(row.querySelectorAll('.ic-acts .ib'));
+  var bi=btns.indexOf(e.target);
+  if(bi>=0){
+    if(k==='ArrowRight'){e.preventDefault();btns[Math.min(bi+1,btns.length-1)].focus();return;}
+    if(k==='ArrowLeft'){e.preventDefault();if(bi===0)row.focus();else btns[bi-1].focus();return;}
+    if(k==='Escape'){e.preventDefault();row.focus();return;}
+    if(k==='Enter'||k===' '){e.stopPropagation();return;}
+    if(k==='ArrowUp'||k==='ArrowDown'){if(!e.altKey)e.preventDefault();}
+    else return;
+  }
+  if(bi<0&&k==='ArrowRight'&&btns.length){e.preventDefault();btns[0].focus();return;}
   if(k==='Enter'||k===' '){e.preventDefault();selItem(id);return;}
   if(e.altKey&&(k==='ArrowUp'||k==='ArrowDown')){
     e.preventDefault();
@@ -5782,6 +5843,9 @@ function openRQModal(id){
 }
 function popRQVars(roleValues){
   var vars=getAllVars();
+  var opts='<option value="">(choose)</option>'+vars.map(function(v){return'<option value="'+esc(v.id)+'">'+esc(v.label)+'</option>';}).join('');
+  ['rq-sug-a','rq-sug-b'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  var sf=document.getElementById('rq-sug-field');if(sf)sf.hidden=!!editRqId||vars.length<2;
   document.getElementById('rqVarCBs').innerHTML=vars.length?'<span style="font-size:11px;color:var(--t3)">Assign each variable its role in the analysis.</span>':'<span style="font-size:11px;color:var(--t3)">Define items and scales first.</span>';
   renderRoleFields(roleValues||{});
 }
@@ -5858,6 +5922,32 @@ function onTestChg(renderRoles){
 ['crosstab','chi_square'].forEach(function(t){if(ANALYSIS_REGISTRY[t])ANALYSIS_REGISTRY[t].showPercent=true;});
 var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
 function hasTextItems(){return S.items.some(function(i){return i.type==='text'||i.type==='textarea';});}
+// The method for 2 variables, from their measurement levels: 2 likert or
+// ordinal items, or a likert and a numeric one, suggest Spearman; a grouping
+// item and an outcome suggest Mann-Whitney for 2 groups and Kruskal-Wallis for
+// 3 or more; 2 grouping items a chi-square; 2 numeric ones Pearson; a text
+// item term frequency. The suggestion fills the method's roles with the 2.
+function suggestFromPair(){
+  var a=gv('rq-sug-a'),b=gv('rq-sug-b'),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg');
+  if(!a||!b){box.style.display='none';return;}
+  if(a===b){msg.textContent='Pick 2 different variables for a suggestion.';box.style.display='flex';return;}
+  var ca=getVarCat(a),cb=getVarCat(b),sug,order=[a,b];
+  if(ca==='text'||cb==='text'){sug='term_freq';order=[ca==='text'?a:b];}
+  else{
+    sug=TEST_SUGGEST[ca+'+'+cb]||'correlation_pearson';
+    if(sug==='mann_whitney'){
+      var g=ca==='cat'?a:b;order=[g,g===a?b:a];
+      var n=groupLevels(g);if(n!==null&&n>2)sug='kruskal_wallis';
+    }
+  }
+  var reg=ANALYSIS_REGISTRY[sug];if(!reg){box.style.display='none';return;}
+  document.getElementById('rq-test').value=sug;
+  var vals={},rest=order.slice();
+  (reg.roles||[]).forEach(function(r){if(!rest.length)return;vals[r.id]=r.max>1?rest.splice(0):rest.shift();});
+  renderRoleFields(vals);onTestChg(false);
+  msg.textContent=reg.label+' is suggested for '+a+' and '+b+', from their measurement levels.';
+  box.style.display='flex';
+}
 function suggestTest(){
   var sel=flattenRoles(collectRoles()),box=document.getElementById('rqSuggest'),msg=document.getElementById('rqSuggestMsg'),curMethod=document.getElementById('rq-test').value;
   if(sel.length===0){
@@ -5872,9 +5962,11 @@ function suggestTest(){
     // way as the general suggestion below: only on a brand-new plan
     // still on the modal's placeholder default, so it never overrides a
     // plan the user (or a saved plan being edited) already chose.
+    // The nudge names the text methods without switching to one: switching
+    // on open left the plan on term frequency, whose roles list text items
+    // alone, so no other method was ever suggested (M5).
     if(!editRqId&&curMethod==='mann_whitney'&&hasTextItems()){
-      document.getElementById('rq-test').value='term_freq';onTestChg();
-      msg.textContent='This survey has open-ended text items. '+((ANALYSIS_REGISTRY.term_freq||{}).label)+' is suggested as a starting point; pick a different text method above if you meant another one.';
+      msg.textContent='This survey has open-ended text items. For those, '+((ANALYSIS_REGISTRY.term_freq||{}).label)+' is a starting point, under Analysis method. For other questions, pick 2 variables above.';
       box.style.display='flex';
       return;
     }

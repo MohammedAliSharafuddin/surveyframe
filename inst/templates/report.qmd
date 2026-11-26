@@ -417,13 +417,17 @@ if (is.null(prov)) {
 
 ---
 
-## Codebook {#sec-codebook .unnumbered}
+```{r head-codebook, results='asis', echo=FALSE, eval=isTRUE(params$include_codebook)}
+# A section left out with its include_ flag goes with its heading, in the
+# body and the table of contents (L9).
+cat("## Codebook {#sec-codebook .unnumbered}\n\n")
+```
 
 ```{r codebook, eval=params$include_codebook}
 #| tbl-cap: !expr if (out_html) "Survey items"
 cb <- sframe_codebook(instrument)
 apa_kable(content$codebook_items, cap = "Survey items",
-  align = c("l","l","l","l","l","c","c"))
+  align = c("l","l","l","l","l","c","c","l"))
 ```
 
 ```{r codebook-scales, eval=params$include_codebook && nrow(cb$scales_table) > 0}
@@ -465,7 +469,9 @@ apa_kable(cb$models_table, cap = "Measurement and structural models",
 
 ---
 
-## Data Quality {#sec-quality .unnumbered}
+```{r head-quality, results='asis', echo=FALSE, eval=isTRUE(params$include_quality)}
+cat("## Data Quality {#sec-quality .unnumbered}\n\n")
+```
 
 ```{r quality-check, eval=params$include_quality && has_data}
 qr <- sframe_quality_results(responses, instrument)
@@ -519,7 +525,9 @@ apa_kable(sl_df, cap = "Straight-lining by scale", align=c("l","c","r"))
 
 ---
 
-## Missing Data {#sec-missing .unnumbered}
+```{r head-missing, results='asis', echo=FALSE, eval=isTRUE(params$include_missing)}
+cat("## Missing Data {#sec-missing .unnumbered}\n\n")
+```
 
 ```{r missing-data, eval=params$include_missing && has_data}
 #| output: asis
@@ -538,7 +546,9 @@ if (is.null(mr)) {
 
 ---
 
-## Descriptives {#sec-descriptives .unnumbered}
+```{r head-descriptives, results='asis', echo=FALSE, eval=isTRUE(params$include_descriptives)}
+cat("## Descriptives {#sec-descriptives .unnumbered}\n\n")
+```
 
 ```{r descriptives, eval=params$include_descriptives && has_data}
 #| output: asis
@@ -558,7 +568,9 @@ if (!is.list(desc)) {
 
 ---
 
-## Response distributions {#sec-distributions .unnumbered}
+```{r head-distributions, results='asis', echo=FALSE, eval=isTRUE(params$include_descriptives)}
+cat("## Response distributions {#sec-distributions .unnumbered}\n\n")
+```
 
 ```{r distributions, eval=params$include_descriptives && has_data, fig.width=7, fig.height=3.2, fig.align='left'}
 #| output: asis
@@ -580,7 +592,9 @@ for (chart in content$charts) {
 
 ---
 
-## Reliability {#sec-reliability .unnumbered}
+```{r head-reliability, results='asis', echo=FALSE, eval=isTRUE(params$include_reliability)}
+cat("## Reliability {#sec-reliability .unnumbered}\n\n")
+```
 
 ```{r reliability, eval=params$include_reliability && has_data}
 #| output: asis
@@ -614,7 +628,9 @@ if (is.null(rr)) {
 
 ---
 
-## Analysis Plan {#sec-analysis .unnumbered}
+```{r head-analysis, results='asis', echo=FALSE, eval=isTRUE(params$include_analysis)}
+cat("## Analysis Plan {#sec-analysis .unnumbered}\n\n")
+```
 
 ```{r study, eval=params$include_analysis && !is.null(content$study)}
 #| output: asis
@@ -695,9 +711,12 @@ if (!has_data) {
         # Planned or exploratory, decided by render_report() (owner 2026-11-04).
         if (isTRUE(r$exploratory)) cat(sprintf("**%s**\n\n", r$exploratory_label))
         if (!is.null(r$apa)) {
-          cat(sprintf("**Result:** %s\n\n", r$apa))
+          cat(sprintf("**Result:** %s\n\n", r$apa_md %||% r$apa))
         } else if (length(scale_entries) == 0) {
           cat("**Result:** see the matching section of this report above.\n\n")
+        }
+        if (!is.null(r$advisory)) {
+          cat(sprintf("**Note:** %s\n\n", r$advisory_md %||% r$advisory))
         }
         if (!is.null(r$syntax)) {
           cat("````\n")
@@ -783,7 +802,9 @@ if (!has_data) {
 
 ---
 
-## Model Appendix {#sec-models .unnumbered}
+```{r head-models, results='asis', echo=FALSE, eval=isTRUE(params$include_models)}
+cat("## Model Appendix {#sec-models .unnumbered}\n\n")
+```
 
 ```{r models, eval=params$include_models && length(instrument$models %||% list()) > 0}
 #| output: asis

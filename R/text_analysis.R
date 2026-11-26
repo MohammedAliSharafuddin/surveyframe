@@ -115,9 +115,9 @@
 #'
 #' @param data A data.frame of responses.
 #' @param item_id Character. The text/textarea item's column name.
-#' @param lowercase Logical. Lower-case the text. Default `TRUE`.
-#' @param remove_punct Logical. Strip punctuation. Default `TRUE`.
-#' @param strip_numbers Logical. Strip digits. Default `FALSE`.
+#' @param lowercase Logical. Lower-case the text. Defaults to `TRUE`.
+#' @param remove_punct Logical. Strip punctuation. Defaults to `TRUE`.
+#' @param strip_numbers Logical. Strip digits. Defaults to `FALSE`.
 #' @param instrument Optional `sframe` instrument. When supplied, `item_id`
 #'   is validated as a `"text"` or `"textarea"` item before cleaning.
 #'
@@ -191,7 +191,7 @@ sframe_clean_text <- function(data, item_id, lowercase = TRUE,
 #' @param stop_words Character vector of words to exclude, or `NULL` to use
 #'   the built-in English list, or `character(0)` for no filtering.
 #' @param top_n Integer. Maximum number of terms to return, most frequent
-#'   first. Default `30`.
+#'   first. Defaults to 30.
 #'
 #' @return A data.frame with columns `term`, `n` and `pct`.
 #' @export
@@ -649,28 +649,26 @@ sframe_run_stm_topics <- function(data, roles, options, instrument) {
 
 #' Extract representative quotes for each STM topic
 #'
-#' Takes the result of [sframe_run_stm_topics()] (not a raw `stm` model
-#' object) and, for each topic, pulls the top `n_quotes` documents by
-#' topic-document probability using `stm::findThoughts()`, then maps each
-#' one back to its original respondent row via the mapping
-#' [sframe_run_stm_topics()] stored on `result$fit`.
+#' Takes an `stm_topics` result from [run_analysis_plan()] (not a raw `stm`
+#' model object) and, for each topic, pulls the top `n_quotes` documents by
+#' topic-document probability using `stm::findThoughts()`. Each quote is
+#' mapped back to its original respondent row through the mapping the
+#' result stores on `result$fit`.
 #'
-#' @param model A `stm_topics` result list from [sframe_run_stm_topics()]
-#'   (the whole `result` list, which holds the fitted model in `result$fit`).
-#' @param text The response vector the topic model was fit on: either the
-#'   raw vector (one entry per original data row, indexed 1:1 by row
-#'   number) or the [sframe_clean_text()]-cleaned vector, which drops
-#'   blank/missing rows and is therefore *shorter*, its positions no
-#'   longer equal original row numbers once any earlier row was dropped.
-#'   Both forms work correctly: when `text` carries the `respondent`
-#'   attribute [sframe_clean_text()] sets, that mapping is used to find
-#'   each quote's real position, and otherwise `text` is assumed to be the raw,
-#'   1:1-indexed vector.
-#' @param n_quotes Integer. Quotes to return per topic. Default `3L`.
+#' @param model An `stm_topics` result from [run_analysis_plan()], the whole
+#'   result list, which holds the fitted model in `result$fit`.
+#' @param text The response vector the topic model was fitted on: either the
+#'   raw vector, 1 entry per original data row, or the vector
+#'   [sframe_clean_text()] returns. The cleaned vector drops blank and missing
+#'   rows, so it can be shorter than the data. Both forms work: when `text`
+#'   carries the `respondent` attribute that [sframe_clean_text()] sets, that
+#'   mapping finds each quote's row, and otherwise `text` is taken to be the
+#'   raw vector.
+#' @param n_quotes Integer. Quotes to return per topic. Defaults to 3.
 #'
 #' @return A data.frame with columns `topic`, `rank`, `respondent` (the
 #'   original row index in the data the model's `text` argument came from,
-#'   not a document-matrix or corpus row index), and `quote`.
+#'   not a document-matrix or corpus row index) and `quote`.
 #' @export
 #' @examples
 #' \donttest{
@@ -759,13 +757,13 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
 #'
 #' @param text Character vector of responses (raw or already cleaned by
 #'   [sframe_clean_text()]).
-#' @param n Integer. N-gram size. Default `2` (bigrams).
+#' @param n Integer. N-gram size. Defaults to 2 (bigrams).
 #' @param stop_words Character vector of words to exclude, or `NULL` to use
 #'   the built-in English list, or `character(0)` for no filtering.
 #' @param top_n Integer. Maximum number of n-grams to return, most frequent
-#'   first. Default `30`.
+#'   first. Defaults to 30.
 #'
-#' @return A data.frame with columns `term` (the space-joined n-gram), `n`,
+#' @return A data.frame with columns `term` (the space-joined n-gram), `n`
 #'   and `pct`.
 #' @export
 #' @examples
@@ -827,11 +825,11 @@ sframe_ngram_frequency <- function(text, n = 2L, stop_words = NULL, top_n = 30L)
 #'   [sframe_clean_text()].
 #' @param term Character. A single keyword to search for.
 #' @param window Integer. Maximum number of words of context to keep before
-#'   and after each match. Default `6`.
+#'   and after each match. Defaults to 6.
 #' @param max_matches Integer. Maximum number of matches to return, counted
-#'   across all responses. Default `20`.
+#'   across all responses. Defaults to 20.
 #'
-#' @return A data.frame with columns `respondent`, `before`, `match`, and
+#' @return A data.frame with columns `respondent`, `before`, `match` and
 #'   `after`.
 #' @export
 #' @examples

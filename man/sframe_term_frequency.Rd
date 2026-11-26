@@ -14,7 +14,7 @@ sframe_term_frequency(text, stop_words = NULL, top_n = 30L)
 the built-in English list, or \code{character(0)} for no filtering.}
 
 \item{top_n}{Integer. Maximum number of terms to return, most frequent
-first. Default \code{30}.}
+first. Defaults to 30.}
 }
 \value{
 A data.frame with columns \code{term}, \code{n} and \code{pct}.

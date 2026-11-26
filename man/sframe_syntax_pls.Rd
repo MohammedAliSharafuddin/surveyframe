@@ -9,11 +9,13 @@ sframe_syntax_pls(model, data_name = "data", nboot = NULL, seed = 123)
 \arguments{
 \item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object of type \code{"pls_sem"}.}
 
-\item{data_name}{Name of the data object in generated R code.}
+\item{data_name}{Name of the data object in generated R code. Defaults to
+\code{"data"}.}
 
-\item{nboot}{Number of bootstrap samples.}
+\item{nboot}{Number of bootstrap samples. When \code{NULL}, the model's
+\code{bootstrap} option, or 5000 when it has none.}
 
-\item{seed}{Random seed for bootstrap syntax.}
+\item{seed}{Random seed for bootstrap syntax. Defaults to 123.}
 }
 \value{
 An R syntax string for \code{seminr}.

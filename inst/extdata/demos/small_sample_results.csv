@@ -7,4 +7,4 @@
 "RQ2","fisher_exact","Online: No","2"
 "RQ2","fisher_exact","In person: Yes","8"
 "RQ2","fisher_exact","Online: Yes","7"
-"RQ3","firth_logistic","apa","Firth logistic regression (n = 18), likelihood ratio = 0.00. The odds are of ""Will you attend next year?"" being Yes, against No. (demonstration data)"
+"RQ3","firth_logistic","apa","Firth logistic regression, likelihood-ratio chi-square(1, N = 18) = 0.00, p = .947. The odds are of ""Will you attend next year?"" being Yes, against No. (demonstration data)"

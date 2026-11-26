@@ -24,12 +24,13 @@ sframe_posthoc_results(
 
 \item{group}{Grouping variable for group comparisons.}
 
-\item{table_vars}{2 categorical variables for chi-square residuals and
+\item{table_vars}{Two categorical variables for chi-square residuals and
 pairwise proportion tests.}
 
 \item{measures}{Repeated binary measures for pairwise McNemar tests.}
 
-\item{correction}{Multiple-comparison correction.}
+\item{correction}{Multiple-comparison correction: \code{"holm"} (the default),
+\code{"bonferroni"} or \code{"BH"}.}
 }
 \value{
 An object of class \code{sframe_posthoc_report}.

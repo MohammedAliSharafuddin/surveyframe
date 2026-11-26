@@ -173,8 +173,9 @@ sframe_write_report_source <- function(dir, instrument, data, front,
 #' @param dir The report source folder. Defaults to the working directory,
 #'   which is the folder itself when Quarto renders its `report.qmd`.
 #' @param include_analysis Logical. Whether the report includes the analysis
-#'   plan results.
-#' @param plot_palette `"web"` or `"print"`, as in [render_report()].
+#'   plan results. Defaults to `TRUE`.
+#' @param plot_palette `"web"` (the default) or `"print"`, as in
+#'   [render_report()].
 #' @return A list the template reads: paths to the inputs it renders from, the
 #'   instrument hash, the analysis seed and `check`, a list of the verdicts
 #'   (`numbers_match`, `results_file_match`, `references_match`,

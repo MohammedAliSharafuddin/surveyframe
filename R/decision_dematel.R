@@ -73,10 +73,10 @@ sframe_check_dematel_input <- function(x) {
 #'
 #' @param x A square numeric matrix of direct influence, zero diagonal.
 #' @return A list with `normalised` (N), `total_relation` (T), `D`, `R`,
-#'   `prominence` (D + R), `relation` (D - R), `threshold` (mean of T), and
+#'   `prominence` (D + R), `relation` (D - R), `threshold` (mean of T) and
 #'   `role` (a character vector, `"cause"` where relation > 0, else
 #'   `"effect"`).
-#' @family Decision analysis functions
+#' @keywords internal
 #' @examples
 #' influence <- matrix(c(0, 2, 1, 0), nrow = 2, byrow = TRUE,
 #'                     dimnames = list(c("cost", "quality"),
@@ -296,11 +296,11 @@ sframe_run_dematel <- function(data, roles, options, instrument) {
 #' DEMATEL classifies criteria on 2 axes. It produces a causal map in place of a single
 #' ranked score, so a ranking bar chart would misrepresent it.
 #'
-#' @param result A `dematel`-family result list from [run_analysis_plan()] or
-#'   `sframe_run_dematel()`, carrying `prominence`, `relation`, and
-#'   `criteria`.
-#' @param palette One of `"web"` or `"print"`. See `sframe_brand()`.
-#' @return A ggplot2 object, or `NULL` when the result lacks a DEMATEL
+#' @param result A `dematel` result list from [run_analysis_plan()], carrying
+#'   `prominence`, `relation` and `criteria`.
+#' @param palette One of `"web"` (brand colours) or `"print"` (black, grey and
+#'   white). See [theme_surveyframe()].
+#' @return A ggplot2 object, or `NULL` when the result lacks the DEMATEL
 #'   fields to plot.
 #' @export
 #' @seealso [sframe_plot_decision_ranking()]

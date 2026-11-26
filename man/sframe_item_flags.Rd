@@ -7,13 +7,14 @@
 sframe_item_flags(result, htmt = 0.85, all = FALSE, block = NULL)
 }
 \arguments{
-\item{result}{A result of one of the kinds above.}
+\item{result}{A result of one of the kinds listed in Details.}
 
 \item{htmt}{The HTMT threshold: \code{0.85} for conceptually distinct
 constructs (the default) or \code{0.90} for similar ones. The value applied
 is kept as the attribute \code{htmt_threshold}.}
 
-\item{all}{If \code{TRUE}, every row is returned, flagged or not.}
+\item{all}{Logical. If \code{TRUE}, every row is returned, flagged or not.
+Defaults to \code{FALSE}.}
 
 \item{block}{Character or \code{NULL}. The plan block named in the reasons. A
 plan result supplies its own.}

@@ -93,7 +93,7 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #' @section Choosing a method:
 #' `"full"` enumerates every combination, which is exact but grows fast: 4
 #' attributes at 3 levels each is 81 profiles. `"random"` takes a seeded
-#' random subset of that size. `"balanced"` samples repeatedly and keeps the
+#' random subset of `n_profiles` of them. `"balanced"` samples repeatedly and keeps the
 #' subset with the most even level spread and the weakest association between
 #' attributes.
 #'
@@ -112,10 +112,12 @@ sframe_conjoint_select <- function(full, n_profiles, method, tries = 200L,
 #'   `profiles` is supplied.
 #' @param n_profiles Number of profiles to keep. Required for `"balanced"`
 #'   and `"random"`, ignored for `"full"`.
-#' @param n_alternatives Alternatives shown per choice task, default 2.
+#' @param n_alternatives Integer. Alternatives shown per choice task. Defaults
+#'   to 2.
 #' @param n_tasks Choice tasks per block. Defaults to as many whole tasks as
 #'   the profile set supports.
-#' @param blocks Number of blocks the tasks are split across, default 1.
+#' @param blocks Integer. Number of blocks the tasks are split across.
+#'   Defaults to 1.
 #' @param seed Integer seed. Generated and stored when omitted.
 #' @param profiles Optional data frame of pre-built profiles, one column per
 #'   attribute. Supplying this bypasses generation and declares the design as

@@ -8,7 +8,7 @@ sframe_apa(x, ...)
 }
 \arguments{
 \item{x}{An \code{sframe_analysis_results}, \code{sframe_descriptives_report},
-\code{sframe_missing_data_report}, \code{sframe_validity_report}, or
+\code{sframe_missing_data_report}, \code{sframe_validity_report} or
 \code{sframe_assumption_report} object.}
 
 \item{...}{Passed to methods.}

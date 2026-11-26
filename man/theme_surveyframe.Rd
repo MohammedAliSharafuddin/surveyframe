@@ -17,8 +17,7 @@ theme_surveyframe(
 device default).}
 
 \item{palette}{One of \code{"web"} (brand colours, for on-screen use) or
-\code{"print"} (black/grey/white only, for journal-ready figures). See
-\code{sframe_brand()} for the verified contrast ratios behind each.}
+\code{"print"} (black, grey and white only, for journal-ready figures).}
 }
 \value{
 A ggplot2 theme object.

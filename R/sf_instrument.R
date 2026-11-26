@@ -17,7 +17,7 @@
 #'   Defaults to `"en"`. Multi-language support is planned for a later release.
 #' @param components List. A list of component objects created by the
 #'   constructor family: [sframe_item()], [sframe_choice_set()], [sframe_scale()],
-#'   [sframe_branch()], [sframe_attention_check()], [sframe_conjoint_design()], and [sframe_reference()].
+#'   [sframe_branch()], [sframe_attention_check()], [sframe_conjoint_design()] and [sframe_reference()].
 #'   Components are
 #'   sorted by class automatically, so they can be supplied in any order.
 #' @param render List or NULL. Optional rendering hints passed to
@@ -28,7 +28,7 @@
 #'   or imported from a `.sframe` file.
 #' @param study List or `NULL`. The study the instrument serves: `problem` (1
 #'   short paragraph), `objectives` (a list, each with an `id` such as `"O1"`
-#'   and its `text`) and `sampling` (`population`, `method` from
+#'   and its `text`), `sampling` (`population`, `method` from
 #'   [sframe_sampling_methods()] and `planned_n`) and `preregistration`
 #'   (`exclusion_rules`, `stopping_rule`, `primary_outcomes`,
 #'   `secondary_outcomes`, `multiplicity` and `contingency`, each optional
@@ -48,13 +48,13 @@
 #'                           c("New visitor", "Returning visitor"))
 #'
 #' item1 <- sframe_item("sat_1", "The service met my expectations.",
-#'                  type = "likert", choice_set = "agree5",
-#'                  scale_id = "sat", required = TRUE)
+#'                      type = "likert", choice_set = "agree5",
+#'                      scale_id = "sat", required = TRUE)
 #' item2 <- sframe_item("sat_2", "I would recommend this service.",
-#'                  type = "likert", choice_set = "agree5",
-#'                  scale_id = "sat", required = TRUE)
+#'                      type = "likert", choice_set = "agree5",
+#'                      scale_id = "sat", required = TRUE)
 #' item3 <- sframe_item("visitor_type", "I am a",
-#'                  type = "single_choice", choice_set = "visitor")
+#'                      type = "single_choice", choice_set = "visitor")
 #'
 #' scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
 #'

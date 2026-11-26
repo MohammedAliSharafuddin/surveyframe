@@ -42,9 +42,9 @@ within each defined scale block. Defaults to \code{TRUE}.}
 \item{straightline_min_items}{Integer. The minimum number of items a scale
 must have before it is checked for straight-lining. Defaults to \code{4}. A
 respondent who gives the identical response to every item in a 2-item
-scale has done exactly what a genuinely consistent respondent does,
-this is not evidence of inattention on its own, and checking scales
-that short flags a large share of honest respondents (see the worked
+scale has done exactly what a genuinely consistent respondent does, so
+this is not evidence of inattention on its own. Checking scales that
+short flags a large share of honest respondents (see the worked
 example in \code{vignette("surveyframe")}, where 3 scales of 2 items alone
 drove a 91 percent flag rate before this threshold existed). Set to
 \code{2} to restore the previous, more permissive behaviour.
@@ -60,7 +60,7 @@ above which a respondent is flagged. Defaults to \code{0.2}.}
 }
 \value{
 An object of class \code{sframe_quality_report}, a named list with
-elements: \code{summary}, \code{attention}, \code{timing}, \code{straightline}, \code{missing},
+elements: \code{summary}, \code{attention}, \code{timing}, \code{straightline}, \code{missing}
 and \code{duplicates}. Use \code{print()} for a formatted summary.
 }
 \description{

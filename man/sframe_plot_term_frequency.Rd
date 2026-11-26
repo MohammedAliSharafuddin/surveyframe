@@ -9,7 +9,8 @@ sframe_plot_term_frequency(result, palette = c("web", "print"))
 \arguments{
 \item{result}{A \code{term_freq} result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no table.
@@ -17,8 +18,7 @@ A ggplot2 object, or \code{NULL} when the result carries no table.
 \description{
 Top terms from a \code{term_freq} result as a horizontal bar chart, or a word
 cloud when \code{result$options$wordcloud} is \code{TRUE} (opt-in, default
-\code{FALSE}). Facets by group when the result carries a \code{group} role
-(todo_text_analysis.md section 1a).
+\code{FALSE}). Facets by group when the result carries a \code{group} role.
 }
 \examples{
 \donttest{

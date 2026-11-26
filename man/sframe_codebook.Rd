@@ -15,7 +15,9 @@ With \code{"md"}, the codebook also carries itself as Markdown text, in
 }
 \value{
 An object of class \code{sframe_codebook}, a list with elements
-\code{instrument_meta}, \code{items_table}, \code{choices_table}, \code{scales_table},
+\code{instrument_meta}, \code{items_table} (1 row per item: \code{id}, \code{label},
+\code{type}, \code{choice_set}, \code{scale_id}, \code{reverse}, \code{required} and \code{help}),
+\code{choices_table}, \code{scales_table},
 \code{plan_table}, \code{models_table} and \code{format}, and with \code{format = "md"},
 \code{markdown}: one character string holding the whole codebook as Markdown,
 with a pipe table per component. Save it with
@@ -29,13 +31,13 @@ scale membership and reverse-coding status. The codebook can be rendered
 as HTML or Markdown.
 }
 \examples{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-i1    <- sframe_item("sat_1", "Item 1", type = "likert",
-                 choice_set = "ag5", scale_id = "sat")
-i2    <- sframe_item("sat_2", "Item 2", type = "likert",
-                 choice_set = "ag5", scale_id = "sat")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+i1 <- sframe_item("sat_1", "Item 1", type = "likert",
+                  choice_set = "ag5", scale_id = "sat")
+i2 <- sframe_item("sat_2", "Item 2", type = "likert",
+                  choice_set = "ag5", scale_id = "sat")
 scale <- sframe_scale("sat", "Satisfaction", items = c("sat_1", "sat_2"))
 instr <- sframe_instrument("Demo Survey", components = list(cs, i1, i2, scale))
 

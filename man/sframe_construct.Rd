@@ -34,7 +34,7 @@ A construct is the building block of \code{\link[=sframe_model_spec]{sframe_mode
 }
 \examples{
 sq <- sframe_construct("sq", "Service Quality",
-                    items = c("sq_1", "sq_2", "sq_3"))
+                       items = c("sq_1", "sq_2", "sq_3"))
 sq$mode
 sq$items
 }

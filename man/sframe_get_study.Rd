@@ -22,7 +22,7 @@ Returns the instrument's \code{study}: the problem statement, the objectives
 describing an \code{"other"} method, and \code{planned_n}), and the preregistration
 fields a plan states beyond its blocks (\code{preregistration}, with
 \code{exclusion_rules}, \code{stopping_rule}, \code{primary_outcomes},
-\code{secondary_outcomes}, \code{multiplicity} and \code{contingency}, each 1 optional
+\code{secondary_outcomes}, \code{multiplicity} and \code{contingency}, each an optional
 text). The study is inside the hash, so on a published instrument a change
 to any of these is a design amendment, recorded with \code{\link[=amend_sframe]{amend_sframe()}}.
 Set it with \code{sframe_instrument(study = )} or by assigning

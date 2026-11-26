@@ -10,7 +10,7 @@ sframe_show(path, quiet = FALSE, option = NULL)
 \item{path}{Character. The file to show.}
 
 \item{quiet}{Logical. When \code{TRUE}, nothing is printed when the file is not
-opened.}
+opened. Defaults to \code{FALSE}.}
 
 \item{option}{Character or \code{NULL}. The name of an option that, set to
 \code{FALSE}, keeps the file closed, for a function with its own switch.}

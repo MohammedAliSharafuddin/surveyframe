@@ -102,6 +102,34 @@ sframe_item_response_columns <- function(instrument, item) {
   if (length(cols) > 0L && !identical(item$type, "single_choice")) cols else c(item$id, cols)
 }
 
+# The columns a response file for `instrument` carries, in order: the
+# collector's respondent_id, started_at and submitted_at, then every column
+# each answerable item posts. Display-only items (section breaks and text
+# blocks) collect no data and get no column. The Google Sheets collector,
+# SurveyStudio's blank response template and run_survey() all read it here.
+sframe_response_template_columns <- function(instrument) {
+  response_items <- Filter(
+    function(i) !identical(i$type %in% c("section_break", "text_block"), TRUE),
+    instrument$items %||% list()
+  )
+  item_headers <- unlist(lapply(response_items, function(i) {
+    sframe_item_response_columns(instrument, i)
+  }), use.names = FALSE)
+  unique(c("respondent_id", "started_at", "submitted_at", item_headers))
+}
+
+# Writes a header-only CSV with the columns of
+# sframe_response_template_columns(), the blank file a researcher fills or
+# matches when data was collected elsewhere.
+sframe_write_response_template <- function(instrument, path) {
+  cols <- sframe_response_template_columns(instrument)
+  blank <- as.data.frame(stats::setNames(
+    replicate(length(cols), character(0), simplify = FALSE), cols),
+    check.names = FALSE, stringsAsFactors = FALSE)
+  utils::write.csv(blank, path, row.names = FALSE, na = "")
+  invisible(path)
+}
+
 # The choice set with id `id`, or NULL.
 sframe_choice_set_by_id <- function(instrument, id) {
   if (is.null(id)) return(NULL)
@@ -367,7 +395,7 @@ sframe_align_judgement_matrices <- function(matrices) {
 #' @param method `"geometric"` (the AHP default) or `"arithmetic"` (DEMATEL).
 #' @param cr_filter Logical. When `TRUE`, individual matrices with a
 #'   consistency ratio at or above 0.10 are dropped before aggregation.
-#'   Applies to reciprocal matrices only. Default `FALSE`.
+#'   Applies to reciprocal matrices only. Defaults to `FALSE`.
 #' @return A list with `matrix`, `method`, `n_respondents`, `n_dropped`,
 #'   `n_dropped_consistency` and `consistency` (the per-respondent CR
 #'   distribution, or `NULL` for a non-reciprocal set).
@@ -479,7 +507,7 @@ sframe_aggregate_judgements <- function(matrices,
 #' @param cr_filter Logical. Passed to [sframe_aggregate_judgements()] for a
 #'   pairwise item. Ignored otherwise.
 #' @return A list with `weights` (a named numeric vector summing to 1),
-#'   `criteria`, `source`, `item_id`, `n_respondents`, `n_dropped`, and
+#'   `criteria`, `source`, `item_id`, `n_respondents`, `n_dropped` and
 #'   `consistency` (pairwise items only).
 #' @export
 #' @seealso [sframe_assemble_pairwise()]
@@ -583,17 +611,17 @@ sframe_collected_weights <- function(data, instrument, item_id,
 #'   block also collects weights through a `weights_item` whose criterion names
 #'   differ from these ids, the items pair with its criteria in this order, and
 #'   the result notes each pairing.
-#' @param statistic `"mean"` or `"median"`.
+#' @param statistic `"mean"` (the default) or `"median"`.
 #' @return A list with `matrix` (alternatives x criteria, with dimnames), `n`,
 #'   `sd`, `alternatives`, `criteria` and `statistic`.
 #' @export
 #' @seealso [sframe_collected_weights()]
 #' @examples
-#' q5    <- sframe_choice_set("q5", 1:5,
-#'            c("Very poor", "Poor", "Fair", "Good", "Excellent"))
+#' q5 <- sframe_choice_set("q5", 1:5,
+#'                         c("Very poor", "Poor", "Fair", "Good", "Excellent"))
 #' price <- sframe_item("rate_price", "Rate each supplier: value",
-#'                  type = "matrix", matrix_items = c("Alpha", "Basilica"),
-#'                  choice_set = "q5")
+#'                      type = "matrix", matrix_items = c("Alpha", "Basilica"),
+#'                      choice_set = "q5")
 #' study <- sframe_instrument("Supplier selection", components = list(q5, price))
 #' responses <- data.frame(rate_price__Alpha = c(3, 4), rate_price__Basilica = c(5, 5))
 #' rm <- sframe_rated_matrix(responses, study, "rate_price")

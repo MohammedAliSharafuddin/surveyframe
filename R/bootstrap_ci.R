@@ -89,8 +89,8 @@ sframe_with_seed <- function(seed, expr) {
 #'   attributes `resamples`, `valid_resamples` and, when the interval is
 #'   withheld, `reason`. The bounds are `NA` when fewer than 90% of resamples
 #'   give a value, or when every resample gives the same value, since neither
-#'   leaves a sampling distribution to read. The bounds
-#'   are `NA` when `x` has fewer than 3 finite values.
+#'   leaves a sampling distribution to read. They
+#'   are also `NA` when `x` has fewer than 3 finite values.
 #' @export
 #' @seealso [sframe_cohens_d_ci()], [sframe_cramers_v_ci()], [sframe_eta_sq_ci()]
 #'
@@ -140,8 +140,8 @@ sframe_bootstrap_ci <- function(x, FUN = stats::median, R = 2000,
 #'   attributes `resamples`, `valid_resamples` and, when the interval is
 #'   withheld, `reason`. The bounds are `NA` when fewer than 90% of resamples
 #'   give a value, or when every resample gives the same value, since neither
-#'   leaves a sampling distribution to read. The bounds
-#'   are `NA` when either group has fewer than 3 finite values.
+#'   leaves a sampling distribution to read. They
+#'   are also `NA` when either group has fewer than 3 finite values.
 #' @export
 #' @seealso [sframe_bootstrap_ci()]
 #'
@@ -182,11 +182,12 @@ sframe_cohens_d_ci <- function(x, y, R = 2000, conf.level = 0.95, seed = NULL) {
 #' table, as `effectsize::cramers_v(adjust = FALSE, alternative =
 #' "two.sided")` computes it: the 2-sided interval for the noncentrality of
 #' the chi-square statistic, each bound turned into V as
-#' \eqn{\sqrt{\lambda / (n (k - 1))}}, where k is the smaller of the number
+#' \ifelse{html}{\out{&radic;(&lambda; / (n(k &minus; 1)))}}{\eqn{\sqrt{\lambda / (n (k - 1))}}{sqrt(lambda / (n(k - 1)))}},
+#' where k is the smaller of the number
 #' of rows and columns. For a 2 by 2 table V equals phi. The interval reaches
 #' 0 when the test is far from significant. Until 0.4.3 this was a percentile
 #' bootstrap, whose resampled V is 0 or above, so an exactly independent
-#' table had the interval \[0.05, 0.50\] beside V = 0 (FR-24).
+#' table had the interval \[0.05, 0.50\] beside V = 0.
 #'
 #' @param tab A contingency table (from [table()]) or a matrix of counts.
 #' @param R Kept so existing calls still run. Unused since 0.4.3.
@@ -253,12 +254,13 @@ sframe_cramers_v <- function(tbl) {
 #' The noncentrality interval for the proportion of variance in `outcome`
 #' explained by `group`, as `effectsize::eta_squared(partial = FALSE,
 #' alternative = "two.sided")` computes it for a one-way ANOVA: the 2-sided
-#' interval for the noncentrality \eqn{\lambda} of the F statistic, each
-#' bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
+#' interval for the noncentrality
+#' \ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} of the F statistic, each
+#' bound turned into
+#' \ifelse{html}{\out{&lambda; / (&lambda; + df<sub>error</sub>)}}{\eqn{\lambda / (\lambda + df_{error})}{lambda / (lambda + df_error)}}. The interval
 #' reaches 0 when the test is far from significant. Until 0.4.3 this was a
 #' percentile bootstrap, whose resampled eta squared is 0 or above, so 40
-#' samples with equal group means all had an interval above 0
-#' (FR-24).
+#' samples with equal group means all had an interval above 0.
 #'
 #' @param outcome A numeric vector.
 #' @param group A grouping vector of the same length.

@@ -28,6 +28,12 @@ sframe_items_table <- function(instrument) {
       }, logical(1)))
     }, logical(1)),
     required   = vapply(instrument$items, function(i) isTRUE(i$required), logical(1)),
+    # The help text shown under the question, "" when there is none (L11,
+    # finding 8 of the 0.4.0 review).
+    help       = vapply(instrument$items, function(i) {
+      h <- i$help
+      if (is.null(h) || !length(h) || is.na(h[1])) "" else as.character(h[1])
+    }, character(1)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -170,11 +176,11 @@ sframe_models_table <- function(instrument) {
 #' @seealso [sframe_accessors], [sframe_codebook()]
 #'
 #' @examples
-#' cs    <- sframe_choice_set("ag5", 1:5,
-#'            c("Strongly disagree", "Disagree", "Neutral",
-#'              "Agree", "Strongly agree"))
-#' item  <- sframe_item("sat_1", "The service met my expectations.",
-#'                  type = "likert", choice_set = "ag5", scale_id = "sat")
+#' cs <- sframe_choice_set("ag5", 1:5,
+#'                         c("Strongly disagree", "Disagree", "Neutral",
+#'                           "Agree", "Strongly agree"))
+#' item <- sframe_item("sat_1", "The service met my expectations.",
+#'                     type = "likert", choice_set = "ag5", scale_id = "sat")
 #' scale <- sframe_scale("sat", "Satisfaction", items = "sat_1")
 #' instr <- sframe_instrument("Demo Survey", components = list(cs, item, scale))
 #'

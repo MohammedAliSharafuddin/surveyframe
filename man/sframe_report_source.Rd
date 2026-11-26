@@ -11,9 +11,10 @@ sframe_report_source(dir = ".", include_analysis = TRUE, plot_palette = "web")
 which is the folder itself when Quarto renders its \code{report.qmd}.}
 
 \item{include_analysis}{Logical. Whether the report includes the analysis
-plan results.}
+plan results. Defaults to \code{TRUE}.}
 
-\item{plot_palette}{\code{"web"} or \code{"print"}, as in \code{\link[=render_report]{render_report()}}.}
+\item{plot_palette}{\code{"web"} (the default) or \code{"print"}, as in
+\code{\link[=render_report]{render_report()}}.}
 }
 \value{
 A list the template reads: paths to the inputs it renders from, the

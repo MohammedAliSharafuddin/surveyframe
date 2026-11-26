@@ -41,7 +41,7 @@ expected-count checks and sparse-cell warnings.
 \examples{
 demo <- sframe_demo("two_group")
 ar <- sframe_assumption_results(demo$responses, variables = "sessions_attended",
-                         group = "format")
+                                group = "format")
 print(ar)
 }
 \seealso{

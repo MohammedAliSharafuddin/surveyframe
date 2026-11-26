@@ -2,7 +2,7 @@
 % Please edit documentation in R/psychometrics.R
 \name{sframe_efa_readiness_results}
 \alias{sframe_efa_readiness_results}
-\title{Prepare a survey instrument for exploratory factor analysis}
+\title{Check whether scale items are ready for exploratory factor analysis}
 \usage{
 sframe_efa_readiness_results(
   data,

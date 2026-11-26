@@ -15,19 +15,21 @@ chrome <- tryCatch(chromote::find_chrome(), error = function(e) NULL)
 skip_if(length(chrome) != 1L || is.na(chrome) || !nzchar(chrome), "Chrome not found")
 
 test_that("Drop from scale and Put back go through the 1 amendment dialog", {
-  b <- ui1_studio("factor_structure", "analysis")
+  # likert_scale's org_4 since the demos were calibrated to psych::bfi
+  # (2026-11-26); factor_structure's con_4 is no longer flagged.
+  b <- ui1_studio("likert_scale", "analysis")
   expect_true(ui1_screen(b, "analysis"))
   ui2_js(b, "if ($('input[name=analysis_stage]').length) Shiny.setInputValue('analysis_stage', 'Run'); true")
   drop_btn <- "$('#screen-analysis .flag-list[data-block=\"RQ2\"] button:contains(\"Drop from scale\")')"
   expect_true(ui2_wait(b, paste0(drop_btn, ".length === 1"), 90))
-  expect_match(ui1_text(b, "screen-analysis"), "con_4: loading .398 in RQ2, below .40",
+  expect_match(ui1_text(b, "screen-analysis"), "org_4: alpha if deleted .73 in RQ2, above the scale's .69",
                fixed = TRUE)
 
   ui2_js(b, paste0(drop_btn, ".click(); true"))
   expect_true(ui2_wait(b, ui1_modal_open, 20))
-  expect_match(ui1_text(b, "shiny-modal"), "Drop con_4 from content", fixed = TRUE)
-  expect_match(ui2_js(b, "$('#amend_dlg-reason_text').val()"), "loading .39", fixed = TRUE)
-  expect_match(ui1_text(b, "shiny-modal"), "Scales whose scoring changes: content", fixed = TRUE)
+  expect_match(ui1_text(b, "shiny-modal"), "Drop org_4 from organisation", fixed = TRUE)
+  expect_match(ui2_js(b, "$('#amend_dlg-reason_text').val()"), "alpha if deleted .73", fixed = TRUE)
+  expect_match(ui1_text(b, "shiny-modal"), "Scales whose scoring changes: organisation", fixed = TRUE)
   ui2_js(b, "$('#amend_dlg-record').click(); true")
   expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
 
@@ -38,17 +40,17 @@ test_that("Drop from scale and Put back go through the 1 amendment dialog", {
 
   ui2_js(b, paste0(put_btn, ".click(); true"))
   expect_true(ui2_wait(b, ui1_modal_open, 20))
-  expect_match(ui1_text(b, "shiny-modal"), "Put con_4 back in content", fixed = TRUE)
+  expect_match(ui1_text(b, "shiny-modal"), "Put org_4 back in organisation", fixed = TRUE)
   ui2_js(b, "$('#amend_dlg-record').click(); true")
   expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
   expect_true(ui2_wait(b, "document.getElementById('status_instrument').innerText.indexOf('2 amendments') >= 0", 20))
 
   # The Amendments screen holds the whole history, with the hashes.
   expect_true(ui1_screen(b, "amendments"))
-  expect_true(ui2_wait(b, "(document.getElementById('amendment_log_table')||{innerText:''}).innerText.indexOf('Put con_4 back') >= 0", 20))
+  expect_true(ui2_wait(b, "(document.getElementById('amendment_log_table')||{innerText:''}).innerText.indexOf('Put org_4 back') >= 0", 20))
   log <- ui1_text(b, "amendment_log_table")
   expect_match(log, "Hash before", fixed = TRUE)
-  expect_match(log, "Model respecification: con_4: loading", fixed = TRUE)
+  expect_match(log, "Model respecification: org_4: alpha if deleted", fixed = TRUE)
   expect_match(ui1_text(b, "amend_version_line"), "2 amendments", fixed = TRUE)
   expect_match(ui1_text(b, "amend_put_back_note"), "put the item back in Design", fixed = TRUE)
 })
@@ -64,7 +66,9 @@ test_that("Quality records a bot removal as a pipeline amendment", {
   Sys.sleep(1)
   ui2_js(b, "$('#amend_dlg-record').click(); true")
   expect_true(ui2_wait(b, paste0("!", ui1_modal_open), 20))
-  expect_true(ui2_wait(b, "document.getElementById('status_instrument').innerText.indexOf('3 amendments') >= 0", 20))
+  # factor_structure's first amendment since the drop test moved to
+  # likert_scale's own Studio (2026-11-26).
+  expect_true(ui2_wait(b, "document.getElementById('status_instrument').innerText.indexOf('1 amendment') >= 0", 20))
 })
 
 test_that("Analyse shows the declared plan, and a plan change after the data is a design amendment", {

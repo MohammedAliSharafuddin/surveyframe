@@ -23,6 +23,9 @@
 devtools::load_all(quiet = TRUE)
 # Each demo's study, author, wording, hypotheses and decision rules.
 source(file.path("data-raw", "demo_stories.R"))
+# Category shares, item correlations and path sizes read from psych::bfi and
+# seminr::mobi by data-raw/demo_calibration.R (plan step 2, 2026-11-26).
+source(file.path("data-raw", "demo_calibration_targets.R"))
 
 out_dir <- file.path("inst", "extdata", "demos")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
@@ -35,18 +38,59 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 # scale, and apply missingness last so an effect survives in the complete
 # cases whatever gets blanked.
 
+#' A latent normal cut at given category shares: what an ordinal item is.
+#'
+#' `shares` are the proportions of each category from the lowest up. The cut
+#' points are the normal quantiles of their running sum, so a standard normal
+#' latent reproduces the shares exactly in expectation. findInterval() keeps
+#' a category with a share of 0 empty rather than failing on tied cuts.
+cut_at <- function(latent, shares) {
+  cuts <- stats::qnorm(cumsum(shares)[-length(shares)])
+  as.integer(findInterval(latent, cuts) + 1L)
+}
+
 #' A latent normal cut into k ordered bands, which is what a Likert item is.
 #'
-#' The 5-point cuts lean towards agreement, as answers to a positively worded
-#' item do: about 4, 11, 22, 44 and 20 per cent from "Strongly disagree" to
-#' "Strongly agree" on a standard normal latent, a mean near 3.7 and an SD
-#' near 1. Equal-probability cuts, used before 2026-11-23, gave every point
-#' the same 20 per cent, a flat bar chart no real survey shows. A reverse
+#' The 5-point shares since 2026-11-26 are those of the 25 psych::bfi items,
+#' each scored in its keyed direction and pooled, with the 2 middle points
+#' of the 6-point source merged: about 7, 11, 32, 27 and 22 per cent from
+#' "Strongly disagree" to "Strongly agree" (demo_calibration$lik_default).
+#' Fixed cuts leaning towards agreement were used from 2026-11-23, and equal
+#' shares before that, a flat bar chart no real survey shows. A reverse
 #' worded item, written as 6 minus the band, leans towards disagreement.
 lik <- function(latent, k = 5) {
-  cuts <- if (k == 5) c(-Inf, -1.75, -1.05, -0.35, 0.85, Inf) else
-    stats::qnorm(seq(0, 1, length.out = k + 1))
-  as.integer(cut(latent, breaks = cuts, labels = FALSE, include.lowest = TRUE))
+  if (k == 5) return(cut_at(latent, demo_calibration$lik_default))
+  as.integer(cut(latent, breaks = stats::qnorm(seq(0, 1, length.out = k + 1)),
+                 labels = FALSE, include.lowest = TRUE))
+}
+
+#' Items drawn together: multivariate normal at a target correlation matrix,
+#' each column cut at its own category shares.
+#'
+#' This is how the scale demos come out ordinal, skewed and correlated the
+#' way the published items they are calibrated to are. `R` is a latent
+#' (polychoric) correlation matrix and `shares` a list of category shares, 1
+#' per column.
+mvn_items <- function(n, R, shares) {
+  z <- MASS::mvrnorm(n, mu = rep(0, ncol(R)), Sigma = R)
+  out <- vapply(seq_len(ncol(R)), function(j) cut_at(z[, j], shares[[j]]),
+                integer(n))
+  colnames(out) <- colnames(R)
+  out
+}
+
+#' bfi items, some turned to their keyed direction: a reverse-keyed item
+#' becomes a positively worded one by reversing its shares and the sign of
+#' its correlations.
+bfi_block <- function(items, flip = character()) {
+  R <- demo_calibration$bfi_poly[items, items]
+  s <- ifelse(items %in% flip, -1, 1)
+  R <- R * outer(s, s)
+  shares <- lapply(items, function(i) {
+    p <- demo_calibration$bfi_p5[[i]]
+    if (i %in% flip) rev(p) else p
+  })
+  list(R = R, shares = shares)
 }
 
 #' A truncated normal on a slider's declared range.
@@ -60,13 +104,6 @@ mcar <- function(x, p = 0.03) {
   i <- which(stats::runif(length(x)) < p)
   x[i] <- NA
   x
-}
-
-#' Indicators loading on a common factor, for scales and constructs.
-indicators <- function(factor_scores, loadings, k = 5) {
-  vapply(loadings, function(l) {
-    lik(l * factor_scores + sqrt(1 - l^2) * stats::rnorm(length(factor_scores)), k)
-  }, integer(length(factor_scores)))
 }
 
 #' Respondent ids and the 2 timestamp columns every collector writes.
@@ -358,14 +395,19 @@ likert_scale <- sf_instrument(
          family = "reliability", method = "item_diagnostics", roles = list())
   )
 )
-# Loadings calibrated against the delivered alpha, since cutting a latent
-# normal into 5 Likert bands attenuates it: 0.75/0.72/0.70/0.42 gives 0.68,
-# not the 0.82 intended. Calibrated over 40 draws at n = 50.
-f <- stats::rnorm(n)                              # true alpha about 0.84
-ind <- indicators(f, c(0.88, 0.86, 0.84, 0.62))   # org_4 deliberately weaker
+# Calibrated to bfi's Agreeableness items (2026-11-26): org_1 to org_3 take
+# A2, A3 and A5, and org_4 takes A1, the reverse-keyed item that sits weakly
+# with its scale in bfi itself. The 4 are drawn at their polychoric
+# correlations and cut at their own 5-point shares, so org_4 is stored as
+# answered (low on a positive scale) and the scale reverses it. The true
+# alpha of these 4 items in bfi is .69 (demo_calibration$likert_scale_alpha),
+# just under the .70 rule, and org_4's corrected item-total r is .32 there:
+# the weak reverse item that dropping would lift alpha, which RQ4 shows.
+ag <- bfi_block(c("A2", "A3", "A5", "A1"))
+ind <- mvn_items(n, ag$R, ag$shares)
 ls_df <- frame_of(n, 2)
 ls_df$org_1 <- ind[, 1]; ls_df$org_2 <- ind[, 2]
-ls_df$org_3 <- ind[, 3]; ls_df$org_4 <- 6L - ind[, 4]   # reverse worded
+ls_df$org_3 <- ind[, 3]; ls_df$org_4 <- ind[, 4]   # reverse worded, as answered
 write_demo("likert_scale", likert_scale, ls_df)
 
 # --- 3. matrix_likert ------------------------------------------------------
@@ -403,12 +445,18 @@ matrix_likert <- sf_instrument(
   )
 )
 ml <- frame_of(n, 3)
-# true means: lectures high at about 4.2, assessment low at about 2.6
-for (j in seq_along(sessions)) {
-  mu <- c(4.2, 3.4, 2.6, 3.6)[j]
-  ml[[paste0("session__", sessions[j])]] <-
-    pmin(5L, pmax(1L, as.integer(round(stats::rnorm(n, mu, 0.9)))))
-}
+# Calibrated to bfi (2026-11-26). Each part of the course takes the 5-point
+# shares of a bfi item whose mean is near the one the story needs: lectures
+# rated highest (O1, mean 3.9), seminars (E3, 3.3), assessment lowest (E1 as
+# answered, 2.6) and reading materials (C2, 3.6). The 4 ratings correlate at
+# .40 with each other, the mean within-scale polychoric r of bfi
+# (demo_calibration$bfi_mean_within_r), since a student who likes the course
+# tends to rate all of its parts higher.
+ml_items <- c("O1", "E3", "E1", "C2")
+ml_R <- matrix(demo_calibration$bfi_mean_within_r, 4, 4); diag(ml_R) <- 1
+dimnames(ml_R) <- list(ml_items, ml_items)
+ml_x <- mvn_items(n, ml_R, demo_calibration$bfi_p5[ml_items])
+for (j in seq_along(sessions)) ml[[paste0("session__", sessions[j])]] <- ml_x[, j]
 ml$format <- sample(c("in_person", "online"), n, TRUE, c(0.65, 0.35))
 write_demo("matrix_likert", matrix_likert, ml)
 
@@ -728,10 +776,18 @@ factor_structure <- sf_instrument(
          roles = list(items = c(paste0("org_", 1:4), paste0("con_", 1:4))))
   )
 )
-f1 <- stats::rnorm(n); f2 <- 0.35 * f1 + sqrt(1 - 0.35^2) * stats::rnorm(n)
+# Calibrated to bfi (2026-11-26): organisation takes Conscientiousness C1,
+# C2, C3 and C4, content takes Extraversion E3, E4, E5 and E2, with C4 and E2
+# turned to their keyed direction since every item here is positively
+# worded. All 8 are drawn at bfi's polychoric correlations, so the true
+# structure is 2 factors whose scale scores correlate about .26 in bfi
+# (demo_calibration$bfi_scale_r), with the uneven loadings and small
+# cross-loadings of real items.
+fb <- bfi_block(c("C1", "C2", "C3", "C4", "E3", "E4", "E5", "E2"),
+                flip = c("C4", "E2"))
+fx <- mvn_items(n, fb$R, fb$shares)
 fsx <- frame_of(n, 11)
-o <- indicators(f1, c(0.80, 0.78, 0.74, 0.70))
-c2 <- indicators(f2, c(0.79, 0.76, 0.73, 0.68))
+o <- fx[, 1:4]; c2 <- fx[, 5:8]
 for (k in 1:4) fsx[[paste0("org_", k)]] <- o[, k]
 for (k in 1:4) fsx[[paste0("con_", k)]] <- c2[, k]
 write_demo("factor_structure", factor_structure, fsx)
@@ -820,14 +876,39 @@ sem_pls <- sf_instrument(
                       outcome = "intention"))
   )
 )
-# paths 0.45 and 0.40 with a direct 0.20, so the indirect effect is near 0.18
-cqf <- stats::rnorm(n)
-saf <- 0.45 * cqf + sqrt(1 - 0.45^2) * stats::rnorm(n)
-itf <- 0.40 * saf + 0.20 * cqf + sqrt(1 - 0.40^2 - 0.20^2) * stats::rnorm(n)
+# Calibrated to seminr::mobi (2026-11-26). Content quality takes the 3
+# perceived-quality items that load highest (PERQ1, PERQ3, PERQ7),
+# satisfaction CUSA1 to CUSA3, and intention CUSL1, CUSL3 and CUSL2, in that
+# order. The 9 items are drawn at the correlations mobi's PLS estimate
+# implies: each item's outer loading (demo_calibration$mobi_loadings) times
+# the correlation of the constructs, which follows from the paths quality to
+# satisfaction .80, satisfaction to loyalty .59 and quality to loyalty .08
+# (demo_calibration$mobi_paths). Each is cut at mobi's 10-point shares
+# merged into 5, so they lean towards agreement as satisfaction data does.
+# mobi's raw item correlations were tried first and rejected: perceived
+# quality and satisfaction items correlate as strongly across constructs as
+# within them there, so HTMT came out above 1, which no teaching demo of a
+# 3-construct model should open with. CUSL2 asks whether a customer would
+# switch for a lower price and loads about .20 in mobi; it stays as it_3,
+# "I would pay to attend again", the weak item a PLS or CFA should flag.
+# Satisfaction carries nearly all of the effect, which RQ3's mediation shows.
 sp <- frame_of(n, 12)
-for (k in 1:3) sp[[paste0("cq_", k)]] <- indicators(cqf, 0.80)[, 1]
-for (k in 1:3) sp[[paste0("sa_", k)]] <- indicators(saf, 0.78)[, 1]
-for (k in 1:3) sp[[paste0("it_", k)]] <- indicators(itf, 0.76)[, 1]
+sp_items <- c("PERQ1", "PERQ3", "PERQ7", "CUSA1", "CUSA2", "CUSA3",
+              "CUSL1", "CUSL3", "CUSL2")   # CUSL2 last, as it_3
+pa <- demo_calibration$mobi_paths
+phi_qs <- pa[["quality_satisfaction"]]
+phi_ql <- pa[["quality_loyalty"]] + pa[["satisfaction_loyalty"]] * phi_qs
+phi_sl <- pa[["satisfaction_loyalty"]] + pa[["quality_loyalty"]] * phi_qs
+phi <- matrix(c(1, phi_qs, phi_ql, phi_qs, 1, phi_sl, phi_ql, phi_sl, 1), 3)
+lam <- demo_calibration$mobi_loadings[sp_items]
+con <- rep(1:3, each = 3)
+sp_R <- outer(lam, lam) * phi[con, con]
+diag(sp_R) <- 1
+dimnames(sp_R) <- list(sp_items, sp_items)
+spx <- mvn_items(n, sp_R, demo_calibration$mobi_p5[sp_items])
+for (k in 1:3) sp[[paste0("cq_", k)]] <- spx[, k]
+for (k in 1:3) sp[[paste0("sa_", k)]] <- spx[, 3 + k]
+for (k in 1:3) sp[[paste0("it_", k)]] <- spx[, 6 + k]
 write_demo("sem_pls", sem_pls, sp)
 
 # --- 13. branching ---------------------------------------------------------

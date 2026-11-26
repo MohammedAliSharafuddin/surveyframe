@@ -47,7 +47,8 @@ you supply, or a screen name, given here with its sidebar label:
 
 \item{host}{Host address passed to \code{\link[shiny:runApp]{shiny::runApp()}}.}
 
-\item{launch.browser}{Whether to open the browser automatically.}
+\item{launch.browser}{Logical. Whether to open the browser automatically.
+Defaults to \code{interactive()}.}
 
 \item{demo}{Optional. A demo name from \code{\link[=sframe_list_demos]{sframe_list_demos()}}. Studio then
 opens with that demo's instrument and responses loaded, in place of
@@ -55,7 +56,8 @@ opens with that demo's instrument and responses loaded, in place of
 \code{"input_types"} uses every input type Studio supports.}
 }
 \value{
-Called for its side effect.
+Called for its side effect of running the app. When the app
+closes, the value \code{\link[shiny:runApp]{shiny::runApp()}} returns, invisibly.
 }
 \description{
 Opens the SurveyStudio Shiny application, the visual interface for working
@@ -91,7 +93,7 @@ launch_studio(
 \code{\link[=launch_builder]{launch_builder()}}, \code{\link[=read_sframe]{read_sframe()}},
 \code{\link[=read_responses]{read_responses()}}
 
-Other entry points:
+Other Entry points:
 \code{\link{surveyframe-package}}
 }
-\concept{entry points}
+\concept{Entry points}

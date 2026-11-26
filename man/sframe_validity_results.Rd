@@ -11,8 +11,8 @@ sframe_validity_results(
 )
 }
 \arguments{
-\item{loadings}{A data.frame with columns \code{construct}, \code{item}, and
-\code{loading} or a named list of loading vectors by construct.}
+\item{loadings}{A data.frame with columns \code{construct}, \code{item} and
+\code{loading}, or a named list of loading vectors by construct.}
 
 \item{construct_scores}{Optional data.frame of construct scores for
 Fornell-Larcker and inter-construct correlations.}

@@ -19,13 +19,13 @@ An object of class \code{sframe_item_report}: a named list with one
 element per scale, each a list holding \code{scale_id}, \code{label} and
 \code{diagnostics}, a data frame with one row per item and columns \code{item_id},
 \code{mean}, \code{sd}, \code{item_rest_r}, \code{floor_prop}, \code{ceiling_prop} and \code{n_missing}. The floor and ceiling
-shares are proportions. \code{floor_pct} and \code{ceiling_pct}, their names
-before 0.4.3, are kept as copies for 1 release.
+shares are proportions. \code{floor_pct} and \code{ceiling_pct} give the same
+shares as percentages from 0 to 100.
 \code{as.data.frame()} stacks every scale's diagnostics into one table.
 }
 \description{
 Produces, for each item within each scale, the item-rest correlation,
-floor and ceiling proportions, and the item mean and standard deviation.
+floor and ceiling proportions and the item mean and standard deviation.
 }
 \details{
 Diagnostics use the scale's scoring orientation, so an item the scale

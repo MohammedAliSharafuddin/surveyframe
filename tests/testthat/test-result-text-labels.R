@@ -12,9 +12,9 @@ test_that("result text names variables and groups by their labels", {
 
   p <- sframe_demo("paired")
   res <- suppressWarnings(run_analysis_plan(p$responses, p$instrument))
-  # The paired demo's wording since Session 10.
-  expect_match(res$RQ1$apa, "higher in \"After the training, how confident are you applying this skill? (0 to 100)\"",
-               fixed = TRUE)
+  # The paired demo's labels are whole questions, so the sentence names each
+  # measure by its column name in words (J3, Ubuntu review_043).
+  expect_match(res$RQ1$apa, "higher in confidence after", fixed = TRUE)
   expect_false(grepl("confidence_after", res$RQ2$apa, fixed = TRUE))
 
   f <- sframe_demo("first_survey")

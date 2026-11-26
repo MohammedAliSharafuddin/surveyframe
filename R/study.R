@@ -52,7 +52,7 @@ sframe_sampling_methods <- function(type = c("all", "probability", "non_probabil
 #' describing an `"other"` method, and `planned_n`), and the preregistration
 #' fields a plan states beyond its blocks (`preregistration`, with
 #' `exclusion_rules`, `stopping_rule`, `primary_outcomes`,
-#' `secondary_outcomes`, `multiplicity` and `contingency`, each 1 optional
+#' `secondary_outcomes`, `multiplicity` and `contingency`, each an optional
 #' text). The study is inside the hash, so on a published instrument a change
 #' to any of these is a design amendment, recorded with [amend_sframe()].
 #' Set it with `sframe_instrument(study = )` or by assigning

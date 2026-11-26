@@ -19,8 +19,8 @@ export_survey(
 \item{output_path}{Character. File path for the output HTML. When \code{NULL},
 a \verb{<survey_title>.html} file is written in \code{\link[=tempdir]{tempdir()}}.}
 
-\item{open}{Logical. If \code{TRUE} (default) and the session is interactive,
-the file is opened in the default browser after writing.}
+\item{open}{Logical. Whether to open the file in the default browser
+after writing. Defaults to \code{interactive()}.}
 
 \item{endpoint_url}{Character or NULL. A URL to which responses are
 POSTed as JSON on submission. When NULL, CSV download is the only
@@ -82,7 +82,7 @@ recorded, sent but unconfirmed, not sent or failed. Write
 not state delivery in it. It appears below the status line in every case
 except a failed send, and defaults to "Thank you for participating."
 
-2 settings in the instrument's \code{render} block suit a host too.
+Two settings in the instrument's \code{render} block suit a host too.
 \code{render$thankyou$show_restart = FALSE} hides "Submit another response".
 \code{render$save_draft = TRUE} keeps the answers in the browser's local storage
 as the respondent goes, under a key drawn from the instrument's content, so
@@ -95,26 +95,26 @@ opening directly from disk.
 }
 
 \examples{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-i1    <- sframe_item("sat_1", "Overall I am satisfied with the service.",
-                 type = "likert", choice_set = "ag5", required = TRUE)
-i2    <- sframe_item("comments", "Any additional comments?", type = "textarea")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+i1 <- sframe_item("sat_1", "Overall I am satisfied with the service.",
+                  type = "likert", choice_set = "ag5", required = TRUE)
+i2 <- sframe_item("comments", "Any additional comments?", type = "textarea")
 instr <- sframe_instrument("Customer Satisfaction Survey",
-                       components = list(cs, i1, i2))
+                           components = list(cs, i1, i2))
 
 # Write to a temp file without opening the browser
 out <- export_survey(instr,
-                             output_path = file.path(tempdir(), "sat.html"),
-                             open = FALSE, overwrite = TRUE)
+                     output_path = file.path(tempdir(), "sat.html"),
+                     open = FALSE, overwrite = TRUE)
 sframe_show(out)
 
 \donttest{
 # Write to a temp file and open in the default browser
 export_survey(instr,
-                     output_path = file.path(tempdir(), "sat_browser.html"),
-                     overwrite = TRUE)
+              output_path = file.path(tempdir(), "sat_browser.html"),
+              overwrite = TRUE)
 
 # Write with a Google Apps Script endpoint for server-side collection
 export_survey(

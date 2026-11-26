@@ -19,7 +19,7 @@ pairwise item. Ignored otherwise.}
 }
 \value{
 A list with \code{weights} (a named numeric vector summing to 1),
-\code{criteria}, \code{source}, \code{item_id}, \code{n_respondents}, \code{n_dropped}, and
+\code{criteria}, \code{source}, \code{item_id}, \code{n_respondents}, \code{n_dropped} and
 \code{consistency} (pairwise items only).
 }
 \description{
@@ -49,7 +49,6 @@ Other Decision analysis functions:
 \code{\link[=sframe_aggregate_judgements]{sframe_aggregate_judgements()}},
 \code{\link[=sframe_assemble_pairwise]{sframe_assemble_pairwise()}},
 \code{\link[=sframe_decision_options]{sframe_decision_options()}},
-\code{\link[=sframe_dematel_compute]{sframe_dematel_compute()}},
 \code{\link[=sframe_rated_matrix]{sframe_rated_matrix()}},
 \code{\link[=sframe_sensitivity_analysis]{sframe_sensitivity_analysis()}}
 }

@@ -7,11 +7,13 @@
 sframe_syntax_sem(model, instrument = NULL, standardised = TRUE)
 }
 \arguments{
-\item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object of type \code{"cb_sem"}.}
+\item{model}{An \code{\link[=sframe_model_spec]{sframe_model_spec()}} object of type \code{"cb_sem"}. A
+\code{"cfa"} model is refused: its syntax comes from \code{\link[=sframe_syntax_cfa]{sframe_syntax_cfa()}}.}
 
 \item{instrument}{Optional \code{sframe} object for indicator validation.}
 
-\item{standardised}{Logical. Adds a standardised-estimates fitting note.}
+\item{standardised}{Logical. Whether to add a standardised-estimates
+fitting note. Defaults to \code{TRUE}.}
 }
 \value{
 A lavaan syntax string.

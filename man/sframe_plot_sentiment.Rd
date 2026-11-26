@@ -9,15 +9,16 @@ sframe_plot_sentiment(result, palette = c("web", "print"))
 \arguments{
 \item{result}{A \code{tidy_sentiment} result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no table.
 }
 \description{
 A ggplot2 diverging bar for a \code{tidy_sentiment} result by default:
-positive counts extend one direction, negative counts the other, so bar
-position carries the polarity, so the chart reads without colour. Likert
+positive counts extend one direction and negative counts the other, so bar
+position carries the polarity and the chart reads without colour. Likert
 charts follow the same convention, with a darker shade toward each pole.
 Facets by group when \code{result$table} carries a
 \code{group} column, mirroring \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s grouped
@@ -28,8 +29,8 @@ When \code{result$options$wordcloud} is \code{TRUE} (opt-in, default \code{FALSE
 matching \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s own word-cloud toggle),
 draws a comparison cloud instead: negative-sentiment words above the
 centre line, positive-sentiment words below it, each word sized by how
-often it occurred, using the internal \code{tidy_sentiment} runner's
-\verb{$word_sentiment} word-by-sentiment counts. Answers a different
+often it occurred, from the word-by-sentiment counts the result holds in
+\verb{$word_sentiment}. Answers a different
 question from the diverging bar: not "how many responses leaned
 positive," but "which \emph{words} drove that."
 }

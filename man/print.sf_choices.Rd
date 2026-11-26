@@ -20,12 +20,12 @@ option's value and label.
 }
 \examples{
 cs <- sframe_choice_set("agree5", 1:5,
-                 c("Strongly disagree", "Disagree", "Neutral",
-                   "Agree", "Strongly agree"))
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
 print(cs)
 }
 \seealso{
-Other printing formatting and summary methods:
+Other Display methods:
 \code{\link[=format.sf_branch]{format.sf_branch()}},
 \code{\link[=format.sf_check]{format.sf_check()}},
 \code{\link[=format.sf_choices]{format.sf_choices()}},
@@ -47,4 +47,4 @@ Other printing formatting and summary methods:
 \code{\link[=summary.sf_scale]{summary.sf_scale()}},
 \code{\link[=summary.sframe]{summary.sframe()}}
 }
-\concept{printing formatting and summary methods}
+\concept{Display methods}

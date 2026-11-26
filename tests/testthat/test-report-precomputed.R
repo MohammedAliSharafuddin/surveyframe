@@ -38,6 +38,10 @@ test_that("the content holds the codebook table, the charts and the results", {
   content <- sframe_report_content(d$instrument, d$responses)
   expect_s3_class(content$codebook_items, "data.frame")
   expect_true(all(c("ID", "Label", "Required") %in% names(content$codebook_items)))
+  # Every column has a heading: the Quarto engine named 7 of the 8 when the
+  # help column joined the table, so its last <th> printed empty.
+  expect_identical(names(content$codebook_items)[8], "Help text")
+  expect_false(anyNA(names(content$codebook_items)))
   expect_true(length(content$charts) > 0)
   direct <- run_analysis_plan(d$responses, d$instrument, plots = TRUE)
   expect_identical(vapply(content$results, function(r) r$apa %||% "", ""),

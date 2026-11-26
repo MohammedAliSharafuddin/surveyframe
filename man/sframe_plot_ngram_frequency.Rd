@@ -9,16 +9,16 @@ sframe_plot_ngram_frequency(result, palette = c("web", "print"))
 \arguments{
 \item{result}{An \code{ngram_freq} result list from \code{\link[=run_analysis_plan]{run_analysis_plan()}}.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} when the result carries no table.
 }
 \description{
-Top 20 n-grams from an \code{ngram_freq} result as a horizontal bar chart.
-Shares its bar-building logic with \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}}'s bar
-path via the internal \code{.sframe_plot_term_bar()} helper. Unlike that
-function, there is no word-cloud mode and no group faceting for this id.
+Top 20 n-grams from an \code{ngram_freq} result as a horizontal bar chart, drawn
+as the bar chart of \code{\link[=sframe_plot_term_frequency]{sframe_plot_term_frequency()}} is. Unlike that
+function, it has no word-cloud mode and no faceting by group.
 }
 \examples{
 \donttest{

@@ -160,6 +160,34 @@ sframe_upload_ext <- function(upload) {
   tolower(tools::file_ext(upload$name %||% ""))
 }
 
+# What Open Instrument says when a chosen file does not open: it names the
+# file the researcher chose, not the temporary copy shiny reads, and tells a
+# file that is not an instrument (a .png, a .csv) from an instrument whose
+# hash does not match, where both read "Integrity check failed" before.
+studio_open_error_message <- function(e, upload) {
+  name <- upload$name %||% "The chosen file"
+  msg <- conditionMessage(e)
+  if (!is.null(upload$datapath)) {
+    for (p in unique(c(upload$datapath, normalizePath(upload$datapath, mustWork = FALSE),
+                       sframe_show_path(upload$datapath)))) {
+      msg <- gsub(p, name, msg, fixed = TRUE)
+    }
+  }
+  ext <- tolower(tools::file_ext(name))
+  not_instrument <- !identical(ext, "sframe") ||
+    grepl("^(Unsupported file type|Upload a \\.sframe|Uploaded \\.sframe file must)", msg) ||
+    grepl("parse error|lexical error|not valid JSON|premature EOF", msg, ignore.case = TRUE)
+  if (not_instrument) {
+    return(paste0(name, " is not an instrument file. Open a .sframe file, ",
+                  "as SurveyBuilder, SurveyStudio or write_sframe() saves it."))
+  }
+  if (grepl("Integrity check failed", msg, fixed = TRUE)) {
+    return(paste0("Integrity check failed for ", name, ". The file may have ",
+                  "been modified after it was written."))
+  }
+  paste0(name, " could not be opened: ", msg)
+}
+
 sframe_validate_upload <- function(upload, extensions, max_size = 10 * 1024^2) {
   if (is.null(upload) || is.null(upload$datapath) || !file.exists(upload$datapath)) {
     stop("No file was uploaded. Select a .sframe file and try again.", call. = FALSE)
@@ -1080,6 +1108,18 @@ studio_result_table_tag <- function(tbl, label = "Result table") {
   if (!is.data.frame(tbl) || nrow(tbl) == 0) {
     return(NULL)
   }
+  # A table whose rows are named, as a cross-tab's are by its row levels,
+  # shows the names as its first column. They were dropped, so G3's counts
+  # stood without the channels they belong to (N9).
+  rn <- rownames(tbl)
+  if (!is.null(rn) && !identical(rn, as.character(seq_len(nrow(tbl))))) {
+    tbl <- cbind(stats::setNames(data.frame(rn, stringsAsFactors = FALSE), " "),
+                 tbl, stringsAsFactors = FALSE)
+  }
+  # A p column prints as APA sets it, .032 or <.001, not rounded to 0 (J6).
+  for (pc in intersect(c("p", "p value", "p.value"), names(tbl))) {
+    if (is.numeric(tbl[[pc]])) tbl[[pc]] <- sframe_p_cell(tbl[[pc]])
+  }
   num_cols <- vapply(tbl, is.numeric, logical(1))
   if (any(num_cols)) {
     tbl[num_cols] <- lapply(tbl[num_cols], function(col) round(col, 3))
@@ -1092,6 +1132,19 @@ studio_result_table_tag <- function(tbl, label = "Result table") {
   })
   studio_scroll(tags$table(class = "sf-table", tags$thead(header),
                            tags$tbody(do.call(tagList, body_rows))), label)
+}
+
+# A result's table, then the table the report sets beside it, such as a
+# cross-tab's counts with the declared row percentages, under its caption,
+# as both report engines show it (N9).
+studio_result_tables <- function(result, label) {
+  sup <- tryCatch(sframe_result_supplement(result), error = function(e) NULL)
+  tagList(
+    studio_result_table_tag(result$table, label),
+    if (!is.null(sup) && is.data.frame(sup$table) && nrow(sup$table) > 0) tagList(
+      tags$p(class = "hint sf-table-caption", sup$caption %||% ""),
+      studio_result_table_tag(sup$table, paste(label, sup$caption %||% "")))
+  )
 }
 
 # The chart(s) attached to one analysis-plan result: the main chart, plus a
@@ -1434,6 +1487,13 @@ ui <- fluidPage(
       .badge-ok { background: var(--sf-success-tint); color: var(--sf-success-ink); }
       .badge-wait { background: var(--sf-warning-tint); color: var(--sf-warning-ink); }
       .badge-warn { background: var(--sf-danger-tint); color: var(--sf-danger-ink); }
+      /* A link inside running text is underlined, not told apart by colour
+         alone (WCAG 1.4.1, axe link-in-text-block on Design). */
+      .screen p a:not(.btn), .screen li a:not(.btn), .hint a:not(.btn) { text-decoration: underline; }
+      .sf-error-card { border-left: 4px solid var(--sf-danger-ink); }
+      /* The blank-CSV label is long; at 390 px it wraps inside the screen. */
+      #download_sample_csv, #load_sample_btn { white-space: normal; max-width: 100%; height: auto; }
+      .sf-error-card p { margin: 4px 0; overflow-wrap: anywhere; }
       .filter-bar { background: var(--sf-surface); border-radius: 10px; padding: 14px 16px; box-shadow: var(--sf-shadow-1); margin-bottom: 16px; }
       .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; align-items: end; }
       .filter-grid label { font-size: 12px; font-weight: 600; color: var(--sf-text-2); }
@@ -2048,12 +2108,13 @@ ui <- fluidPage(
             "Responses can come from the exported surveyframe survey or from another tool (Microsoft Forms, Qualtrics, Google Forms, and similar). Export them to CSV, then:"),
           tags$ol(class = "hint", style = "margin: 0 0 12px; padding-left: 18px; line-height: 1.7",
             tags$li("Open the matching instrument on the Open Instrument screen. The .sframe carries the analysis plan, so it is still required."),
-            tags$li("Make sure the CSV column names match the item IDs in that instrument (download the sample CSV below for the expected format)."),
+            tags$li("Make sure the CSV column names match the item IDs in that instrument (the blank CSV below has a header row with every column this instrument expects)."),
             tags$li("Browse the CSV above, set the respondent-ID and submitted-at columns if present, then click Load responses.")
           ),
-          downloadButton("download_sample_csv", "Download sample CSV format", class = "btn-outline sf-secondary"),
+          downloadButton("download_sample_csv", "Download a blank CSV for this instrument", class = "btn-outline sf-secondary"),
           actionButton("load_sample_btn", "Or load the bundled demo", class = "btn-outline sf-secondary")
         ),
+        uiOutput("responses_error"),
         uiOutput("responses_summary_card"),
         uiOutput("responses_amend_card")
       ),
@@ -2062,8 +2123,9 @@ ui <- fluidPage(
         tags$div(class = "screen-head", tags$h2(class = "screen-title", "Quality"),
           studio_next_primary("reliability", "Check reliability")),
         uiOutput("quality_gate"),
-        uiOutput("quality_output"),
+        # The chart first, then the tables it summarises (N6).
         plotOutput("studio_quality_chart", height = "260px"),
+        uiOutput("quality_output"),
         plotOutput("studio_missing_chart", height = "260px"),
         uiOutput("quality_amend_card")
       ),
@@ -2659,8 +2721,9 @@ server <- function(input, output, session) {
       showNotification("Instrument loaded. Showing the survey preview.", type = "message")
       switch_tab("preview")
     }, error = function(e) {
-      rv$open_verification <- paste("Integrity check failed:", conditionMessage(e))
-      showNotification(paste("Error:", conditionMessage(e)), type = "error")
+      msg <- studio_open_error_message(e, input$instr_file)
+      rv$open_verification <- msg
+      showNotification(msg, type = "error")
     })
   })
 
@@ -3007,9 +3070,13 @@ server <- function(input, output, session) {
         submitted_at = time_col,
         strict = isTRUE(input$resp_strict)
       )
+      rv$responses_error <- NULL
       showNotification(paste(nrow(rv$responses), "responses loaded."), type = "message")
       switch_tab("quality")
     }, error = function(e) {
+      # The reason stays on the panel until the next load: a notification
+      # alone was gone in seconds, before a long column list could be read.
+      rv$responses_error <- conditionMessage(e)
       showNotification(paste("Error:", conditionMessage(e)), type = "error")
     })
   })
@@ -3035,10 +3102,12 @@ server <- function(input, output, session) {
         respondent_id = trim_or_null(input$sheet_id_col),
         submitted_at  = trim_or_null(input$sheet_time_col)
       )
+      rv$responses_error <- NULL
       showNotification(paste(nrow(rv$responses), "responses read from the Google Sheet."),
                        type = "message")
       switch_tab("quality")
     }, error = function(e) {
+      rv$responses_error <- paste("Google Sheet error:", conditionMessage(e))
       showNotification(paste("Google Sheet error:", conditionMessage(e)), type = "error")
     })
   })
@@ -3061,12 +3130,22 @@ server <- function(input, output, session) {
     })
   })
 
+  # The blank response file for the open instrument: its header row holds
+  # the columns read_responses() expects, from the same column contract the
+  # Google Sheets collector writes (N5). With no instrument open, the
+  # bundled input_types demo's instrument stands in.
+  sample_csv_instrument <- function() {
+    rv$instrument %||% sframe_demo("input_types", preview = FALSE)$instrument
+  }
   output$download_sample_csv <- downloadHandler(
-    filename = function() "surveyframe_input_types_responses.csv",
+    filename = function() {
+      inst <- sample_csv_instrument()
+      stem <- tolower(gsub("[^A-Za-z0-9]+", "_", inst$meta$title %||% "survey"))
+      stem <- gsub("^_+|_+$", "", stem)
+      paste0(if (nzchar(stem)) stem else "survey", "_responses_template.csv")
+    },
     content = function(file) {
-      src <- system.file("extdata", "surveyframe_input_types_responses.csv",
-                         package = "surveyframe")
-      file.copy(src, file, overwrite = TRUE)
+      sframe_write_response_template(sample_csv_instrument(), file)
     }
   )
 
@@ -3076,7 +3155,11 @@ server <- function(input, output, session) {
     # needing fixes (Codex P1-09).
     empty <- is.null(rv$instrument) && length(draft$instrument$items) == 0
     tagList(
-      if (!empty) tags$div(if (draft$valid) "Draft ready" else "Draft needs fixes"),
+      # An open instrument that passes validation is "Valid" (P1-09); "Draft"
+      # is for what is being written in Design and not yet opened.
+      if (!empty) tags$div(id = "status_validity",
+        if (draft$valid) (if (!is.null(rv$instrument)) "Valid" else "Draft valid")
+        else if (!is.null(rv$instrument)) "Needs fixes" else "Draft needs fixes"),
       tags$div(id = "status_instrument", if (!is.null(rv$instrument))
         paste0("Instrument ", sframe_studio_version_label(rv$instrument))
         else if (empty) "No instrument open"
@@ -3338,6 +3421,14 @@ server <- function(input, output, session) {
     }
   })
 
+  output$responses_error <- renderUI({
+    msg <- rv$responses_error
+    if (is.null(msg)) return(NULL)
+    tags$div(class = "card sf-error-card", id = "responses_error_card", role = "alert",
+      tags$div(class = "card-title", "The responses were not loaded"),
+      lapply(strsplit(msg, "\n", fixed = TRUE)[[1]], function(line) tags$p(line)))
+  })
+
   output$responses_summary_card <- renderUI({
     req(rv$responses)
     tags$div(class = "card",
@@ -3382,6 +3473,12 @@ server <- function(input, output, session) {
   output$quality_output <- renderUI({
     req(rv$instrument, rv$responses)
     qr <- quality_result()
+    # A share as "12.5%", or "not computed" where it is missing, which printed
+    # as "NA%" (N6).
+    pct <- function(x) {
+      x <- suppressWarnings(as.numeric(x %||% NA_real_))[1]
+      if (length(x) == 0 || is.na(x)) "not computed" else sprintf("%.1f%%", x * 100)
+    }
     n <- qr$summary$n_respondents
     n_flag <- qr$summary$n_flagged %||% 0L
     stat_box <- function(v, l) tags$div(class = "stat-box",
@@ -3394,7 +3491,7 @@ server <- function(input, output, session) {
           stat_box(n, "Respondents"),
           stat_box(qr$summary$n_items, "Items"),
           stat_box(n - n_flag, "Clean"),
-          stat_box(sprintf("%d (%.1f%%)", n_flag, qr$summary$flag_rate * 100), "Flagged")
+          stat_box(sprintf("%d (%s)", n_flag, pct(qr$summary$flag_rate)), "Flagged")
         ),
         tags$p(class = "hint",
           "A respondent is flagged if caught by any check below: a failed attention check, straight-lining a scale, completing too fast, missing more than the threshold, or being a duplicate row.")
@@ -3407,7 +3504,7 @@ server <- function(input, output, session) {
             tags$td(chk$type),
             tags$td(chk$n_pass %||% NA),
             tags$td(chk$n_fail),
-            tags$td(sprintf("%.1f%%", chk$pass_rate * 100))
+            tags$td(pct(chk$pass_rate))
           )
         })
         table_card("Attention checks",
@@ -3422,7 +3519,11 @@ server <- function(input, output, session) {
             tags$td(s$scale_id),
             tags$td(s$n_items),
             tags$td(length(s$flagged_rows %||% integer(0))),
-            tags$td(sprintf("%.1f%%", (s$flag_rate %||% 0) * 100))
+            # A scale's rate over the respondents who answered it, or over
+            # every respondent when the report gives none.
+            tags$td(pct(if (is.null(s$flag_rate) || is.na(s$flag_rate[1])) {
+              if (isTRUE(n > 0)) length(s$flagged_rows %||% integer(0)) / n else NA
+            } else s$flag_rate))
           )
         })
         table_card("Straight-lining by scale",
@@ -3435,10 +3536,10 @@ server <- function(input, output, session) {
         tags$div(class = "card-title", "Completion time"),
         if (isTRUE(qr$timing$available)) {
           tags$p(sprintf(
-            "Median completion %.0f seconds. %s (%.1f%%) flagged as too fast.",
+            "Median completion %.0f seconds. %s (%s) flagged as too fast.",
             qr$timing$median_sec %||% NA_real_,
             sframe_count_noun(qr$timing$n_flagged %||% 0L, "respondent"),
-            (qr$timing$flag_rate %||% 0) * 100))
+            pct(qr$timing$flag_rate %||% 0)))
         } else {
           tags$p(class = "hint",
             qr$timing$reason %||% "Timing analysis needs started_at and submitted_at columns.")
@@ -3448,15 +3549,16 @@ server <- function(input, output, session) {
       tags$div(class = "card",
         tags$div(class = "card-title", "Duplicates and missingness"),
         if (isTRUE(qr$duplicates$checked)) {
-          tags$p(paste0(sframe_count_noun(qr$duplicates$n_duplicates %||% 0L,
-                                           "duplicate response row"), " detected."))
+          n_dup <- qr$duplicates$n_duplicates %||% 0L
+          tags$p(if (isTRUE(n_dup == 0)) "No duplicate response rows."
+                 else paste0(sframe_count_noun(n_dup, "duplicate response row"), " detected."))
         } else {
           tags$p(class = "hint",
             "Duplicates were not checked. Name the respondent ID column to check them.")
         },
         tags$p(sprintf(
-          "%.1f%% of respondents exceed the %.0f%% missing threshold.",
-          mean(qr$missing$respondent_miss > qr$missing$flagged_threshold, na.rm = TRUE) * 100,
+          "%s of respondents exceed the %.0f%% missing threshold.",
+          pct(mean(qr$missing$respondent_miss > qr$missing$flagged_threshold, na.rm = TRUE)),
           qr$missing$flagged_threshold * 100
         ))
       )
@@ -3750,7 +3852,7 @@ server <- function(input, output, session) {
           tagList(
             tags$p(tags$strong("Result: "),
                    result$apa %||% "See the matching section of the report."),
-            studio_result_table_tag(result$table,
+            studio_result_tables(result,
                                     paste(studio_rq_heading(i, result$block_id), "result table")),
             # A CFA/SEM/PLS-SEM syntax block has no table or chart: its
             # whole output is the generated syntax text.
@@ -4242,7 +4344,7 @@ server <- function(input, output, session) {
         } else {
           tagList(
             tags$p(tags$strong("Result: "), result$apa %||% ""),
-            studio_result_table_tag(result$table,
+            studio_result_tables(result,
                                     paste(studio_rq_heading(i, block_id), "result table")),
             if (!is.null(result$syntax)) tags$pre(class = "sf-code", result$syntax),
             do.call(tagList, plot_tags)

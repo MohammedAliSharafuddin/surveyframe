@@ -15,7 +15,7 @@ read_responses(
 )
 }
 \arguments{
-\item{x}{A file path to a delimited text file, a \code{data.frame}, or a \code{tibble}.}
+\item{x}{A file path to a delimited text file, a \code{data.frame} or a \code{tibble}.}
 
 \item{instrument}{An \code{sframe} object created by \code{\link[=sframe_instrument]{sframe_instrument()}}.}
 
@@ -65,7 +65,7 @@ in the instrument. Non-item columns are allowed only when declared through
 A single-answer item has 1 column named by its ID. A matrix, ranking,
 multiple-choice or decision item has 1 column per row, option, pair or
 criterion, named \code{item__sub}, and each is checked: a battery with some of its
-columns absent is reported by name. 2 columns with the same name are
+columns absent is reported by name. Two columns with the same name are
 refused, since one would otherwise be lost.
 
 A choice set with \code{allow_other} ("Other, please specify") adds

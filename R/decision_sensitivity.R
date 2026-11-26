@@ -51,8 +51,8 @@
 #'   criterion.
 #' @param method Ranking method. One of `"topsis"`, `"vikor"`, `"moora"`,
 #'   `"smart"`, `"waspas"`, `"promethee"` or `"electre"`.
-#' @param delta Perturbation size as a proportion of the weight, default
-#'   `0.05`. A weight of 0.40 with `delta = 0.05` is tested at 0.42 and 0.38
+#' @param delta Perturbation size as a proportion of the weight. Defaults
+#'   to 0.05. A weight of 0.40 with `delta = 0.05` is tested at 0.42 and 0.38
 #'   before renormalisation.
 #' @param alternatives Optional labels for the rows of `x`.
 #' @param criteria Optional labels for the columns of `x`.

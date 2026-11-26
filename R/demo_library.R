@@ -126,8 +126,9 @@ sframe_reference_demo <- function(name) {
 
 #' List the bundled demos
 #'
-#' Every demo does one job, so a failure points at one method and a reader can
-#' hold the whole questionnaire in view. Use [sframe_demo()] to load one.
+#' Lists the demos that ship with the package. Every demo does one job, so a
+#' failure points at one method and a reader can hold the whole questionnaire
+#' in view. Use [sframe_demo()] to load one.
 #'
 #' The 25 teaching demos come first. The last 2 rows, with focus
 #' `"reference"`, are larger datasets: `"tourism_services"`, a realistic
@@ -137,7 +138,7 @@ sframe_reference_demo <- function(name) {
 #' @return A data frame of class `sframe_demo_list` with 1 row per demo: its
 #'   `name`, whether its `focus` is analysis, presentation, provenance or
 #'   reference, what it `teaches`, the input `fields` it uses, the statistical
-#'   `technique` it demonstrates, and the demo whose responses it reuses, if
+#'   `technique` it demonstrates and the demo whose responses it reuses, if
 #'   any. Printed, it shows 1 line per demo, grouped by focus, with
 #'   `two_group` named as the place to start. `as.data.frame()` gives the
 #'   full table.
@@ -145,7 +146,7 @@ sframe_reference_demo <- function(name) {
 #' @seealso [sframe_demo()], [sframe_demo_qmd()]
 #' @examples
 #' sframe_list_demos()
-#' head(as.data.frame(sframe_list_demos()), 3)
+#' head(as.data.frame(sframe_list_demos())[, c("name", "focus")], 3)
 #' @family Demo functions
 sframe_list_demos <- function() {
   structure(rbind(sframe_demo_index(), sframe_reference_demo_index()),
@@ -188,7 +189,7 @@ sframe_demo_dir <- function() {
 
 #' Load one bundled demo
 #'
-#' One of the 25-item teaching library: 19 analysis examples, 3
+#' One of the 25 demos in the teaching library: 19 analysis examples, 3
 #' presentation examples and 3 provenance examples. Or 1 of the 2 reference
 #' datasets: `"tourism_services"`, a realistic multi-scale instrument, and
 #' `"input_types"`, which uses every input type SurveyBuilder and
@@ -196,7 +197,7 @@ sframe_demo_dir <- function() {
 #'
 #' @param name Character. A demo name, as listed by [sframe_list_demos()].
 #' @param branded Logical. When `TRUE`, the instrument comes back with the
-#'   standard welcome page, logo, theme colour and thank you page spliced into
+#'   standard welcome page, logo, theme colour and thank-you page spliced into
 #'   its `render` block. The bundled file on disk is left unchanged, so the
 #'   same branding can be shown on whichever demo matches your own survey.
 #' @param preview Logical. When `TRUE`, in an interactive session, the survey
@@ -205,7 +206,7 @@ sframe_demo_dir <- function() {
 #'   answers go nowhere. Nothing opens in a script, a knitr or Quarto render,
 #'   or with `options(surveyframe.demo_preview = FALSE)`.
 #'
-#' @return A list of class `sframe_demo` with `instrument`, `responses`, and
+#' @return A list of class `sframe_demo` with `instrument`, `responses` and
 #'   the paths behind them. Printed, it shows a short card: what the demo
 #'   teaches, its size, its files and the commands to try next. The parts are
 #'   `instrument`, `responses`,
@@ -484,7 +485,9 @@ print.sframe_branding <- function(x, ...) {
 
 #' Write responses to SPSS or Stata with the labels attached
 #'
-#' A plain CSV carries codes. `dm_1` arrives in SPSS as a column of integers
+#' Writes response data to an SPSS `.sav` or Stata `.dta` file, with variable
+#' and value labels taken from the instrument. A plain CSV carries codes:
+#' `dm_1` arrives in SPSS as a column of integers
 #' with empty variable and value labels, and the reader has to
 #' reconstruct all of it from the questionnaire. This attaches both from the
 #' instrument: the variable label is the item's `label`, and the value labels
@@ -514,7 +517,7 @@ print.sframe_branding <- function(x, ...) {
 #' a letter, and a number added where 2 names would otherwise match. Variable
 #' labels are cut at 256 bytes for SPSS and 80 characters for Stata, and value
 #' labels at 120 bytes for SPSS and 80 characters for Stata. Everything else
-#' keeps its full label. 1 message lists each change as old -> new.
+#' keeps its full label. One message lists each change as old -> new.
 #'
 #' @return The path, invisibly. When any name or label was changed, the path
 #'   carries an attribute `"renamed"`, a data frame with the columns `kind`
@@ -720,7 +723,8 @@ sframe_labelled_message <- function(changes, ext) {
 #'
 #' @param name Character. A demo name, as listed by [sframe_list_demos()].
 #' @param dir Directory to write into. Defaults to the working directory.
-#' @param overwrite Logical. Overwrite an existing file of the same name.
+#' @param overwrite Logical. Whether to overwrite an existing file of the
+#'   same name. Defaults to `FALSE`.
 #'
 #' @return The path written, invisibly.
 #' @export
@@ -787,9 +791,10 @@ sframe_demo_qmd <- function(name, dir = ".", overwrite = FALSE) {
 #'   the notebook runs.
 #' @param dir Directory to write into. Defaults to the working directory.
 #' @param basename Character or `NULL`. File base name shared by the `.qmd`,
-#'   `.sframe`, and `_responses.csv` files. Defaults to a slug of the
+#'   `.sframe` and `_responses.csv` files. Defaults to a slug of the
 #'   instrument's title.
-#' @param overwrite Logical. Overwrite existing files of the same name.
+#' @param overwrite Logical. Whether to overwrite existing files of the same
+#'   name. Defaults to `FALSE`.
 #'
 #' @return A list with `qmd`, `sframe` and `csv` paths, invisibly.
 #' @export

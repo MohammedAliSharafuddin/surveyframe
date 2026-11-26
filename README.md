@@ -14,6 +14,7 @@ Same study, same verifiable file.
   <a href="https://cran.r-project.org/package=surveyframe"><img src="https://cranlogs.r-pkg.org/badges/grand-total/surveyframe" alt="CRAN downloads" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-0a6f6d.svg" alt="MIT licence" /></a>
   <a href="https://github.com/MohammedAliSharafuddin/surveyframe"><img src="https://img.shields.io/github/stars/MohammedAliSharafuddin/surveyframe?style=flat&color=0a6f6d" alt="GitHub stars" /></a>
+  <a href="https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check" /></a>
 </p>
 
 <p align="center">
@@ -26,7 +27,7 @@ Same study, same verifiable file.
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MohammedAliSharafuddin/surveyframe/main/.github/readme/studio.png" width="900" alt="SurveyStudio's Design screen, with the Build, Collect, Analyse, Report and Record stages on the left" />
+  <img src="https://raw.githubusercontent.com/MohammedAliSharafuddin/surveyframe/main/.github/readme/studio.png" width="900" alt="SurveyStudio's Design screen with a question open: the question list on the left, the live survey preview in the centre and the question settings on the right" />
 </p>
 
 ## What you get
@@ -36,12 +37,12 @@ You write your analysis plan with your questions. When the answers arrive, surve
 - **A point-and-click studio.** Build, preview and run a whole study in SurveyStudio, from 1 line of R or the RStudio Addins menu.
 - **The plan before the data.** Each research question is tied to its test and its variables at design time, ready to preregister.
 - **APA 7 reports.** Create tables, figures, effect sizes and references in HTML, Word, PDF or Quarto.
-- **Psychometrics and models.** Run reliability, item analysis, EFA, CFA, SEM and PLS-SEM syntax from 1 model.
+- **Psychometrics and models.** Run reliability, item analysis and EFA, and write CFA, SEM and PLS-SEM syntax from 1 model.
 - **Small samples and decisions.** Use exact tests, Firth regression and 10 multi-criteria decision methods.
 - **Files anyone can verify.** Every questionnaire carries a sealed hash and an amendment log.
 
-Free and open source under MIT, with no account. The analysis runs on your
-computer, and you choose where responses are collected and stored.
+Free and open source under the MIT licence, with no account needed. The analysis
+runs on your computer, and you choose where responses are collected and stored.
 
 ## How it works
 
@@ -60,7 +61,7 @@ install.packages("surveyframe")
 surveyframe::launch_studio()
 ```
 
-Or open RStudio's **Addins** menu and choose **surveyframe: Try a demo**: pick a study, and it opens in SurveyStudio with its questionnaire, plan and demonstration responses.
+Or open RStudio's **Addins** menu, choose **surveyframe: Try a demo** and pick a study. It opens in SurveyStudio with its questionnaire, plan and demonstration responses.
 
 The development version, with the newest features before they reach CRAN:
 
@@ -90,7 +91,7 @@ Use surveyframe when:
 
 Another tool fits better when:
 
-- you only need to collect responses with no plan up front (Google Forms, Qualtrics, REDCap, [surveydown](https://github.com/surveydown-dev/surveydown)). surveyframe reads their exported data later.
+- you only need to collect responses, with no plan up front (Google Forms, Qualtrics, REDCap, [surveydown](https://github.com/surveydown-dev/surveydown)). surveyframe can read their exported data later.
 - you need weighting or complex-sample variance ([survey](https://cran.r-project.org/package=survey), [srvyr](https://cran.r-project.org/package=srvyr)). surveyframe works alongside them.
 
 ## FAQ
@@ -118,8 +119,6 @@ citation("surveyframe")
 
 Questions and bug reports are welcome in [issues](https://github.com/MohammedAliSharafuddin/surveyframe/issues).
 
-[![R-CMD-check](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MohammedAliSharafuddin/surveyframe/actions/workflows/R-CMD-check.yaml)
+## Licence
 
-## License
-
-MIT. See [LICENSE](LICENSE).
+MIT, copyright 2026 Mohammed Ali Sharafuddin. See [LICENSE](LICENSE).

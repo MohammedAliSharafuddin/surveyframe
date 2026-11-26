@@ -6,18 +6,12 @@
 \alias{surveyframe-package}
 \title{surveyframe: Design, Plan, Seal and Report Questionnaire Studies}
 \description{
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
+Design a questionnaire, declare its analysis plan and seal both in 1 verifiable file, then check the responses and report from that plan. The instrument, an analysis plan declared before data collection and a measurement or structural model are held in 1 typed, integrity-checked object (the 'sframe'), so a study's confirmatory tests are fixed before any response arrives. Includes visual instrument design in a browser-based builder or a 'Shiny' studio, export to a self-contained static HTML survey, an embeddable 'Shiny' module, SHA-256 integrity-checked serialisation to the '.sframe' format, multi-page survey rendering with branching logic, response quality checks, scale scoring, psychometric diagnostics, analysis-plan execution, model syntax for EFA, CFA, CB-SEM and PLS-SEM, an interactive response dashboard, codebooks and reproducible reports. Also supports multi-criteria decision analysis (AHP, ANP, DEMATEL, TOPSIS, VIKOR, MOORA, SMART, WASPAS, PROMETHEE II and ELECTRE I) and small-sample methods (Hodges-Lehmann estimates, exact odds ratios and Firth logistic regression). Open-ended responses are analysed by term and n-gram frequency, keyword in context, co-occurrence networks, sentiment, document-feature matrices and topic models (LDA or structural topic models).
+}
+\details{
 \if{latex}{\out{\global\emergencystretch=3em\global\tolerance=3000\global\hbadness=10000}}
-surveyframe defines a survey instrument as a first-class R object and
-supports a complete workflow from questionnaire design through data
-collection, quality checking, scoring, psychometric diagnostics and
-reproducible reporting. The package covers static HTML survey export,
-an embeddable Shiny survey module, an interactive response dashboard,
-a role-based analysis planner with pre-declared research questions, common
-survey statistics with small-sample alternatives (Hodges-Lehmann,
-pseudomedian, exact odds-ratio and Firth logistic regression), multi-
-criteria decision analysis (AHP, ANP, DEMATEL, VIKOR, MOORA, SMART,
-WASPAS, PROMETHEE, ELECTRE and TOPSIS), and model syntax planning for
-EFA, CFA, CB-SEM and PLS-SEM.
 \subsection{Start here}{
 
 \code{\link[=launch_studio]{launch_studio()}} opens SurveyStudio, where you point and click an
@@ -130,8 +124,8 @@ the \code{sframe_syntax_} generators, the plots and the demo library.
 }
 
 Lister names use the \code{sframe_get_} prefix, such as \code{sframe_get_items()}.
-The names used before 0.4.3 still work, silently. See
-\link{superseded}.
+The names used before 0.4.3 still work, silently. The help page
+\code{?superseded} lists each old name with its replacement.
 }
 
 \subsection{File format}{
@@ -149,7 +143,7 @@ Useful links:
 }
 
 
-Other entry points:
+Other Entry points:
 \code{\link[=launch_studio]{launch_studio()}}
 }
 \author{
@@ -161,4 +155,4 @@ Authors:
 }
 
 }
-\concept{entry points}
+\concept{Entry points}

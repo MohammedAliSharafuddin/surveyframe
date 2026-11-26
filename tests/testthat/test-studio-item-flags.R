@@ -9,26 +9,29 @@
 
 skip_if_not_installed("psych")
 
+# likert_scale since the demos were calibrated to psych::bfi (2026-11-26):
+# its weak reverse-worded org_4 is the item RQ2's reliability check flags,
+# where factor_structure's con_4 loaded .398 on the old flat data.
 fs_flagged <- function() {
-  d <- sframe_demo("factor_structure")
+  d <- sframe_demo("likert_scale")
   res <- suppressWarnings(run_analysis_plan(d$responses, d$instrument))
   hit <- Filter(function(r) identical(r$block_id, "RQ2"), res)[[1]]
   list(instrument = d$instrument, result = hit,
        flags = surveyframe:::sframe_studio_result_flags(hit))
 }
 
-test_that("a flagged EFA item is dropped from the scale holding it", {
+test_that("a flagged reliability item is dropped from the scale holding it", {
   x <- fs_flagged()
-  expect_identical(x$flags$item, "con_4")
+  expect_identical(x$flags$item, "org_4")
   expect_identical(surveyframe:::sframe_studio_drop_targets(x$instrument, x$flags),
-                   "content")
+                   "organisation")
 
   p <- surveyframe:::sframe_studio_drop_proposal(x$instrument, x$flags)
-  content <- Filter(function(s) s$id == "content", p$after$scales)[[1]]
-  expect_false("con_4" %in% content$items)
-  expect_match(p$defaults$reason_text, "con_4: loading .398 in RQ2, below .40",
+  org <- Filter(function(s) s$id == "organisation", p$after$scales)[[1]]
+  expect_false("org_4" %in% org$items)
+  expect_match(p$defaults$reason_text, "org_4: alpha if deleted .73 in RQ2, above the scale's .69",
                fixed = TRUE)
-  expect_match(p$start_label, "Drop con_4 from content", fixed = TRUE)
+  expect_match(p$start_label, "Drop org_4 from organisation", fixed = TRUE)
 })
 
 test_that("a reliability flag names its scale, a CFA flag its models", {
@@ -57,7 +60,7 @@ test_that("Put back is a second amendment that restores the scale and the item",
   expect_identical(restored$items, x$instrument$items)
   back <- suppressMessages(amend_sframe(
     dropped, restored, reason_code = "model_respecification",
-    reason_text = "Put con_4 back in content.", tier = "design",
+    reason_text = "Put org_4 back in organisation.", tier = "design",
     deviation_report = "Undoing the drop.", version = "1.2.0"))
   log <- sframe_get_amendments(back)
   expect_identical(nrow(log), 2L)
@@ -69,7 +72,7 @@ test_that("Put back is a second amendment that restores the scale and the item",
   expect_identical(names(hist), c("Date", "Tier", "Reason", "What changed",
                                   "Deviation report", "Hash before", "Hash after"))
   expect_identical(hist$Tier, c("Design", "Design"))
-  expect_match(hist$Reason[2], "^Model respecification: Put con_4 back")
+  expect_match(hist$Reason[2], "^Model respecification: Put org_4 back")
   expect_identical(hist$`Hash before`[2], hist$`Hash after`[1])
   expect_identical(nchar(hist$`Hash after`), c(12L, 12L))
 })
@@ -79,8 +82,8 @@ test_that("Put back refuses a scale changed again since the drop", {
   p <- surveyframe:::sframe_studio_drop_proposal(x$instrument, x$flags)
   drop <- list(item = p$item, before = x$instrument, after = p$after)
   later <- p$after
-  k <- which(vapply(later$scales, function(s) s$id, "") == "content")
-  later$scales[[k]]$items <- setdiff(later$scales[[k]]$items, "con_3")
+  k <- which(vapply(later$scales, function(s) s$id, "") == "organisation")
+  later$scales[[k]]$items <- setdiff(later$scales[[k]]$items, "org_3")
   expect_error(surveyframe:::sframe_studio_put_back(later, drop),
                class = "sframe_put_back_error")
 })

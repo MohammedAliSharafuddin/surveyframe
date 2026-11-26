@@ -18,8 +18,8 @@ when an instrument is supplied, otherwise all columns.}
 \value{
 An object of class \code{sframe_missing_data_report}. Its
 \code{item_missing} and \code{respondent_missing} tables give \code{missing_prop}, a
-proportion between 0 and 1. Their \code{missing_pct} column, the name before
-0.4.3 kept for 1 release, holds the same proportion from 0 to 1. The
+proportion between 0 and 1, and \code{missing_pct}, the same share as a
+percentage from 0 to 100, as its name says. The
 \code{patterns} table gives each pattern's \code{n}, its \code{percent} from 0 to 100
 and its \code{prop} between 0 and 1.
 }

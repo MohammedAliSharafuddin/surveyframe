@@ -25,21 +25,24 @@ sframe_efa_solution(
 
 \item{scales}{Optional scale IDs used to select item columns.}
 
-\item{nfactors}{Number of factors.}
+\item{nfactors}{Integer. Number of factors. Defaults to 1.}
 
-\item{extraction}{Extraction method passed to \code{psych::fa()}.}
+\item{extraction}{Extraction method passed to \code{psych::fa()}: \code{"minres"}
+(the default), \code{"pa"} or \code{"ml"}.}
 
-\item{rotation}{Rotation method passed to \code{psych::fa()}.}
+\item{rotation}{Rotation method passed to \code{psych::fa()}: \code{"oblimin"}
+(the default), \code{"promax"} or \code{"varimax"}.}
 
-\item{min_loading}{Minimum salient loading.}
+\item{min_loading}{Minimum salient loading. Defaults to 0.3.}
 
-\item{cross_loading}{Maximum secondary loading before a warning is raised.}
+\item{cross_loading}{Maximum secondary loading before a warning is raised.
+Defaults to 0.3.}
 }
 \value{
 An object of class \code{sframe_efa_solution}. Alongside the psych
 objects it carries 3 tidy data frames ready for plotting and
 reporting: \code{loadings_long} (item_id, factor, loading),
-\code{communalities_table} (item_id, communality, uniqueness), and
+\code{communalities_table} (item_id, communality, uniqueness) and
 \code{variance_table} (factor, ss_loadings, proportion_var,
 cumulative_var).
 }

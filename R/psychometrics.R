@@ -17,7 +17,8 @@
 #'
 #' @return An object of class `sframe_reliability_report`, a list with one
 #'   element per scale. Each element holds `scale_id`, `label`, `n_items`,
-#'   `n`, `alpha`, `alpha_std` and `alpha_if_deleted`, and with `omega =
+#'   `n`, `alpha`, `alpha_ci` (Feldt's 95% confidence interval, as `lower`
+#'   and `upper`), `alpha_std` and `alpha_if_deleted`, and with `omega =
 #'   TRUE`, `omega_t`, McDonald's omega total from a 1-factor model. Every
 #'   display reports alpha and `omega_t`. `omega_h` is kept for code that
 #'   reads it: in a 1-factor model there are no group factors, so it carries
@@ -78,6 +79,10 @@ sframe_reliability_results <- function(
       ))
       result$alpha      <- a$total$raw_alpha
       result$alpha_std  <- a$total$std.alpha
+      # Feldt's (1965) 95% interval, the one psych::alpha.ci() gives, from
+      # the F distribution on n - 1 and (n - 1)(k - 1) degrees of freedom
+      # (L2).
+      result$alpha_ci <- sframe_alpha_ci(result$alpha, result$n, result$n_items)
       # Alpha with each item left out, for sframe_item_flags().
       result$alpha_if_deleted <- stats::setNames(a$alpha.drop$raw_alpha, rownames(a$alpha.drop))
     }
@@ -125,6 +130,18 @@ sframe_reliability_results <- function(
   structure(results, class = "sframe_reliability_report")
 }
 
+# Feldt's confidence interval for Cronbach's alpha, as c(lower, upper) with
+# a "level" attribute, or NULL when it cannot be computed.
+sframe_alpha_ci <- function(alpha, n, k, level = 0.95) {
+  if (is.null(alpha) || !is.finite(alpha) || n < 3 || k < 2) return(NULL)
+  df1 <- n - 1
+  df2 <- (n - 1) * (k - 1)
+  g <- (1 - level) / 2
+  structure(c(lower = 1 - (1 - alpha) * stats::qf(1 - g, df1, df2),
+              upper = 1 - (1 - alpha) * stats::qf(g, df1, df2)),
+            level = level)
+}
+
 #' @exportS3Method print sframe_reliability_report
 print.sframe_reliability_report <- function(x, ...) {
   cat("Reliability Report\n\n")
@@ -145,7 +162,7 @@ print.sframe_reliability_report <- function(x, ...) {
 #' Generate item-level diagnostics
 #'
 #' Produces, for each item within each scale, the item-rest correlation,
-#' floor and ceiling proportions, and the item mean and standard deviation.
+#' floor and ceiling proportions and the item mean and standard deviation.
 #'
 #' Diagnostics use the scale's scoring orientation, so an item the scale
 #' reverse-codes is reversed first, as in [score_scales()] and
@@ -169,8 +186,8 @@ print.sframe_reliability_report <- function(x, ...) {
 #'   element per scale, each a list holding `scale_id`, `label` and
 #'   `diagnostics`, a data frame with one row per item and columns `item_id`,
 #'   `mean`, `sd`, `item_rest_r`, `floor_prop`, `ceiling_prop` and `n_missing`. The floor and ceiling
-#'   shares are proportions. `floor_pct` and `ceiling_pct`, their names
-#'   before 0.4.3, are kept as copies for 1 release.
+#'   shares are proportions. `floor_pct` and `ceiling_pct` give the same
+#'   shares as percentages from 0 to 100.
 #'   `as.data.frame()` stacks every scale's diagnostics into one table.
 #' @export
 #' @seealso [sframe_reliability_results()], [sframe_scale()]
@@ -222,9 +239,9 @@ sframe_item_results <- function(data, instrument, scales = NULL) {
         ceiling_prop = if (is.null(bounds)) NA_real_ else mean(vals == bounds[2]),
         n_missing    = sum(is.na(oriented[[col]]))
       )
-      # floor_pct and ceiling_pct, the names before 0.4.3, kept for 1 release
-      d$floor_pct <- d$floor_prop
-      d$ceiling_pct <- d$ceiling_prop
+      # floor_pct and ceiling_pct hold percentages, as their names say (I5)
+      d$floor_pct <- 100 * d$floor_prop
+      d$ceiling_pct <- 100 * d$ceiling_prop
       d
     })
 
@@ -254,7 +271,7 @@ print.sframe_item_report <- function(x, ...) {
 
 # efa_report.R
 
-#' Prepare a survey instrument for exploratory factor analysis
+#' Check whether scale items are ready for exploratory factor analysis
 #'
 #' Reports KMO sampling adequacy, Bartlett's test of sphericity and a
 #' parallel analysis scree plot to inform factor number selection. The

@@ -21,7 +21,8 @@ columns are used.}
 
 \item{split_by}{Optional grouping variable.}
 
-\item{conf_level}{Confidence level for the mean interval.}
+\item{conf_level}{Confidence level for the mean interval. Defaults to
+0.95.}
 
 \item{weights}{Optional case-weight column, such as a design weight the
 researcher set. A named column missing from \code{data} is an error.}
@@ -41,7 +42,7 @@ skewness, kurtosis, standard error and confidence intervals.
 \examples{
 demo <- sframe_demo("two_group")
 dr <- sframe_descriptives_results(demo$responses, variables = "sessions_attended",
-                           split_by = "format")
+                                  split_by = "format")
 dr$table
 }
 \seealso{

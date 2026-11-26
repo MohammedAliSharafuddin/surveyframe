@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_write_sframe.R
 \name{SFRAME_FORMAT_VERSION}
 \alias{SFRAME_FORMAT_VERSION}
-\title{The \code{.sframe} format version, written into every file as \code{sframe_format}.}
+\title{The .sframe format version}
 \usage{
 SFRAME_FORMAT_VERSION
 }
@@ -10,7 +10,7 @@ SFRAME_FORMAT_VERSION
 A character scalar containing the current \code{.sframe} format version.
 }
 \description{
-Tracks the shape of the serialised object. The package version and the
+The version written into every file as \code{sframe_format}. It tracks the shape of the serialised object. The package version and the
 instrument's own version are separate. Bump it only when the file's structure
 changes in a way a consumer must react to. \code{sframe-schema} conformance
 profiles are keyed to this value.

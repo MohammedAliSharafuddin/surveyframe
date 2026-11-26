@@ -10,7 +10,7 @@ sframe_demo(name, branded = FALSE, preview = interactive())
 \item{name}{Character. A demo name, as listed by \code{\link[=sframe_list_demos]{sframe_list_demos()}}.}
 
 \item{branded}{Logical. When \code{TRUE}, the instrument comes back with the
-standard welcome page, logo, theme colour and thank you page spliced into
+standard welcome page, logo, theme colour and thank-you page spliced into
 its \code{render} block. The bundled file on disk is left unchanged, so the
 same branding can be shown on whichever demo matches your own survey.}
 
@@ -21,7 +21,7 @@ answers go nowhere. Nothing opens in a script, a knitr or Quarto render,
 or with \code{options(surveyframe.demo_preview = FALSE)}.}
 }
 \value{
-A list of class \code{sframe_demo} with \code{instrument}, \code{responses}, and
+A list of class \code{sframe_demo} with \code{instrument}, \code{responses} and
 the paths behind them. Printed, it shows a short card: what the demo
 teaches, its size, its files and the commands to try next. The parts are
 \code{instrument}, \code{responses},
@@ -33,7 +33,7 @@ same data through another package. The 2 reference datasets omit
 codebook or results table, so those 2 paths are \code{NA}.
 }
 \description{
-One of the 25-item teaching library: 19 analysis examples, 3
+One of the 25 demos in the teaching library: 19 analysis examples, 3
 presentation examples and 3 provenance examples. Or 1 of the 2 reference
 datasets: \code{"tourism_services"}, a realistic multi-scale instrument, and
 \code{"input_types"}, which uses every input type SurveyBuilder and

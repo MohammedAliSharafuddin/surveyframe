@@ -13,22 +13,23 @@ sframe_plot_descriptives(x, data, palette = c("web", "print"))
 Required, because the violins need the raw values and \code{x} carries the
 summary table.}
 
-\item{palette}{One of \code{"web"} or \code{"print"}. See \code{sframe_brand()}.}
+\item{palette}{One of \code{"web"} (brand colours) or \code{"print"} (black, grey and
+white). See \code{\link[=theme_surveyframe]{theme_surveyframe()}}.}
 }
 \value{
 A ggplot2 object, or \code{NULL} if none of the report's variables have
 enough data to draw.
 }
 \description{
-One violin per variable in a \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, built from
+One violin per variable in an \code{\link[=sframe_descriptives_results]{sframe_descriptives_results()}} table, built from
 the underlying response data, so the reader sees the shape that the
 skewness and kurtosis numbers summarise: asymmetry, multimodality and
 tails. Each
 variable is standardised (z-scored) before plotting so variables on
 different original scales (a 5-point Likert item next to a 0-100 slider)
 share one comparable y-axis. Standardising is a linear transform and does
-not change skewness. Each violin's subtitle-free panel keeps the
-variable's skewness value in its axis label. Grouped \code{sframe_descriptives_results()}
+not change skewness. Each variable's axis label gives its skewness.
+Grouped \code{sframe_descriptives_results()}
 output (one row per variable per \code{split_by} group) is faceted by group.
 }
 \examples{

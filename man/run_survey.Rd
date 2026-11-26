@@ -41,15 +41,15 @@ a callback.
 }
 \examples{
 \donttest{
-cs    <- sframe_choice_set("ag5", 1:5,
-           c("Strongly disagree", "Disagree", "Neutral",
-             "Agree", "Strongly agree"))
-item  <- sframe_item("sat_1", "How satisfied are you?",
-                 type = "likert", choice_set = "ag5")
+cs <- sframe_choice_set("ag5", 1:5,
+                        c("Strongly disagree", "Disagree", "Neutral",
+                          "Agree", "Strongly agree"))
+item <- sframe_item("sat_1", "How satisfied are you?",
+                    type = "likert", choice_set = "ag5")
 instr <- sframe_instrument("My Survey", components = list(cs, item))
 app <- run_survey(instr)
 app <- run_survey(instr, save_responses = "csv",
-                      output_path = tempfile(fileext = ".csv"))
+                  output_path = tempfile(fileext = ".csv"))
 }
 }
 \seealso{

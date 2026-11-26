@@ -27,12 +27,13 @@ variation within the groups.
 \description{
 The noncentrality interval for the proportion of variance in \code{outcome}
 explained by \code{group}, as \code{effectsize::eta_squared(partial = FALSE, alternative = "two.sided")} computes it for a one-way ANOVA: the 2-sided
-interval for the noncentrality \eqn{\lambda} of the F statistic, each
-bound turned into \eqn{\lambda / (\lambda + df_{error})}. The interval
+interval for the noncentrality
+\ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} of the F statistic, each
+bound turned into
+\ifelse{html}{\out{&lambda; / (&lambda; + df<sub>error</sub>)}}{\eqn{\lambda / (\lambda + df_{error})}{lambda / (lambda + df_error)}}. The interval
 reaches 0 when the test is far from significant. Until 0.4.3 this was a
 percentile bootstrap, whose resampled eta squared is 0 or above, so 40
-samples with equal group means all had an interval above 0
-(FR-24).
+samples with equal group means all had an interval above 0.
 }
 \examples{
 sframe_eta_sq_ci(mtcars$mpg, mtcars$cyl)

@@ -10,14 +10,15 @@ sframe_list_demos()
 A data frame of class \code{sframe_demo_list} with 1 row per demo: its
 \code{name}, whether its \code{focus} is analysis, presentation, provenance or
 reference, what it \code{teaches}, the input \code{fields} it uses, the statistical
-\code{technique} it demonstrates, and the demo whose responses it reuses, if
+\code{technique} it demonstrates and the demo whose responses it reuses, if
 any. Printed, it shows 1 line per demo, grouped by focus, with
 \code{two_group} named as the place to start. \code{as.data.frame()} gives the
 full table.
 }
 \description{
-Every demo does one job, so a failure points at one method and a reader can
-hold the whole questionnaire in view. Use \code{\link[=sframe_demo]{sframe_demo()}} to load one.
+Lists the demos that ship with the package. Every demo does one job, so a
+failure points at one method and a reader can hold the whole questionnaire
+in view. Use \code{\link[=sframe_demo]{sframe_demo()}} to load one.
 }
 \details{
 The 25 teaching demos come first. The last 2 rows, with focus
@@ -27,7 +28,7 @@ SurveyBuilder and SurveyStudio support.
 }
 \examples{
 sframe_list_demos()
-head(as.data.frame(sframe_list_demos()), 3)
+head(as.data.frame(sframe_list_demos())[, c("name", "focus")], 3)
 }
 \seealso{
 \code{\link[=sframe_demo]{sframe_demo()}}, \code{\link[=sframe_demo_qmd]{sframe_demo_qmd()}}
