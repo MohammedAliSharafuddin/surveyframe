@@ -91,7 +91,7 @@ articles:
   text-analysis: text-analysis.html
   articles/templates/training-evaluation-before-and-after: templates/training-evaluation-before-and-after.html
   articles/guides/weight-a-survey-sample-to-its-population: guides/weight-a-survey-sample-to-its-population.html
-last_built: 2026-11-26T19:33Z
+last_built: 2026-11-26T20:11Z
 urls:
   reference: https://surveyframe.org/reference
   article: https://surveyframe.org/articles

@@ -588,7 +588,7 @@ html_path <- export_survey(
   open        = FALSE
 )
 #> Static survey written (103.3 KB):
-#> /tmp/RtmpZ6QhD4/tourism_services_survey.html
+#> /tmp/RtmpLg1Ja1/tourism_services_survey.html
 file.exists(html_path)
 ```
 
@@ -640,7 +640,7 @@ script_path <- export_google_sheet(
   output_dir = tempdir()
 )
 #> Apps Script written:
-#> /tmp/RtmpZ6QhD4/surveyframe_collector.gs
+#> /tmp/RtmpLg1Ja1/surveyframe_collector.gs
 #> Follow the setup instructions inside the file to deploy it.
 file.exists(script_path)
 ```
@@ -1119,7 +1119,7 @@ render_report(
 #> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
 #> Rendering the report with Quarto 1.11.9. This usually takes under a minute.
 #> Report rendered with the Quarto engine:
-#> /tmp/RtmpZ6QhD4/tourism_report.html
+#> /tmp/RtmpLg1Ja1/tourism_report.html
 ```
 
 ------------------------------------------------------------------------
