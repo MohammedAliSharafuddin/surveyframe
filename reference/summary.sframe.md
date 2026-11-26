@@ -1,0 +1,59 @@
+# Summarise an sframe instrument object
+
+Prints a structured summary of an `sframe` object including metadata,
+item type counts, scale definitions, branching rules and check
+specifications.
+
+## Usage
+
+``` r
+# S3 method for class 'sframe'
+summary(object, ...)
+```
+
+## Arguments
+
+- object:
+
+  An object of class `sframe`.
+
+- ...:
+
+  Ignored. Present for S3 consistency.
+
+## Value
+
+`object`, invisibly.
+
+## See also
+
+Other Display methods:
+[`format.sf_branch()`](https://surveyframe.org/reference/format.sf_branch.md),
+[`format.sf_check()`](https://surveyframe.org/reference/format.sf_check.md),
+[`format.sf_choices()`](https://surveyframe.org/reference/format.sf_choices.md),
+[`format.sf_item()`](https://surveyframe.org/reference/format.sf_item.md),
+[`format.sf_model()`](https://surveyframe.org/reference/format.sf_model.md),
+[`format.sf_scale()`](https://surveyframe.org/reference/format.sf_scale.md),
+[`format.sframe()`](https://surveyframe.org/reference/format.sframe.md),
+[`print.sf_branch()`](https://surveyframe.org/reference/print.sf_branch.md),
+[`print.sf_check()`](https://surveyframe.org/reference/print.sf_check.md),
+[`print.sf_choices()`](https://surveyframe.org/reference/print.sf_choices.md),
+[`print.sf_item()`](https://surveyframe.org/reference/print.sf_item.md),
+[`print.sf_model()`](https://surveyframe.org/reference/print.sf_model.md),
+[`print.sf_scale()`](https://surveyframe.org/reference/print.sf_scale.md),
+[`print.sframe()`](https://surveyframe.org/reference/print.sframe.md),
+[`summary.sf_branch()`](https://surveyframe.org/reference/summary.sf_branch.md),
+[`summary.sf_check()`](https://surveyframe.org/reference/summary.sf_check.md),
+[`summary.sf_choices()`](https://surveyframe.org/reference/summary.sf_choices.md),
+[`summary.sf_item()`](https://surveyframe.org/reference/summary.sf_item.md),
+[`summary.sf_model()`](https://surveyframe.org/reference/summary.sf_model.md),
+[`summary.sf_scale()`](https://surveyframe.org/reference/summary.sf_scale.md)
+
+## Examples
+
+``` r
+item <- sframe_item("q1", "How satisfied are you?", type = "likert",
+                    choice_set = "agree5")
+instr <- sframe_instrument("My Survey", components = list(item))
+summary(instr)
+```

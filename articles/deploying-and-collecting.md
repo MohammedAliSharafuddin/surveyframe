@@ -1,0 +1,196 @@
+# Deploying a survey and collecting responses on free hosting
+
+This guide takes a finished instrument to a live, public survey that
+writes responses into a Google Sheet. Every step is free, and the survey
+itself is a single HTML file that runs in any browser with no server.
+
+The deployment has 3 parts.
+
+1.  A Google Apps Script collector turns a Google Sheet into a response
+    endpoint.
+2.  The survey HTML carries that endpoint URL and posts each submission
+    to it.
+3.  A free static host serves the HTML file to respondents.
+
+You can do all of this on SurveyStudio’s Collect screen without writing
+R, or from R with 2 function calls. Both routes produce the same files.
+
+## What you need
+
+- A Google account, for the Sheet and the Apps Script collector.
+- A finished instrument, either an `.sframe` file from SurveyStudio or
+  an `sframe` object in R.
+- A free static host. This guide covers GitHub Pages and Blogger.
+  Netlify Drop and Google Sites work the same way.
+
+## Step 1: Create the Google Sheet and the collector
+
+Create an empty Google Sheet. The collector adds a `Responses` tab with
+the correct column headers on the first submission, so you do not
+prepare the sheet by hand.
+
+Generate the Apps Script collector. On SurveyStudio’s Collect screen,
+paste your Sheet URL under Google Sheet URL and click **Download Apps
+Script (.gs)**. From R, call
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md).
+
+``` r
+
+study <- read_sframe("my_study.sframe")
+
+export_google_sheet(
+  study,
+  sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
+  output_dir = "."
+)
+```
+
+Both routes write `surveyframe_collector.gs`. The file contains one
+column per question, plus `respondent_id`, `started_at`, and
+`submitted_at`. Matrix, multiple-choice, and ranking questions expand
+into more than one column: a matrix gets one column per row, a
+multiple-choice question gets one 0/1 column per option, and a ranking
+question gets one column per option holding its rank.
+
+## Step 2: Deploy the collector as a web app
+
+1.  Open the Google Sheet.
+2.  Click Extensions, then Apps Script.
+3.  Paste the contents of `surveyframe_collector.gs`, replacing any
+    existing code, and save.
+4.  In the Apps Script editor, click **Services**, add **Google Sheets
+    API**, and keep its identifier as `Sheets`. The collector refuses a
+    response rather than risk changing its values when this service is
+    unavailable.
+5.  Click Deploy, then New deployment. Set the type to Web app.
+6.  Set “Who has access” to Anyone.
+7.  Authorise the script when Google prompts you.
+8.  Copy the Web App URL. It ends in `/exec`.
+
+This URL is your collection endpoint. Keep it for the next step.
+
+## Step 3: Put the endpoint into the survey
+
+The exported survey posts each response to whatever endpoint it carries.
+Set the endpoint before you export.
+
+On SurveyStudio’s Collect screen, paste the Web App URL into Web app
+address that receives the responses, then click **Download survey
+(.html)**. From R, store the URL on the instrument and call
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md).
+
+``` r
+
+study$render$google_sheets_endpoint <-
+  "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+
+export_survey(
+  study,
+  output_path = "index.html",
+  open        = FALSE
+)
+```
+
+The result is a single HTML file. When an endpoint is configured, the
+browser sends the row to Google Sheets. Because this is a cross-origin
+`no-cors` request, the page can confirm only that it sent the request.
+Google’s acceptance stays unconfirmed from the page’s side. Depending on
+the instrument’s thank-you settings, the page also offers the respondent
+a CSV download, which becomes a real backup once the respondent actually
+saves it. Pilot the complete route and check the stored row before
+inviting participants.
+
+Name the file `index.html` if you plan to host it at the root of a site,
+because most hosts serve `index.html` as the default page.
+
+## Step 4a: Host on GitHub Pages
+
+GitHub Pages serves static files straight from a repository.
+
+1.  Create a public repository, for example `my-survey`.
+2.  Upload `index.html` to the repository. Use the web uploader at Add
+    file, then Upload files, or push with git.
+3.  Open the repository Settings, then Pages.
+4.  Under Build and deployment, set Source to Deploy from a branch,
+    choose the `main` branch and the `/ (root)` folder, then Save.
+5.  Wait for the green confirmation. Your survey is now live at
+    `https://YOUR_USERNAME.github.io/my-survey/`.
+
+Share that link. To update the survey, re-export the HTML and upload it
+again over the old file.
+
+## Step 4b: Host on Blogger
+
+Blogger can serve a survey inside a page.
+
+1.  In Blogger, create a new Page, not a Post.
+2.  Switch the editor from Compose to HTML view.
+3.  The exported survey is a full HTML document, so embed it in an
+    iframe rather than pasting the whole file. Upload `index.html` to
+    any static host first (GitHub Pages or Netlify Drop), then embed it:
+
+``` html
+<iframe src="https://YOUR_USERNAME.github.io/my-survey/"
+        style="width:100%;height:1200px;border:0"></iframe>
+```
+
+4.  Publish the page and share its address.
+
+The iframe approach keeps the survey self-contained and avoids conflicts
+with the Blogger theme. The same iframe works in Google Sites,
+WordPress, and most content systems.
+
+## Step 5: Read the responses back
+
+Once responses arrive in the Sheet, pull them into R for analysis. Use
+the Sheet ID or full URL.
+
+``` r
+
+responses <- read_sheet_responses(
+  sheet_id   = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
+  instrument = study
+)
+
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
+```
+
+The returned data frame is validated against the instrument and is ready
+for
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md),
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md),
+and
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md).
+
+## Updating a live survey
+
+Editing the instrument changes what respondents see and may change the
+column set. Keep one instrument version per study: record the change
+with
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+retain the earlier instrument, and identify which version each
+respondent received. Prefer a new response tab or Sheet for a materially
+changed instrument. When you add, remove, or rename questions:
+
+1.  Re-export and re-deploy the collector so the headers match.
+2.  Re-export the survey HTML and upload it over the hosted file.
+
+Existing rows remain, but they were collected under the earlier
+instrument, so treat a comparison across the change as needing its own
+justification. Pilot the revised survey and confirm its headers and
+stored values before reopening it.
+
+## Checklist
+
+- Sheet created and collector deployed as a web app set to Anyone.
+- Google Sheets API advanced service enabled with the identifier
+  `Sheets`.
+- Web App URL copied and stored on the instrument.
+- Survey exported with the endpoint embedded.
+- HTML uploaded to a static host and confirmed live.
+- A test submission appears as a new row in the Sheet.
+- The stored test values match what was entered, including values
+  beginning with `=`, `+`, `-`, or `@`.
+- [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+  returns that row in R.

@@ -1,0 +1,1186 @@
+# Survey design and live results: a tourism services example
+
+## About this vignette
+
+This vignette follows a single instrument through the complete
+surveyframe workflow: design the questionnaire, export it as a hosted
+survey with a Google Sheets backend, collect responses, clean and score
+them, run the analysis plan, and render a results report. The results
+section uses 60 simulated responses so the vignette builds offline.
+Replacing the simulated data with a call to
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+connects the same workflow to live responses that grow with each
+submission.
+
+Allow about 30 minutes for the complete case study. For a 5-minute
+runnable introduction, begin with the “Learn by example” vignette and
+its `first_survey` demo. Return here for the full design-to-report
+workflow.
+
+The questionnaire and concept are adopted from:
+
+> Sharafuddin, M. A., Madhavan, M., & Wangtueai, S. (2024). Assessing
+> the Effectiveness of Digital Marketing in Enhancing Tourist
+> Experiences and Satisfaction: A Study of Thailand’s Tourism Services.
+> *Administrative Sciences*, *14*(11), 273.
+> <https://doi.org/10.3390/admsci14110273>
+
+The instrument covers 5 research areas applicable to any tourism
+services context: digital marketing effectiveness (relevance,
+accessibility, ease of use, and perceived value), destination service
+quality (accommodation and local transport), destination sustainability
+quality, tourist satisfaction, and behavioural intention. The item
+wording is reproduced from the original questionnaire. Researchers
+studying other destinations can adapt the scales and analysis plan to
+their own context.
+
+------------------------------------------------------------------------
+
+## The questionnaire
+
+### Shared Likert scale
+
+All rated items use a 5-point agreement scale.
+
+``` r
+
+likert5 <- sframe_choice_set(
+  "likert5",
+  values = 1:5,
+  labels = c("Strongly disagree", "Disagree",
+             "Neither agree nor disagree", "Agree", "Strongly agree")
+)
+```
+
+### Helper functions
+
+`stem_items()` builds items that share a common sentence stem. Each item
+is the stem followed by a unique completion. `solo_items()` builds
+standalone items. Neither function is exported, and both use only
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md).
+
+``` r
+
+stem_items <- function(ids, stem, completions, scale_id) {
+  Map(
+    function(id, comp)
+      sframe_item(id, paste(stem, comp),
+              type = "likert", required = TRUE,
+              choice_set = "likert5", scale_id = scale_id),
+    ids, completions
+  )
+}
+
+solo_items <- function(ids, labels, scale_id) {
+  Map(
+    function(id, lab)
+      sframe_item(id, lab,
+              type = "likert", required = TRUE,
+              choice_set = "likert5", scale_id = scale_id),
+    ids, labels
+  )
+}
+```
+
+### Digital marketing items
+
+**Relevance and engagement (DMRE, 5 items)**
+
+``` r
+
+dmre_stem <- paste(
+  "The digital marketing contents I encountered during my",
+  "trip planning and booking phases were"
+)
+dmre_completions <- c(
+  "relevant to my interests.",
+  "engaging.",
+  "customisable.",
+  "flexible and I was able to make real-time adjustments for my demand.",
+  "able to cater to my specific needs and preferences."
+)
+dmre_items <- stem_items(
+  paste0("dmre_", 1:5), dmre_stem, dmre_completions, "DMRE"
+)
+```
+
+**Accessibility and usefulness (DMAU, 5 items)**
+
+``` r
+
+dmau_stem <- "The contents, communication, and booking services were"
+dmau_completions <- c(
+  "easy to find so I could contact service providers and book my trip directly.",
+  "fast.",
+  "efficient.",
+  "of good quality.",
+  "user friendly."
+)
+dmau_items <- stem_items(
+  paste0("dmau_", 1:5), dmau_stem, dmau_completions, "DMAU"
+)
+```
+
+**Ease of use (DMEU, 5 items)**
+
+``` r
+
+dmeu_stem <- paste(
+  "The digital marketing contents and procedures regarding",
+  "trip planning and booking were"
+)
+dmeu_completions <- c(
+  "easy to learn.",
+  "understandable and required little mental effort.",
+  "neat and simple.",
+  "easy to follow.",
+  "mobile friendly."
+)
+dmeu_items <- stem_items(
+  paste0("dmeu_", 1:5), dmeu_stem, dmeu_completions, "DMEU"
+)
+```
+
+**Perceived value (DMPV, 5 items)**
+
+``` r
+
+dmpv_stem <- paste(
+  "In terms of value, both the commercial and",
+  "user-generated contents are"
+)
+dmpv_completions <- c(
+  "sufficient to support eco-friendly practices.",
+  "appropriate.",
+  "trustworthy and credible.",
+  "consistent across all digital platforms.",
+  "value for money."
+)
+dmpv_items <- stem_items(
+  paste0("dmpv_", 1:5), dmpv_stem, dmpv_completions, "DMPV"
+)
+```
+
+### Destination service quality items
+
+**Accommodation (DSQA, 4 items)**
+
+``` r
+
+dsqa_stem <- "The accommodation related services met my expectations for"
+dsqa_completions <- c(
+  "check-in and check-out services.",
+  "room cleanliness.",
+  "staff attitude.",
+  "safety and security."
+)
+dsqa_items <- stem_items(
+  paste0("dsqa_", 1:4), dsqa_stem, dsqa_completions, "DSQA"
+)
+```
+
+**Local transport (DSQT, 5 items)**
+
+``` r
+
+dsqt_stem <- "The local transport related services met my expectations for"
+dsqt_completions <- c(
+  "frequency.",
+  "connectivity.",
+  "comfort.",
+  "staff attitude.",
+  "ride safety."
+)
+dsqt_items <- stem_items(
+  paste0("dsqt_", 1:5), dsqt_stem, dsqt_completions, "DSQT"
+)
+```
+
+### Destination sustainability quality (DSUQ, 11 items)
+
+``` r
+
+dsuq_labels <- c(
+  "I can easily find and purchase locally-made handicrafts and souvenir products.",
+  "The livelihoods of local vendors and artisans are respected, and fair prices are paid for their products.",
+  "The size of food portions sold is adequate, reducing waste and leftovers.",
+  "Awareness programmes are adequate in encouraging me to reduce water consumption.",
+  "There are enough local guides with in-depth knowledge to enhance my travel experience.",
+  "Sustainable transport options such as bikes, walking routes, and public transport are adequate.",
+  "Reusable bags are adequately available for purchase.",
+  "Digital infrastructure is adequate so that I can avoid printing and use digital copies.",
+  "There are adequate choices of sustainable seafood in the destination.",
+  "There are enough litter bins throughout the destination.",
+  "There are adequate awareness signs about endangered marine species, plants, and animals."
+)
+dsuq_items <- solo_items(paste0("dsuq_", 1:11), dsuq_labels, "DSUQ")
+```
+
+### Tourist satisfaction (TS, 3 items) and behavioural intention (BI, 3 items)
+
+``` r
+
+ts_items <- solo_items(
+  paste0("ts_", 1:3),
+  c(
+    "The destination met or exceeded my expectations.",
+    "Overall, my travel experience with the destination was good.",
+    "Overall, I felt comfortable in the destination."
+  ),
+  "TS"
+)
+
+bi_items <- solo_items(
+  paste0("bi_", 1:3),
+  c(
+    "I will recommend others to use online platforms for planning and booking their trips.",
+    "I will share my experience online.",
+    "I intend to revisit the destination."
+  ),
+  "BI"
+)
+```
+
+### Demographic items
+
+``` r
+
+gender_cs    <- sframe_choice_set("gender",
+  c("male", "female", "transgender"), c("Male", "Female", "Transgender"))
+
+age_cs       <- sframe_choice_set("age",
+  c("18_25", "26_40", "41_50", "51_60", "60_plus"),
+  c("18-25", "26-40", "41-50", "51-60", "60 and above"))
+
+visitor_cs   <- sframe_choice_set("visitor",
+  c("first_time", "repeat"),
+  c("First-time visitor", "Repeated visitor"))
+
+freq_cs      <- sframe_choice_set("freq_visit",
+  c("lt_1", "once", "2_3", "gt_3"),
+  c("Less than 1 time in a year", "Once in a year",
+    "2-3 times in a year", "More than 3 times in a year"))
+
+nationality_cs <- sframe_choice_set("nationality",
+  c("thai", "chinese", "japanese", "korean", "indian", "australian",
+    "british", "german", "american", "other"),
+  c("Thai", "Chinese", "Japanese", "Korean", "Indian", "Australian",
+    "British", "German", "American", "Other"))
+
+education_cs <- sframe_choice_set("education",
+  c("high_school", "diploma", "undergraduate", "post_graduate"),
+  c("High school", "Diploma", "Undergraduate", "Post graduate"))
+
+profession_cs <- sframe_choice_set("profession",
+  c("student", "business", "salaried", "freelancer", "not_working"),
+  c("Student", "Business", "Salaried and working", "Freelancer",
+    "Not working (housewife or retired)"))
+
+companion_cs <- sframe_choice_set("companion",
+  c("friends", "family", "other"),
+  c("Friends", "Family members", "Other"))
+
+group_cs     <- sframe_choice_set("group_size",
+  c("lt_3", "3_5", "gt_5"),
+  c("Less than 3", "3-5", "More than 5"))
+
+demo_items <- list(
+  sframe_item("gender",        "Gender",                type = "single_choice",
+          required = TRUE, choice_set = "gender"),
+  sframe_item("age_band",      "Age",                   type = "single_choice",
+          required = TRUE, choice_set = "age"),
+  sframe_item("visitor_type",  "I am",                  type = "single_choice",
+          required = TRUE, choice_set = "visitor"),
+  sframe_item("freq_visit",    "Frequency of visit",    type = "single_choice",
+          required = TRUE, choice_set = "freq_visit"),
+  sframe_item("nationality",   "Nationality",           type = "single_choice",
+          required = TRUE, choice_set = "nationality"),
+  sframe_item("education",     "Education level",       type = "single_choice",
+          required = TRUE, choice_set = "education"),
+  sframe_item("profession",    "Profession",            type = "single_choice",
+          required = TRUE, choice_set = "profession"),
+  sframe_item("companion",     "I visit with my",       type = "single_choice",
+          required = TRUE, choice_set = "companion"),
+  sframe_item("group_size",    "My travel group size is", type = "single_choice",
+          required = TRUE, choice_set = "group_size")
+)
+```
+
+### Scales
+
+``` r
+
+make_scale <- function(id, label, ids) {
+  sframe_scale(id, label, items = ids, method = "mean")
+}
+
+scales <- list(
+  make_scale("DMRE", "Digital marketing: relevance and engagement",  paste0("dmre_", 1:5)),
+  make_scale("DMAU", "Digital marketing: accessibility and usefulness", paste0("dmau_", 1:5)),
+  make_scale("DMEU", "Digital marketing: ease of use",               paste0("dmeu_", 1:5)),
+  make_scale("DMPV", "Digital marketing: perceived value",           paste0("dmpv_", 1:5)),
+  make_scale("DSQA", "Destination service quality: accommodation",   paste0("dsqa_", 1:4)),
+  make_scale("DSQT", "Destination service quality: transport",       paste0("dsqt_", 1:5)),
+  make_scale("DSUQ", "Destination sustainability quality",           paste0("dsuq_", 1:11)),
+  make_scale("TS",   "Tourist satisfaction",                         paste0("ts_",   1:3)),
+  make_scale("BI",   "Behavioural intention",                        paste0("bi_",   1:3))
+)
+```
+
+### Assemble the instrument
+
+``` r
+
+choice_sets <- list(
+  likert5, gender_cs, age_cs, visitor_cs, freq_cs, nationality_cs,
+  education_cs, profession_cs, companion_cs, group_cs
+)
+
+rated_items <- c(dmre_items, dmau_items, dmeu_items, dmpv_items,
+                 dsqa_items, dsqt_items, dsuq_items, ts_items, bi_items)
+
+study <- sframe_instrument(
+  title       = "Digital Marketing Effectiveness of Tourism Services",
+  version     = "1.0.0",
+  description = paste(
+    "Questionnaire covering digital marketing effectiveness,",
+    "destination service quality, sustainability quality,",
+    "tourist satisfaction, and behavioural intention.",
+    "Adopted from Sharafuddin, Madhavan & Wangtueai (2024),",
+    "Administrative Sciences, 14(11), 273.",
+    "https://doi.org/10.3390/admsci14110273"
+  ),
+  authors   = "Mohammed Ali Sharafuddin",
+  languages = "en",
+  components = c(choice_sets, rated_items, demo_items, scales)
+)
+
+study
+```
+
+------------------------------------------------------------------------
+
+## Validate and serialise
+
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
+checks every item ID, choice set reference, and scale membership before
+any data is collected. It returns a diagnostic that prints what it
+found, so printing the call is enough to read the result.
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+saves the validated instrument with a SHA-256 hash so any
+post-collection edits are detectable.
+
+``` r
+
+validate_sframe(study, strict = FALSE)
+```
+
+Read the parts of the diagnostic with the accessors, which saves
+reaching into it. [`summary()`](https://rdrr.io/r/base/summary.html)
+shows every check that ran, including the ones that found nothing, which
+is how you tell a check that passed from a check that was never reached.
+
+``` r
+
+v <- validate_sframe(study, strict = FALSE)
+sframe_is_valid(v)
+sframe_problems(v)
+head(summary(v), 5)
+```
+
+``` r
+
+# Save the instrument. Keep this file alongside your analysis script.
+sframe_path <- write_sframe(study, file.path(tempdir(), "tourism_services_v1.sframe"),
+                             overwrite = TRUE)
+
+# Reload the instrument from disk at any time with:
+study2 <- read_sframe(sframe_path)
+identical(sframe_meta(study)$title, sframe_meta(study2)$title)
+```
+
+### What the SHA-256 hash proves, and what it does not
+
+The hash
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+embeds confirms one thing: the instrument’s canonicalised content
+matches the digest stored in the `.sframe` file. Change a covered value,
+an item’s wording, a scale’s membership, or a plan’s variables, and
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)
+detects the mismatch and refuses to load the file. Silent acceptance
+would leave a reader believing changed content was the original.
+
+That is a narrow, specific guarantee. It proves file identity. It does
+not prove the survey has good questions, an unbiased sample, or a sound
+analysis, and it says nothing about p-hacking or HARKing on its own. The
+package supports a separate safeguard: the `analysis_plan` slot can be
+bound to the instrument at design time, before data arrive, and
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
+then executes that recorded plan in one pass. This makes prior decisions
+easier to audit, and it shows that a recorded plan predates a given run.
+Establishing when a researcher first considered an analysis, or
+compelling disclosure, each needs separate evidence: “this content
+matches its stored digest” and “this analysis was declared before seeing
+the data” rest on different evidence, each standing on its own.
+
+### `.sframe` is plain JSON, not a proprietary format
+
+A `.sframe` file is ordinary, git-diffable, UTF-8 JSON, readable in any
+text editor. Any tool that reads JSON can open one, and the format is
+documented independently of this package in
+`system.file("schema", "sframe_schema.json", package = "surveyframe")`,
+a JSON Schema a reviewer or a second tool can validate against, with R
+left out of the loop. It is a copy of the instrument profile published
+in the sframe-schema repository, kept identical by a test, so the
+package and the published format describe the same file.
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md) also
+reads files written before the `sframe_format` field existed.
+
+``` r
+
+schema_path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
+jsonlite::fromJSON(schema_path, simplifyVector = FALSE)$required
+```
+
+Because the file is plain text, 2 versions of it diff the same way any
+source file does. If `tourism_services_v1.sframe` were committed to a
+Git repository, revising it and running `git diff` on the file would
+show exactly which lines, which item, which choice, which plan block,
+changed, alongside Git’s own commit history for who changed it and when.
+That diff is Git’s job, and the next section shows how the 2 connect.
+
+### Disclosed revision: `amend_sframe()`
+
+A hash mismatch shows that the content changed. A legitimate correction
+(fixing a data-entry error, removing bot responses, correcting a
+misspecified model) and an undisclosed change move the hash in the same
+way.
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
+gives legitimate revision a structured, disclosed path instead: it
+compares the instrument before and after a change, and appends a record
+of what changed and why, directly inside the `.sframe` file next to the
+content it explains, never overwriting an earlier entry.
+
+Amendments come in 2 tiers, because not every change carries the same
+risk to the plan’s design-time-binding logic:
+
+- **`"pipeline"`** amendments (`data_correction`, `bot_removal`) are
+  expected researcher hygiene and stay low-friction: a reason code and a
+  short explanation are enough.
+- **`"design"`** amendments (anything touching the analysis plan or a
+  model, `model_respecification`, or `instrument_revision`/`other` by
+  default) are exactly the kind of post-hoc change the design-time plan
+  binding exists to guard against. They require a `deviation_report`
+  describing what changed in the research question, method, or model and
+  why, and record `signoff` explicitly, as a reviewer’s name or the
+  literal value `"none"` when no second sign-off was given, so an
+  unreviewed design change stays visible to an auditor, where an empty
+  field would read as a sign-off.
+
+``` r
+
+# Suppose a pilot round surfaces an ambiguous item and it needs rewording.
+dmre_1_revised <- sframe_item(
+  "dmre_1", paste(dmre_stem, "relevant to my personal travel interests."),
+  type = "likert", required = TRUE, choice_set = "likert5", scale_id = "DMRE"
+)
+
+study_revised <- study
+study_revised$items[[which(vapply(study$items, `[[`, character(1), "id")
+                            == "dmre_1")]] <- dmre_1_revised
+
+study_amended <- amend_sframe(
+  study, study_revised,
+  reason_code = "instrument_revision",
+  reason_text = "Clarified item wording after pilot feedback.",
+  deviation_report = "Wording only; the construct measured is unchanged."
+)
+#> The version stays 1.0.0. Suggested next version: 1.1.0. A design amendment
+#> changes what is measured or analysed, so the minor number moves. Set it with
+#> `version = "1.1.0"`.
+
+sframe_get_amendments(study_amended)
+```
+
+[`sframe_get_amendments()`](https://surveyframe.org/reference/sframe_get_amendments.md)
+returns the full history as a data frame, one row per disclosed change,
+printable or exported with
+[`write.csv()`](https://rdrr.io/r/utils/write.table.html) for an
+external audit trail.
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md) on
+the amended instrument persists the log in the file. A reviewer who
+later loads it with
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md) sees
+both the current content and every disclosed step that produced it, and
+the hash check keeps its full force: an edit made directly to the file,
+bypassing
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+still fails
+[`read_sframe()`](https://surveyframe.org/reference/read_sframe.md)’s
+integrity check exactly as before.
+
+Be clear about what this does and does not guarantee.
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
+records a disclosed change. It cannot compel disclosure, the same way a
+preregistration deviation report can’t be forced. Nothing prevents a
+researcher from reconstructing an instrument from scratch and calling
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md) on
+it directly, skipping the amendment log entirely. What the mechanism
+actually guarantees is narrower and still useful: *if* a change is
+disclosed through
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md),
+the record is structured, timestamped, and permanent inside the file. It
+does not guarantee that every change is disclosed in the first place.
+
+### Linking a saved instrument to its Git commit
+
+A bare hash carries the file’s identity alone. A diff, an author and an
+explanation come from Git, which already provides all 3.
+[`sframe_link_git_commit()`](https://surveyframe.org/reference/sframe_link_git_commit.md)
+points the instrument at Git and leaves the history there: it records
+the current commit’s SHA and subject line, so the SHA-256 hash’s role
+narrows to confirming that the file on disk matches what that specific,
+already-explained commit produced. It degrades gracefully with no error
+when Git isn’t installed or the path isn’t a repository. Git stays
+optional, and the rest of the package runs on its own.
+
+``` r
+
+sframe_link_git_commit(study_amended, repo_path = tempdir())
+```
+
+------------------------------------------------------------------------
+
+## Set up data collection
+
+### Store the Google Sheets endpoint in the instrument
+
+When an endpoint URL is set on the instrument,
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md)
+reads it automatically. Set the URL once, and every later export reuses
+it.
+
+``` r
+
+# Replace with your deployed Apps Script URL after the setup steps below.
+study$render$google_sheets_endpoint <-
+  "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+```
+
+### Export the static HTML survey
+
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md)
+produces a single self-contained HTML file. Respondents open it in any
+browser and, if an endpoint is configured, the browser sends the
+submission to Google Sheets. The cross-origin request confirms only that
+the row was sent. Whether the Sheet stored it stays unconfirmed from
+here. Depending on the thank-you settings, the page can also offer a CSV
+download, but it becomes a local backup only if the respondent saves it.
+Pilot the endpoint and verify a stored row before collection. The HTML
+can be hosted on GitHub Pages, shared by email, or opened directly from
+disk.
+
+``` r
+
+html_path <- export_survey(
+  study,
+  output_path = file.path(tempdir(), "tourism_services_survey.html"),
+  open        = FALSE
+)
+#> Static survey written (103.3 KB):
+#> /tmp/RtmpZ6QhD4/tourism_services_survey.html
+file.exists(html_path)
+```
+
+### What the respondent sees
+
+The exported survey carries its own design, independent of the
+SurveyBuilder or SurveyStudio chrome used to build it. Question text
+sits in a serif typeface, options render as bordered cards with a
+selection tick, Likert items render as numbered squares, and a slim
+progress bar tracks completion. Every one of those colours derives from
+the instrument’s single theme colour, so the line below re-skins the
+whole survey on its own.
+
+``` r
+
+study$render$theme <- "#0f766e"
+```
+
+2 things about the export matter for planning a real deployment.
+
+- **It is designed for a phone first.** Option cards and touch targets
+  meet a 44 pixel minimum, and a matrix question (see the input-types
+  demo in the SurveyBuilder vignette) reflows from a table into stacked,
+  labelled cards below 600 pixels of width, so every question completes
+  on a small screen within its width.
+- **It meets WCAG 2.2 AA.** Every control carries an accessible name,
+  keyboard focus is visible on option cards, a validation error is
+  announced to assistive technology, and required questions are marked
+  by more than colour alone.
+
+### Generate the Google Sheets collector script
+
+[`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
+writes a Google Apps Script file. Deploy it in a Google Sheet and it
+creates a response tab with the correct column headers. Matrix,
+multiple-choice, and ranking questions each need more than one column,
+so the collector expands them automatically: a matrix gets one column
+per row, a multiple-choice question gets one 0/1 column per option, and
+a ranking question gets one column per option holding its rank. A
+5-option multiple-choice item named `channels`, for example, becomes 5
+columns, `channels__option1` through `channels__option5`, each holding
+`0` or `1`, ready for analysis, with the splitting already done.
+
+``` r
+
+script_path <- export_google_sheet(
+  study,
+  sheet_url  = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID",
+  output_dir = tempdir()
+)
+#> Apps Script written:
+#> /tmp/RtmpZ6QhD4/surveyframe_collector.gs
+#> Follow the setup instructions inside the file to deploy it.
+file.exists(script_path)
+```
+
+**To deploy the script:**
+
+1.  Open or create a Google Sheet.
+2.  Click Extensions, then Apps Script.
+3.  Paste the contents of the generated `.gs` file, replacing any
+    existing code.
+4.  In the Apps Script editor, add **Services \> Google Sheets API** and
+    keep its identifier as `Sheets`. Without it, the collector refuses
+    the response rather than risk storing an altered value.
+5.  Click Deploy, then New deployment. Set type to Web app.
+6.  Set “Who has access” to Anyone.
+7.  Copy the Web App URL.
+8.  Paste the URL into `study$render$google_sheets_endpoint` above and
+    re-export the survey.
+
+### Pull live responses
+
+Once the survey is live, read the growing response set with one call.
+Re-run this line and everything below it to refresh all results.
+
+``` r
+
+responses <- read_sheet_responses(
+  sheet_id   = "YOUR_SHEET_ID",
+  instrument = study
+)
+```
+
+------------------------------------------------------------------------
+
+## Simulated responses for offline demonstration
+
+The code block below generates 60 plausible responses so the remainder
+of this vignette runs without a network connection. Replace `responses`
+with the output of
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+and re-run from the quality section onward to use real data.
+
+``` r
+
+set.seed(2024)
+n <- 60
+
+# Each construct is driven by a latent score plus item-level noise.
+# Correlations between constructs are introduced by sharing variance.
+lat <- function(mu, sigma) pmax(1, pmin(5, round(rnorm(n, mu, sigma))))
+add_noise <- function(x, sigma = 0.45) {
+  pmax(1L, pmin(5L, as.integer(round(x + rnorm(n, 0, sigma)))))
+}
+
+# Higher service quality and sustainability lift satisfaction.
+lat_dsqa <- lat(3.7, 0.6)
+lat_dsqt <- lat(3.6, 0.6)
+lat_dsuq <- lat(3.5, 0.6)
+lat_ts   <- pmax(1, pmin(5, round(
+  0.4 * lat_dsqa + 0.3 * lat_dsqt + 0.2 * lat_dsuq + rnorm(n, 0.6, 0.3)
+)))
+lat_bi   <- pmax(1, pmin(5, round(0.7 * lat_ts + rnorm(n, 0.5, 0.4))))
+
+# Digital marketing constructs are loosely correlated with each other.
+lat_dmre <- lat(3.8, 0.6)
+lat_dmau <- pmax(1, pmin(5, round(0.5 * lat_dmre + rnorm(n, 1.9, 0.4))))
+lat_dmeu <- pmax(1, pmin(5, round(0.4 * lat_dmre + rnorm(n, 2.2, 0.4))))
+lat_dmpv <- pmax(1, pmin(5, round(0.3 * lat_dmre + rnorm(n, 2.5, 0.4))))
+
+# Repeat visitors score slightly higher on satisfaction and intention.
+visitor_type <- sample(c("first_time", "repeat"), n,
+                       replace = TRUE, prob = c(0.45, 0.55))
+lat_ts[visitor_type == "repeat"] <- pmin(5L, lat_ts[visitor_type == "repeat"] + 1L)
+lat_bi[visitor_type == "repeat"] <- pmin(5L, lat_bi[visitor_type == "repeat"] + 1L)
+
+# Build item columns from latent scores.
+make_cols <- function(lat, k, prefix) {
+  setNames(
+    as.data.frame(
+      vapply(seq_len(k), function(i) add_noise(lat), integer(n))
+    ),
+    paste0(prefix, seq_len(k))
+  )
+}
+
+sim_df <- cbind(
+  data.frame(
+    respondent_id = sprintf("R%03d", seq_len(n)),
+    submitted_at  = format(
+      seq(as.POSIXct("2025-01-10 09:00", tz = "UTC"),
+          by = "1 hour", length.out = n),
+      "%Y-%m-%dT%H:%M:%SZ"
+    ),
+    started_at = format(
+      seq(as.POSIXct("2025-01-10 08:50", tz = "UTC"),
+          by = "1 hour", length.out = n),
+      "%Y-%m-%dT%H:%M:%SZ"
+    ),
+    gender = sample(c("male", "female", "transgender"),
+                    n, TRUE, c(0.44, 0.55, 0.01)),
+    age_band = sample(c("18_25", "26_40", "41_50", "51_60", "60_plus"),
+                      n, TRUE, c(0.15, 0.40, 0.25, 0.15, 0.05)),
+    visitor_type = visitor_type,
+    freq_visit = sample(c("lt_1", "once", "2_3", "gt_3"),
+                        n, TRUE, c(0.15, 0.25, 0.35, 0.25)),
+    nationality = sample(
+      c("thai", "chinese", "japanese", "korean", "indian",
+        "australian", "british", "german", "american", "other"),
+      n, TRUE),
+    education = sample(c("high_school", "diploma", "undergraduate", "post_graduate"),
+                       n, TRUE, c(0.05, 0.10, 0.48, 0.37)),
+    profession = sample(c("student", "business", "salaried", "freelancer", "not_working"),
+                        n, TRUE, c(0.15, 0.20, 0.45, 0.12, 0.08)),
+    companion = sample(c("friends", "family", "other"),
+                       n, TRUE, c(0.35, 0.55, 0.10)),
+    group_size = sample(c("lt_3", "3_5", "gt_5"),
+                        n, TRUE, c(0.30, 0.50, 0.20)),
+    stringsAsFactors = FALSE
+  ),
+  make_cols(lat_dmre, 5, "dmre_"),
+  make_cols(lat_dmau, 5, "dmau_"),
+  make_cols(lat_dmeu, 5, "dmeu_"),
+  make_cols(lat_dmpv, 5, "dmpv_"),
+  make_cols(lat_dsqa, 4, "dsqa_"),
+  make_cols(lat_dsqt, 5, "dsqt_"),
+  make_cols(lat_dsuq, 11, "dsuq_"),
+  make_cols(lat_ts,   3, "ts_"),
+  make_cols(lat_bi,   3, "bi_")
+)
+
+# Align the data frame to the instrument.
+responses <- read_responses(sim_df, study,
+                             respondent_id = "respondent_id",
+                             submitted_at  = "submitted_at",
+                             meta_cols     = "started_at",
+                             strict        = FALSE)
+
+cat("Respondents:", nrow(responses), "\n")
+cat("Columns:    ", ncol(responses), "\n")
+```
+
+------------------------------------------------------------------------
+
+## Quality checks
+
+``` r
+
+qr <- sframe_quality_results(responses, study, respondent_id = "respondent_id")
+# as.data.frame() gives the summary row, so no reaching into the object.
+qr_summary <- as.data.frame(qr)
+quality_summary <- data.frame(
+  Metric = c("Respondents", "Items", "Flagged for review", "Flag rate"),
+  Value  = c(qr_summary$n_respondents, qr_summary$n_items, qr_summary$n_flagged,
+             sprintf("%.1f%%", 100 * qr_summary$flag_rate)),
+  stringsAsFactors = FALSE
+)
+kable(quality_summary, align = c("l", "r"), caption = "Quality screening summary")
+```
+
+The flagged count reflects straight-lining detection on simulated data,
+where random responses often repeat values. With real survey responses
+the flagging rate is typically much lower. The flag marks respondents
+for researcher review, not automatic exclusion.
+
+``` r
+
+mr <- sframe_missing_data_results(responses, study)
+# as.data.frame() returns the item-level table, which is what the report is
+# mainly about.
+mr_items <- as.data.frame(mr)[, c("variable", "missing_n", "missing_prop", "valid_n")]
+mr_items$missing_prop <- 100 * mr_items$missing_prop
+kable(mr_items, digits = 1, row.names = FALSE,
+      col.names = c("Variable", "Missing (n)", "Missing (%)", "Valid (n)"),
+      caption = "Item-level missingness")
+# sframe_apa() gives a plain-language summary suitable for a methods section.
+cat(sframe_apa(mr), "\n")
+```
+
+------------------------------------------------------------------------
+
+## Score and describe
+
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
+appends one column per scale to the data frame, using the scoring rules
+stored in the instrument. If a column with the same name as a scale
+already exists in the data frame,
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
+skips that scale so pre-scored data survives intact.
+
+``` r
+
+scored <- score_scales(responses, study)
+
+scale_cols <- c("DMRE", "DMAU", "DMEU", "DMPV",
+                "DSQA", "DSQT", "DSUQ", "TS", "BI")
+
+# Display scale means and standard deviations as a table
+scale_summary <- data.frame(
+  Scale = scale_cols,
+  Mean  = round(colMeans(scored[, scale_cols], na.rm = TRUE), 2),
+  SD    = round(apply(scored[, scale_cols], 2, sd, na.rm = TRUE), 2),
+  row.names = NULL
+)
+kable(scale_summary, digits = 2, caption = "Scale score summary")
+```
+
+``` r
+
+op <- par(mfrow = c(3, 3), mar = c(4, 3, 2, 1))
+for (s in scale_cols) {
+  v <- scored[[s]]; v <- v[is.finite(v)]
+  hist(v, col = "#16B3B1", border = "white", main = s, xlab = "Score", ylab = "")
+}
+par(op)
+```
+
+------------------------------------------------------------------------
+
+## Reliability
+
+``` r
+
+if (requireNamespace("psych", quietly = TRUE)) {
+  rr <- sframe_reliability_results(scored, study, omega = FALSE)
+  # One row per scale, with NA where a statistic could not be computed.
+  rr_df <- as.data.frame(rr)
+  rel_df <- data.frame(
+    Scale = paste0(rr_df$label, " (", rr_df$scale_id, ")"),
+    Items = rr_df$n_items,
+    N     = rr_df$n,
+    Alpha = ifelse(is.na(rr_df$alpha), "n/a", sprintf("%.2f", rr_df$alpha)),
+    stringsAsFactors = FALSE
+  )
+  kable(rel_df, row.names = FALSE, align = c("l", "c", "c", "r"),
+        caption = "Scale reliability")
+}
+```
+
+A value near 0.70 is sometimes used as a rough convention, but
+reliability must be interpreted against the construct, intended use,
+item count, uncertainty, and model assumptions. Alpha and the omega
+variants target reliability under different measurement assumptions, so
+treat them as distinct estimates. Decide which quantity answers the
+study’s question, and report that one on its own merits. Pass
+`omega = TRUE` to report the available omega estimates alongside alpha,
+and name the estimate and assumptions in the write-up. See
+[`?sframe_reliability_results`](https://surveyframe.org/reference/sframe_reliability_results.md)
+for details.
+
+## EFA readiness
+
+Before a confirmatory factor analysis, it is useful to screen whether
+the item correlations appear suitable for exploratory factoring.
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)
+runs the KMO measure of sampling adequacy and Bartlett’s test of
+sphericity, and uses parallel analysis to suggest the number of factors.
+
+``` r
+
+if (requireNamespace("psych", quietly = TRUE)) {
+  er <- sframe_efa_readiness_results(scored, study)
+  print(er)
+}
+```
+
+A KMO value and Bartlett’s test provide preliminary screening evidence,
+one input among a few toward judging whether a particular factor model
+is appropriate. Treat 0.60 as a rough, informal KMO convention. The
+factor count from parallel analysis is also a guide to interpret with
+theory, design, loadings, residuals, and model fit.
+
+## Construct validity
+
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
+computes composite reliability (CR) and average variance extracted (AVE)
+from supplied factor loadings. Discriminant validity is assessed via the
+Fornell-Larcker criterion and HTMT when construct scores are supplied.
+
+``` r
+
+# Supply a named list of loadings (construct -> item loadings vector)
+loadings_list <- list(
+  DMRE = c(dm_1 = 0.78, dm_2 = 0.82, dm_3 = 0.75),
+  TS   = c(ts_1 = 0.84, ts_2 = 0.80)
+)
+vr <- sframe_validity_results(loadings_list)
+print(as.data.frame(vr))
+```
+
+AVE above 0.50 and CR above 0.70 are the conventional thresholds for
+convergent validity. The Fornell-Larcker criterion requires that the
+square root of each construct’s AVE exceeds its highest correlation with
+any other construct.
+
+------------------------------------------------------------------------
+
+## Analysis plan
+
+The plan binds each research question to a statistical technique and the
+variable roles it needs.
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
+executes every block and returns one result per question.
+
+``` r
+
+sframe_plan(study) <- list(
+  list(
+    id               = "RQ1",
+    research_question = "Are digital marketing perceptions associated with tourist satisfaction?",
+    family           = "association",
+    method           = "correlation_pearson",
+    roles            = list(x = "DMRE", y = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ2",
+    research_question = "Is service quality associated with tourist satisfaction?",
+    family           = "association",
+    method           = "correlation_pearson",
+    roles            = list(x = "DSQT", y = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ3",
+    research_question = "Do service quality and sustainability quality predict satisfaction?",
+    family           = "regression",
+    method           = "regression_linear",
+    roles            = list(predictors = c("DSQA", "DSQT", "DSUQ"),
+                            dependent  = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ4",
+    research_question = "Do first-time and repeat visitors differ in satisfaction?",
+    family           = "group_comparison",
+    method           = "mann_whitney",
+    roles            = list(group = "visitor_type", outcome = "TS"),
+    options          = list(alpha = 0.05)
+  ),
+  list(
+    id               = "RQ5",
+    research_question = "Does satisfaction predict behavioural intention?",
+    family           = "regression",
+    method           = "regression_linear",
+    roles            = list(predictors = "TS", dependent = "BI"),
+    options          = list(alpha = 0.05)
+  )
+)
+
+length(sframe_plan(study))
+```
+
+------------------------------------------------------------------------
+
+## Assumption checks
+
+Before running the analysis plan, check statistical assumptions for the
+variables involved.
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
+tests normality (Shapiro-Wilk for samples below 5,000), homogeneity of
+variance (Levene) for grouped tests, and linearity for regression pairs.
+
+``` r
+
+if (requireNamespace("psych", quietly = TRUE)) {
+  ar <- sframe_assumption_results(scored, variables = scale_cols)
+  print(ar)
+}
+```
+
+Review the `$normality` and `$homogeneity` slots to decide whether
+parametric or non-parametric alternatives are appropriate. The analysis
+plan can override the test method per block wherever the default fits
+the data poorly.
+
+------------------------------------------------------------------------
+
+## Run the analysis plan
+
+``` r
+
+results <- run_analysis_plan(scored, study)
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
+```
+
+Each result carries an APA-formatted statistic, an effect size, a
+writing prompt, and the methodological reference that supports the
+chosen test.
+
+``` r
+
+results_table(results)
+```
+
+The full writing prompt for each result is available in `r$prompt`. The
+first one reads:
+
+``` r
+
+cat(results[[1]]$prompt)
+```
+
+The `prompt` field is a sentence template for the methods or results
+section. The researcher fills in the substantive interpretation. The
+package supplies the statistic and the label. This separation is
+intentional: statistical significance and practical significance are
+distinct judgements.
+
+### Plots on demand
+
+When ggplot2 is installed, `plots = TRUE` attaches a brand-styled chart
+to every supported block: bar charts for frequency and chi-square
+blocks, and scatter plots with a regression overlay for correlation and
+regression blocks. Plotting stays opt-in, so an installation that skips
+ggplot2 keeps working as before.
+
+``` r
+
+results_p <- run_analysis_plan(scored, study, plots = TRUE)
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
+first_plot <- Filter(function(r) !is.null(r$plot), results_p)[[1]]
+first_plot$plot
+```
+
+Inferential blocks also return a `$table` data frame ready for
+[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html), and the
+HTML report picks both up automatically.
+
+------------------------------------------------------------------------
+
+## Results report
+
+[`render_results()`](https://surveyframe.org/reference/render_results.md)
+writes one section per research question.
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
+adds a codebook, quality summary, and descriptives alongside the
+analysis results.
+
+``` r
+
+results_path <- render_results(
+  results,
+  study,
+  output_file = file.path(tempdir(), "tourism_results.html")
+)
+cat("Results report written:", results_path, "\n")
+cat("Size:", round(file.size(results_path) / 1024, 1), "KB\n")
+```
+
+The results report contains one section per research question, with the
+APA statistic, effect size, writing prompt, and the reference for the
+chosen method, each paired with its own chart drawn directly beneath its
+table. A Likert item’s distribution renders as a diverging stacked bar,
+with agreement and disagreement categories running away from a shared
+zero line and any neutral category split evenly across it, so the
+balance of opinion is readable at a glance, where a plain frequency bar
+leaves it to be inferred.
+
+``` r
+
+render_report(
+  study,
+  data             = scored,
+  output_file      = file.path(tempdir(), "tourism_report.html"),
+  include_codebook = TRUE,
+  include_quality  = TRUE,
+  include_missing  = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis = TRUE,
+  include_models   = FALSE
+)
+#> Warning: Scale scoring failed before analysis, so blocks run on unscored data: The responses already hold a column named 'DMRE', 'DMAU', 'DMEU', 'DMPV', 'DSQA', 'DSQT', 'DSUQ', 'TS', 'BI', which is also a scale ID.
+#> ℹ score_scales() stores each score in a column named by its scale ID, so scoring would replace that data. Rename the scale, or drop the column first where it holds scores from an earlier run.
+#> Rendering the report with Quarto 1.11.9. This usually takes under a minute.
+#> Report rendered with the Quarto engine:
+#> /tmp/RtmpZ6QhD4/tourism_report.html
+```
+
+------------------------------------------------------------------------
+
+## The live workflow
+
+The section below shows the full sequence from a live Google Sheet.
+Every step from
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+onward is identical to the simulated workflow. Re-run this block each
+time you want updated results.
+
+``` r
+
+# 1. Pull the latest responses from the Google Sheet.
+responses <- read_sheet_responses(
+  sheet_id   = "YOUR_SHEET_ID",
+  instrument = study
+)
+
+# 2. Run quality checks on the new data.
+sframe_quality_results(responses, study, respondent_id = "respondent_id")
+
+# 3. Score the scales.
+scored <- score_scales(responses, study)
+
+# 4. Run the pre-declared analysis plan.
+results <- run_analysis_plan(scored, study)
+
+# 5. Render the updated report.
+render_report(
+  study,
+  data             = scored,
+  output_file      = "tourism_report_latest.html",
+  include_codebook = TRUE,
+  include_quality  = TRUE,
+  include_missing  = TRUE,
+  include_descriptives = TRUE,
+  include_reliability  = TRUE,
+  include_analysis = TRUE,
+  include_models   = FALSE
+)
+```
+
+As more respondents complete the survey, re-running from the
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+call above refreshes every result, table, and figure in the report,
+leaving the analysis code as it stands.
+
+------------------------------------------------------------------------
+
+## Summary
+
+The instrument built in this vignette can be loaded into SurveyBuilder
+for visual editing or distributed directly as the exported HTML file.
+The Google Sheets script connects online submissions to R through a
+single function call. Because the questionnaire, the scales, and the
+analysis plan are stored together in the sframe, the design and the
+analysis travel as one object.
+
+``` r
+
+citation("surveyframe")
+```

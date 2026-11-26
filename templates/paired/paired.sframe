@@ -1,0 +1,170 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "a434cf3124068b9cf27eb900f591c582c3383707ef4d47a2dd94968c87890a72",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Before and after the workshop",
+    "version": "1.0.0",
+    "description": "A pre and post training evaluation: participants rate their confidence, and say whether they would recommend the training, before and after it.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:43Z"
+  },
+  "items": [
+    {
+      "id": "confidence_before",
+      "label": "Before the training, how confident were you applying this skill? (0 to 100)",
+      "type": "slider",
+      "required": false,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    },
+    {
+      "id": "confidence_after",
+      "label": "After the training, how confident are you applying this skill? (0 to 100)",
+      "type": "slider",
+      "required": false,
+      "reverse": false,
+      "slider_min": 0,
+      "slider_max": 100,
+      "slider_step": 1
+    },
+    {
+      "id": "recommend_before",
+      "label": "Before the training, would you have recommended it to a colleague?",
+      "type": "single_choice",
+      "required": false,
+      "choice_set": "yn",
+      "reverse": false
+    },
+    {
+      "id": "recommend_after",
+      "label": "After the training, would you recommend it to a colleague?",
+      "type": "single_choice",
+      "required": false,
+      "choice_set": "yn",
+      "reverse": false
+    }
+  ],
+  "choices": [
+    {
+      "id": "yn",
+      "values": ["no", "yes"],
+      "labels": ["No", "Yes"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "Did confidence change from before to after the training?",
+      "family": "group_comparison",
+      "method": "t_test_pair",
+      "roles": {
+        "before": "confidence_before",
+        "after": "confidence_after"
+      },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Mean confidence is the same before and after the training.",
+        "alternative": "Mean confidence differs before and after the training."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "t_test_pair",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "Did confidence change, without assuming normality?",
+      "family": "group_comparison",
+      "method": "wilcoxon_pair",
+      "roles": {
+        "before": "confidence_before",
+        "after": "confidence_after"
+      },
+      "objective": "O1",
+      "hypotheses": {
+        "null": "Confidence ratings are not shifted from before to after the training.",
+        "alternative": "Confidence ratings are shifted from before to after the training."
+      },
+      "decision_rule": "Reject H0 if p < .05 on this rank-based test, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "wilcoxon_pair",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "Did willingness to recommend change?",
+      "family": "categorical",
+      "method": "mcnemar",
+      "roles": {
+        "before": "recommend_before",
+        "after": "recommend_after"
+      },
+      "objective": "O2",
+      "hypotheses": {
+        "null": "The share willing to recommend is the same before and after.",
+        "alternative": "The share willing to recommend differs before and after."
+      },
+      "decision_rule": "Reject H0 if p < .05, and report the effect size with its 95% confidence interval.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "mcnemar",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Before and after the workshop",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A training unit needs evidence that a one-day workshop changes participants' confidence, not only that they enjoyed it.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Measure the change in confidence from before to after the training."
+      },
+      {
+        "id": "O2",
+        "text": "Measure the change in willingness to recommend it."
+      }
+    ],
+    "sampling": {
+      "population": "Staff attending the workshop",
+      "method": "census",
+      "planned_n": 50
+    }
+  }
+}

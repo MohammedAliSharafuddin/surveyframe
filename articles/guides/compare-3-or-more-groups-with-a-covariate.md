@@ -1,0 +1,46 @@
+# How to compare 3 or more groups, with a covariate
+
+Compare an outcome across 3 or more groups, add a second factor, and
+adjust for a covariate.
+
+The example in this guide is *Who attends the most?* A comparison of
+engagement across 3 attendee roles, with attendance format as a second
+factor and age as a covariate.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `multi_group`.
+2.  On **Design**, choose **Plan**. RQ1 compares the 3 roles, RQ3 adds
+    the attendance format as a second factor, and RQ4 adjusts for age as
+    a covariate.
+3.  RQ2 asks the same question as RQ1 on ranks, for an outcome far from
+    normal.
+4.  On **Analyse**, run the plan and read the post hoc comparisons for
+    the groups that differ.
+
+## In R
+
+``` r
+
+d <- sframe_demo("multi_group")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Do the 3 attendee roles differ in sessions attended? | One-way ANOVA | The APA 7 sentence and a table, with a chart where the method has one |
+| Do the 3 attendee roles differ in sessions attended according to a Kruskal-Wallis test? | Kruskal-Wallis test | The APA 7 sentence and a table, with a chart where the method has one |
+| Do role and format both matter? | Two-way ANOVA | The APA 7 sentence and a table, with a chart where the method has one |
+| Does the role difference survive adjusting for age? | Analysis of covariance (ANCOVA) | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

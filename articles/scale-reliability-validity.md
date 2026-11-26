@@ -1,0 +1,173 @@
+# Scale reliability and validity
+
+Measurement quality is part of the research design. This vignette works
+through the reliability and validity evidence from the published
+Thailand digital marketing study (Sharafuddin, Madhavan, and Wangtueai
+2024). The reliability and item reports read scale definitions from an
+instrument, so they are shown on the bundled tourism demo, a synthetic
+companion to the study. The validity summary runs on the loadings the
+paper reported, which is all it needs.
+
+## Reliability from the instrument
+
+[`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
+reads the scale definitions and reports Cronbach’s alpha and, with the
+optional `psych` package, McDonald’s omega. The published study reported
+strong reliability for every construct. At the higher-order level the
+alpha and composite reliability were 0.828 and 0.883 for digital
+marketing effectiveness, 0.792 and 0.906 for service quality, 0.769 and
+0.843 for sustainability quality, 0.897 and 0.936 for satisfaction, and
+0.921 and 0.950 for behavioural intention.
+
+``` r
+
+demo      <- sframe_demo("tourism_services")
+instr     <- demo$instrument
+responses <- demo$responses
+
+rr <- sframe_reliability_results(responses, instr, omega = TRUE)
+# as.data.frame() gives one row per scale, so no reaching into the object.
+rr_df <- as.data.frame(rr)
+rel_df <- data.frame(
+  Scale   = paste0(rr_df$label, " (", rr_df$scale_id, ")"),
+  Items   = rr_df$n_items,
+  N       = rr_df$n,
+  Alpha = ifelse(is.na(rr_df$alpha),   "n/a", sub("^0\\.", ".", sprintf("%.2f", rr_df$alpha))),
+  Omega = ifelse(is.na(rr_df$omega_t), "n/a", sub("^0\\.", ".", sprintf("%.2f", rr_df$omega_t))),
+  stringsAsFactors = FALSE)
+kable(rel_df, row.names = FALSE,
+      col.names = c("Scale", "Items", "N", "Alpha", "Omega"),
+      align = c("l", "c", "c", "r", "r"),
+      caption = "Scale reliability statistics")
+```
+
+## Item diagnostics
+
+Item diagnostics identify sparse items, weak item-total relationships,
+and floor or ceiling effects. These are the item-level facts behind a
+retention decision.
+
+``` r
+
+demo      <- sframe_demo("tourism_services")
+instr     <- demo$instrument
+responses <- demo$responses
+
+items <- sframe_item_results(responses, instr)
+first  <- items[[1]]
+kable(first$diagnostics, digits = 2,
+      caption = paste0("Item diagnostics: ", first$label, " (", first$scale_id, ")"))
+```
+
+## EFA readiness
+
+[`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)
+reports the Kaiser-Meyer-Olkin measure and Bartlett’s test as a
+screening step before a confirmatory model.
+
+``` r
+
+sframe_efa_readiness_results(responses, instr)
+```
+
+## Convergent validity from the published loadings
+
+This step runs on the loadings alone.
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
+computes composite reliability and average variance extracted from
+standardised loadings. Feeding the outer loadings reported in the paper
+reproduces its convergent validity, which is a direct check of the
+measurement model.
+
+``` r
+
+published_loadings <- list(
+  DMRE = c(dmre_1 = .815, dmre_2 = .899, dmre_3 = .668, dmre_4 = .838),
+  DMAU = c(dmau_1 = .843, dmau_2 = .915, dmau_3 = .920),
+  DMEU = c(dmeu_1 = .897, dmeu_2 = .929, dmeu_3 = .932),
+  DMPV = c(dmpv_1 = .818, dmpv_2 = .916, dmpv_3 = .900, dmpv_4 = .863),
+  DSQA = c(dsqa_1 = .904, dsqa_2 = .920, dsqa_3 = .869),
+  DSQT = c(dsqt_1 = .778, dsqt_2 = .883, dsqt_3 = .879, dsqt_4 = .811, dsqt_5 = .713),
+  DSUQ = c(dsuq_1 = .780, dsuq_2 = .855, dsuq_3 = .845, dsuq_4 = .551, dsuq_5 = .529),
+  TS   = c(ts_1 = .912, ts_2 = .950, ts_3 = .869),
+  BI   = c(bi_1 = .937, bi_2 = .911, bi_3 = .940)
+)
+
+validity <- sframe_validity_results(published_loadings)
+kable(as.data.frame(validity), digits = 2,
+      caption = "Composite reliability and average variance extracted")
+```
+
+The average variance extracted exceeds 0.5 for every construct, and the
+composite reliability exceeds 0.7, so each construct explains more than
+half the variance in its items. The sustainability construct sits
+lowest, in line with the 2 weaker items the paper flagged (DSUQ4 and
+DSUQ5).
+
+## Discriminant validity
+
+The study assessed discriminant validity in 2 ways. The Fornell-Larcker
+criterion compares the square root of a construct’s AVE with its
+correlations with the others. The square roots, 0.810 for digital
+marketing effectiveness, 0.910 for service quality, 0.726 for
+sustainability quality, 0.911 for satisfaction, and 0.930 for
+behavioural intention, each exceeded the off-diagonal correlations. The
+Heterotrait-Monotrait ratios were all below the 0.90 threshold, the
+highest being 0.766 between ease of use and accessibility. Both results
+support discriminant validity.
+
+[`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
+computes both, and which one you get depends on what you give it.
+Construct scores give the Fornell-Larcker matrix, and the `htmt` element
+then holds the absolute inter-construct correlations, which is a
+different quantity from the Henseler ratio. Item-level responses per
+construct give the real heterotrait-monotrait ratio. The report records
+which it computed in `htmt_method`, so a write-up can name the quantity
+it reports.
+
+``` r
+
+demo <- sframe_demo("tourism_services")
+scored <- score_scales(demo$responses, demo$instrument)
+scale_ids <- vapply(sframe_get_scales(demo$instrument), sframe_id, character(1))
+construct_scores <- scored[, scale_ids, drop = FALSE]
+
+loadings <- lapply(sframe_get_scales(demo$instrument), function(s) {
+  stats::setNames(rep(0.8, length(s$items)), s$items)
+})
+names(loadings) <- scale_ids
+
+from_scores <- sframe_validity_results(loadings, construct_scores = construct_scores)
+from_scores$htmt_method
+```
+
+Passing the items themselves is what asks for the Henseler ratio:
+
+``` r
+
+items_by_construct <- lapply(sframe_get_scales(demo$instrument), function(s) {
+  scored[, s$items, drop = FALSE]
+})
+names(items_by_construct) <- scale_ids
+
+real_htmt <- sframe_validity_results(loadings, construct_scores = construct_scores,
+                             items_by_construct = items_by_construct)
+real_htmt$htmt_method
+```
+
+A construct with a single item has no monotrait correlations, so its
+HTMT entries come back `NA`.
+
+## Collinearity
+
+The study reported variance inflation factors below 5 for every
+indicator, which indicates multicollinearity mild enough to proceed.
+[`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
+returns variance inflation factors when a regression is specified, which
+is shown in the “Analysing survey responses” vignette.
+
+## Cautious interpretation
+
+Reliability and validity summaries are diagnostics, not automatic
+decisions. Read them with the questionnaire wording, the sampling
+context, the construct definitions, and the planned model in view.

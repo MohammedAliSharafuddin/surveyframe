@@ -1,0 +1,1198 @@
+# Plan, run and report survey research
+
+Design your questionnaire, plan your analysis and prepare an APA 7
+report. Work visually in SurveyStudio or use R.
+
+For people conducting, supervising, reviewing or planning survey
+research.
+
+[Explore templates](https://surveyframe.org/articles/templates.md) [Get
+started](https://surveyframe.org/articles/start.md)
+
+SurveyStudio opens through R. The [setup
+guide](https://surveyframe.org/articles/start.md) explains installing
+the required software and opening your first study.
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/surveyframe)](https://CRAN.R-project.org/package=surveyframe)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Conducting a survey for your studies?
+
+Plan your research, create your questionnaire, analyse responses and
+prepare your report. [Guidance for survey
+students](https://surveyframe.org/articles/learn/for-students.md)
+
+## Supervising students conducting survey research?
+
+Review each student’s analysis plan, compare it with the completed
+report and follow recorded amendments and their reasons. [Guidance for
+supervisors](https://surveyframe.org/articles/learn/for-supervisors.md)
+
+## Reviewing a survey study as an ethics committee?
+
+Examine the proposed study documentation, then review the completed
+study and its recorded changes. [Guidance for ethics
+committees](https://surveyframe.org/articles/learn/for-ethics-committees.md)
+
+## Planning survey research for an NGO or research organisation?
+
+Prepare a pre-analysis plan and keep the questionnaire, analysis
+decisions and reporting connected. [Guidance for NGOs and research
+organisations](https://surveyframe.org/articles/learn/for-research-organisations.md)
+
+## Keep your questionnaire and analysis plan connected
+
+Save your questions, scoring rules, analysis plan and references in a
+portable `.sframe` file. Collect responses using your chosen setup,
+check their quality and prepare a report that presents the planned
+analyses alongside the results and your interpretation.
+
+Record later changes with their reasons so readers can follow the
+study’s development.
+
+**Plan your study before collecting responses.** Record your research
+questions, hypotheses and analysis choices alongside the questionnaire.
+[How to write the analysis
+plan](https://surveyframe.org/articles/learn/analysis-plan.md).
+
+**Move from responses to a research report.** Check the collected
+responses, run the planned analyses and prepare APA 7 tables, figures
+and references for supported methods. [See the report
+stage](https://surveyframe.org/articles/run-a-study-in-surveystudio.html#report).
+
+**Keep a record of your research design.** Preserve the questionnaire
+version, sources and disclosed amendments with the design file. [Verify
+a `.sframe` file](https://surveyframe.org/verify/) to check that it
+matches the hash recorded when it was saved.
+
+For example, start with the [course evaluation
+survey](https://surveyframe.org/articles/templates/course-evaluation-survey.md),
+plan how you will summarise the ratings, collect responses and prepare a
+report for the teaching team. It is an example to adapt to your own
+course and questions.
+
+## Start from a template
+
+Each template holds a questionnaire and an example analysis plan to
+adapt to your own study.
+
+**Psychology and measurement.** [Likert scale
+questionnaire](https://surveyframe.org/articles/templates/likert-scale-questionnaire.md),
+[Measurement model questionnaire (CFA and
+SEM)](https://surveyframe.org/articles/templates/measurement-model-questionnaire.md).
+
+**Education.** [Course evaluation
+survey](https://surveyframe.org/articles/templates/course-evaluation-survey.md),
+[Training evaluation before and
+after](https://surveyframe.org/articles/templates/training-evaluation-before-and-after.md).
+
+**Business.** [Customer satisfaction
+survey](https://surveyframe.org/articles/templates/customer-satisfaction-survey.md),
+[Employee engagement
+survey](https://surveyframe.org/articles/templates/employee-engagement-survey.md),
+[Supplier and venue selection (decision
+making)](https://surveyframe.org/articles/templates/supplier-and-venue-selection.md).
+
+**Events and tourism.** [Open-ended feedback
+survey](https://surveyframe.org/articles/templates/open-ended-feedback-survey.md).
+
+**Research methods.** [Pilot survey with a small
+sample](https://surveyframe.org/articles/templates/pilot-survey-small-sample.md),
+[Preparing a survey study for
+preregistration](https://surveyframe.org/articles/templates/pre-registered-survey-sealed-and-amended.md).
+
+[All questionnaire
+templates](https://surveyframe.org/articles/templates.md)
+
+## How a study runs
+
+1.  **Design** the questionnaire and write the analysis plan, with
+    hypotheses and decision rules, before collecting responses.
+2.  **Collect** responses with a survey web page, stored where you
+    choose, such as a Google Sheet you own.
+3.  **Check** responses for failed attention checks, speeding, identical
+    answers across a scale and missing answers.
+4.  **Analyse** the responses with the plan as written. A later change
+    is recorded as an amendment with its reason.
+5.  **Report** in APA 7, as HTML, Word, PDF or OpenDocument.
+
+[Run a study in
+SurveyStudio](https://surveyframe.org/articles/run-a-study-in-surveystudio.md)
+shows each stage by point and click, and [Run a study in
+R](https://surveyframe.org/articles/run-a-study-in-r.md) shows the same
+stages in R.
+
+Already use R? Open a first study from the Console
+
+``` r
+
+install.packages("surveyframe")
+library(surveyframe)
+d <- sframe_demo("first_survey")
+```
+
+Then read the [R reference](https://surveyframe.org/reference/index.md),
+the [worked
+examples](https://surveyframe.org/articles/learn-by-example.md) and the
+[changelog](https://surveyframe.org/news/index.md).
+
+# Articles
+
+## Questionnaire templates
+
+10 example questionnaires, each with an analysis plan to adapt and
+screenshots of the study in SurveyStudio, grouped by field.
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md):
+
+  10 example questionnaires, each with an analysis plan to adapt, in
+  psychology, education, business, events and tourism, and research
+  methods.
+
+- [Course evaluation
+  survey](https://surveyframe.org/articles/templates/course-evaluation-survey.md):
+
+  A course evaluation in which students rate each part of a course on 1
+  grid, compared between students who took it in person and online.
+  surveyframe gives you the questionnaire, the analysis plan and a
+  report for the teaching team.
+
+- [Customer satisfaction
+  survey](https://surveyframe.org/articles/templates/customer-satisfaction-survey.md):
+
+  A customer study of return intention: whether customers who use a
+  service more come back, and how that use relates to their satisfaction
+  and the offer they prefer. surveyframe gives you the questionnaire, a
+  plan with logistic regressions declared in advance, and the report.
+
+- [Employee engagement
+  survey](https://surveyframe.org/articles/templates/employee-engagement-survey.md):
+
+  An engagement survey of 8 items written to measure 2 dimensions, how
+  work is organised and the content of the work, with a check that
+  employees’ answers support 2 scores. surveyframe gives you the
+  questionnaire, the analysis plan and the report.
+
+- [Likert scale
+  questionnaire](https://surveyframe.org/articles/templates/likert-scale-questionnaire.md):
+
+  A short questionnaire that measures 1 idea with a 4-item Likert scale,
+  including a reverse-worded item, and checks that the scale holds
+  together before its score is used. surveyframe gives you the
+  questionnaire, a pre-analysis plan to submit with your proposal, and
+  an APA 7 report.
+
+- [Measurement model questionnaire (CFA and
+  SEM)](https://surveyframe.org/articles/templates/measurement-model-questionnaire.md):
+
+  A study exploring a proposed relationship between content quality,
+  satisfaction and the intention to return. Specify the measurement and
+  structural model, then generate syntax for lavaan or seminr.
+  surveyframe gives you the questionnaire, the model syntax and the
+  report.
+
+- [Open-ended feedback
+  survey](https://surveyframe.org/articles/templates/open-ended-feedback-survey.md):
+
+  A feedback survey of what worked and what to change, analysed as text:
+  frequent words and phrases, words in context, sentiment and topics.
+  surveyframe gives you the questionnaire, the analysis plan and the
+  report.
+
+- [Pilot survey with a small
+  sample](https://surveyframe.org/articles/templates/pilot-survey-small-sample.md):
+
+  A pilot with 18 participants that answers the main study’s questions
+  with methods suited to a small sample: a rank-based comparison, an
+  exact test and a penalised logistic regression. surveyframe gives you
+  the questionnaire, the pre-analysis plan and the report.
+
+- [Preparing a survey study for
+  preregistration](https://surveyframe.org/articles/templates/pre-registered-survey-sealed-and-amended.md):
+
+  A survey study whose instrument and analysis plan are saved with a
+  hash before data collection, with any later change recorded as a
+  disclosed amendment. surveyframe writes a pre-analysis plan for you to
+  complete and register on OSF or Zenodo, and a report that names the
+  instrument it analysed.
+
+- [Supplier and venue selection (decision
+  making)](https://surveyframe.org/articles/templates/supplier-and-venue-selection.md):
+
+  Compare candidate suppliers or venues using the criteria your
+  committee values. Record the criteria and the judgements, then review
+  the rankings your selected methods produce. surveyframe gives you the
+  questionnaire, the analysis plan and the report.
+
+- [Training evaluation before and
+  after](https://surveyframe.org/articles/templates/training-evaluation-before-and-after.md):
+
+  Compare the same participants’ confidence, and their willingness to
+  recommend a workshop, before and after the training. Plan the paired
+  comparisons before collecting responses. surveyframe gives you the
+  questionnaire, the plan and the report.
+
+## How-to guides
+
+Complete tasks, from setting up a questionnaire to analysing responses
+and recording the study, each in SurveyStudio and in R.
+
+- [How-to guides](https://surveyframe.org/articles/guides.md):
+
+  Follow a complete task, from setting up a questionnaire to analysing
+  responses and documenting your study, in SurveyStudio and in R.
+
+- [How to add a welcome page, a logo and a colour to a
+  survey](https://surveyframe.org/articles/guides/add-a-welcome-page-a-logo-and-a-colour-to-a-survey.md):
+
+  Personalise a survey with a welcome page, your organisation’s logo and
+  a theme colour.
+
+- [How to analyse a grid of rating
+  questions](https://surveyframe.org/articles/guides/analyse-a-grid-of-rating-questions.md):
+
+  Summarise the ratings for each row of a grid question and compare them
+  between groups.
+
+- [How to analyse a survey with fewer than 30
+  respondents](https://surveyframe.org/articles/guides/analyse-a-survey-with-fewer-than-30-respondents.md):
+
+  Plan and review an analysis for a survey with a small sample, such as
+  a pilot.
+
+- [How to analyse choose-any and ranking
+  questions](https://surveyframe.org/articles/guides/analyse-choose-any-and-ranking-questions.md):
+
+  Summarise questions where respondents tick any options or put options
+  in order.
+
+- [How to analyse open-ended
+  answers](https://surveyframe.org/articles/guides/analyse-open-ended-answers.md):
+
+  Explore what respondents wrote in open-ended answers: the frequent
+  words, how a word is used, the topics and the tone.
+
+- [How to ask questions only of those they apply
+  to](https://surveyframe.org/articles/guides/ask-questions-only-of-those-they-apply-to.md):
+
+  Show a question only to respondents whose earlier answer makes it
+  apply to them.
+
+- [How to change a questionnaire mid-study, on the
+  record](https://surveyframe.org/articles/guides/change-a-questionnaire-mid-study-on-the-record.md):
+
+  Change a questionnaire during a study and record the change with its
+  reason.
+
+- [How to check whether a Likert scale holds
+  together](https://surveyframe.org/articles/guides/check-whether-a-likert-scale-holds-together.md):
+
+  Check whether the items of a Likert scale measure 1 thing well enough
+  to combine into a score.
+
+- [How to check whether your items measure the factors you
+  assumed](https://surveyframe.org/articles/guides/check-whether-your-items-measure-the-factors-you-assumed.md):
+
+  Explore whether your items group into the factors you expected.
+
+- [How to choose between options on multiple
+  criteria](https://surveyframe.org/articles/guides/choose-between-options-on-multiple-criteria.md):
+
+  Rank decision options by criteria weighted by the people you asked.
+
+- [How to cite the sources of a scale and a
+  method](https://surveyframe.org/articles/guides/cite-the-sources-of-a-scale-and-a-method.md):
+
+  Keep the sources of your scale and your methods with the study, and
+  cite them in the report.
+
+- [How to combine 1 question at a time with skip
+  logic](https://surveyframe.org/articles/guides/combine-1-question-at-a-time-with-skip-logic.md):
+
+  Combine a survey shown 1 question at a time with questions that depend
+  on earlier answers.
+
+- [How to compare 2 groups on a survey
+  outcome](https://surveyframe.org/articles/guides/compare-2-groups-on-a-survey-outcome.md):
+
+  Compare a numeric outcome between 2 independent groups of respondents.
+
+- [How to compare 3 or more groups, with a
+  covariate](https://surveyframe.org/articles/guides/compare-3-or-more-groups-with-a-covariate.md):
+
+  Compare an outcome across 3 or more groups, add a second factor, and
+  adjust for a covariate.
+
+- [How to compare 3 or more measurements of the same
+  people](https://surveyframe.org/articles/guides/compare-3-or-more-measurements-of-the-same-people.md):
+
+  Compare 3 or more measurements taken from the same respondents.
+
+- [How to compare the same people before and
+  after](https://surveyframe.org/articles/guides/compare-the-same-people-before-and-after.md):
+
+  Compare answers from the same respondents before and after an
+  activity.
+
+- [How to find what goes with an outcome, and how much it
+  explains](https://surveyframe.org/articles/guides/find-what-goes-with-an-outcome-and-how-much-it-explains.md):
+
+  Find which measures go together with an outcome, and how much of it
+  they explain together.
+
+- [How to predict a yes or no, an ordered rating or a
+  choice](https://surveyframe.org/articles/guides/predict-a-yes-or-no-an-ordered-rating-or-a-choice.md):
+
+  Choose and run a model for an outcome that is a yes or no, an ordered
+  rating or a choice between categories.
+
+- [How to prove a questionnaire file is the one you
+  planned](https://surveyframe.org/articles/guides/prove-a-questionnaire-file-is-the-one-you-planned.md):
+
+  Check that a questionnaire file matches the hash recorded when it was
+  saved.
+
+- [How to run a complete survey, from questionnaire to report, in
+  R](https://surveyframe.org/articles/guides/run-a-complete-survey-from-questionnaire-to-report-in-r.md):
+
+  Run a whole survey study in R: write the questionnaire and its plan,
+  collect responses, check them, analyse them as planned and write the
+  report.
+
+- [How to show a survey 1 question at a
+  time](https://surveyframe.org/articles/guides/show-a-survey-1-question-at-a-time.md):
+
+  Present your survey 1 question at a time, with a progress bar.
+
+- [How to test a measurement and structural
+  model](https://surveyframe.org/articles/guides/test-a-measurement-and-structural-model.md):
+
+  Declare the measurement and structural model for your constructs, take
+  its syntax to lavaan or seminr to fit it, and test mediation and
+  moderation.
+
+- [How to test mediation and
+  moderation](https://surveyframe.org/articles/guides/test-mediation-and-moderation.md):
+
+  Test whether a variable carries an effect (mediation) or changes its
+  strength (moderation).
+
+- [How to test whether 2 categorical answers are
+  associated](https://surveyframe.org/articles/guides/test-whether-2-categorical-answers-are-associated.md):
+
+  Test whether 2 categorical answers are associated.
+
+- [How to weight a survey sample to its
+  population](https://surveyframe.org/articles/guides/weight-a-survey-sample-to-its-population.md):
+
+  Apply survey weights so your summaries describe the population the
+  sample was drawn from.
+
+## Documentation
+
+How to set up each question type and each analysis method, with
+screenshots of SurveyStudio.
+
+- [Documentation: how to set up
+  surveyframe](https://surveyframe.org/articles/docs.md):
+
+  How to set up each question type and analysis in surveyframe, step by
+  step, with annotated SurveyStudio screenshots.
+
+- [Test an association between
+  categories](https://surveyframe.org/articles/docs/methods/associations.md):
+
+  These methods test whether 2 categorical answers go together.
+
+- [Measure how answers go
+  together](https://surveyframe.org/articles/docs/methods/correlations.md):
+
+  These methods measure how strongly 2 numeric or ordered answers move
+  together, and whether that holds with a third held constant.
+
+- [Add a criteria weighting
+  question](https://surveyframe.org/articles/docs/question-types/criteria-weights.md):
+
+  Add a question, choose Criteria weight, and list the criteria to
+  divide 100 points across.
+
+- [Add a date
+  question](https://surveyframe.org/articles/docs/question-types/date.md):
+
+  Add a question and choose Date. The respondent picks it from a
+  calendar.
+
+- [Choose between
+  options](https://surveyframe.org/articles/docs/methods/decisions.md):
+
+  These methods weigh each criterion and rank the options.
+
+- [Describe the answers and their
+  quality](https://surveyframe.org/articles/docs/methods/describing-data.md):
+
+  These methods describe who answered what, how complete the answers
+  are, and which responses the quality checks flag.
+
+- [Check structure and write model
+  syntax](https://surveyframe.org/articles/docs/methods/factor-models.md):
+
+  These methods check whether items measure the factors assumed, write
+  the lavaan or seminr syntax for a declared model, and estimate
+  mediation and moderation.
+
+- [Add a grid of rating
+  questions](https://surveyframe.org/articles/docs/question-types/grid.md):
+
+  Add a question, choose Matrix, list the rows, and pick the scale every
+  row is rated on.
+
+- [Compare
+  groups](https://surveyframe.org/articles/docs/methods/group-comparisons.md):
+
+  These methods test whether an outcome differs between 2 or more groups
+  of respondents.
+
+- [Add a Likert question to a
+  scale](https://surveyframe.org/articles/docs/question-types/likert.md):
+
+  Add a question, choose Likert, and choose the choice set that holds
+  its answer options, such as Strongly disagree to Strongly agree.
+
+- [Add an open-ended
+  question](https://surveyframe.org/articles/docs/question-types/long-text.md):
+
+  Add a question and choose Long text for a paragraph.
+
+- [Add a choose-any
+  question](https://surveyframe.org/articles/docs/question-types/multiple-choice.md):
+
+  Add a question, choose Multiple choice, and give the options the
+  respondent may tick.
+
+- [Add a number
+  question](https://surveyframe.org/articles/docs/question-types/numeric.md):
+
+  Add a question, choose Numeric, and set the range the answer may take.
+
+- [Add pairwise
+  comparisons](https://surveyframe.org/articles/docs/question-types/pairwise-comparison.md):
+
+  Choose the task first. To find which criteria matter most (AHP, ANP),
+  use Saaty’s importance scale. To find how criteria influence each
+  other (DEMATEL), use the influence scale. Then add a question, choose
+  Pairwise comparison and list the criteria.
+
+- [Add a ranking
+  question](https://surveyframe.org/articles/docs/question-types/ranking.md):
+
+  Add a question, choose Ranking, and give the options to put in order.
+
+- [Predict an
+  outcome](https://surveyframe.org/articles/docs/methods/regression.md):
+
+  These methods estimate how much predictors explain a numeric outcome,
+  or how they change the odds of a yes, an ordered rating or a choice.
+
+- [Compare the same people over
+  time](https://surveyframe.org/articles/docs/methods/repeated-measures.md):
+
+  These methods test whether answers change between 2 or more
+  measurements of the same respondents.
+
+- [Score a scale and check its
+  reliability](https://surveyframe.org/articles/docs/methods/scales-reliability.md):
+
+  These methods give a scale’s score and test whether its items hold
+  together.
+
+- [Add a short text
+  question](https://surveyframe.org/articles/docs/question-types/short-text.md):
+
+  Add a question and choose Short text for a word or a line.
+
+- [Add a single-choice
+  question](https://surveyframe.org/articles/docs/question-types/single-choice.md):
+
+  Add a question, choose Single choice, and give the options the
+  respondent picks 1 from.
+
+- [Add a slider
+  rating](https://surveyframe.org/articles/docs/question-types/slider.md):
+
+  Add a question, choose Slider, and set its range and step.
+
+- [Add a star
+  rating](https://surveyframe.org/articles/docs/question-types/star-rating.md):
+
+  Add a question and choose Rating for a row of stars.
+
+- [Analyse open
+  answers](https://surveyframe.org/articles/docs/methods/text-analysis.md):
+
+  These methods find the words, phrases, contexts, tones and topics in
+  open answers.
+
+## Get started and learn
+
+Install surveyframe and open a study in SurveyStudio, guidance for each
+audience, the frequently asked questions, comparisons with other tools,
+and how to cite surveyframe.
+
+- [Get started with
+  surveyframe](https://surveyframe.org/articles/start.md):
+
+  Install R, RStudio and surveyframe, open an example study in
+  SurveyStudio, then turn a downloaded template into your own study, by
+  point and click in SurveyStudio.
+
+- [Cite surveyframe](https://surveyframe.org/articles/cite.md):
+
+  How to cite surveyframe in a thesis or paper: the APA 7 reference, the
+  BibTeX entry and the DOI.
+
+- [Plan first, analyse second: the analysis plan in
+  surveyframe](https://surveyframe.org/articles/learn/analysis-plan.md):
+
+  How to plan your analysis before collecting responses: for each
+  research question, what you expect to find, the measurements you will
+  use and how you will analyse them.
+
+- [Choosing a survey tool for
+  research](https://surveyframe.org/articles/learn/choosing-a-survey-tool.md):
+
+  What to look for in a survey tool for research: the analysis plan,
+  preregistration, reporting, data ownership and reproducibility, and
+  where surveyframe fits.
+
+- [Frequently asked
+  questions](https://surveyframe.org/articles/learn/faq.md):
+
+  Answers about surveyframe: using it for a thesis, preregistering on
+  OSF, planning first and creative thinking, working by point and click
+  in SurveyStudio, collecting answers, and checking a questionnaire
+  file.
+
+- [Reviewing survey studies for an ethics
+  committee](https://surveyframe.org/articles/learn/for-ethics-committees.md):
+
+  Guidance for ethics committees: review the proposed questionnaire and
+  study plan before collection, identify the submitted instrument
+  version, then review the completed report and its recorded changes.
+
+- [Survey research for NGOs and research
+  organisations](https://surveyframe.org/articles/learn/for-research-organisations.md):
+
+  Guidance for NGOs and research organisations: prepare a pre-analysis
+  plan, connect it to the questionnaire, document analysis decisions and
+  amendments, and report the completed study to stakeholders.
+
+- [Survey research for your
+  studies](https://surveyframe.org/articles/learn/for-students.md):
+
+  Guidance for students conducting a survey study: choose and adapt an
+  example, write the questionnaire and analysis plan, collect and check
+  responses, and produce the study report.
+
+- [Supervising survey
+  research](https://surveyframe.org/articles/learn/for-supervisors.md):
+
+  Guidance for supervisors: review a student’s questionnaire and
+  analysis plan, keep the agreed version, compare the completed report
+  with the plan, and inspect recorded amendments and their reasons.
+
+- [Choosing questions for your
+  survey](https://surveyframe.org/articles/learn/question-types.md):
+
+  Choose a question type to match the information you need, from
+  agreement ratings and dates to written feedback and ranked options,
+  with the analyses each type suits.
+
+- [Register your analysis plan on
+  OSF](https://surveyframe.org/articles/learn/register-on-osf.md):
+
+  How to preregister a surveyframe study on the Open Science Framework:
+  write the pre-analysis plan, complete the remaining fields, and upload
+  it with the .sframe file.
+
+- [surveyframe and Google
+  Forms](https://surveyframe.org/articles/compare/google-forms.md):
+
+  How surveyframe relates to Google Forms: what each does, what
+  surveyframe adds for research, and how to analyse Google Forms
+  responses with surveyframe.
+
+- [surveyframe and
+  LimeSurvey](https://surveyframe.org/articles/compare/limesurvey.md):
+
+  How surveyframe relates to LimeSurvey: what each does, what
+  surveyframe adds for research, and how to analyse LimeSurvey responses
+  with surveyframe.
+
+- [surveyframe and
+  Qualtrics](https://surveyframe.org/articles/compare/qualtrics.md):
+
+  How surveyframe relates to Qualtrics: what each does, what surveyframe
+  adds for research, and how to analyse Qualtrics responses with
+  surveyframe.
+
+- [surveyframe and
+  surveydown](https://surveyframe.org/articles/compare/surveydown.md):
+
+  How surveyframe relates to surveydown: what each does, what
+  surveyframe adds for research, and how to analyse surveydown responses
+  with surveyframe.
+
+## Start here
+
+The 5 stages of a study, in SurveyStudio or in R, then 25 small surveys,
+each doing 1 job, with the whole path from the questionnaire to the
+report. Choose the demo that matches the data you have.
+
+- [Run a study in
+  SurveyStudio](https://surveyframe.org/articles/run-a-study-in-surveystudio.md):
+- [Run a study in
+  R](https://surveyframe.org/articles/run-a-study-in-r.md):
+- [Learn by example: 25 small
+  surveys](https://surveyframe.org/articles/learn-by-example.md):
+
+## Survey research workflow
+
+Read these in order. Start with the worked example, then build the
+instrument, analyse responses, check reliability and validity, generate
+model syntax, and finish with the visual tools.
+
+- [Survey design and live results: a tourism services
+  example](https://surveyframe.org/articles/surveyframe.md):
+- [Building a survey instrument: questions, plan, and
+  model](https://surveyframe.org/articles/building-survey-instrument.md):
+- [Deploying a survey and collecting responses on free
+  hosting](https://surveyframe.org/articles/deploying-and-collecting.md):
+- [Analysing survey responses: running the
+  plan](https://surveyframe.org/articles/analysing-survey-responses.md):
+- [Scale reliability and
+  validity](https://surveyframe.org/articles/scale-reliability-validity.md):
+- [EFA, CFA, CB-SEM, and PLS-SEM syntax
+  generation](https://surveyframe.org/articles/efa-cfa-sem-pls-syntax.md):
+- [The visual workflow: SurveyBuilder, SurveyStudio, and the
+  dashboard](https://surveyframe.org/articles/surveybuilder-gui-overview.md):
+
+## Specialised analyses
+
+Read these when a study calls for them. Small-sample inference covers
+studies below the n = 30 threshold, multi-criteria decision analysis
+covers ranking alternatives against criteria that compete, and text
+analysis covers open-ended survey responses.
+
+- [Small-sample
+  inference](https://surveyframe.org/articles/small-sample.md):
+- [Multi-criteria decision
+  analysis](https://surveyframe.org/articles/mcdm-analysis.md):
+- [Text and open-ended response
+  analysis](https://surveyframe.org/articles/text-analysis.md):
+
+# R reference
+
+## Start here
+
+SurveyStudio opens an instrument and takes it through every stage below,
+by point and click. ?surveyframe is the map of the package, and
+sframe_demo(“first_survey”) is a whole survey to start from.
+
+- [`surveyframe`](https://surveyframe.org/reference/surveyframe-package.md)
+  [`surveyframe-package`](https://surveyframe.org/reference/surveyframe-package.md)
+  : surveyframe: Design, Plan, Seal and Report Questionnaire Studies
+- [`launch_studio()`](https://surveyframe.org/reference/launch_studio.md)
+  : Launch the SurveyStudio interface
+
+## Design
+
+Make the instrument: its questions, choice sets, scales, branching and
+attention checks, saved as a portable .sframe file. In SurveyBuilder:
+the Build mode. In code:
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md)
+and the makers listed here, then
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md).
+
+- [`launch_builder()`](https://surveyframe.org/reference/launch_builder.md)
+  : Launch the surveyframe visual survey builder
+- [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md)
+  : Create a survey instrument object
+- [`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md)
+  : The study an instrument serves
+- [`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md)
+  : Sampling methods a study can declare
+- [`sframe_item()`](https://surveyframe.org/reference/sframe_item.md) :
+  Define a survey item
+- [`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md)
+  : Define a reusable choice set
+- [`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md)
+  : Define a scored scale
+- [`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md)
+  : Define a branching rule
+- [`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md)
+  : Define a design-time survey check
+- [`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md)
+  : Declare a choice-experiment (conjoint) design
+- [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+  : Write an instrument to a .sframe file
+- [`read_sframe()`](https://surveyframe.org/reference/read_sframe.md) :
+  Read an instrument from a .sframe file
+- [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
+  : Validate an instrument object
+- [`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md)
+  : Report on a validation result
+- [`as_sframe()`](https://surveyframe.org/reference/as_sframe.md) :
+  Coerce to an instrument
+
+## Plan
+
+Declare the analysis before the data arrive, so the report shows what
+was planned and what was run. In SurveyBuilder: the Plan mode. In
+SurveyStudio: Plan, or the Analyse screen. In code:
+`sframe_plan(x) <- plan`.
+
+- [`sframe_plan()`](https://surveyframe.org/reference/sframe_plan.md) :
+  Get the pre-declared analysis plan
+- [`` `sframe_plan<-`() ``](https://surveyframe.org/reference/sframe_plan-set.md)
+  : Set the pre-declared analysis plan
+- [`sframe_sample_size_plan()`](https://surveyframe.org/reference/sframe_sample_size_plan.md)
+  : Plan the sample size for an analysis
+
+## Preview
+
+See the survey as a respondent meets it, with nothing collected. In
+SurveyStudio: the Preview screen. In code:
+[`preview_survey()`](https://surveyframe.org/reference/preview_survey.md).
+
+- [`preview_survey()`](https://surveyframe.org/reference/preview_survey.md)
+  : Preview a survey as a respondent sees it
+- [`run_survey()`](https://surveyframe.org/reference/run_survey.md) :
+  Render a survey from an instrument object
+
+## Collect
+
+Send the survey out: a standalone HTML page, optionally saving answers
+to a Google Sheet, or a Shiny module inside your own app. In
+SurveyBuilder: Export survey, with the Google Sheets settings. In code:
+[`export_survey()`](https://surveyframe.org/reference/export_survey.md).
+
+- [`export_survey()`](https://surveyframe.org/reference/export_survey.md)
+  : Export a self-contained static HTML survey
+- [`export_google_sheet()`](https://surveyframe.org/reference/export_google_sheet.md)
+  : Export a survey instrument to Google Sheets collection format
+- [`sframe_survey_ui()`](https://surveyframe.org/reference/sframe_survey_ui.md)
+  : Shiny module UI for an embedded survey
+- [`sframe_survey_server()`](https://surveyframe.org/reference/sframe_survey_server.md)
+  : Shiny module server for an embedded survey
+
+## Responses
+
+Read the answers back against the instrument, check their quality, and
+export them with labels for other software. In SurveyStudio: the
+Responses and Quality screens. In code:
+[`read_responses()`](https://surveyframe.org/reference/read_responses.md).
+
+- [`read_responses()`](https://surveyframe.org/reference/read_responses.md)
+  : Read and validate survey responses
+- [`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md)
+  : Read survey responses from a Google Sheet
+- [`export_responses()`](https://surveyframe.org/reference/export_responses.md)
+  : Write responses to SPSS or Stata with the labels attached
+- [`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
+  : Generate a data quality report for survey responses
+- [`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md)
+  : Missing-data report
+- [`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md)
+  : Flag univariate and multivariate outliers
+
+## Analyse
+
+Score the scales and run the plan, block by block. In SurveyStudio: the
+Explore, Reliability and Analyse screens. In code:
+[`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md).
+
+- [`run_analysis_plan()`](https://surveyframe.org/reference/run_analysis_plan.md)
+  : Run a pre-planned analysis from an instrument's analysis plan
+- [`score_scales()`](https://surveyframe.org/reference/score_scales.md)
+  : Score defined scales from survey responses
+- [`sframe_descriptives_results()`](https://surveyframe.org/reference/sframe_descriptives_results.md)
+  : Descriptive statistics report
+- [`sframe_reliability_results()`](https://surveyframe.org/reference/sframe_reliability_results.md)
+  : Estimate scale reliability from item responses
+- [`sframe_item_results()`](https://surveyframe.org/reference/sframe_item_results.md)
+  : Generate item-level diagnostics
+- [`sframe_efa_readiness_results()`](https://surveyframe.org/reference/sframe_efa_readiness_results.md)
+  : Check whether scale items are ready for exploratory factor analysis
+- [`sframe_efa_solution()`](https://surveyframe.org/reference/sframe_efa_solution.md)
+  : Estimate an exploratory factor solution
+- [`sframe_validity_results()`](https://surveyframe.org/reference/sframe_validity_results.md)
+  : Validity report for construct models
+- [`sframe_assumption_results()`](https://surveyframe.org/reference/sframe_assumption_results.md)
+  : Assumption-check report
+- [`sframe_posthoc_results()`](https://surveyframe.org/reference/sframe_posthoc_results.md)
+  : Post-hoc and pairwise comparison report
+
+## Report
+
+Write up what was run: an HTML, PDF, Word or OpenDocument report or its
+Quarto source, a codebook, the figures, and the R code behind each
+result, and
+[`sframe_show()`](https://surveyframe.org/reference/sframe_show.md) to
+open a written file. In SurveyStudio: the Report screen. In code:
+[`render_report()`](https://surveyframe.org/reference/render_report.md).
+
+- [`render_report()`](https://surveyframe.org/reference/render_report.md)
+  : Render a reproducible survey report
+- [`sframe_report_source()`](https://surveyframe.org/reference/sframe_report_source.md)
+  : Recompute and check a report source folder
+- [`render_results()`](https://surveyframe.org/reference/render_results.md)
+  : Render analysis results to a formatted HTML report
+- [`sframe_reports`](https://surveyframe.org/reference/sframe_reports.md)
+  : Choosing a report
+- [`sframe_format_result()`](https://surveyframe.org/reference/sframe_format_result.md)
+  : Render one analysis result as the report does
+- [`sframe_codebook()`](https://surveyframe.org/reference/sframe_codebook.md)
+  : Generate a survey codebook from an instrument object
+- [`sframe_save_figures()`](https://surveyframe.org/reference/sframe_save_figures.md)
+  : Save the charts from an analysis plan as files
+- [`sframe_analysis_qmd()`](https://surveyframe.org/reference/sframe_analysis_qmd.md)
+  : Write a Quarto analysis notebook for any instrument
+- [`sframe_show()`](https://surveyframe.org/reference/sframe_show.md) :
+  Show a file surveyframe wrote
+
+## References
+
+Cite the works an instrument draws on. The references travel in the
+.sframe file and the report lists each one once, at the end. In
+SurveyStudio: the References screen. In code:
+[`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md).
+
+- [`sframe_reference()`](https://surveyframe.org/reference/sframe_reference.md)
+  : Create a reference
+- [`read_bibtex()`](https://surveyframe.org/reference/read_bibtex.md) :
+  Read references from BibTeX
+- [`sframe_add_references()`](https://surveyframe.org/reference/sframe_add_references.md)
+  : Add references to an instrument
+- [`sframe_get_references()`](https://surveyframe.org/reference/sframe_get_references.md)
+  : List an instrument's references
+- [`sframe_bibliography()`](https://surveyframe.org/reference/sframe_bibliography.md)
+  : Write a bibliography as CSL-JSON
+
+## Amendments
+
+Change an instrument mid-study, on the record: each amendment is logged
+with its reason and the hash it replaced. In SurveyStudio: the
+Amendments screen. In code:
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md).
+
+- [`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
+  : Record a disclosed amendment to an instrument
+- [`sframe_get_amendments()`](https://surveyframe.org/reference/sframe_get_amendments.md)
+  : Read an instrument's amendment log
+- [`sframe_drop_items()`](https://surveyframe.org/reference/sframe_drop_items.md)
+  : Drop items from scales or models
+- [`sframe_item_flags()`](https://surveyframe.org/reference/sframe_item_flags.md)
+  : Items past the usual cut-offs in a measurement result
+- [`sframe_link_git_commit()`](https://surveyframe.org/reference/sframe_link_git_commit.md)
+  : Link an instrument to its current Git commit
+
+## Inspect
+
+Read parts of an instrument, a validation result or a report without
+reaching into the object, at any stage. Each accessor and as.data.frame
+method states the classes it accepts and what it returns.
+
+- [`sframe_accessors`](https://surveyframe.org/reference/sframe_accessors.md)
+  : Explore a surveyframe object
+- [`sframe_apa()`](https://surveyframe.org/reference/sframe_apa.md) :
+  Extract APA-formatted result summaries
+- [`sframe_get_branches()`](https://surveyframe.org/reference/sframe_get_branches.md)
+  : Get branching rules
+- [`sframe_get_attention_checks()`](https://surveyframe.org/reference/sframe_get_attention_checks.md)
+  : Get response-quality checks
+- [`sframe_get_choice_sets()`](https://surveyframe.org/reference/sframe_get_choice_sets.md)
+  : Get choice sets
+- [`sf_component_list`](https://surveyframe.org/reference/sf_component_list.md)
+  : A list of instrument components
+- [`sframe_flagged()`](https://surveyframe.org/reference/sframe_flagged.md)
+  : Get rows flagged by response-quality checks
+- [`sframe_id()`](https://surveyframe.org/reference/sframe_id.md) : Get
+  an instrument component ID
+- [`sframe_identity`](https://surveyframe.org/reference/sframe_identity.md)
+  : The ID and label of an instrument component
+- [`sframe_is_valid()`](https://surveyframe.org/reference/sframe_is_valid.md)
+  : Test whether validation passed
+- [`sframe_get_items()`](https://surveyframe.org/reference/sframe_get_items.md)
+  : Get survey items
+- [`sframe_label()`](https://surveyframe.org/reference/sframe_label.md)
+  : Get an instrument component label
+- [`sframe_meta()`](https://surveyframe.org/reference/sframe_meta.md) :
+  Get survey metadata
+- [`sframe_missing_columns()`](https://surveyframe.org/reference/sframe_missing_columns.md)
+  : Columns the instrument declares that the responses left out
+- [`sframe_get_models()`](https://surveyframe.org/reference/sframe_get_models.md)
+  : Get model specifications
+- [`sframe_object()`](https://surveyframe.org/reference/sframe_object.md)
+  : Recover the validated object
+- [`sframe_problems()`](https://surveyframe.org/reference/sframe_problems.md)
+  : Get validation problems
+- [`sframe_notes()`](https://surveyframe.org/reference/sframe_notes.md)
+  : Notes from a validation
+- [`sframe_report_accessors`](https://surveyframe.org/reference/sframe_report_accessors.md)
+  : Read the reportable parts of an analysis or quality result
+- [`sframe_get_scales()`](https://surveyframe.org/reference/sframe_get_scales.md)
+  : Get survey scales
+- [`sframe_validation_accessors`](https://surveyframe.org/reference/sframe_validation_accessors.md)
+  : Read a validation diagnostic
+- [`sframe_as_data_frame`](https://surveyframe.org/reference/sframe_as_data_frame.md)
+  : Coerce a surveyframe object to a data frame
+- [`sframe_subset`](https://surveyframe.org/reference/sframe_subset.md)
+  : Subset a surveyframe report
+- [`as.data.frame(`*`<sf_choices>`*`)`](https://surveyframe.org/reference/as.data.frame.sf_choices.md)
+  : Coerce a choice set to a data frame
+- [`as.data.frame(`*`<sframe>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe.md)
+  : Coerce an instrument to its item summary
+- [`as.data.frame(`*`<sframe_analysis_results>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_analysis_results.md)
+  : Summarise analysis-plan results as a data frame
+- [`as.data.frame(`*`<sframe_assumption_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_assumption_report.md)
+  : Coerce an assumption report to a data frame
+- [`as.data.frame(`*`<sframe_codebook>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_codebook.md)
+  : Extract the item table from a codebook report
+- [`as.data.frame(`*`<sframe_descriptives_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_descriptives_report.md)
+  : Extract the descriptives results table
+- [`as.data.frame(`*`<sframe_efa_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_efa_report.md)
+  : Coerce an EFA readiness report to a data frame
+- [`as.data.frame(`*`<sframe_efa_solution>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_efa_solution.md)
+  : Extract the loading table from an EFA solution
+- [`as.data.frame(`*`<sframe_item_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_item_report.md)
+  : Coerce an item report to a data frame
+- [`as.data.frame(`*`<sframe_missing_data_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_missing_data_report.md)
+  : Extract item missingness results
+- [`as.data.frame(`*`<sframe_quality_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_quality_report.md)
+  : Coerce a response-quality report to a data frame
+- [`as.data.frame(`*`<sframe_reliability_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_reliability_report.md)
+  : Coerce a reliability report to a data frame
+- [`as.data.frame(`*`<sframe_sample_size_plan>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_sample_size_plan.md)
+  : Coerce a sample-size plan to a data frame
+- [`as.data.frame(`*`<sframe_sensitivity>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_sensitivity.md)
+  : Extract a sensitivity-analysis results table
+- [`as.data.frame(`*`<sframe_validation>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_validation.md)
+  : Coerce validation problems to a data frame
+- [`as.data.frame(`*`<sframe_validity_report>`*`)`](https://surveyframe.org/reference/as.data.frame.sframe_validity_report.md)
+  : Extract reliability evidence from a validity report
+
+## Models and syntax
+
+Declare constructs, paths and covariances, and generate lavaan, seminr
+and psych syntax from the instrument.
+
+- [`sframe_model_spec()`](https://surveyframe.org/reference/sframe_model_spec.md)
+  : Create a surveyframe model specification
+- [`sframe_construct()`](https://surveyframe.org/reference/sframe_construct.md)
+  : Define a latent or composite construct
+- [`sframe_path()`](https://surveyframe.org/reference/sframe_path.md) :
+  Define a structural path between constructs
+- [`sframe_covariance()`](https://surveyframe.org/reference/sframe_covariance.md)
+  : Define a covariance between constructs
+- [`sframe_indirect_effect()`](https://surveyframe.org/reference/sframe_indirect_effect.md)
+  : Define an indirect effect path
+- [`sframe_add_model()`](https://surveyframe.org/reference/sframe_add_model.md)
+  : Add a model specification to an instrument
+- [`sframe_validate_model()`](https://surveyframe.org/reference/sframe_validate_model.md)
+  : Validate a surveyframe model specification
+- [`sframe_model_json()`](https://surveyframe.org/reference/sframe_model_json.md)
+  : Serialise a model specification to JSON
+- [`sframe_model_outline()`](https://surveyframe.org/reference/sframe_model_outline.md)
+  : Create a model reporting template
+- [`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md)
+  : Generate lavaan CFA syntax from an instrument or a declared model
+- [`sframe_syntax_efa()`](https://surveyframe.org/reference/sframe_syntax_efa.md)
+  : Generate EFA planning syntax
+- [`sframe_syntax_sem()`](https://surveyframe.org/reference/sframe_syntax_sem.md)
+  : Generate lavaan CB-SEM syntax
+- [`sframe_syntax_pls()`](https://surveyframe.org/reference/sframe_syntax_pls.md)
+  : Generate seminr PLS-SEM syntax
+- [`sframe_syntax_result()`](https://surveyframe.org/reference/sframe_syntax_result.md)
+  : The R code behind an analysis result
+
+## Charts
+
+Opt-in ggplot2 charts for analysis results, and the package theme.
+
+- [`sframe_plots`](https://surveyframe.org/reference/sframe_plots.md) :
+  Choosing a plot
+- [`theme_surveyframe()`](https://surveyframe.org/reference/theme_surveyframe.md)
+  : surveyframe brand theme for ggplot2
+- [`plot(`*`<sframe_analysis_results>`*`)`](https://surveyframe.org/reference/plot.sframe_analysis_results.md)
+  : Plot analysis-plan results
+- [`sframe_plot_correlation_matrix()`](https://surveyframe.org/reference/sframe_plot_correlation_matrix.md)
+  : Correlation matrix heatmap
+- [`sframe_plot_decision_ranking()`](https://surveyframe.org/reference/sframe_plot_decision_ranking.md)
+  : Ranked-score bar chart for a decision-family result
+- [`sframe_plot_dematel_influence()`](https://surveyframe.org/reference/sframe_plot_dematel_influence.md)
+  : Prominence-relation scatter for a DEMATEL result
+- [`sframe_plot_descriptives()`](https://surveyframe.org/reference/sframe_plot_descriptives.md)
+  : Distribution shape by variable, standardised
+- [`sframe_plot_efa_loadings()`](https://surveyframe.org/reference/sframe_plot_efa_loadings.md)
+  : Loadings heatmap from a fitted EFA solution
+- [`sframe_plot_efa_scree()`](https://surveyframe.org/reference/sframe_plot_efa_scree.md)
+  : Scree plot from an EFA readiness report
+- [`sframe_plot_group_comparison()`](https://surveyframe.org/reference/sframe_plot_group_comparison.md)
+  : Group-comparison boxplot
+- [`sframe_plot_likert_matrix()`](https://surveyframe.org/reference/sframe_plot_likert_matrix.md)
+  : Grouped diverging chart for a Likert matrix question
+- [`sframe_plot_likert_scale()`](https://surveyframe.org/reference/sframe_plot_likert_scale.md)
+  : Grouped diverging chart for a scale's Likert items
+- [`sframe_plot_missingness()`](https://surveyframe.org/reference/sframe_plot_missingness.md)
+  : Missing-data report plot: missingness rate by item
+- [`sframe_plot_paired_comparison()`](https://surveyframe.org/reference/sframe_plot_paired_comparison.md)
+  : Paired-comparison slope plot
+- [`sframe_plot_quality()`](https://surveyframe.org/reference/sframe_plot_quality.md)
+  : Quality report plot: straight-lining flag rate by scale
+- [`sframe_plot_regression_diagnostics()`](https://surveyframe.org/reference/sframe_plot_regression_diagnostics.md)
+  : Regression diagnostic plots for a regression_linear result
+- [`sframe_plot_reliability()`](https://surveyframe.org/reference/sframe_plot_reliability.md)
+  : Reliability plot: alpha and omega by scale
+- [`sframe_plot_validity()`](https://surveyframe.org/reference/sframe_plot_validity.md)
+  : Validity report plot: composite reliability and AVE by construct
+- [`sframe_plot_variable_distribution()`](https://surveyframe.org/reference/sframe_plot_variable_distribution.md)
+  : Raw-variable distribution panels: histogram, boxplot and Q-Q
+- [`sframe_plot_term_frequency()`](https://surveyframe.org/reference/sframe_plot_term_frequency.md)
+  : Term-frequency plot: horizontal bar or word cloud
+- [`sframe_plot_ngram_frequency()`](https://surveyframe.org/reference/sframe_plot_ngram_frequency.md)
+  : N-gram-frequency plot: horizontal bar
+- [`sframe_plot_cooccurrence()`](https://surveyframe.org/reference/sframe_plot_cooccurrence.md)
+  : Term co-occurrence heatmap
+- [`sframe_plot_cooccurrence_network()`](https://surveyframe.org/reference/sframe_plot_cooccurrence_network.md)
+  : Term co-occurrence network plot
+- [`sframe_plot_sentiment()`](https://surveyframe.org/reference/sframe_plot_sentiment.md)
+  : Sentiment plot: diverging bar, or a positive/negative comparison
+  cloud
+- [`sframe_plot_topics()`](https://surveyframe.org/reference/sframe_plot_topics.md)
+  : Topic-model top-terms plot: faceted bars, one facet per topic
+
+## Decision analysis
+
+Multi-criteria decision analysis. The 10 methods run through the
+analysis plan like any other, so the functions here assemble their input
+and test how stable a ranking is.
+
+- [`sframe_sensitivity_analysis()`](https://surveyframe.org/reference/sframe_sensitivity_analysis.md)
+  : Test how far a decision ranking moves when the weights are perturbed
+- [`sframe_assemble_pairwise()`](https://surveyframe.org/reference/sframe_assemble_pairwise.md)
+  : Assemble per-respondent comparison matrices
+- [`sframe_aggregate_judgements()`](https://surveyframe.org/reference/sframe_aggregate_judgements.md)
+  : Aggregate individual judgement matrices
+- [`sframe_collected_weights()`](https://surveyframe.org/reference/sframe_collected_weights.md)
+  : Criterion weights collected from respondents
+- [`sframe_rated_matrix()`](https://surveyframe.org/reference/sframe_rated_matrix.md)
+  : Build a performance matrix from rated matrix items
+- [`sframe_decision_options()`](https://surveyframe.org/reference/sframe_decision_options.md)
+  : Normalise the decision options of an analysis-plan block
+
+## Text analysis
+
+Open-ended answers: term and n-gram frequency, keyword in context, and
+quote extraction.
+
+- [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)
+  : Clean open-ended text responses for analysis
+- [`sframe_term_frequency()`](https://surveyframe.org/reference/sframe_term_frequency.md)
+  : Term frequency for open-ended text
+- [`sframe_ngram_frequency()`](https://surveyframe.org/reference/sframe_ngram_frequency.md)
+  : N-gram frequency for open-ended text
+- [`sframe_term_context()`](https://surveyframe.org/reference/sframe_term_context.md)
+  : Keyword-in-context concordance for open-ended text
+- [`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md)
+  : Extract representative quotes for each STM topic
+
+## Confidence intervals
+
+Base-R bootstrap and effect-size confidence intervals, reused across the
+inferential runners.
+
+- [`sframe_bootstrap_ci()`](https://surveyframe.org/reference/sframe_bootstrap_ci.md)
+  : Percentile bootstrap confidence interval for a statistic
+- [`sframe_cohens_d_ci()`](https://surveyframe.org/reference/sframe_cohens_d_ci.md)
+  : Bootstrap confidence interval for Cohen's d
+- [`sframe_cramers_v_ci()`](https://surveyframe.org/reference/sframe_cramers_v_ci.md)
+  : Confidence interval for Cramer's V
+- [`sframe_eta_sq_ci()`](https://surveyframe.org/reference/sframe_eta_sq_ci.md)
+  : Confidence interval for eta squared
+
+## Demos
+
+25 small teaching demos, each doing one job, and 2 larger reference
+datasets. Each comes with an instrument and response data, and the
+teaching demos with a codebook and the results surveyframe produced. See
+the “Learn by example” article.
+
+- [`sframe_list_demos()`](https://surveyframe.org/reference/sframe_list_demos.md)
+  : List the bundled demos
+- [`sframe_demo()`](https://surveyframe.org/reference/sframe_demo.md) :
+  Load one bundled demo
+- [`sframe_demo_qmd()`](https://surveyframe.org/reference/sframe_demo_qmd.md)
+  : Copy a demo's Quarto notebook so you can run and change it
+
+## Methods
+
+Print, format and summary methods, so every component prints and
+summarises cleanly at the console and inside reports.
+
+- [`print(`*`<sframe>`*`)`](https://surveyframe.org/reference/print.sframe.md)
+  : Print an sframe instrument object
+- [`format(`*`<sframe>`*`)`](https://surveyframe.org/reference/format.sframe.md)
+  : Format an sframe instrument object as a string
+- [`summary(`*`<sframe>`*`)`](https://surveyframe.org/reference/summary.sframe.md)
+  : Summarise an sframe instrument object
+- [`print(`*`<sf_choices>`*`)`](https://surveyframe.org/reference/print.sf_choices.md)
+  : Print an sf_choices object
+- [`format(`*`<sf_choices>`*`)`](https://surveyframe.org/reference/format.sf_choices.md)
+  : Format an sf_choices object as a string
+- [`summary(`*`<sf_choices>`*`)`](https://surveyframe.org/reference/summary.sf_choices.md)
+  : Summarise an sf_choices object
+- [`print(`*`<sf_item>`*`)`](https://surveyframe.org/reference/print.sf_item.md)
+  : Print an sf_item object
+- [`format(`*`<sf_item>`*`)`](https://surveyframe.org/reference/format.sf_item.md)
+  : Format an sf_item object as a string
+- [`summary(`*`<sf_item>`*`)`](https://surveyframe.org/reference/summary.sf_item.md)
+  : Summarise an sf_item object
+- [`print(`*`<sf_scale>`*`)`](https://surveyframe.org/reference/print.sf_scale.md)
+  : Print an sf_scale object
+- [`format(`*`<sf_scale>`*`)`](https://surveyframe.org/reference/format.sf_scale.md)
+  : Format an sf_scale object as a string
+- [`summary(`*`<sf_scale>`*`)`](https://surveyframe.org/reference/summary.sf_scale.md)
+  : Summarise an sf_scale object
+- [`print(`*`<sf_branch>`*`)`](https://surveyframe.org/reference/print.sf_branch.md)
+  : Print an sf_branch object
+- [`format(`*`<sf_branch>`*`)`](https://surveyframe.org/reference/format.sf_branch.md)
+  : Format an sf_branch object as a string
+- [`summary(`*`<sf_branch>`*`)`](https://surveyframe.org/reference/summary.sf_branch.md)
+  : Summarise an sf_branch object
+- [`print(`*`<sf_check>`*`)`](https://surveyframe.org/reference/print.sf_check.md)
+  : Print an sf_check object
+- [`format(`*`<sf_check>`*`)`](https://surveyframe.org/reference/format.sf_check.md)
+  : Format an sf_check object as a string
+- [`summary(`*`<sf_check>`*`)`](https://surveyframe.org/reference/summary.sf_check.md)
+  : Summarise an sf_check object
+- [`print(`*`<sf_model>`*`)`](https://surveyframe.org/reference/print.sf_model.md)
+  : Print an sf_model object
+- [`format(`*`<sf_model>`*`)`](https://surveyframe.org/reference/format.sf_model.md)
+  : Format an sf_model object as a string
+- [`summary(`*`<sf_model>`*`)`](https://surveyframe.org/reference/summary.sf_model.md)
+  : Summarise an sf_model object
+
+## For the report template
+
+The APA cell formatter the Quarto report template calls. Exported
+because Quarto renders against the installed package.
+
+- [`sframe_apa_cells()`](https://surveyframe.org/reference/sframe_apa_cells.md)
+  [`sframe_apa_col_labels()`](https://surveyframe.org/reference/sframe_apa_cells.md)
+  : Format a result table's cells as an APA 7 report prints them
+

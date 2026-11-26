@@ -1,0 +1,34 @@
+# How to combine 1 question at a time with skip logic
+
+Combine a survey shown 1 question at a time with questions that depend
+on earlier answers.
+
+The example in this guide is *One question at a time, with skip logic*.
+The skip-logic survey shown one question at a time, so each respondent
+sees only the questions that apply to them.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `conversational_branching`.
+2.  Open **Survey settings**. On **General**, **Presentation mode** is
+    Conversational. On **Design**, the dependent question has a
+    branching rule.
+3.  On **Preview**, answer the first question in different ways. A
+    question hidden by its rule is stepped over, so the respondent moves
+    straight to the next question that applies.
+
+## In R
+
+``` r
+
+d <- sframe_demo("conversational_branching")
+sframe_get_branches(d$instrument)
+export_survey(d$instrument, "survey.html")
+```
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

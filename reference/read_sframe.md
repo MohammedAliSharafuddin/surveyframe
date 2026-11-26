@@ -1,0 +1,107 @@
+# Read an instrument from a .sframe file
+
+Reads a `.sframe` JSON file, or the same JSON held as text, and
+reconstructs an `sframe` instrument object. The SHA-256 integrity hash
+is verified by default, and content must match its hash. The hash covers
+a canonical form of the content, so it detects a change to the content
+of a written file, and it ignores whitespace and key order. It is
+unsigned, so anyone who edits a file can also recompute it.
+
+## Usage
+
+``` r
+read_sframe(path = NULL, validate = TRUE, text = NULL, verify = TRUE)
+```
+
+## Arguments
+
+- path:
+
+  Character. The path to a `.sframe` file. Leave it `NULL` and give
+  `text` to read a payload held in memory.
+
+- validate:
+
+  Logical. Whether to validate the loaded instrument with
+  [`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md).
+  Defaults to `TRUE`. This controls structural validation only. `verify`
+  controls the integrity hash.
+
+- text:
+
+  Character. The `.sframe` JSON itself, for example a payload a host
+  keeps in a database, read directly from memory. One string, or lines
+  to be joined.
+
+- verify:
+
+  Logical. Whether to refuse content whose hash is missing or differs.
+  Defaults to `TRUE`. With `FALSE`, such content is read with a warning
+  of class `sframe_unverified_warning` and the instrument is marked
+  unverified (see the Unverified reads section).
+
+## Value
+
+An `sframe` object.
+
+## Details
+
+The hash's `canonical` field names the form it was taken in. A file
+naming `"rfc8785"` is checked in RFC 8785 alone. A file with an empty
+form was written before the field existed: it is checked in RFC 8785 and
+then in the forms surveyframe used before 0.4.3, and any match is
+accepted with a message of class `sframe_locale_order_hash` asking you
+to save it again. A file naming any other form is refused, since it
+needs a newer surveyframe.
+
+The instrument remembers the content and amendment log it was read with,
+so [`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+can refuse an undisclosed revision.
+
+## Unverified reads
+
+`verify = FALSE` lets a host preserve every field in a payload whose
+integrity it has not established. The result carries the attribute
+`sframe_verified`, `FALSE` (it is `TRUE` on every verified read), and
+[`print()`](https://rdrr.io/r/base/print.html) says so.
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+refuses to write an unverified instrument unless `new_instrument = TRUE`
+declares it new, since its content lacks a link to a state someone
+wrote. That holds with the amendment log it was read with too, since the
+log was read unchecked: a sign-off, a tier or a timestamp edited as text
+would otherwise be written back and read verified. A new instrument
+starts a new log, so clear the old one first with
+`instrument$amendments <- list()`. No amendment can start from it:
+[`amend_sframe()`](https://surveyframe.org/reference/amend_sframe.md)
+refuses it.
+
+## See also
+
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md)
+
+Other Design functions:
+[`as_sframe()`](https://surveyframe.org/reference/as_sframe.md),
+[`launch_builder()`](https://surveyframe.org/reference/launch_builder.md),
+[`sframe_attention_check()`](https://surveyframe.org/reference/sframe_attention_check.md),
+[`sframe_branch()`](https://surveyframe.org/reference/sframe_branch.md),
+[`sframe_choice_set()`](https://surveyframe.org/reference/sframe_choice_set.md),
+[`sframe_conjoint_design()`](https://surveyframe.org/reference/sframe_conjoint_design.md),
+[`sframe_get_study()`](https://surveyframe.org/reference/sframe_get_study.md),
+[`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md),
+[`sframe_item()`](https://surveyframe.org/reference/sframe_item.md),
+[`sframe_sampling_methods()`](https://surveyframe.org/reference/sframe_sampling_methods.md),
+[`sframe_scale()`](https://surveyframe.org/reference/sframe_scale.md),
+[`sframe_validation`](https://surveyframe.org/reference/sframe_validation.md),
+[`validate_sframe()`](https://surveyframe.org/reference/validate_sframe.md),
+[`write_sframe()`](https://surveyframe.org/reference/write_sframe.md)
+
+## Examples
+
+``` r
+instr <- read_sframe(
+  system.file("extdata", "demos", "two_group.sframe",
+              package = "surveyframe")
+)
+print(instr)
+```

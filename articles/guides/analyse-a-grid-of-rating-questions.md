@@ -1,0 +1,49 @@
+# How to analyse a grid of rating questions
+
+Summarise the ratings for each row of a grid question and compare them
+between groups.
+
+The example in this guide is *Rate each session*. A course evaluation in
+which students rate each part of a course on one grid, compared across
+students who attended in person and online.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `matrix_likert`.
+2.  On **Design**, select the grid. Each row becomes its own column in
+    the data, named after the row.
+3.  On **Explore**, view the distribution of ratings for each row.
+4.  On **Analyse**, run the descriptives for every row and the
+    cross-tabulation of 1 row by attendance format.
+
+![The Design screen with the Rate each session study
+open.](../../templates/matrix_likert/design.png)
+
+The Design screen with the Rate each session study open.
+
+## In R
+
+``` r
+
+d <- sframe_demo("matrix_likert")
+names(d$responses)                  # 1 column per grid row
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| How was each part of the course rated? | Descriptive statistics | The APA 7 sentence and a table, with a chart where the method has one |
+| How were ratings of the lectures distributed? | Frequencies and percentages | The APA 7 sentence and a table, with a chart where the method has one |
+| Did in-person and online students rate the lectures differently? | Cross-tabulation | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

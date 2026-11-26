@@ -1,0 +1,52 @@
+# Create a model reporting template
+
+Writes a Markdown outline for reporting a model: its type and engine,
+its constructs and their items, its structural paths and reporting
+notes, with the model's JSON when `include_json = TRUE`.
+
+## Usage
+
+``` r
+sframe_model_outline(model, include_json = TRUE)
+```
+
+## Arguments
+
+- model:
+
+  An
+  [`sframe_model_spec()`](https://surveyframe.org/reference/sframe_model_spec.md)
+  object.
+
+- include_json:
+
+  Logical. Whether to include the JSON schema block. Defaults to `TRUE`.
+
+## Value
+
+A character string.
+
+## See also
+
+Other Models and syntax functions:
+[`sframe_add_model()`](https://surveyframe.org/reference/sframe_add_model.md),
+[`sframe_construct()`](https://surveyframe.org/reference/sframe_construct.md),
+[`sframe_covariance()`](https://surveyframe.org/reference/sframe_covariance.md),
+[`sframe_indirect_effect()`](https://surveyframe.org/reference/sframe_indirect_effect.md),
+[`sframe_model_json()`](https://surveyframe.org/reference/sframe_model_json.md),
+[`sframe_model_spec()`](https://surveyframe.org/reference/sframe_model_spec.md),
+[`sframe_path()`](https://surveyframe.org/reference/sframe_path.md),
+[`sframe_syntax_cfa()`](https://surveyframe.org/reference/sframe_syntax_cfa.md),
+[`sframe_syntax_efa()`](https://surveyframe.org/reference/sframe_syntax_efa.md),
+[`sframe_syntax_pls()`](https://surveyframe.org/reference/sframe_syntax_pls.md),
+[`sframe_syntax_result()`](https://surveyframe.org/reference/sframe_syntax_result.md),
+[`sframe_syntax_sem()`](https://surveyframe.org/reference/sframe_syntax_sem.md),
+[`sframe_validate_model()`](https://surveyframe.org/reference/sframe_validate_model.md)
+
+## Examples
+
+``` r
+m <- sframe_model_spec("cb1", type = "cb_sem",
+              constructs = list(sframe_construct("sat", items = c("sat_1", "sat_2"))))
+cat(sframe_model_outline(m, include_json = FALSE))
+```

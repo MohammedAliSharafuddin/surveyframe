@@ -1,0 +1,34 @@
+# How to cite the sources of a scale and a method
+
+Keep the sources of your scale and your methods with the study, and cite
+them in the report.
+
+The example in this guide is *Trust in a new team leader*. A study of
+trust in a new team leader, measured with items adapted from a published
+model of trust, with each source cited where it is used.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `citing_sources`.
+2.  Open **References** to see the sources the study holds. Paste BibTeX
+    from Google Scholar, Zotero or a journal page to add one.
+3.  On **Design**, choose **Plan**, open a research question and cite a
+    reference for its method.
+4.  The report cites each source where it is used and lists them at the
+    end in APA 7.
+
+## In R
+
+``` r
+
+d <- sframe_demo("citing_sources")
+sframe_get_references(d$instrument)
+# Add your own: sframe_add_references(instrument, read_bibtex("refs.bib"))
+```
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

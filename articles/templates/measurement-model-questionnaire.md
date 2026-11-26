@@ -1,0 +1,100 @@
+# Measurement model questionnaire (CFA and SEM)
+
+A study exploring a proposed relationship between content quality,
+satisfaction and the intention to return. Specify the measurement and
+structural model, then generate syntax for lavaan or seminr. surveyframe
+gives you the questionnaire, the model syntax and the report.
+
+## Preview the questionnaire
+
+This is the questionnaire as respondents see it. It is a preview to try,
+and it stores no answers. [Open the Measurement model questionnaire (CFA
+and SEM) preview in a new
+tab](https://surveyframe.org/templates/sem_pls/preview.md).
+
+## The example analysis plan
+
+Before any data is collected, surveyframe writes the pre-analysis plan:
+the study, the questionnaire, each research question with its
+hypotheses, method and decision rule, and the fields a preregistration
+still asks you to complete. [Read the Measurement model questionnaire
+(CFA and SEM) plan](https://surveyframe.org/templates/sem_pls/plan.md),
+or [download the Measurement model questionnaire (CFA and SEM)
+instrument
+(.sframe)](https://surveyframe.org/templates/sem_pls/sem_pls.sframe) to
+adapt it.
+
+Methods it declares: Structural equation model (lavaan syntax), PLS
+structural equation model (seminr syntax), Mediation analysis,
+Confirmatory factor analysis (lavaan syntax), PLS structural equation
+model, Moderation analysis.
+
+## What you get
+
+The study in SurveyStudio, stage by stage: design, collect, check,
+analyse and report.
+
+![The Measurement model questionnaire (CFA and SEM) study on the Design
+screen, with its questions
+listed.](../../templates/sem_pls/design.png)![The Measurement model
+questionnaire (CFA and SEM) study on the Collect screen, which exports
+the survey web page.](../../templates/sem_pls/collect.png)![The
+Measurement model questionnaire (CFA and SEM) study on the Quality
+screen, which checks the
+responses.](../../templates/sem_pls/check.png)![The Measurement model
+questionnaire (CFA and SEM) study on the Analyse screen, with the
+declared plan.](../../templates/sem_pls/analyse.png)![The Measurement
+model questionnaire (CFA and SEM) study on the Report screen, which
+exports the report.](../../templates/sem_pls/report.png)
+
+## Open this instrument in SurveyStudio
+
+1.  Set up R, RStudio and surveyframe as [Get
+    started](https://surveyframe.org/articles/start.md) shows.
+2.  To explore the example with its demonstration responses, open
+    RStudio’s **Addins** menu, choose **surveyframe: Try a demo** and
+    pick `sem_pls`, which opens this template’s study.
+3.  To make it your own study, download the instrument above, choose
+    **surveyframe: Open analysis workspace** from the **Addins** menu,
+    then **Open Instrument** in SurveyStudio’s left menu, and select the
+    file.
+4.  Adapt the questions on the **Design** screen and the research
+    questions under **Plan**, press **Save to Studio**, then press
+    **Download copy** on the **Report** screen to save your study.
+
+## Questions
+
+### Which software estimates the model?
+
+surveyframe writes the model syntax for you to fit in lavaan
+(covariance-based SEM and CFA) or seminr (PLS-SEM). It estimates the
+mediation and moderation itself, by regression, and reports those
+estimates.
+
+### Can I declare the model before collecting data?
+
+Yes. Constructs, paths and the indirect effect are declared in the
+instrument and saved with it.
+
+### Can I run the whole study in SurveyStudio?
+
+Yes. The model layer opens in SurveyStudio from RStudio’s Addins menu.
+
+## Optional R code
+
+Open this study in R
+
+``` r
+
+d <- sframe_demo("sem_pls")
+render_report(d$instrument)                 # the pre-analysis plan
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## Related
+
+- [All psychology and measurement
+  templates](https://surveyframe.org/articles/templates.html#psychology)
+- [Likert scale
+  questionnaire](https://surveyframe.org/articles/templates/likert-scale-questionnaire.md)
+- [How-to guides](https://surveyframe.org/articles/guides.md)

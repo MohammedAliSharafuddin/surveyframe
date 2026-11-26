@@ -1,0 +1,49 @@
+# How to run a complete survey, from questionnaire to report, in R
+
+Run a whole survey study in R: write the questionnaire and its plan,
+collect responses, check them, analyse them as planned and write the
+report.
+
+The example in this guide is *Event feedback*. A short feedback survey
+for a one-day professional event, run to describe who attended and to
+check the quality of the answers before the programme is planned again.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `first_survey`.
+2.  Read the questionnaire on the **Design** screen, then choose
+    **Plan** to see the 4 research questions and their methods.
+3.  On **Quality**, review attention checks, speed and missing answers.
+4.  On **Analyse**, run the plan, then export the report from
+    **Report**.
+
+## In R
+
+``` r
+
+library(surveyframe)
+d <- sframe_demo("first_survey")
+d$instrument                          # the questionnaire and its plan
+export_survey(d$instrument, "survey.html")   # the survey web page
+results <- run_analysis_plan(d$responses, d$instrument)
+render_report(d$instrument, d$responses, output_file = "report.html")
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Who came to the event? | Frequencies and percentages | The APA 7 sentence and a table, with a chart where the method has one |
+| How old are attendees? | Descriptive statistics | The APA 7 sentence and a table, with a chart where the method has one |
+| How complete is the data? | Missing-data summary | The APA 7 sentence and a table, with a chart where the method has one |
+| Are there inattentive responses? | Response quality checks | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)

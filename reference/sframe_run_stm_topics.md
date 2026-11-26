@@ -1,0 +1,55 @@
+# Fit a structural topic model (STM) on open-ended text
+
+Cleans the text item via
+[`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md),
+tokenises with
+[`tidytext::unnest_tokens()`](https://juliasilge.github.io/tidytext/reference/unnest_tokens.html),
+casts to a document-term matrix, converts it to `stm`'s corpus format
+with `stm::readCorpus(type = "slam")` and
+[`stm::prepDocuments()`](https://rdrr.io/pkg/stm/man/prepDocuments.html),
+and fits [`stm::stm()`](https://rdrr.io/pkg/stm/man/stm.html) after a
+fixed [`set.seed()`](https://rdrr.io/r/base/Random.html) (stm's own fit
+is not otherwise seed-stable).
+
+## Usage
+
+``` r
+sframe_run_stm_topics(data, roles, options, instrument)
+```
+
+## Arguments
+
+- data:
+
+  A data.frame of responses.
+
+- roles:
+
+  A list with `item`, the text/textarea item id.
+
+- options:
+
+  A list with `k` (topic count, default `4L`, which is a demonstration
+  value to tune for real data: see
+  [`vignette("text-analysis")`](https://surveyframe.org/articles/text-analysis.md)'s
+  topic- modelling section for
+  [`topicmodels::perplexity()`](https://rdrr.io/pkg/topicmodels/man/perplexity.html)-based
+  selection), `seed` (default `42L`), `stop_words` (passed through to
+  the tokeniser).
+
+- instrument:
+
+  Optional `sframe` instrument, passed to
+  [`sframe_clean_text()`](https://surveyframe.org/reference/sframe_clean_text.md)
+  for item-type validation.
+
+## Value
+
+A runner-contract result list: `test = "stm_topics"`, `table`
+(topic/proportion/term/beta/rank, where proportion is the topic's mean
+document weight, beta its per-term probability, both from the fitted
+`stm` object), `fit` (a runtime-only list holding the `stm` model object
+and the document-to-respondent mapping needed by
+[`sframe_extract_quotes()`](https://surveyframe.org/reference/sframe_extract_quotes.md)),
+`apa`, `prompt`. On failure:
+`list(test = "stm_topics", error = <message>)`.

@@ -1,0 +1,46 @@
+# Plan first, analyse second: the analysis plan in surveyframe
+
+For each research question, record what you expect to find, which
+measurements you will use and how you will analyse them, before any
+responses arrive. surveyframe keeps this plan in the questionnaire file.
+You enter each research question under **Plan** on the Design screen,
+and the analyses run as written.
+
+## What each research question records
+
+- **The research question**, in words.
+- **The hypotheses**: the null hypothesis (H0), that there is no
+  difference or relation, and the alternative hypothesis (H1), what you
+  expect to find.
+- **The method**, such as an independent samples t-test or a binary
+  logistic regression.
+- **The variables**, each in its role, such as the outcome you measure,
+  the group you compare, or the predictors you use.
+- **The significance level**, alpha, where the method tests a
+  hypothesis.
+- **The decision rule**: what result will count as support.
+- **The objective** of the study it serves.
+
+## Why before the data
+
+A plan written after seeing the data can bend to fit it. Declared first,
+and sealed in the file’s hash, it shows a reader which analyses were
+planned and which were added.
+
+## The pre-analysis plan
+
+[`render_report()`](https://surveyframe.org/reference/render_report.md)
+with no data, or SurveyStudio before any responses are loaded, writes
+the plan as a document: the study, the questionnaire, each research
+question with its method and decision rule, and what a preregistration
+still asks for. See [Register your plan on
+OSF](https://surveyframe.org/articles/learn/register-on-osf.md).
+
+## When the plan must change
+
+A change after the answers arrive is recorded as an **amendment**.
+Record what changed and why. The amendment record identifies the
+affected parts of the study, and the report shows each recorded change.
+Each amendment also carries a tier, which says how far the change
+reaches, from wording to the analysis itself. The amendment log stays in
+the file, so the change is on the record.

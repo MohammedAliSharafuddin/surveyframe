@@ -1,0 +1,143 @@
+# Read and validate survey responses
+
+Loads survey response data and checks that it conforms to the instrument
+specification. Column names in the response file must match item IDs
+defined in the instrument. Non-item columns are allowed only when
+declared through `respondent_id`, `submitted_at` or `meta_cols`.
+
+## Usage
+
+``` r
+read_responses(
+  x,
+  instrument,
+  respondent_id = NULL,
+  submitted_at = NULL,
+  meta_cols = NULL,
+  strict = TRUE,
+  delim = NULL
+)
+```
+
+## Arguments
+
+- x:
+
+  A file path to a delimited text file, a `data.frame` or a `tibble`.
+
+- instrument:
+
+  An `sframe` object created by
+  [`sframe_instrument()`](https://surveyframe.org/reference/sframe_instrument.md).
+
+- respondent_id:
+
+  Character or NULL. The name of the column containing unique respondent
+  identifiers. If NULL, no respondent ID column is expected.
+
+- submitted_at:
+
+  Character or NULL. The name of the column containing submission
+  timestamps. The metadata columns surveyframe's own collectors write,
+  `respondent_id`, `response_id`, `started_at` and `submitted_at`, are
+  recognised without being declared: a file this package collected reads
+  back without naming the columns it wrote. Anything else outside the
+  instrument still has to be declared, or `strict = FALSE` used.
+
+- meta_cols:
+
+  Character vector or NULL. Additional column names, outside the item
+  IDs, to retain (for example, condition assignment or source URL).
+
+- strict:
+
+  Logical. When `TRUE` (default), a column outside the declared item
+  IDs, their expansion columns and the metadata columns is an error,
+  naming the columns. When `FALSE`, such columns are kept, placed last,
+  with a warning.
+
+- delim:
+
+  `NULL` (default), `","`, `";"` or `"\t"`. The field separator of a
+  file. When `NULL` it is detected from the header line as a comma,
+  semicolon or tab, and a message names the separator when it is not a
+  comma. A semicolon file is read the way Excel writes one in a comma
+  decimal locale, so a comma is the decimal mark in its numeric columns
+  (`3,5` reads as 3.5). A byte order mark is ignored. Not used for data
+  frames.
+
+## Value
+
+A `data.frame` with columns ordered as: metadata columns first, then
+item columns in instrument order, each item followed by its expansion
+columns, then any undeclared columns kept under `strict = FALSE`. To
+keep an extra column under `strict = TRUE`, name it in `meta_cols` or
+select the columns you need before reading.
+
+## Columns
+
+A single-answer item has 1 column named by its ID. A matrix, ranking,
+multiple-choice or decision item has 1 column per row, option, pair or
+criterion, named `item__sub`, and each is checked: a battery with some
+of its columns absent is reported by name. Two columns with the same
+name are refused, since one would otherwise be lost.
+
+A choice set with `allow_other` ("Other, please specify") adds
+`<id>__other_text` to a single choice item, whose own column then holds
+the code `"other"` when Other is chosen, and `<id>__other` (1 or 0) and
+`<id>__other_text` to a multiple choice item.
+
+## Records
+
+Every row of a file must have as many fields as its header. When every
+data row has exactly 1 field more and that field is empty in all of
+them, as a trailing separator gives, the field is dropped with a
+message. Any other row of a different width is refused, naming the
+lines, since reading it would move answers into the wrong columns. In a
+file of 1 column, a blank line is a respondent who left the question
+unanswered, so it is kept as a missing answer, except after the last
+line that holds anything.
+
+## Values
+
+A CSV file is read as text, so identifiers such as `001`, dates and text
+answers arrive exactly as written, a literal `NA` included. Columns of
+items with numeric responses (numeric, slider and rating items, choice
+items whose codes are all numbers, and ranking, multiple-choice and
+decision expansion columns) are then converted to numbers, with an empty
+cell or `NA` read as missing. A column that does not convert cleanly is
+kept as text, with a warning naming the column and up to 3 of the
+values. In every column, a blank answer (an empty cell, or only spaces)
+is missing, and a factor column of a data frame becomes text. The column
+of a single choice item that allows Other, and every `<id>__other_text`
+column, stay text. Data frames go through the same conversion, so a CSV
+file and a data frame holding the same responses read the same.
+
+## See also
+
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md),
+[`score_scales()`](https://surveyframe.org/reference/score_scales.md)
+
+Other Responses functions:
+[`export_responses()`](https://surveyframe.org/reference/export_responses.md),
+[`read_sheet_responses()`](https://surveyframe.org/reference/read_sheet_responses.md),
+[`sframe_missing_data_results()`](https://surveyframe.org/reference/sframe_missing_data_results.md),
+[`sframe_outlier_results()`](https://surveyframe.org/reference/sframe_outlier_results.md),
+[`sframe_quality_results()`](https://surveyframe.org/reference/sframe_quality_results.md)
+
+## Examples
+
+``` r
+responses <- read_responses(
+  x = system.file("extdata", "demos", "two_group_responses.csv",
+                  package = "surveyframe"),
+  instrument = read_sframe(
+    system.file("extdata", "demos", "two_group.sframe",
+                package = "surveyframe")
+  ),
+  respondent_id = "respondent_id",
+  submitted_at = "submitted_at",
+  meta_cols = "started_at"
+)
+head(responses[, c("respondent_id", "format", "sessions_attended")])
+```

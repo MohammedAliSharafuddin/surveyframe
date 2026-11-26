@@ -1,0 +1,174 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "fab7ddf43799e6e6f52be79a288a62dc103e2b291dc3abc2ee862bab96380147",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Was the event well organised?",
+    "version": "1.0.0",
+    "description": "A thesis questionnaire measuring how well organised attendees found an event, on a 4-item Likert scale with 1 reverse-worded item.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:40Z"
+  },
+  "items": [
+    {
+      "id": "org_1",
+      "label": "The event ran to time.",
+      "type": "likert",
+      "required": false,
+      "choice_set": "agree5",
+      "scale_id": "organisation",
+      "reverse": false
+    },
+    {
+      "id": "org_2",
+      "label": "It was easy to find my way around.",
+      "type": "likert",
+      "required": false,
+      "choice_set": "agree5",
+      "scale_id": "organisation",
+      "reverse": false
+    },
+    {
+      "id": "org_3",
+      "label": "Staff were helpful when I had a question.",
+      "type": "likert",
+      "required": false,
+      "choice_set": "agree5",
+      "scale_id": "organisation",
+      "reverse": false
+    },
+    {
+      "id": "org_4",
+      "label": "I struggled to work out where to go.",
+      "type": "likert",
+      "required": false,
+      "choice_set": "agree5",
+      "scale_id": "organisation",
+      "reverse": true
+    }
+  ],
+  "choices": [
+    {
+      "id": "agree5",
+      "values": [1, 2, 3, 4, 5],
+      "labels": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+      "allow_other": false,
+      "randomise": false
+    }
+  ],
+  "scales": [
+    {
+      "id": "organisation",
+      "label": "Perceived organisation",
+      "items": ["org_1", "org_2", "org_3", "org_4"],
+      "method": "mean",
+      "min_valid": null,
+      "reverse_items": ["org_4"]
+    }
+  ],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "How does the scale score overall?",
+      "family": "descriptive",
+      "method": "scale_descriptives",
+      "roles": [],
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "scale_descriptives",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "Is the scale internally consistent?",
+      "family": "reliability",
+      "method": "reliability_alpha",
+      "roles": [],
+      "objective": "O2",
+      "decision_rule": "Treat the scale as reliable when Cronbach's alpha is .70 or above.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "reliability_alpha",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "Is the scale internally consistent according to omega?",
+      "family": "reliability",
+      "method": "reliability_omega",
+      "roles": [],
+      "objective": "O2",
+      "decision_rule": "Treat the scale as reliable when omega is .70 or above.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "reliability_omega",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ4",
+      "research_question": "Does any item sit poorly with the rest?",
+      "family": "reliability",
+      "method": "item_diagnostics",
+      "roles": [],
+      "objective": "O2",
+      "decision_rule": "Review any item whose corrected item-total correlation is below .30.",
+      "options": [],
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "item_diagnostics",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Was the event well organised?",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "A student's thesis needs a short scale of perceived event organisation, and the scale must hold together before its score is used.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Describe how organised the event felt to attendees."
+      },
+      {
+        "id": "O2",
+        "text": "Check that the organisation scale is reliable."
+      }
+    ],
+    "sampling": {
+      "population": "Attendees of a regional conference",
+      "method": "convenience",
+      "planned_n": 80
+    }
+  }
+}

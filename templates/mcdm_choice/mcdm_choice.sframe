@@ -1,0 +1,631 @@
+{
+  "sframe_format": "1.0",
+  "hash": {
+    "algo": "sha256",
+    "value": "4224221a18b60bea18c6e8984d39de1b485d2139af34e4d7ab165fb08ce02181",
+    "canonical": "rfc8785"
+  },
+  "version": "1.0.0",
+  "meta": {
+    "title": "Choosing next year's venue",
+    "version": "1.0.0",
+    "description": "A decision study choosing next year's venue from candidate venues, weighting the criteria and ranking the venues by 10 methods.",
+    "authors": "Demo author",
+    "languages": "en",
+    "validated": true,
+    "created_at": "2026-08-28T10:20:54Z"
+  },
+  "items": [
+    {
+      "id": "crit_pairs",
+      "label": "Compare the importance of each pair of criteria",
+      "type": "pairwise_comparison",
+      "required": true,
+      "reverse": false,
+      "comparison_items": ["cost", "capacity", "transport", "catering"],
+      "comparison_scale": "saaty"
+    },
+    {
+      "id": "crit_points",
+      "label": "Divide 100 points across the criteria",
+      "type": "criteria_weight",
+      "required": true,
+      "reverse": false,
+      "comparison_items": ["cost", "capacity", "transport", "catering"]
+    },
+    {
+      "id": "crit_influence",
+      "label": "How strongly does each factor influence the others?",
+      "type": "pairwise_comparison",
+      "required": true,
+      "reverse": false,
+      "comparison_items": ["cost", "capacity", "transport", "catering"],
+      "comparison_scale": "influence"
+    }
+  ],
+  "choices": [],
+  "scales": [],
+  "branching": [],
+  "checks": [],
+  "analysis_plan": [
+    {
+      "id": "RQ1",
+      "research_question": "What weight does each criterion carry?",
+      "family": "decision",
+      "method": "ahp",
+      "roles": {
+        "pairwise": "crit_pairs"
+      },
+      "options": {
+        "cr_filter": false
+      },
+      "objective": "O1",
+      "decision_rule": "Accept the pairwise judgements when the consistency ratio is below .10.",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "ahp",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ2",
+      "research_question": "What weight does each criterion carry when network dependence is allowed?",
+      "family": "decision",
+      "method": "anp",
+      "roles": {
+        "pairwise": "crit_pairs"
+      },
+      "options": {
+        "cr_filter": false
+      },
+      "objective": "O1",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "anp",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ3",
+      "research_question": "Which criteria drive the others?",
+      "family": "decision",
+      "method": "dematel",
+      "roles": {
+        "pairwise": "crit_influence"
+      },
+      "objective": "O1",
+      "options": [],
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "dematel",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ4",
+      "research_question": "Which venue ranks best overall?",
+      "family": "decision",
+      "method": "topsis",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "topsis",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ5",
+      "research_question": "Which venue ranks highest by compromise ranking?",
+      "family": "decision",
+      "method": "vikor",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "vikor",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ6",
+      "research_question": "Which venue ranks highest by ratio analysis?",
+      "family": "decision",
+      "method": "moora",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "moora",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ7",
+      "research_question": "Which venue ranks highest by simple multi-attribute rating?",
+      "family": "decision",
+      "method": "smart",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "smart",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ8",
+      "research_question": "Which venue ranks highest by weighted aggregated sum product?",
+      "family": "decision",
+      "method": "waspas",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "waspas",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ9",
+      "research_question": "Which venue ranks highest by outranking flows?",
+      "family": "decision",
+      "method": "promethee",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "promethee",
+      "interpretation": "",
+      "citations": []
+    },
+    {
+      "id": "RQ10",
+      "research_question": "Which venue ranks highest by outranking with thresholds?",
+      "family": "decision",
+      "method": "electre",
+      "roles": {
+        "weights_item": "crit_pairs"
+      },
+      "options": {
+        "matrix": [
+          [
+            4.1,
+            3,
+            210,
+            36
+          ],
+          [
+            3.6,
+            4.5,
+            180,
+            48
+          ],
+          [
+            4.8,
+            2.5,
+            260,
+            24
+          ],
+          [
+            3.9,
+            4,
+            150,
+            72
+          ],
+          [
+            4.4,
+            3.8,
+            230,
+            30
+          ]
+        ],
+        "alternatives": [
+          "Riverside",
+          "Old Mill",
+          "Civic Hall",
+          "Parkview",
+          "Harbour Suite"
+        ],
+        "criteria": [
+          "cost",
+          "capacity",
+          "transport",
+          "catering"
+        ],
+        "criteria_types": [
+          "benefit",
+          "benefit",
+          "cost",
+          "cost"
+        ]
+      },
+      "objective": "O2",
+      "decision_rule": "",
+      "reporting_references": [],
+      "status": "draft",
+      "requires_data": true,
+      "test": "electre",
+      "interpretation": "",
+      "citations": []
+    }
+  ],
+  "models": [],
+  "render": {
+    "welcome": {
+      "title": "Choosing next year's venue",
+      "intro_text": "Thank you for taking part. This survey takes a few minutes.",
+      "consent_text": "I agree to take part, and for my answers to be used for this study.",
+      "consent_required": true,
+      "start_label": "Start"
+    },
+    "thankyou": {
+      "message": "Thank you for completing this survey."
+    }
+  },
+  "study": {
+    "problem": "The organising committee must choose a venue on 4 criteria at once and needs a defensible ranking in place of a vote.",
+    "objectives": [
+      {
+        "id": "O1",
+        "text": "Weight the decision criteria."
+      },
+      {
+        "id": "O2",
+        "text": "Rank the venues, and check whether the methods agree."
+      }
+    ],
+    "sampling": {
+      "population": "Members of the organising committee",
+      "method": "purposive",
+      "planned_n": 10
+    }
+  }
+}

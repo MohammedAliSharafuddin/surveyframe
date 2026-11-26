@@ -1,0 +1,42 @@
+# How to compare 3 or more measurements of the same people
+
+Compare 3 or more measurements taken from the same respondents.
+
+The example in this guide is *A 3-day event*. A pre and post training
+evaluation over 3 days: the same participants rate each day of a
+training course.
+
+## In SurveyStudio
+
+1.  In RStudio, open the **Addins** menu, choose **surveyframe: Try a
+    demo** and pick `repeated`.
+2.  On **Design**, see the 3 daily ratings. Each respondent rates every
+    day, so the ratings stay in 1 row.
+3.  On **Design**, choose **Plan**: repeated-measures ANOVA compares the
+    means, and the Friedman test compares ranks.
+4.  On **Analyse**, run the plan and read the assumption notes before
+    choosing which test to report.
+
+## In R
+
+``` r
+
+d <- sframe_demo("repeated")
+results <- run_analysis_plan(d$responses, d$instrument)
+```
+
+## The research questions and what the report gives
+
+| Research question | Method | What the report gives |
+|----|----|----|
+| Did ratings change across the 3 days? | Repeated measures ANOVA | The APA 7 sentence and a table, with a chart where the method has one |
+| Did ratings change across the 3 days, without assuming normality? | Friedman test | The APA 7 sentence and a table, with a chart where the method has one |
+
+Run the example in SurveyStudio or R to see the results, each marked as
+demonstration data.
+
+## Related
+
+- [Questionnaire
+  templates](https://surveyframe.org/articles/templates.md)
+- [All how-to guides](https://surveyframe.org/articles/guides.md)
