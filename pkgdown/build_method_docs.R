@@ -162,6 +162,7 @@ lines <- readLines(landing)
 cut <- grep("^## Methods", lines)
 if (length(cut)) lines <- lines[seq_len(cut[1] - 1)]
 lines <- c(lines, sprintf("## Methods (%d pages) {#methods}", length(families)), "",
+           "Not sure which? [Choose a method](docs/methods/choose-a-method.html) goes from the research question to the method.", "",
            vapply(names(families), function(k) sprintf("- [%s](docs/methods/%s.html)", families[[k]]$title, k), character(1)), "")
 writeLines(lines, landing)
 cat("Wrote", length(families), "method-family pages.\n")

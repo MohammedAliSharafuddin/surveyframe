@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>surveyframe method chooser</title>
+<style>body{margin:16px;background:#ffffff;font-family:Arial,sans-serif}</style>
+</head>
+<body>
+<!-- pkgdown/build_method_chooser.R opens this page in headless Chrome and
+     reads each chart from chooserSvg(). Open it in a browser to see them. -->
+<div id="out"></div>
+<script src="chooser.js"></script>
+<script>
+  if (!/[?&]build\b/.test(location.search)) {
+    for (const k of chooserCharts) {
+      const d = document.createElement("div"); d.style.margin = "0 0 24px";
+      d.innerHTML = chooserSvg(k, "compact"); document.getElementById("out").append(d);
+    }
+  }
+</script>
+</body>
+</html>

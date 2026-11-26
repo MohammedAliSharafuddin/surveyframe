@@ -54,6 +54,14 @@ runs on your computer, and you choose where responses are collected and stored.
 | **Report** | Get a results report you can edit in Word |
 | **Record** | Keep the references and every amendment with the study |
 
+## Which test?
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MohammedAliSharafuddin/surveyframe/main/.github/readme/method-chooser-difference.svg" width="880" alt="Flowchart for a difference between groups or occasions. Scale scores that are roughly normal go to the paired or independent t test, then repeated-measures, one-way or two-way ANOVA, or ANCOVA. Ordinal answers, or scale scores that are not normal, go to the Wilcoxon signed-rank or Mann-Whitney U test, then Friedman or Kruskal-Wallis. Categories go to McNemar or chi-squared, then Cochran's Q or Fisher's exact test. Each test shows the method ID a plan stores." />
+</p>
+
+Each box gives the test and the method ID the plan stores. Relationships, predictions and measurement have their own charts in [Choose a method](https://surveyframe.org/articles/docs/methods/choose-a-method.html).
+
 ## Get started
 
 ```r

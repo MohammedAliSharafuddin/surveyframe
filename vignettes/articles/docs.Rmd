@@ -23,6 +23,8 @@ Set up each question type and each analysis method, step by step, with annotated
 
 ## Methods (10 pages) {#methods}
 
+Not sure which? [Choose a method](docs/methods/choose-a-method.html) goes from the research question to the method.
+
 - [Compare groups](docs/methods/group-comparisons.html)
 - [Compare the same people over time](docs/methods/repeated-measures.html)
 - [Test an association between categories](docs/methods/associations.html)
