@@ -1,8 +1,8 @@
 # tests/testthat/test-shiny-other.R
 #
-# UI-1, from session O: the Shiny survey carried the Other columns of a choice
+# The Shiny survey carried the Other columns of a choice
 # set with allow_other but never drew the option or its text box. It now draws
-# them as the static survey does (UI-2's b11e460), with the same submitted
+# them as the static survey does, with the same submitted
 # shape: a single choice gives the code "other" in <id> and the text in
 # <id>__other_text, a multiple choice gives <id>__other as 1 or 0 and the text
 # in <id>__other_text. Other chosen with nothing typed stops the submission.

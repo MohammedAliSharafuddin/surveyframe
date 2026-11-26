@@ -1,6 +1,6 @@
 # R/quarto_find.R
 #
-# Where Quarto lives (session 8b-R, PREP-01, Codex T3). render_report() looked
+# Where Quarto lives. render_report() looked
 # only at Sys.which("quarto"), so the copies RStudio and Positron bundle, which
 # neither puts on the PATH, went unused, and QUARTO_PATH was ignored. The
 # search order:

@@ -1,4 +1,4 @@
-# Batch 4 #9: the grouped diverging chart began its negative stack at zero and
+# The grouped diverging chart began its negative stack at zero and
 # then drew the neutral segment across zero, so the two overlapped by half the
 # neutral width. With 5 equally frequent categories the negatives occupied
 # -40 to 0 and neutral occupied -10 to 10: 10 percentage points of the bar were
@@ -18,7 +18,7 @@ grouped_segments <- function(counts_by_row, labels) {
 five <- c("Strongly disagree", "Disagree", "Neutral", "Agree",
           "Strongly agree")
 
-test_that("9: segments meet without overlapping, and span the full 100", {
+test_that("Segments meet without overlapping, and span the full 100", {
   # 5 categories, 20 responses each: every segment is 20 percentage points
   segs <- grouped_segments(list(q1 = c(20, 20, 20, 20, 20)), five)
   segs <- segs[order(segs$xmin), ]
@@ -37,7 +37,7 @@ test_that("9: segments meet without overlapping, and span the full 100", {
   expect_equal(max(segs$xmax), 50)
 })
 
-test_that("9: a lopsided row keeps the same rule", {
+test_that("A lopsided row keeps the same rule", {
   segs <- grouped_segments(list(q1 = c(50, 10, 20, 10, 10)), five)
   segs <- segs[order(segs$xmin), ]
   expect_equal(segs$xmin[-1], segs$xmax[-nrow(segs)])
@@ -47,7 +47,7 @@ test_that("9: a lopsided row keeps the same rule", {
   expect_equal(neu$xmax, 10)
 })
 
-test_that("9: an even-length scale has no neutral segment to straddle", {
+test_that("An even-length scale has no neutral segment to straddle", {
   four <- c("Strongly disagree", "Disagree", "Agree", "Strongly agree")
   segs <- grouped_segments(list(q1 = c(25, 25, 25, 25)), four)
   segs <- segs[order(segs$xmin), ]
@@ -57,7 +57,7 @@ test_that("9: an even-length scale has no neutral segment to straddle", {
   expect_true(0 %in% c(segs$xmin, segs$xmax))
 })
 
-test_that("9: every row shares the zero line", {
+test_that("Every row shares the zero line", {
   segs <- grouped_segments(
     list(q1 = c(20, 20, 20, 20, 20), q2 = c(60, 20, 10, 5, 5)), five)
   for (r in unique(segs$row)) {

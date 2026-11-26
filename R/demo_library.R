@@ -300,12 +300,12 @@ sframe_demo_preview <- function(demo, preview) {
 }
 
 # The value of the data_status column in every demo's responses. Outputs made
-# from data that carries it are stamped (owner 2026-11-05), also after the
+# from data that carries it are stamped, also after the
 # data is copied into another project.
 sframe_demo_data_status <- "Demonstration data, not collected from participants"
 
 # Whether responses are surveyframe's demonstration data: their data_status
-# column says so (coordinator ruling 2026-11-14, the column only).
+# column says so. Only that column is read.
 sframe_is_demo_data <- function(data) {
   is.data.frame(data) && "data_status" %in% names(data) &&
     any(as.character(data$data_status) == sframe_demo_data_status, na.rm = TRUE)
@@ -400,7 +400,7 @@ sframe_has_run_links <- function() {
 }
 
 # The welcome, consent and thank-you screens every unbranded demo ships with
-# (Ethos request 3), so a demo opened as a starting point already asks for
+# so a demo opened as a starting point already asks for
 # consent. Plain wording and the default look, which branded = TRUE replaces.
 # Used by data-raw/build_demo_library.R on dev.
 sframe_demo_screens <- function(title) {
@@ -559,7 +559,7 @@ export_responses <- function(data, instrument, path) {
   }
   # A column of choice codes as a labelled vector. Numeric codes held as text,
   # as read from Google Sheets, are read as the numbers the set declares.
-  # Codes such as "01" are text, by the reader's test (P3-03).
+  # Codes such as "01" are text, by the reader's test.
   with_value_labels <- function(x, set) {
     vals <- set$values
     labs <- as.character(set$labels)
@@ -570,7 +570,7 @@ export_responses <- function(data, instrument, path) {
       return(haven::labelled(xn, stats::setNames(v, labs)))
     }
     # Stata attaches value labels to numbers alone: text codes labelled for
-    # Stata read back as A = 0 and B = 0 (Ethos request 15). For a .dta the
+    # Stata read back as A = 0 and B = 0. For a .dta the
     # codes become 1, 2, 3 in the set's order, each with its label. A column
     # holding a code the set lacks keeps its text, unlabelled. SPSS takes
     # labelled text, so a .sav keeps the codes.

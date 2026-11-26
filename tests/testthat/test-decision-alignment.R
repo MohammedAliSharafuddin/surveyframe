@@ -2,19 +2,19 @@
 #
 # Criterion identity in the decision layer.
 #
-# D1. Weights were matched to the performance matrix by count alone, then
+# Weights were matched to the performance matrix by count alone, then
 #     applied by position. A matrix ordered (price, quality) with a weight item
 #     ordered (quality, price) at 90 and 10 applied 90 to price. Supplied named
 #     weights and criterion types lost their names the same way.
-# D2. Aggregation stacked judgement matrices by position and stamped the first
+# Aggregation stacked judgement matrices by position and stamped the first
 #     matrix's labels on the result. The same A-over-B judgement of 9, from one
 #     matrix ordered A,B and one ordered B,A, averaged to indifference.
-# D3. A data-frame options$matrix was treated as a list of rows, so AHP and ANP
+# A data-frame options$matrix was treated as a list of rows, so AHP and ANP
 #     read it transposed, reversing every preference with perfect consistency.
-# Batch 3, finding 4. Factor judgements were read as level positions.
-# Batch 3, finding 5. A supplied AHP matrix got a consistency verdict without
+# Factor judgements were read as level positions.
+# A supplied AHP matrix got a consistency verdict without
 #     being positive, finite, unit-diagonal or reciprocal.
-# Batch 3, finding 9. Unavailable consistency ratios became Inf and NaN
+# Unavailable consistency ratios became Inf and NaN
 #     summaries, and filtering reported them as too inconsistent.
 
 weights_instrument <- function(order = c("quality", "price")) {
@@ -29,7 +29,7 @@ supplied_matrix <- function() {
        criteria = c("price", "quality"))
 }
 
-test_that("D1: collected weights are aligned to the matrix by criterion name", {
+test_that("Collected weights are aligned to the matrix by criterion name", {
   data <- data.frame(w__quality = c(90, 90), w__price = c(10, 10))
   res <- sframe_resolve_decision_inputs(data, list(weights_item = "w"),
                                         supplied_matrix(), weights_instrument(),
@@ -40,7 +40,7 @@ test_that("D1: collected weights are aligned to the matrix by criterion name", {
   expect_identical(names(res$weights), c("price", "quality"))
 })
 
-test_that("D1: a ranking does not change when the weight item is reordered", {
+test_that("A ranking does not change when the weight item is reordered", {
   opts <- supplied_matrix()
   a <- sframe_run_topsis(data.frame(w__quality = 90, w__price = 10),
                          list(weights_item = "w"), opts,
@@ -54,7 +54,7 @@ test_that("D1: a ranking does not change when the weight item is reordered", {
   expect_identical(a$table$Alternative[a$table$Rank == 1], "A1")
 })
 
-test_that("D1: collected weights for different criteria are refused", {
+test_that("Collected weights for different criteria are refused", {
   ins <- weights_instrument(c("quality", "speed"))
   data <- data.frame(w__quality = 50, w__speed = 50)
   res <- sframe_resolve_decision_inputs(data, list(weights_item = "w"),
@@ -64,7 +64,7 @@ test_that("D1: collected weights for different criteria are refused", {
   expect_match(res$error, "price")
 })
 
-test_that("D1: supplied named weights and types are aligned by name", {
+test_that("Supplied named weights and types are aligned by name", {
   opts <- c(supplied_matrix(),
             list(weights = list(quality = 0.9, price = 0.1),
                  criteria_types = c(quality = "benefit", price = "cost")))
@@ -74,7 +74,7 @@ test_that("D1: supplied named weights and types are aligned by name", {
   expect_identical(unname(res$criteria_types), c("cost", "benefit"))
 })
 
-test_that("D1: supplied named weights for other criteria are refused", {
+test_that("Supplied named weights for other criteria are refused", {
   opts <- c(supplied_matrix(), list(weights = c(quality = 0.5, speed = 0.5)))
   expect_error(
     sframe_resolve_decision_inputs(data.frame(), list(), opts,
@@ -88,7 +88,7 @@ reciprocal <- function(labels, ab) {
   m
 }
 
-test_that("D2: the same judgement in a different order aggregates to itself", {
+test_that("The same judgement in a different order aggregates to itself", {
   ab <- reciprocal(c("A", "B"), 9)     # A over B = 9
   ba <- reciprocal(c("B", "A"), 1 / 9) # B over A = 1/9, the same judgement
   agg <- sframe_aggregate_judgements(list(ab, ba))$matrix
@@ -96,14 +96,14 @@ test_that("D2: the same judgement in a different order aggregates to itself", {
   expect_equal(agg["B", "A"], 1 / 9)
 })
 
-test_that("D2: matrices naming different criteria are refused", {
+test_that("Matrices naming different criteria are refused", {
   expect_error(
     sframe_aggregate_judgements(list(reciprocal(c("A", "B"), 3),
                                      reciprocal(c("A", "C"), 3))),
     class = "sframe_error")
 })
 
-test_that("D2: non-square and non-finite matrices are refused", {
+test_that("non-square and non-finite matrices are refused", {
   expect_error(sframe_aggregate_judgements(list(matrix(1, 2, 3))),
                class = "sframe_error")
   bad <- reciprocal(c("A", "B"), 3); bad[1, 2] <- Inf
@@ -115,7 +115,7 @@ test_that("D2: non-square and non-finite matrices are refused", {
                class = "sframe_error")
 })
 
-test_that("D3: a data-frame matrix is read as written, the same as a matrix", {
+test_that("A data-frame matrix is read as written, the same as a matrix", {
   m <- matrix(c(1, 1 / 9, 9, 1), 2, 2)   # row 1: (1, 9), A over B = 9
   as_df <- as.data.frame(m)
   as_rows <- list(c(1, 9), c(1 / 9, 1))
@@ -135,7 +135,7 @@ pairwise_instrument <- function() {
             comparison_items = c("price", "quality"))))
 }
 
-test_that("4: factor judgements are read through their labels", {
+test_that("Factor judgements are read through their labels", {
   numeric_data <- data.frame(pw__price__vs__quality = c(-9, 9))
   factor_data <- data.frame(pw__price__vs__quality = factor(c("-9", "9")))
   a <- sframe_assemble_pairwise(numeric_data, pairwise_instrument(), "pw")
@@ -144,7 +144,7 @@ test_that("4: factor judgements are read through their labels", {
   expect_identical(b$n_respondents, 2L)
 })
 
-test_that("4: factor point allocations are read through their labels", {
+test_that("Factor point allocations are read through their labels", {
   ins <- weights_instrument(c("price", "quality"))
   # Asymmetric, so level positions and labels give different weights.
   numeric_data <- data.frame(w__price = c(30, 60), w__quality = c(70, 40))
@@ -154,7 +154,7 @@ test_that("4: factor point allocations are read through their labels", {
                sframe_collected_weights(numeric_data, ins, "w")$weights)
 })
 
-test_that("5: a supplied AHP matrix must be a positive reciprocal matrix", {
+test_that("A supplied AHP matrix must be a positive reciprocal matrix", {
   not_reciprocal <- matrix(c(1, 9, 9, 1), 2, 2, dimnames = list(c("A", "B"), c("A", "B")))
   bad_diagonal <- reciprocal(c("A", "B"), 3); bad_diagonal[1, 1] <- 2
   zero <- reciprocal(c("A", "B"), 3); zero[1, 2] <- 0
@@ -165,7 +165,7 @@ test_that("5: a supplied AHP matrix must be a positive reciprocal matrix", {
   expect_null(sframe_ahp_compute(reciprocal(c("A", "B"), 3))$error)
 })
 
-test_that("9: unavailable consistency ratios are reported as unavailable", {
+test_that("Unavailable consistency ratios are reported as unavailable", {
   eleven <- matrix(1, 11, 11, dimnames = list(letters[1:11], letters[1:11]))
   s <- sframe_consistency_summary(list(eleven, eleven))
   expect_true(is.na(s$min) && is.na(s$max) && is.na(s$share_above))
@@ -177,7 +177,7 @@ test_that("9: unavailable consistency ratios are reported as unavailable", {
   expect_false(grepl("at or above", err, fixed = TRUE))
 })
 
-test_that("D1: rated items pair with differently named weights in declared order, and say so", {
+test_that("Rated items pair with differently named weights in declared order, and say so", {
   ins <- sframe_instrument(title = "Rated", components = list(
     sframe_choice_set("r5", 1:5, as.character(1:5)),
     sframe_item("rate_price", "Price", "matrix", choice_set = "r5",

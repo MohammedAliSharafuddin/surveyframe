@@ -1,10 +1,9 @@
 # R/results_record.R
 #
-# The results record, the manifest and the provenance block (session 8b-R,
-# NAMING decision 6, SSR 6.0 Layer 4). A report in any format is a
-# presentation of the plan results, and a Word or Quarto copy is meant to be
-# edited. What a reviewer verifies is the results, so every render_report()
-# writes beside its output:
+# The results record, the manifest and the provenance block. A report in any
+# format is a presentation of the plan results, and a Word or Quarto copy is
+# meant to be edited. What a reviewer verifies is the results, so every
+# render_report() writes beside its output:
 #   <name>_results.json   the plan results as canonical JSON, with no
 #                         timestamp, so the same instrument and responses give
 #                         the same bytes and the same sha256
@@ -39,7 +38,7 @@ sframe_record_plain <- function(x) {
 # The results record as a JSON string: canonical (keys sorted, compact,
 # full precision), so its sha256 is a fingerprint of the numbers.
 sframe_results_record_json <- function(results, instrument, seed, style = NULL) {
-  # Each block with whether it is exploratory (owner 2026-11-04).
+  # Each block with whether it is exploratory.
   blocks <- if (is.list(results)) {
     lapply(unclass(results), function(r) {
       b <- sframe_record_plain(r)
@@ -56,8 +55,8 @@ sframe_results_record_json <- function(results, instrument, seed, style = NULL) 
     analysis_seed = as.character(seed),
     results = blocks
   )
-  # The citation style the report formats its references in (owner
-  # 2026-11-03): its name and the sha256 of the file used.
+  # The citation style the report formats its references in: its name and
+  # the sha256 of the file used.
   if (!is.null(style)) record$citation_style <- list(name = style$name, sha256 = style$sha256)
   # An empty list would serialise as {} after canonicalisation, so the result
   # list is kept an array.
@@ -95,7 +94,7 @@ sframe_sha256_file <- function(path) {
 
 # The sha256 of responses held in memory. A data frame has no file to hash, so
 # each column is written with its name, its type and every value in a form
-# that keeps the type and full precision (Fable FR-15): a double as the 17
+# that keeps the type and full precision: a double as the 17
 # significant digits that read back to it, NA, NaN, Inf and -Inf by name, a
 # date as ISO 8601, a POSIXct as its seconds since 1970 in UTC, so the same
 # instant hashes alike in any time zone, and a factor with its levels. JSON's
@@ -215,7 +214,7 @@ sframe_write_manifest <- function(dest, instrument, data, record_path, extra = l
 }
 
 # The citation styles bundled in inst/csl, by the name render_report(csl = )
-# takes (owner 2026-11-03).
+# takes.
 sframe_csl_styles <- c(
   apa = "apa.csl",
   "chicago-author-date" = "chicago-author-date.csl",

@@ -1,5 +1,5 @@
 # tests/testthat/test-validate-field-shapes.R
-# Fable sitting 1 FR-13. validate_sframe(strict = FALSE) stopped with a plain
+# validate_sframe(strict = FALSE) stopped with a plain
 # R error, "argument is of length zero", on an item whose choice_set holds 2
 # ids, a branching rule with no item_id or no depends_on, and a check with no
 # item_id, where it promises to report the problem and return. A file holding
@@ -15,7 +15,7 @@ shape_instr <- function() {
   sframe_instrument("Shapes", components = c(list(cs, g, gi, sc), it))
 }
 
-test_that("FR-13: the 4 shapes give a diagnostic naming the field", {
+test_that("The 4 shapes give a diagnostic naming the field", {
   cases <- list(
     choice_set = list(function(x) { x$items[[2]]$choice_set <- c("ag5", "grp"); x },
                       "Item 2's choice_set must be one value, and has length 2"),
@@ -40,7 +40,7 @@ test_that("FR-13: the 4 shapes give a diagnostic naming the field", {
   }
 })
 
-test_that("FR-13: a file holding a rule with no item_id is refused with the field named", {
+test_that("A file holding a rule with no item_id is refused with the field named", {
   f <- tempfile(fileext = ".sframe")
   write_sframe(shape_instr(), f)
   p <- jsonlite::read_json(f, simplifyVector = FALSE)

@@ -1,10 +1,10 @@
 # tests/testthat/test-render-result-palette.R
 #
-# CX-19. sframe_format_result() used the chart attached to a result whatever the
+# sframe_format_result() used the chart attached to a result whatever the
 # `palette` argument said. An explicit palette now rebuilds the chart with it,
 # and without one the attached chart is used.
 
-test_that("CX-19: an explicit palette rebuilds the chart, no palette keeps the attached one", {
+test_that("An explicit palette rebuilds the chart, no palette keeps the attached one", {
   skip_if_not_installed("ggplot2")
   d <- sframe_demo("two_group")
   res <- run_analysis_plan(d$responses, d$instrument)

@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-preview-browser.R
 #
-# One preview (session 7): the SurveyBuilder's Preview shows the deployable
+# One preview: the SurveyBuilder's Preview shows the deployable
 # survey, the same page export_survey(preview = TRUE) writes and Studio's
 # Preview Survey screen shows, with collection switched off. It drew its own
 # copy of the layout, which ran no answers, required checks or branching.

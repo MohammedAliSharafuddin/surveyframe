@@ -1,10 +1,10 @@
 # tests/testthat/test-studio-sidebar-order-browser.R
 #
-# The SurveyStudio sidebar follows the study's order (session 7, owner
-# approved): Open Instrument, then Build, Collect, Analyse, Report and Record
-# groups under headings that cannot be clicked. Plan is an entry, not a
-# screen: it opens Design with the builder in its Plan mode and is the entry
-# marked active. The screen ids are kept, so launch_studio(screen =) works.
+# The SurveyStudio sidebar follows the study's order: Open Instrument, then
+# Build, Collect, Analyse, Report and Record groups under headings that cannot
+# be clicked. Plan is an entry, not a screen: it opens Design with the builder
+# in its Plan mode and is the entry marked active. The screen ids are kept, so
+# launch_studio(screen =) works.
 
 studio_sidebar <- list(
   list(heading = NULL,      entries = c("Open Instrument" = "open")),
@@ -72,7 +72,7 @@ test_that("the sidebar's groups, labels and screens follow the study's order", {
       paste0("entry:", names(g$entries)))
   }))
   expect_identical(shown, expected)
-  # A heading links nowhere. Since UI-1 item 12a it is 1 fold button with
+  # A heading links nowhere. It is 1 fold button with
   # aria-expanded, so it no longer has nothing to click.
   expect_identical(js("$('.studio-nav > li:not(:has(a))').filter(function() { return $(this).find('a').length > 0 || $(this).find('button[aria-expanded]').length !== 1; }).length"), 0L)
 
@@ -89,7 +89,7 @@ test_that("the sidebar's groups, labels and screens follow the study's order", {
     expect_true(wait(paste0("$('#screen-", screen, "').hasClass('active')"), n = 20), info = label)
     expect_identical(js("$('.studio-nav a.active').length"), 1L, info = label)
     expect_identical(js("$('.studio-nav a.active').text().trim()"), label, info = label)
-    # Since UI-3 item 3 the head is titled by the mode, so Plan reads Plan.
+    # The head is titled by the mode, so Plan reads Plan.
     title <- label
     expect_identical(js(paste0("$('#screen-", screen, " h2.screen-title').text().trim()")),
                      title, info = label)

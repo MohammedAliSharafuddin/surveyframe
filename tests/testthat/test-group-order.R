@@ -1,5 +1,5 @@
 # tests/testthat/test-group-order.R
-# D1. A two-group test takes its groups in the declared order: the grouping
+# A two-group test takes its groups in the declared order: the grouping
 # item's choice set as the instrument lists it, then factor levels, then
 # sorted values. Row order used to decide it, so re-sorting the responses
 # flipped the sign of t.

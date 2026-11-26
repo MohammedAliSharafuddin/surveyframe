@@ -4,7 +4,7 @@
 # inst/schema/sframe_schema.json, byte for byte. The 2 copies had drifted:
 # the bundled one did not require sframe_format and lacked references, so a
 # file could be valid by the package's copy and invalid by the published
-# schema (Ethos request 29). The published profile is the source, and
+# schema. The published profile is the source, and
 # test-sframe-schema.R fails when the copies differ and the sframe-schema
 # repository sits beside this one.
 #

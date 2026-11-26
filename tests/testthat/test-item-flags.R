@@ -1,9 +1,9 @@
 # tests/testthat/test-item-flags.R
 #
-# Session 8a, item (d) (owner 2026-11-01). sframe_item_flags(result) lists
+# sframe_item_flags(result) lists
 # the items past the usual cut-offs in a reliability, item, EFA readiness,
 # EFA, CFA, validity or PLS result, with a ready reason. Checked against the
-# Codex T1 oracle (psych, lavaan and seminr called directly, surveyframe not
+# independent oracle (psych, lavaan and seminr called directly, surveyframe not
 # loaded), copied into fixtures/t1_expected_flags.csv with its 6 PLS rows
 # corrected. Rerun on the calibrated demos (2026-11-26): 17 of 264 rows are
 # flagged.

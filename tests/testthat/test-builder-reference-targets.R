@@ -1,11 +1,11 @@
 # tests/testthat/test-builder-reference-targets.R
 #
-# The builder side of 8b-R's reference targets: a reference can be cited by
+# The builder side of the reference targets: a reference can be cited by
 # the study and by the hypotheses a plan block declares, as cited_by
 # "study" and "hypothesis:<block id>". The builder offers a target only while
 # it is there. Run under V8 (helper-v8-builder.R). The targets are checked
 # against R's cited_by pattern, and the round trip through validate_sframe()
-# is the coordinator's, after the merge with 8b-R's branch.
+# is tested in test-reference-targets.R.
 
 target_pattern <- "^(instrument|study|(item|scale|plan|model|hypothesis):.+)$"
 

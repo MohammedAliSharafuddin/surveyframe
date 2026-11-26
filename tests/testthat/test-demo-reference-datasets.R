@@ -46,8 +46,8 @@ test_that("sframe_list_demos() lists the reference datasets apart", {
   expect_setequal(ref$name, c("tourism_services", "input_types"))
   # listed after the teaching demos
   expect_identical(utils::tail(idx$name, 2), ref$name)
-  # 25 since Session 10 added weighted_survey, citing_sources and
-  # mediation_moderation (7fcf1e1).
+  # 25 since weighted_survey, citing_sources and mediation_moderation were
+  # added.
   expect_identical(sum(idx$focus != "reference"), 25L)
 })
 

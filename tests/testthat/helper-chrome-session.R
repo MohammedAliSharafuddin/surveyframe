@@ -1,14 +1,14 @@
 # tests/testthat/helper-chrome-session.R
 #
-# Session T. Every browser test opens its tab through sframe_chrome_session().
-# When Chrome cannot start, chromote's own error reached the test as a bare
-# failure at the test_that() line (seen at test-builder-d12-browser.R:104),
-# and the rest of the file failed the same way. This names the cause: Chrome
-# did not open its debugging port within chromote.timeout, or the process
-# exited first. The test still fails, so nothing that was checked is skipped.
+# Every browser test opens its tab through sframe_chrome_session(). When Chrome
+# cannot start, chromote's own error reached the test as a bare failure at the
+# test_that() line (seen at test-builder-hypotheses-browser.R:104), and the rest
+# of the file failed the same way. This names the cause: Chrome did not open its
+# debugging port within chromote.timeout, or the process exited first. The test
+# still fails, so nothing that was checked is skipped.
 
 # On GitHub Actions the browser tests run on Ubuntu release alone, where
-# R-CMD-check.yaml sets SURVEYFRAME_CI_BROWSER=true (owner, 2026-11-05).
+# R-CMD-check.yaml sets SURVEYFRAME_CI_BROWSER=true.
 # They check the builder's and Studio's JavaScript, which does not depend on
 # the OS, and Chrome timed out on the other runners (Windows d12:105, CI run
 # 42014288465). Everywhere else, this machine included, they all run.

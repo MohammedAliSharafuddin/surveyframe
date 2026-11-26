@@ -46,7 +46,7 @@ test_that("Save settings with nothing edited changes none of the content", {
   settings_save(ctx)
   back <- read_sframe(builder_save(ctx))
   expect_identical(sframe_content_hash(back), sframe_content_hash(ins))
-  # The demo declares "Demo author" since Session 10. Save settings with
+  # The demo declares "Demo author". Save settings with
   # nothing edited keeps the author list as it was.
   expect_identical(back$meta$authors, ins$meta$authors)
   # An amended instrument the builder left alone takes a further write.
@@ -61,7 +61,7 @@ test_that("Save settings writes the field the user changed and only that", {
   builder_open(ctx, ins)
   settings_save(ctx, list(`s-authors` = "Rahman, A."))
   # builder_save() skips the amendment dialog, so the log no longer ends at
-  # the content saved, and read_sframe() says so (8a).
+  # the content saved, and read_sframe() says so.
   expect_warning(back <- read_sframe(builder_save(ctx), validate = FALSE),
                  class = "sframe_amendment_warning")
   expect_identical(back$meta$authors, "Rahman, A.")

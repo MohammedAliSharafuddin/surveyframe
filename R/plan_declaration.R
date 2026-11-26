@@ -1,7 +1,7 @@
 # R/plan_declaration.R
 #
 # What a plan block declared before the data, and what was written after the
-# results (D12). Every report prints the declaration before the result and
+# results. Every report prints the declaration before the result and
 # the interpretation after it, under labels that say which is which, so the
 # reader can tell the prospective contract from the narrative.
 
@@ -44,7 +44,7 @@ sframe_written_interpretation <- function(block, interpretations = list()) {
 }
 
 # A labelled field as HTML: the label and the text on 1 line when the text
-# is 1 paragraph, else the label above it. The text may hold Markdown (8b-R).
+# is 1 paragraph, else the label above it. The text may hold Markdown.
 sframe_labelled_html <- function(label, text, keys = character(0)) {
   html <- sframe_field_html(text, keys)
   if (!nzchar(html)) return("")
@@ -78,7 +78,7 @@ sframe_plan_declarations <- function(instrument, interpretations = list(),
   blocks <- lapply(plan, function(b) {
     d <- sframe_plan_declaration(b)
     interp <- sframe_written_interpretation(b, interpretations)
-    # The same fields as safe Markdown, printed by the template (8b-R).
+    # The same fields as safe Markdown, printed by the template.
     list(declaration = d,
          interpretation = interp,
          declaration_md = vapply(names(d), function(l) sframe_labelled_md(l, sframe_field_md(d[[l]], keys)),
@@ -89,7 +89,7 @@ sframe_plan_declarations <- function(instrument, interpretations = list(),
   list(interpretation_label = sframe_interpretation_label, blocks = blocks)
 }
 
-# Planned or exploratory (owner 2026-11-04). A result carries a significance
+# Planned or exploratory. A result carries a significance
 # test when its APA line gives a p value or its table has a p column. One
 # that does, from a block that declared no H0 and no H1 before the data, is
 # exploratory, and both reports say so before the result. The 2 placeholder

@@ -1,6 +1,6 @@
 # tests/testthat/test-report-study.R
 #
-# Session 8b-R, item 7 (D13 in the report, found at 8a close). The report's
+# The report's
 # plan section prints the study problem, the objectives, and the trace from
 # each objective to the research questions that serve it, in both engines.
 
@@ -12,7 +12,7 @@ study_instrument <- function() {
                       list(id = "O2", text = "Check that the organisation scale is reliable."),
                       list(id = "O3", text = "Compare first-time and returning attendees.")))
   ids <- vapply(ins$analysis_plan, function(b) b$id, character(1))
-  # The demo's blocks name its own study's objectives (Session 10), cleared
+  # The demo's blocks name its own study's objectives, cleared
   # here so only the 3 below are linked.
   for (k in seq_along(ins$analysis_plan)) ins$analysis_plan[[k]]$objective <- NULL
   ins$analysis_plan[[match("RQ1", ids)]]$objective <- "O1"
@@ -29,7 +29,7 @@ test_that("the trace table maps each objective to the questions that serve it", 
   expect_match(s$trace$`Research questions`[2], "RQ2.*RQ3")
   expect_identical(s$trace$`Research questions`[3], "none yet")
   expect_match(s$unlinked, "RQ4", fixed = TRUE)
-  # The demos declare a study since Session 10, so 1 without it is made here.
+  # The demos declare a study, so 1 without it is made here.
   plain <- sframe_demo("likert_scale")$instrument
   plain$study <- NULL
   expect_null(surveyframe:::sframe_report_study(plain))
@@ -52,7 +52,7 @@ test_that("the built-in report prints the study in its plan section", {
   surveyframe:::.render_report_html(study_instrument(), d$responses, output_path = f,
                                     show_code = FALSE)
   study_checks(paste(readLines(f, warn = FALSE), collapse = "\n"))
-  # With no data the page is the pre-analysis plan (Session 10): the study
+  # With no data the page is the pre-analysis plan: the study
   # opens it, with the objectives table, before the first research question.
   f2 <- tempfile(fileext = ".html")
   surveyframe:::.render_report_html(study_instrument(), NULL, output_path = f2)

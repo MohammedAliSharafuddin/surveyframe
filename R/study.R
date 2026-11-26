@@ -1,6 +1,6 @@
 # R/study.R
 #
-# D13 (decided 2026-10-30). The study an instrument serves: a problem
+# The study an instrument serves: a problem
 # statement, the objectives, and the sampling plan. Bounded so it stays a
 # declaration the package can check and not a proposal: objectives are short
 # items with ids, each plan block names the objective it serves, and the
@@ -9,7 +9,7 @@
 # amendment.
 
 sframe_study_fields <- c("problem", "objectives", "sampling", "preregistration")
-# The preregistration fields (owner 2026-11-14), each an optional text.
+# The preregistration fields, each an optional text.
 sframe_preregistration_fields <- c("exclusion_rules", "stopping_rule", "primary_outcomes",
                                    "secondary_outcomes", "multiplicity", "contingency")
 sframe_sampling_fields <- c("population", "method", "method_other", "planned_n")
@@ -305,7 +305,7 @@ sframe_notes <- function(x) {
   as.character(x$notes %||% character(0))
 }
 
-# The study for a report's plan section (D13 in the report, 8b-R): the
+# The study for a report's plan section: the
 # problem, the objectives, and the trace from each objective to the research
 # questions that name it, built once for both engines. NULL when the
 # instrument describes no study.

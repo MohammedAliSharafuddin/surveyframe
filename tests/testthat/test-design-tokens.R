@@ -1,6 +1,6 @@
-# tests/testthat/test-ui3-design-tokens.R
+# tests/testthat/test-design-tokens.R
 #
-# Session UI-3, item 1: 1 shared stylesheet of design tokens for Studio and
+# 1 shared stylesheet of design tokens for Studio and
 # the builder. Studio links it, the builder inlines it, and neither app's own
 # styles hold a colour literal outside a variable definition.
 
@@ -22,7 +22,7 @@ ui3_colour_literals <- function(lines) {
   grep("#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\(", lines, value = TRUE)
 }
 
-test_that("the token file defines 1 primary colour that carries white text (UI-3)", {
+test_that("the token file defines 1 primary colour that carries white text", {
   css <- ui3_read("inst", "builder", "design_tokens.css")
   hex <- function(name) {
     hit <- grep(paste0("^\\s*", name, ":\\s*#[0-9a-fA-F]{6};"), css, value = TRUE)
@@ -40,7 +40,7 @@ test_that("the token file defines 1 primary colour that carries white text (UI-3
   }
 })
 
-test_that("Studio links the tokens and its styles hold no colour literal (UI-3)", {
+test_that("Studio links the tokens and its styles hold no colour literal", {
   src <- ui3_read("inst", "shiny", "app.R")
   expect_true(any(grepl('href = studio_asset_src("design_tokens.css")', src, fixed = TRUE)))
   a <- grep('tags$style(HTML("', src, fixed = TRUE)[1]
@@ -54,7 +54,7 @@ test_that("Studio links the tokens and its styles hold no colour literal (UI-3)"
   expect_false(any(grepl("#16B3B1", src, fixed = TRUE)))
 })
 
-test_that("the builder's own styles take every colour from a variable (UI-3)", {
+test_that("the builder's own styles take every colour from a variable", {
   b <- ui3_read("inst", "builder", "survey_builder.html")
   end_tokens <- grep("<!-- DESIGN_TOKENS_END -->", b, fixed = TRUE)
   expect_length(end_tokens, 1)

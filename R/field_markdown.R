@@ -1,6 +1,6 @@
 # R/field_markdown.R
 #
-# Markdown in free-text fields (owner 2026-11-04, 8b-R). The research
+# Markdown in free-text fields. The research
 # question, H0, H1, decision rule, interpretation, study problem and an
 # amendment's deviation report may hold Markdown: bold, italic, lists, links,
 # [@key] citations, ~sub~, ^sup^, footnotes ^[...] and equations ($...$

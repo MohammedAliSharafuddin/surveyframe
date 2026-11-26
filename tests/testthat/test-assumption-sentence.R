@@ -1,4 +1,4 @@
-# review_040 defect 3 (owner 2026-11-13), Session CF-B: the assumption
+# The assumption
 # report's sentence names the checks that ran, or says none ran and what
 # each needs. With an outcome and a group and no variables it gave empty
 # tables and "Assumption checks were computed."

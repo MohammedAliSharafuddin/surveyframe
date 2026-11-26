@@ -2,7 +2,7 @@
 # Core survey statistics and structured reporting helpers.
 
 # The 1 cleaning every analysis runner, the descriptives and the missing data
-# report start from (P2-04, P2-05, P2-07, FR-28, FR-29, FR-31): a blank answer
+# report start from: a blank answer
 # (sframe_is_blank(): empty, or only white space) is missing in a text or
 # factor column, and a factor keeps only the levels that have answers.
 # read_responses() already made blanks missing, but data built by hand or
@@ -52,10 +52,10 @@ sframe_reads_as_numbers <- function(x) {
 
 # Regression predictors: a single_choice or multiple_choice item enters as a
 # category, whatever its codes look like, since a nominal code has no size
-# (FR-20: region coded 1, 2, 3 entered as 1 slope, as if East were 3 times
-# North). Other numeric columns, and text or factor columns whose values all
-# read as numbers, enter as numbers. Any other text or factor column enters
-# as a category. A category's levels follow sframe_category_levels(), so its
+# (region coded 1, 2, 3 entered as 1 slope, as if East were 3 times North).
+# Other numeric columns, and text or factor columns whose values all read as
+# numbers, enter as numbers. Any other text or factor column enters as a
+# category. A category's levels follow sframe_category_levels(), so its
 # reference is the first declared code with answers, in every locale.
 sframe_predictor_frame <- function(data, predictors,
                                    instrument = .sframe_text_label_env$instrument) {
@@ -403,7 +403,7 @@ sframe_descriptives_results <- function(
     for (var in variables) {
       # Missingness is counted on the responses as given, as the missing-data
       # table counts it. Category codes such as "online" are answers, and
-      # turning them into numbers first made every one missing (Codex P1-02).
+      # turning them into numbers first made every one missing.
       raw <- data[[var]][idx]
       valid_raw <- !is.na(raw)
       x <- if (sframe_reads_as_numbers(raw)) sframe_num(raw) else rep(NA_real_, length(raw))
@@ -500,7 +500,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  # missing_pct holds what its name says, a percentage (I5). Tables show
+  # missing_pct holds what its name says, a percentage. Tables show
   # missing_prop alone (sframe_drop_old_share_cols()), so nothing scales it
   # a second time.
   item_table$missing_pct <- 100 * item_table$missing_prop
@@ -512,7 +512,7 @@ sframe_missing_data_results <- function(data, instrument = NULL, variables = NUL
   }
   pattern_table <- as.data.frame(table(pattern = pattern_key), stringsAsFactors = FALSE)
   # percent is 0 to 100, as its "Percent" heading says, and prop is the
-  # same share as a proportion (Codex P1-01: percent held a proportion).
+  # same share as a proportion (percent held a proportion).
   pattern_table$prop <- if (n == 0) numeric(0) else pattern_table$Freq / n
   pattern_table$percent <- pattern_table$prop * 100
   names(pattern_table)[names(pattern_table) == "Freq"] <- "n"
@@ -922,7 +922,7 @@ sframe_assumption_results <- function(
   )
 }
 
-# What to do when a check clearly fails, naming the alternative test (I6).
+# What to do when a check clearly fails, naming the alternative test.
 # Normality clearly fails at Shapiro-Wilk p < .001, or at p < .05 with an
 # absolute skewness of 1 or more: with a large sample a trivial departure
 # reaches p < .05 alone, and that is not worth an alternative. NULL when
@@ -983,7 +983,7 @@ sframe_assumption_violation_advisory <- function(normality, homogeneity, regress
 # The sentence of an assumption report: the checks that ran, or that none ran
 # and what each needs. It said "Assumption checks were computed." with empty
 # tables when, for example, an outcome and a group were given and no
-# variables (review_040 defect 3).
+# variables.
 sframe_assumption_sentence <- function(normality, homogeneity, regression,
                                        expected_counts, group, outcome, predictors) {
   ran <- character(0)
@@ -1215,19 +1215,19 @@ sframe_phi <- function(tbl, chi_sq = NULL) {
 # and one row per option, counting who selected it, for a multiple_choice
 # item's expansion columns. Every other column keeps its usual statistics.
 # "1 variable", "3 variables": a count that agrees with its noun. Report
-# sentences read "1 variable(s)" (Ethos request 22).
+# sentences read "1 variable(s)".
 sframe_count_noun <- function(n, noun, plural = paste0(noun, "s")) {
   paste(n, sframe_plural(n, noun, plural))
 }
 
 # The noun alone, singular for 1, as a list of ids in a message needs it:
-# "unknown item: q1", "unknown items: q1, q2" (Session LF).
+# "unknown item: q1", "unknown items: q1, q2".
 sframe_plural <- function(n, noun, plural = paste0(noun, "s")) {
   if (identical(as.integer(n), 1L)) noun else plural
 }
 
 # descriptive_stats()'s table with headings a reader expects, as the other
-# plan tables have them (Ethos request 22). The group column goes when there
+# plan tables have them. The group column goes when there
 # is no split, and the weighted mean when there are no weights.
 sframe_descriptives_display_table <- function(table, conf_level = 0.95) {
   if (!is.data.frame(table) || nrow(table) == 0) return(table)
@@ -1257,7 +1257,7 @@ sframe_run_descriptives_result <- function(data, roles, options = list(),
                                logical(1))]
     vars <- setdiff(vars, c(split_by, weights))
   }
-  # One weight check for every weighted method (D6). Rows with a missing
+  # One weight check for every weighted method. Rows with a missing
   # weight leave the choice counts only: the numeric table keeps its own
   # handling of them.
   usable <- sframe_apply_weights(data, weights)
@@ -1492,7 +1492,7 @@ sframe_declared_codes <- function(column, instrument = .sframe_text_label_env$in
 # The categories of a column in 1 order no session locale changes: the codes
 # its choice set declares, in that order, then factor levels, then any other
 # value (numbers, also as text, in numeric order, other text in radix order). Only categories
-# present in `x` are returned. As text, for factor() (FR-19, FR-21).
+# present in `x` are returned. As text, for factor().
 sframe_category_levels <- function(x, column = NULL,
                                    instrument = .sframe_text_label_env$instrument) {
   as.character(sframe_group_order(x, instrument, column))
@@ -1510,10 +1510,10 @@ sframe_category_factor <- function(x, column = NULL, ordered = FALSE,
 # the model gives) named. The 2 levels are those with answers, in the order of
 # sframe_category_levels(): the event is the last, which is the last declared
 # code of a choice set, 1 of 0 and 1, and never a level that depends on the
-# session locale (FR-21). `event` names another. as.factor() then
+# session locale. `event` names another. as.factor() then
 # as.integer() - 1 modelled the level that sorts last in the locale, so "no"
 # against "Yes" flipped with LC_COLLATE, and a factor with an unused level
-# gave codes 0 and 2 (P2-08).
+# gave codes 0 and 2.
 sframe_binary_outcome <- function(x, column, event = NULL) {
   lev <- sframe_category_levels(x, column)
   if (length(lev) != 2L) {
@@ -1543,7 +1543,7 @@ sframe_event_sentence <- function(column, outcome) {
 # McNemar's test compares 1 question asked twice, so the 2 items must share
 # their categories and the table must pair each category with itself. The
 # table is laid out on 1 order for both items: the declared choice set, then
-# any other value in radix order (FR-22, P2-03). table() of the 2 columns as
+# any other value in radix order. table() of the 2 columns as
 # they came paired the first row level with the first column level, whatever
 # those were, so 2 factors with the same labels in a different level order,
 # or 2 items whose observed categories differed, gave a test of the wrong
@@ -1760,7 +1760,7 @@ sframe_run_partial_correlation <- function(data, roles, options = list()) {
   }
   # Without x and y there is nothing to correlate. A block naming its 2
   # variables under `variables`, as a correlation block may, failed with
-  # "undefined columns selected" (J5).
+  # "undefined columns selected".
   if (is.na(x) || is.na(y) || !nzchar(x) || !nzchar(y)) {
     named <- setdiff(names(roles %||% list()), c("controls", "covariates", "control"))
     return(list(test = "partial_correlation", error = paste0(
@@ -1993,7 +1993,7 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   df <- df[stats::complete.cases(df), , drop = FALSE]
   # The outcome's order is the one its choice set declares, never the
   # alphabet: ordered() of low, medium, high gave high < low < medium and
-  # reversed the slope's sign (FR-19).
+  # reversed the slope's sign.
   df[[outcome]] <- sframe_category_factor(df[[outcome]], outcome, ordered = TRUE)
   df <- droplevels(df)
   coding <- sframe_predictor_coding(df, predictors)
@@ -2013,7 +2013,7 @@ sframe_run_ordinal_logistic <- function(data, roles, options = list()) {
   # p from the Wald z, and an odds ratio with its interval for the slopes
   # only: the rows after them are thresholds (cut points between outcome
   # levels), which have no odds ratio. The table printed an "odds ratio" of
-  # 3.10 for low|medium and no p or interval at all (FR-35).
+  # 3.10 for low|medium and no p or interval at all.
   threshold <- !rownames(co) %in% names(stats::coef(fit))
   co$p <- 2 * stats::pnorm(-abs(co[[1]] / co[["Std. Error"]]))
   co$odds_ratio <- ifelse(threshold, NA_real_, exp(co[[1]]))
@@ -2080,7 +2080,7 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
   }
 
   # Both spellings the option registry accepts. conf_level was accepted and
-  # never read, so it gave a 95% interval with nothing ignored (FR-36).
+  # never read, so it gave a 95% interval with nothing ignored.
   conf_level <- options$conf_level %||% options$conf.level %||% 0.95
   form <- stats::as.formula(
     paste(outcome, "~", paste(predictors, collapse = " + "))
@@ -2120,7 +2120,7 @@ sframe_run_firth_logistic <- function(data, roles, options = list()) {
 
   # The likelihood-ratio test of the model against the null on the model's
   # df, as logistf's summary reports it. The sentence gave the statistic
-  # alone, "likelihood ratio = 0.00", with no df or p (J10).
+  # alone, "likelihood ratio = 0.00", with no df or p.
   lr_df <- as.numeric(fit$df %||% length(predictors))
   lr_p <- if (is.finite(lr)) stats::pchisq(lr, lr_df, lower.tail = FALSE) else NA_real_
   list(
@@ -2160,7 +2160,7 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   sframe_require_nnet("to fit multinomial logistic regression with nnet::multinom()")
   df <- data[, vars, drop = FALSE]
   # The reference is the first declared category, or the first in radix
-  # order with no choice set, never the locale's first (FR-21).
+  # order with no choice set, never the locale's first.
   df[[outcome]] <- sframe_category_factor(df[[outcome]], outcome)
   df[predictors] <- sframe_predictor_frame(df, predictors)
   df <- droplevels(df[stats::complete.cases(df), , drop = FALSE])
@@ -2200,7 +2200,7 @@ sframe_run_multinomial_logistic <- function(data, roles, options = list()) {
   reference <- levels(df[[outcome]])[1]
   # Separation: a predictor that (almost) perfectly predicts a category sends
   # its coefficient off towards infinity, giving odds ratios in the millions
-  # with huge standard errors (J6). nnet stops where it is, so it is caught
+  # with huge standard errors. nnet stops where it is, so it is caught
   # here, on the size of the coefficient (|b| > 10, an odds ratio beyond
   # 22,000) or of its standard error.
   # The intercepts are left out: a large intercept comes from an uncentred

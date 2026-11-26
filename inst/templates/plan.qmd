@@ -1,21 +1,21 @@
 ---
 title: "Pre-analysis plan"
 # The date as the plan's title page writes it, 14 November 2026, where
-# Quarto's default printed 2026-11-14 (owner preview of 48b585e).
+# Quarto's default printed 2026-11-14.
 date: today
 date-format: "D MMMM YYYY"
 format:
   html:
     toc: true
     # Only the HTML file is published or written, so no links to the other
-    # formats, which pointed to files that did not exist (Codex WR95).
+    # formats, which pointed to files that did not exist.
     format-links: false
     toc-depth: 3
     toc-location: left
     embed-resources: true
     theme: [cosmo, report.scss]
     code-fold: true
-    # Equations as MathML: no script, so an offline report shows them (8b-R).
+    # Equations as MathML: no script, so an offline report shows them.
     html-math-method: mathml
     grid:
       sidebar-width: 280px
@@ -30,7 +30,7 @@ format:
   pdf:
     toc: true
     # Tables single-spaced in a smaller size, as APA 7 allows, so that 10
-    # columns fit the text width (Codex P1-05).
+    # columns fit the text width.
     include-in-header:
       text: |
         \usepackage{etoolbox}

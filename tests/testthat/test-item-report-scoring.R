@@ -1,6 +1,6 @@
 # tests/testthat/test-item-report-scoring.R
 #
-# sframe_item_results() diagnostics, batch 2 findings 17, 18 and 19.
+# sframe_item_results() diagnostics.
 #
 # 17. Item-rest correlations used raw item columns, while sframe_reliability_results()
 #     reversed declared items first. A reverse-keyed item in a coherent scale
@@ -37,7 +37,7 @@ keyed_data <- function(n = 200) {
              k3 = 8 - band(latent + stats::rnorm(n, sd = .5)))
 }
 
-test_that("17: a reverse-keyed item gets its item-rest correlation on the scored orientation", {
+test_that("A reverse-keyed item gets its item-rest correlation on the scored orientation", {
   d <- keyed_data()
   oriented <- transform(d, k3 = 8 - k3)
   oracle <- psych::alpha(oriented, check.keys = FALSE,
@@ -48,7 +48,7 @@ test_that("17: a reverse-keyed item gets its item-rest correlation on the scored
   expect_true(all(got > 0.5))
 })
 
-test_that("18: a missing rest item removes the respondent from the diagnostics", {
+test_that("A missing rest item removes the respondent from the diagnostics", {
   d <- keyed_data()
   d$k2[1:30] <- NA
   complete <- d[stats::complete.cases(d), ]
@@ -59,7 +59,7 @@ test_that("18: a missing rest item removes the respondent from the diagnostics",
   expect_equal(got, oracle, tolerance = 1e-8)
 })
 
-test_that("19: floor and ceiling use the declared bounds of the scale", {
+test_that("Floor and ceiling use the declared bounds of the scale", {
   ins <- sframe_instrument(title = "Bounds", components = list(
     seven(),
     sframe_item("m1", "One", "likert", choice_set = "ag7", scale_id = "m"),
@@ -76,7 +76,7 @@ test_that("19: floor and ceiling use the declared bounds of the scale", {
   expect_equal(diag$ceiling_prop[diag$item_id == "m2"], 0.25)
 })
 
-test_that("19: floor and ceiling are NA for an item with no declared bounds", {
+test_that("Floor and ceiling are NA for an item with no declared bounds", {
   ins <- sframe_instrument(title = "Unbounded", components = list(
     sframe_item("u1", "One", "numeric", scale_id = "u"),
     sframe_item("u2", "Two", "numeric", scale_id = "u"),

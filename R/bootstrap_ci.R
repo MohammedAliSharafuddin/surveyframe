@@ -225,7 +225,7 @@ sframe_cramers_v_ci <- function(tab, R = 2000, conf.level = 0.95, seed = NULL) {
 # at which the observed statistic sits at the upper and lower tail. `cdf`
 # gives P(statistic <= observed) at a noncentrality, decreasing in it. A
 # bound is 0 when even lambda = 0 leaves the statistic inside that tail,
-# which is how the interval reaches 0 (FR-24).
+# which is how the interval reaches 0.
 sframe_ncp_ci <- function(stat, cdf, conf.level = 0.95) {
   a <- (1 - conf.level) / 2
   bound <- function(p) {

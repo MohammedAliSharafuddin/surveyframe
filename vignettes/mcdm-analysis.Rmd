@@ -14,7 +14,7 @@ vignette: >
 ```{r setup, include = FALSE}
 # On surveyframe.org (pkgdown sets IN_PKGDOWN) the code shows but its printed
 # results and plots do not: the site shows no numbers from demonstration data
-# (owner rule, Codex WR02 to WR80). Installed copies show everything.
+# Installed copies show everything.
 if (identical(Sys.getenv("IN_PKGDOWN"), "true")) knitr::opts_chunk$set(results = "hide", fig.show = "hide")
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(surveyframe)

@@ -1,9 +1,9 @@
 # tests/testthat/test-builder-narrow.R
 #
-# UX-01, UX-08: on a narrow screen SurveyBuilder's Design shows 1 pane at a
-# time, the question list, then the editor with its live preview and a Back
-# control. The layout is checked at 390 x 844 in a real Chrome in
-# test-builder-ui2-browser.R. This checks the state that drives it, under V8.
+# On a narrow screen SurveyBuilder's Design shows 1 pane at a time, the question
+# list, then the editor with its live preview and a Back control. The layout is
+# checked at 390 x 844 in a real Chrome in test-builder-screens-browser.R. This
+# checks the state that drives it, under V8.
 
 test_that("opening a question marks the page as editing, and Back clears it", {
   ctx <- builder_context()

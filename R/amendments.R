@@ -133,7 +133,7 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
   # log was read unchecked too: written back, an entry edited as text (a
   # sign-off, a tier, a timestamp, a deleted entry) would read back verified,
   # since the entry fingerprints compared below were taken from that same
-  # unchecked read (Fable sitting 1 FR-05).
+  # unchecked read.
   if (!isTRUE(new_instrument) && isFALSE(origin$verified)) {
     abort(sprintf(paste0(
       "This instrument was read from '%s' without a matching integrity hash, ",
@@ -200,7 +200,7 @@ sframe_check_amendment_boundary <- function(instrument, new_instrument = FALSE) 
         "written."), origin$path))
     }
     # The first entry on a file read with no log starts from the content read
-    # (CX-01). Each later entry follows the one before, as checked above.
+    # Each later entry follows the one before, as checked above.
     if (length(loaded) == 0 && length(am) > 0 &&
         !identical(am[[1]]$previous_hash %||% "", origin$content_hash)) {
       abort(sprintf(paste0(
@@ -321,7 +321,7 @@ sframe_suggest_version <- function(version, tier = c("design", "pipeline")) {
 # reverse_items), the scale each item names, the choice codes of every item a
 # scale scores, and what each attention check tests and passes. A change to
 # any of them moves scale scores or who is flagged, so it is design tier
-# (Fable sitting 1 FR-06). Each is a list named by id, so a component added
+# Each is a list named by id, so a component added
 # with none of them set changes nothing here.
 sframe_scoring_inputs <- function(payload) {
   items <- payload$items %||% list()
@@ -632,7 +632,7 @@ amend_sframe <- function(previous, instrument, reason_code, reason_text,
   }
 
   # The anchor: the previous state as the log last recorded it, else the
-  # content of the file `previous` was read from (CX-01). A `previous` that
+  # content of the file `previous` was read from. A `previous` that
   # no longer matches its anchor carries an undisclosed edit, and a log
   # started from it would describe a state no file held. Candidates cover the
   # serialisations an older version may have used, such as the empty render

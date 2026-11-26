@@ -1,6 +1,6 @@
 # tests/testthat/test-amend-scale-tier.R
 #
-# Session 8a, item (a) (owner 2026-11-01). amend_sframe() forced the design
+# amend_sframe() forced the design
 # tier for a change to the analysis plan, a model or a conjoint design, and
 # not for a scale. Dropping an item from a scale, reverse keying one or
 # changing its weights changes every score the plan analyses, so it is a
@@ -57,7 +57,7 @@ test_that("(a) a scale's label alone stays pipeline", {
   expect_identical(sframe_get_amendments(am)$tier, "pipeline")
 })
 
-# Fable sitting 1 FR-06. An item's own reverse = TRUE, which score_scales()
+# An item's own reverse = TRUE, which score_scales()
 # applies as the scale's reverse_items, passed as a pipeline amendment, and
 # moved the 4 probe scores from 1.25, 2.25, 4.75, 4.5 to 2.25, 2.75, 3.75, 4.
 # So did recoding a scored item's choice codes, changing an attention check's
@@ -78,7 +78,7 @@ scored_instr <- function() {
   sframe_instrument("Scored", version = "1.0.0", components = comps)
 }
 
-test_that("FR-06: what moves a score or a flag outside the scale is design tier", {
+test_that("What moves a score or a flag outside the scale is design tier", {
   changes <- list(
     item_reverse = function(x) { x$items[[1]]$reverse <- TRUE; x },
     codes_reversed = function(x) { x$choices[[1]]$values <- 5:1; x },
@@ -95,7 +95,7 @@ test_that("FR-06: what moves a score or a flag outside the scale is design tier"
   expect_identical(p$design_changes, "the items' reverse keys")
 })
 
-test_that("FR-06: wording and a code no scale scores stay pipeline", {
+test_that("Wording and a code no scale scores stay pipeline", {
   wording <- scored_instr()
   wording$items[[1]]$label <- "Reworded"
   other_codes <- scored_instr()

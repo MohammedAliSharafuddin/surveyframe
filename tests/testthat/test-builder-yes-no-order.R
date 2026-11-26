@@ -1,5 +1,5 @@
-# M-04 (Fable sitting 2, owner 2026-11-13), Session CF-B: a binary model's
-# event is the last declared code (FR-21, glm's convention), so SurveyBuilder's
+# A binary model's
+# event is the last declared code (glm's convention), so SurveyBuilder's
 # Yes/No presets declare No first and new files model Yes. The 2 bundled
 # files that declare yes, no keep their order, since their hashes would move.
 

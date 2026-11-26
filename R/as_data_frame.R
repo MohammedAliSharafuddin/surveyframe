@@ -28,8 +28,7 @@ sframe_items_table <- function(instrument) {
       }, logical(1)))
     }, logical(1)),
     required   = vapply(instrument$items, function(i) isTRUE(i$required), logical(1)),
-    # The help text shown under the question, "" when there is none (L11,
-    # finding 8 of the 0.4.0 review).
+    # The help text shown under the question, "" when there is none.
     help       = vapply(instrument$items, function(i) {
       h <- i$help
       if (is.null(h) || !length(h) || is.na(h[1])) "" else as.character(h[1])

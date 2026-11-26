@@ -283,9 +283,8 @@ optional_choices <- function(ids, none_label = "(None)") {
 }
 
 # A table that may be wider than its card scrolls sideways inside a region a
-# keyboard can focus, with a name for assistive technology (WCAG 2.1.1, Codex
-# P1-12). The table itself was the scroll box at 390 px, with nothing in it
-# to focus.
+# keyboard can focus, with a name for assistive technology (WCAG 2.1.1). The
+# table itself was the scroll box at 390 px, with nothing in it to focus.
 studio_scroll <- function(table, label) {
   tags$div(class = "sf-scroll", tabindex = "0", role = "region",
            `aria-label` = label, table)
@@ -1109,14 +1108,14 @@ studio_result_table_tag <- function(tbl, label = "Result table") {
     return(NULL)
   }
   # A table whose rows are named, as a cross-tab's are by its row levels,
-  # shows the names as its first column. They were dropped, so G3's counts
-  # stood without the channels they belong to (N9).
+  # shows the names as its first column. They were dropped, so a cross-tab's
+  # counts stood without the channels they belong to.
   rn <- rownames(tbl)
   if (!is.null(rn) && !identical(rn, as.character(seq_len(nrow(tbl))))) {
     tbl <- cbind(stats::setNames(data.frame(rn, stringsAsFactors = FALSE), " "),
                  tbl, stringsAsFactors = FALSE)
   }
-  # A p column prints as APA sets it, .032 or <.001, not rounded to 0 (J6).
+  # A p column prints as APA sets it, .032 or <.001, not rounded to 0.
   for (pc in intersect(c("p", "p value", "p.value"), names(tbl))) {
     if (is.numeric(tbl[[pc]])) tbl[[pc]] <- sframe_p_cell(tbl[[pc]])
   }
@@ -1136,7 +1135,7 @@ studio_result_table_tag <- function(tbl, label = "Result table") {
 
 # A result's table, then the table the report sets beside it, such as a
 # cross-tab's counts with the declared row percentages, under its caption,
-# as both report engines show it (N9).
+# as both report engines show it.
 studio_result_tables <- function(result, label) {
   sup <- tryCatch(sframe_result_supplement(result), error = function(e) NULL)
   tagList(
@@ -1279,11 +1278,10 @@ studio_nav_entry <- function(tab, label) {
            `aria-current` = if (identical(initial_tab, tab)) "page", label))
 }
 
-# The open instrument's schema status, from validate_sframe() run on it now.
-# The stored meta$validated is a cache only, which Studio never trusts: a
-# valid demo read "Draft" from it and a changed file could read valid (owner
-# 2026-11-10, Codex P1-09). Returns valid, a label, the problem count and a
-# line naming the first problem, "" when valid.
+# The open instrument's schema status, from validate_sframe() run on it now. The
+# stored meta$validated is a cache only, which Studio never trusts: a valid demo
+# read "Draft" from it and a changed file could read valid. Returns valid, a
+# label, the problem count and a line naming the first problem, "" when valid.
 studio_schema_status <- function(instr) {
   check <- tryCatch(validate_sframe(instr, strict = FALSE),
                     error = function(e) list(valid = FALSE, problems = conditionMessage(e)))
@@ -1304,7 +1302,7 @@ studio_nav_heading <- function(label) {
     tags$button(type = "button", class = "studio-nav-fold", `aria-expanded` = "true", label), .noWS = c("after-begin", "before-end"))
 }
 
-# The Report screen's local tabs (UX-07): a tab button and its pane. The
+# The Report screen's local tabs: a tab button and its pane. The
 # panes are hidden, never redrawn, so their inputs keep their values.
 # A screen's 1 primary action (item 12e): a link to its next step, drawn
 # with the shared .sf-primary level in inst/builder/design_tokens.css.
@@ -1329,7 +1327,7 @@ studio_asset_src <- function(file, query = NULL) {
                                         collapse = "&"))
 }
 
-# A colour from the shared design tokens (UI-3, inst/builder/design_tokens.css),
+# A colour from the shared design tokens (inst/builder/design_tokens.css),
 # for the charts R draws, which cannot read a CSS variable. A token defined
 # as another variable or a mix falls back to its plain hex value given here.
 studio_token <- function(name, fallback) {
@@ -1344,7 +1342,7 @@ dash_muted <- studio_token("--sf-text-3", "#5b6b80")
 dash_danger <- studio_token("--sf-danger", "#dc2626")
 dash_surface <- studio_token("--sf-surface", "#ffffff")
 
-# The class of a tile's value: a long one takes a smaller size (UI-3 item 6).
+# The class of a tile's value: a long one takes a smaller size.
 studio_stat_class <- function(v) {
   if (nchar(paste(as.character(v), collapse = " ")) > 10) "stat-val stat-val-long" else "stat-val"
 }
@@ -1362,7 +1360,7 @@ studio_report_pane <- function(id, on, ...) {
 
 ui <- fluidPage(
   # The interface is in English, so assistive technology reads it as such
-  # (WCAG 3.1.1, Codex P1-06).
+  # (WCAG 3.1.1).
   lang = "en",
   tags$head(
     tags$title("SurveyStudio"),
@@ -1405,7 +1403,7 @@ ui <- fluidPage(
         letter-spacing: 0.08em; text-transform: uppercase; color: var(--sf-nav-muted);
         user-select: none;
       }
-      /* 24 px tall, the WCAG 2.5.8 target size (Codex P1-07), with the
+      /* 24 px tall, the WCAG 2.5.8 target size, with the
          heading's padding cut by as much so the sidebar keeps its height. */
       .studio-nav-fold { background: none; border: none; padding: 0; width: 100%; text-align: left;
         min-height: 24px; font: inherit; line-height: 24px; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; }
@@ -1444,7 +1442,7 @@ ui <- fluidPage(
         min-height: 100vh; box-sizing: border-box;
         min-width: 0;
       }
-      /* Narrow screens (UX-01, UX-08): below 800 px the sidebar is a drawer
+      /* Narrow screens: below 800 px the sidebar is a drawer
          behind a labelled Menu button, cards stack, and a wide table or code
          block scrolls inside its own region, so no page is wider than the
          viewport. */
@@ -1510,12 +1508,12 @@ ui <- fluidPage(
       }
       .stat-box .stat-val { font-size: 28px; font-weight: 700; color: var(--sf-ink); }
       /* A value longer than a number, such as a version or a date range,
-         takes a smaller size, so it stays inside its tile (UI-3 item 6). */
+         takes a smaller size, so it stays inside its tile. */
       .stat-box .stat-val.stat-val-long { font-size: 17px; line-height: 1.3; padding-top: 6px; overflow-wrap: anywhere; }
       .stat-box .stat-lbl { font-size: 12px; color: var(--sf-text-3); margin-top: 4px; }
       table.sf-table { width: 100%; border-collapse: collapse; font-size: 14px;
         display: block; overflow-x: auto; max-width: 100%; }
-      /* The scroll region round a table (Codex P1-12): it scrolls, so the
+      /* The scroll region round a table: it scrolls, so the
          table inside it is a table again. */
       .sf-scroll { max-width: 100%; overflow-x: auto; }
       .sf-scroll > table, .sf-scroll .shiny-html-output > table, .sf-scroll table.sf-table { display: table; overflow: visible; }
@@ -1533,7 +1531,7 @@ ui <- fluidPage(
          table sideways and RQ1 stays on one line */
       .sf-table-wide td { overflow-wrap: break-word; min-width: 4em; }
       .sf-table-wide td:first-child { white-space: nowrap; min-width: 0; }
-      /* Explore's view tabs look like the Report's local tabs (UI-3 item 6):
+      /* Explore's view tabs look like the Report's local tabs:
          1 tab style in Studio, the open tab underlined, not shown by colour alone. */
       .studio-tabs .shiny-options-group {
         display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--sf-border);
@@ -1576,7 +1574,7 @@ ui <- fluidPage(
         min-height: 160px; resize: vertical; font-size: 14px; line-height: 1.5;
       }
       .studio-copy-btn { margin: 10px 0; font-size: 13px; }
-      /* Every fold is a 24 px target at least (WCAG 2.5.8, Codex P1-07). */
+      /* Every fold is a 24 px target at least (WCAG 2.5.8). */
       details > summary { min-height: 24px; }
       details.amend-import > summary { line-height: 24px; cursor: pointer; }
       details.result-canvas-block > summary { cursor: pointer; list-style: none; padding-left: 18px; position: relative; }
@@ -1688,7 +1686,7 @@ ui <- fluidPage(
           $('#screen-' + tab).addClass('active').trigger('shown');
           Shiny.setInputValue('current_tab', tab, {priority: 'event'});
           // Each screen is a fragment in the browser history, so Back and
-          // Forward move between screens (UX-16).
+          // Forward move between screens.
           var key = nav === 'plan' ? 'plan' : tab;
           if (!fromHistory && location.hash !== '#' + key)
             history.pushState({tab: tab, nav: nav || null}, '', '#' + key);
@@ -1767,7 +1765,7 @@ ui <- fluidPage(
         });
 
         // A gate that names the next stage replaces the screen's body, so no
-        // editor sits live under it (UX-13). A gate that only warns, such as
+        // editor sits live under it. A gate that only warns, such as
         // Preview's validation list, leaves the body shown.
         function studioGate(el) {
           if (!el) return;
@@ -1778,11 +1776,11 @@ ui <- fluidPage(
           if (/_gate$/.test(e.name)) setTimeout(function() { studioGate(document.getElementById(e.name)); }, 0);
         });
 
-        // The shared format toolbar and citation picker (UI-2's field_tools.js)
+        // The shared format toolbar and citation picker
         // on Studio's long text fields, shown on focus and hidden on blur. Each
         // field opts in with data-cite, its label. The
         // references are the open instrument's only, sent by the server, so a
-        // report never cites a source the .sframe does not record (UX-03).
+        // report never cites a source the .sframe does not record.
         window.studioRefs = []; window.studioKnownKeys = []; window.studioPickers = {};
         Shiny.addCustomMessageHandler('studio-refs', function(m) {
           window.studioRefs = m.refs || []; window.studioKnownKeys = m.known || [];
@@ -1854,11 +1852,11 @@ ui <- fluidPage(
             if (d.dirty !== true && typeof d.label === 'string' && d.label) $('#design_saved').text(d.label);
           } else if (d.type === 'goto' && (d.screen === 'collect' || d.screen === 'references')) {
             // The builder's Google Sheets and References tabs and the picker's
-            // Manage references open Studio's own screen (UI-2, 4949b18).
+            // Manage references open Studio's own screen.
             studioPicked = true;
             studioShowScreen(null, d.screen);
           } else if (d.type === 'goto' && d.screen === 'plan') {
-            // The builder's canvas offers Plan as the next step (UI-3 item 5),
+            // The builder's canvas offers Plan as the next step,
             // and the sidebar's Plan entry picks the mode.
             studioPicked = true;
             $('.studio-nav a[data-nav=\"plan\"]').click();
@@ -1935,7 +1933,7 @@ ui <- fluidPage(
         tags$div(class = "screen-head",
           tags$h2(class = "screen-title", id = "design_title", "Design"),
           uiOutput("design_status", inline = TRUE),
-          # The builder reports its save state, undo and redo (UI-3 item 3),
+          # The builder reports its save state, undo and redo,
           # and this row holds them, with Save to Studio at the far right.
           tags$span(id = "design_saved", class = "hint design-save-state", "Saved"),
           tags$span(id = "design_unsaved", class = "hint design-save-state", style = "display: none;",
@@ -1947,7 +1945,7 @@ ui <- fluidPage(
               title = "Redo (Ctrl+Y)", `aria-label` = "Redo", disabled = NA, HTML("&#8631;")),
             tags$button(type = "button", id = "design_save", class = "btn btn-primary sf-primary",
               title = "Make this survey the instrument Studio has open (Ctrl+S)", "Save to Studio"))),
-        # The cue to the pre-analysis plan (owner UI check, 2026-11-14): the
+        # The cue to the pre-analysis plan: the
         # plan is written here, and exported from the Report screen.
         tags$p(class = "hint design-plan-cue",
           "Plan complete? Save to Studio, then ",
@@ -2123,7 +2121,7 @@ ui <- fluidPage(
         tags$div(class = "screen-head", tags$h2(class = "screen-title", "Quality"),
           studio_next_primary("reliability", "Check reliability")),
         uiOutput("quality_gate"),
-        # The chart first, then the tables it summarises (N6).
+        # The chart first, then the tables it summarises.
         plotOutput("studio_quality_chart", height = "260px"),
         uiOutput("quality_output"),
         plotOutput("studio_missing_chart", height = "260px"),
@@ -2162,7 +2160,7 @@ ui <- fluidPage(
       ),
 
       tags$div(id = "screen-export", class = screen_class("export"),
-        # Report (UX-07): 4 local tabs. Every pane stays in the page and is
+        # Report: 4 local tabs. Every pane stays in the page and is
         # only hidden, so a choice made in 1 survives a switch to another.
         # The .sframe download sits beside the title as "Download copy".
         tags$div(class = "screen-head",
@@ -2182,7 +2180,7 @@ ui <- fluidPage(
               "Open a research question to read its result and write what it means. The report shows each interpretation beside the pre-declared decision rule. Interpretations go into the report only, never into the instrument file."),
             uiOutput("export_interpretations_ui")
           )),
-        # The options render_report() takes from a host (owner 2026-10-30).
+        # The options render_report() takes from a host.
         studio_report_pane("configure", FALSE,
           tags$div(class = "card",
             tags$div(class = "card-title", "Report options"),
@@ -2265,7 +2263,7 @@ ui <- fluidPage(
 studio_stage_labels <- c(design = "Design", open = "Open Instrument",
                          collect = "Collect", responses = "Responses")
 # `primary` names the 1 recommended next step, filled, and the others stay
-# secondary (UI-3, Codex P1-10).
+# secondary.
 studio_next_stage <- function(message, tabs, primary = NULL) {
   tags$div(class = "card next-stage",
     tags$p(message),
@@ -2285,7 +2283,7 @@ no_instrument_next <- function(what) {
                     primary = "open")
 }
 # Collect first and filled, since it is the next stage in order, with
-# Responses beside it for a file collected elsewhere (UF follow-up 2).
+# Responses beside it for a file collected elsewhere.
 no_responses_next <- function(what) {
   studio_next_stage(paste("No responses are loaded. Collect them, or upload",
                           "a file of responses, to", paste0(what, ".")),
@@ -2758,13 +2756,13 @@ server <- function(input, output, session) {
       loaded <- suppressWarnings(read_sframe(text = input$builder_sframe),
                                  classes = "sframe_amendment_warning")
       # An instrument with a history (read from a file, or amended) that
-      # changed goes through the amendment dialog (CX-12). Studio keeps the
+      # changed goes through the amendment dialog. Studio keeps the
       # open instrument as the version before.
       before <- rv$instrument
       tracked <- !is.null(before) &&
         (!is.null(attr(before, "sframe_origin")) || length(before$amendments) > 0)
       # A plan change once responses are loaded is a design amendment too,
-      # with the blocks it changed in the deviation report (UX-02).
+      # with the blocks it changed in the deviation report.
       plan_report <- if (!is.null(before) && !is.null(rv$responses))
         sframe_studio_plan_change_report(before, loaded)
       tracked <- tracked || !is.null(plan_report)
@@ -2974,7 +2972,7 @@ server <- function(input, output, session) {
     }
   })
 
-  # The 1 amendment dialog (UX-06, UX-19). Every start opens it, and it
+  # The 1 amendment dialog. Every start opens it, and it
   # hands back the instrument to make the open one.
   amend_dlg <- sframe_studio_amend_server("amend_dlg")
 
@@ -3132,7 +3130,7 @@ server <- function(input, output, session) {
 
   # The blank response file for the open instrument: its header row holds
   # the columns read_responses() expects, from the same column contract the
-  # Google Sheets collector writes (N5). With no instrument open, the
+  # Google Sheets collector writes. With no instrument open, the
   # bundled input_types demo's instrument stands in.
   sample_csv_instrument <- function() {
     rv$instrument %||% sframe_demo("input_types", preview = FALSE)$instrument
@@ -3152,10 +3150,10 @@ server <- function(input, output, session) {
   output$sidebar_status <- renderUI({
     draft <- draft_result()
     # Nothing open and nothing written in Design: no instrument, not a draft
-    # needing fixes (Codex P1-09).
+    # needing fixes.
     empty <- is.null(rv$instrument) && length(draft$instrument$items) == 0
     tagList(
-      # An open instrument that passes validation is "Valid" (P1-09); "Draft"
+      # An open instrument that passes validation is "Valid"; "Draft"
       # is for what is being written in Design and not yet opened.
       if (!empty) tags$div(id = "status_validity",
         if (draft$valid) (if (!is.null(rv$instrument)) "Valid" else "Draft valid")
@@ -3303,7 +3301,7 @@ server <- function(input, output, session) {
         id = "open_status_version", sframe_studio_version_label(rv$instrument)))
   })
 
-  # The integrity badge (UX-12), with the version and count beside it.
+  # The integrity badge, with the version and count beside it.
   studio_open_badge <- function() {
     message <- rv$open_verification
     if (is.null(message)) {
@@ -3474,7 +3472,7 @@ server <- function(input, output, session) {
     req(rv$instrument, rv$responses)
     qr <- quality_result()
     # A share as "12.5%", or "not computed" where it is missing, which printed
-    # as "NA%" (N6).
+    # as "NA%".
     pct <- function(x) {
       x <- suppressWarnings(as.numeric(x %||% NA_real_))[1]
       if (length(x) == 0 || is.na(x)) "not computed" else sprintf("%.1f%%", x * 100)
@@ -3675,7 +3673,7 @@ server <- function(input, output, session) {
     NULL
   })
 
-  # Analyse shows the declared plan read-only and runs it (UX-02). The
+  # Analyse shows the declared plan read-only and runs it. The
   # builder's Plan is the only plan editor, and "Change plan" opens it.
   output$analysis_declared_plan <- renderUI({
     req(rv$instrument)
@@ -3730,7 +3728,7 @@ server <- function(input, output, session) {
     fluidRow(column(12, uiOutput("analysis_results_output")))
   })
 
-  # Drop from scale and Put back under a result (UI-1). Each button sends 1
+  # Drop from scale and Put back under a result. Each button sends 1
   # event input, as the amendment dialog's buttons do.
   studio_event_button <- function(input_id, label, value, cls = "btn-default sf-secondary") {
     tags$button(type = "button", class = paste("btn", cls),
@@ -4217,7 +4215,7 @@ server <- function(input, output, session) {
     if (!is.null(rv$instrument) && is.null(rv$responses)) {
       # With no responses, render_report() writes the pre-analysis plan, the
       # document a student submits to OSF, Zenodo or an ethics committee, so
-      # the button says so (owner UI check, 2026-11-14).
+      # the button says so.
       tagList(
         downloadButton("download_report_btn", "Export pre-analysis plan", class = "btn-primary sf-primary"),
         tags$p(class = "hint",

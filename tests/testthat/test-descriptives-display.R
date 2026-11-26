@@ -1,10 +1,10 @@
 # tests/testthat/test-descriptives-display.R
 #
-# Ethos request 22 (2026-10-03). A descriptives plan result carried column
+# A descriptives plan result carried column
 # names such as valid_n, missing_n and sd, where the other plan tables read
 # Mean and SD, and its sentence read "computed for 1 variable(s)".
 
-test_that("22: a descriptives plan table has reader headings", {
+test_that("A descriptives plan table has reader headings", {
   d <- sframe_demo("likert_scale")
   res <- run_analysis_plan(d$responses, d$instrument)
   tb <- Filter(function(r) identical(r$test, "descriptives"), res)[[1]]$table
@@ -13,14 +13,14 @@ test_that("22: a descriptives plan table has reader headings", {
   expect_false(any(c("valid_n", "missing_n", "sd", "group", "weighted_mean") %in% names(tb)))
 })
 
-test_that("22: sframe_descriptives_results() keeps its own column names", {
+test_that("sframe_descriptives_results() keeps its own column names", {
   d <- sframe_demo("likert_scale")
   item <- d$instrument$items[[1]]$id
   dr <- sframe_descriptives_results(d$responses, variables = item)
   expect_true(all(c("variable", "valid_n", "sd") %in% names(dr$table)))
 })
 
-test_that("22: report sentences agree in number", {
+test_that("Report sentences agree in number", {
   d <- sframe_demo("likert_scale")
   item <- d$instrument$items[[1]]$id
   expect_match(sframe_descriptives_results(d$responses, variables = item)$apa,

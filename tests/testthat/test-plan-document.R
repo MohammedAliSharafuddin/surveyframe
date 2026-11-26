@@ -1,6 +1,5 @@
-# render_report(instrument) with no data is the pre-analysis plan (Session
-# 10, owner 2026-11-10, coordinator spec 2026-11-14): a document to submit
-# to OSF, Zenodo or an ethics committee, not a results page.
+# render_report(instrument) with no data is the pre-analysis plan: a document to
+# submit to OSF, Zenodo or an ethics committee, not a results page.
 
 plan_md <- function(name, edit = identity) {
   ins <- edit(sframe_demo(name, preview = FALSE)$instrument)

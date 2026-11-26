@@ -1,6 +1,6 @@
 # tests/testthat/test-decision-sensitivity-conjoint.R
 #
-# Batch 3, findings 12, 13 and 14.
+# Sensitivity analysis and conjoint fixes, numbered as below.
 #
 # 12. Sensitivity forwarded a `thresholds` field ELECTRE does not accept, and
 #     dropped the concordance and discordance cutoffs it does, so the baseline
@@ -28,14 +28,14 @@ run_block <- function(options, method = "electre") {
                        data.frame(), electre_instrument())
 }
 
-test_that("12: ELECTRE sensitivity uses the cutoffs the published result used", {
+test_that("ELECTRE sensitivity uses the cutoffs the published result used", {
   res <- run_block(electre_opts())
   expect_null(res$error)
   expect_false(is.null(res$sensitivity))
   expect_identical(unname(res$sensitivity$base_ranks), as.integer(res$ranks))
 })
 
-test_that("12: a requested sensitivity run that fails says so", {
+test_that("A requested sensitivity run that fails says so", {
   opts <- electre_opts()
   opts$sensitivity_delta <- 2          # outside (0, 1)
   res <- run_block(opts)
@@ -43,7 +43,7 @@ test_that("12: a requested sensitivity run that fails says so", {
   expect_match(res$sensitivity_error, "delta")
 })
 
-test_that("13: perturbations that change no weight are not called stable", {
+test_that("Perturbations that change no weight are not called stable", {
   x <- matrix(c(4, 1, 2, 3, 5, 2), nrow = 3)
   sa <- sframe_sensitivity_analysis(x, c(1, 0), c("benefit", "benefit"), method = "topsis")
   expect_identical(sa$n_effective, 0L)
@@ -51,14 +51,14 @@ test_that("13: perturbations that change no weight are not called stable", {
   expect_identical(sa$n_perturbations, 4L)
 })
 
-test_that("13: an ordinary design reports effective and failed perturbation counts", {
+test_that("An ordinary design reports effective and failed perturbation counts", {
   x <- matrix(c(4, 1, 2, 3, 5, 2), nrow = 3)
   sa <- sframe_sensitivity_analysis(x, c(0.6, 0.4), c("benefit", "benefit"), method = "topsis")
   expect_identical(sa$n_effective, 4L)
   expect_identical(sa$n_failed, 0L)
 })
 
-test_that("14: a design that never shows a declared level is not balanced", {
+test_that("A design that never shows a declared level is not balanced", {
   attrs <- list(A = c("a1", "a2"), B = c("b1", "b2"))
   profiles <- data.frame(A = c("a1", "a1"), B = c("b1", "b2"),
                          stringsAsFactors = FALSE)

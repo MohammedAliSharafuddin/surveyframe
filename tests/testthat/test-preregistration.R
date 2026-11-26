@@ -1,4 +1,4 @@
-# study$preregistration (owner 2026-11-14): 6 optional texts a
+# study$preregistration: 6 optional texts a
 # preregistration asks for beyond the plan blocks, sealed in the hash.
 
 prereg_instrument <- function(pre = list(stopping_rule = "At 120 responses or on 30 June.",

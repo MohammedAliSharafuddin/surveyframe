@@ -1,4 +1,4 @@
-# Batch 4's findings on the shared text tokeniser and its neighbours.
+# Findings on the shared text tokeniser and its neighbours.
 #
 # #3. The tokeniser replaced everything outside ASCII letters, digits,
 #     apostrophes and spaces, so "café" became "caf" and "naïve" became two
@@ -15,7 +15,7 @@
 # #7. sframe_term_context() coerced `window` with no range check, so 0 made the index
 #     sequences run backwards and copied the match into its own context.
 
-test_that("3: a word with an accent survives tokenising", {
+test_that("A word with an accent survives tokenising", {
   toks <- surveyframe:::.sframe_tokenise("The café was naïve but sehr schön",
                                          stop_words = character(0))[[1]]
   expect_true("café" %in% toks)
@@ -26,19 +26,19 @@ test_that("3: a word with an accent survives tokenising", {
   expect_false("na" %in% toks)
 })
 
-test_that("3: text in another script survives", {
+test_that("Text in another script survives", {
   toks <- surveyframe:::.sframe_tokenise("الخدمة جيدة",
                                          stop_words = character(0))[[1]]
   expect_length(toks, 2)
 })
 
-test_that("3: punctuation is still separated", {
+test_that("Punctuation is still separated", {
   toks <- surveyframe:::.sframe_tokenise("Great service, really good!",
                                          stop_words = character(0))[[1]]
   expect_equal(toks, c("great", "service", "really", "good"))
 })
 
-test_that("4: an n-gram is built from words that were next to each other", {
+test_that("An n-gram is built from words that were next to each other", {
   # "but" and "not" are stop words. The phrase respondents wrote is
   # "clean but not comfortable", so there is no adjacent pair of kept words
   # here at all, and the table is empty. It used to report
@@ -50,13 +50,13 @@ test_that("4: an n-gram is built from words that were next to each other", {
   expect_false(any(grepl("NA", ng$term, fixed = TRUE)))
 })
 
-test_that("4: adjacency inside a run of kept words still counts", {
+test_that("Adjacency inside a run of kept words still counts", {
   ng <- sframe_ngram_frequency(rep("excellent friendly service", 2), n = 2)
   expect_true("excellent friendly" %in% ng$term)
   expect_true("friendly service" %in% ng$term)
 })
 
-test_that("6: a response that cleans away is dropped, with its mapping", {
+test_that("A response that cleans away is dropped, with its mapping", {
   d <- data.frame(comments = c("Great service", "!!!", "...", "Very good"),
                   stringsAsFactors = FALSE)
   cleaned <- sframe_clean_text(d, "comments")
@@ -66,7 +66,7 @@ test_that("6: a response that cleans away is dropped, with its mapping", {
   expect_equal(attr(cleaned, "respondent"), c(1L, 4L))
 })
 
-test_that("6: a response of numbers alone is dropped when numbers are stripped", {
+test_that("A response of numbers alone is dropped when numbers are stripped", {
   d <- data.frame(comments = c("Great service", "12345"),
                   stringsAsFactors = FALSE)
   cleaned <- sframe_clean_text(d, "comments", strip_numbers = TRUE)
@@ -74,7 +74,7 @@ test_that("6: a response of numbers alone is dropped when numbers are stripped",
   expect_equal(attr(cleaned, "respondent"), 1L)
 })
 
-test_that("7: a zero window gives empty context, and a negative one is refused", {
+test_that("A zero window gives empty context, and a negative one is refused", {
   txt <- structure("the service was very good indeed", respondent = 1L)
   ctx <- sframe_term_context(txt, "service", window = 0)
   expect_equal(ctx$match, "service")
@@ -85,14 +85,14 @@ test_that("7: a zero window gives empty context, and a negative one is refused",
                class = "sframe_error")
 })
 
-test_that("7: an n-gram size below 2 is refused", {
+test_that("An n-gram size below 2 is refused", {
   expect_error(sframe_ngram_frequency("clean and comfortable", n = 1),
                class = "sframe_error")
   expect_error(sframe_ngram_frequency("clean and comfortable", n = 0),
                class = "sframe_error")
 })
 
-# Batch 4 #5: the grouped text paths subset the original row indices with a
+# The grouped text paths subset the original row indices with a
 # comparison that returns NA for a respondent with no group value. Subsetting
 # by NA yields an NA element, so the row map came out longer than the text it
 # labels, and the two could no longer be paired.
@@ -120,7 +120,7 @@ grouped_data <- function() {
 grouped_roles <- list(item = "comments")
 grouped_options <- list(group = "branch")
 
-test_that("5: a respondent with no group value leaves the groups intact", {
+test_that("A respondent with no group value leaves the groups intact", {
   res <- expect_no_error(surveyframe:::sframe_run_term_freq(
     grouped_data(), grouped_roles, grouped_options, NULL))
   expect_setequal(unique(res$table$group), c("north", "south"))
@@ -132,7 +132,7 @@ test_that("5: a respondent with no group value leaves the groups intact", {
   expect_false("lovely" %in% res$table$term)
 })
 
-test_that("5: grouped sentiment survives a missing group value", {
+test_that("Grouped sentiment survives a missing group value", {
   skip_if_not_installed("tidytext")
   res <- expect_no_error(surveyframe:::sframe_run_tidy_sentiment(
     grouped_data(), grouped_roles, grouped_options, NULL))
@@ -145,12 +145,12 @@ test_that("5: grouped sentiment survives a missing group value", {
   expect_equal(unname(totals[["south"]]), 12)
 })
 
-# Batch 4 #8: a grouped word cloud summed each group's term table, which the
+# a grouped word cloud summed each group's term table, which the
 # runner had already truncated to top_n. A term ranked just below the cutoff in
 # every group disappeared even where it led the corpus, and a term that did
 # survive lost its counts from the groups where it fell short.
 
-test_that("8: the grouped runner carries overall counts", {
+test_that("The grouped runner carries overall counts", {
   res <- surveyframe:::sframe_run_term_freq(
     grouped_data(), grouped_roles, c(grouped_options, list(top_n = 1L)), NULL)
 
@@ -165,7 +165,7 @@ test_that("8: the grouped runner carries overall counts", {
   expect_false("service" %in% res$table$term)
 })
 
-test_that("8: overall counts are the corpus total, not a sum of cutoffs", {
+test_that("Overall counts are the corpus total, not a sum of cutoffs", {
   res_all <- surveyframe:::sframe_run_term_freq(
     grouped_data(), grouped_roles, c(grouped_options, list(top_n = 1L)), NULL)
   # "service" appears in both groups' responses, so its corpus count exceeds

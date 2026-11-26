@@ -1,6 +1,6 @@
 # tests/testthat/test-figure-settings.R
 #
-# Ethos request 19 (2026-10-03). render_report() and the plot functions fixed
+# render_report() and the plot functions fixed
 # their own output: a report gave its figures at 1344 by 960 px with no way to
 # ask otherwise, and the built-in engine saved charts at 110 dpi.
 
@@ -11,14 +11,14 @@ png_size <- function(path) {
   c(width = sum(as.integer(h[17:20]) * 256^(3:0)), height = sum(as.integer(h[21:24]) * 256^(3:0)))
 }
 
-test_that("19: figure settings are checked", {
+test_that("Figure settings are checked", {
   expect_error(surveyframe:::sframe_figure_settings(list(dpi = -1)), "positive")
   expect_error(surveyframe:::sframe_figure_settings(list(size = 3)), "Unknown: size")
   expect_error(surveyframe:::sframe_figure_settings(list(format = "bmp")), "must be one of")
   expect_identical(surveyframe:::sframe_figure_settings(list(format = "JPG"))$format, "jpeg")
 })
 
-test_that("19: sframe_save_figures() writes each chart at the stated size and resolution", {
+test_that("sframe_save_figures() writes each chart at the stated size and resolution", {
   skip_if_not_installed("ggplot2")
   d <- sframe_demo("two_group")
   res <- run_analysis_plan(d$responses, d$instrument, plots = TRUE)
@@ -32,7 +32,7 @@ test_that("19: sframe_save_figures() writes each chart at the stated size and re
   expect_true(file.exists(tiff[[1]]))
 })
 
-test_that("19: the built-in engine draws charts at the stated size and dpi", {
+test_that("The built-in engine draws charts at the stated size and dpi", {
   skip_if_not_installed("ggplot2")
   gg <- ggplot2::ggplot(data.frame(x = 1:3, y = 1:3), ggplot2::aes(x, y)) + ggplot2::geom_point()
   env <- surveyframe:::.sframe_figure_env
@@ -47,7 +47,7 @@ test_that("19: the built-in engine draws charts at the stated size and dpi", {
   expect_match(surveyframe:::.render_report_ggplot_png(gg), "data:image/svg+xml;base64,", fixed = TRUE)
 })
 
-test_that("19: render_report() takes figures and figure_dir", {
+test_that("render_report() takes figures and figure_dir", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   d <- sframe_demo("two_group")
@@ -75,7 +75,7 @@ test_that("19: render_report() takes figures and figure_dir", {
 # CI found it on macOS: R's own svg() device needs Cairo, which the macOS
 # build lacks, so an SVG request drew no chart at all. Without a way to write
 # SVG, the report falls back to PNG, and a request for SVG files says why.
-test_that("19: without an SVG device the report falls back to PNG", {
+test_that("Without an SVG device the report falls back to PNG", {
   skip_if_not_installed("ggplot2")
   local_mocked_bindings(sframe_svg_available = function() FALSE)
   gg <- ggplot2::ggplot(data.frame(x = 1:3, y = 1:3), ggplot2::aes(x, y)) + ggplot2::geom_point()

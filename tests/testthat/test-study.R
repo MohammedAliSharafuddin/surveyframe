@@ -1,6 +1,6 @@
 # tests/testthat/test-study.R
 #
-# D13 (decided 2026-10-30), the R side. A top-level `study` field holds the
+# The study, the R side. A top-level `study` field holds the
 # problem statement, the objectives and the sampling plan, so the chain a
 # supervisor or pre-registration reviewer reads starts at the problem, not
 # at the research questions. Bounded so it stays a declaration the package
@@ -14,7 +14,7 @@ study_instr <- function(study = NULL, plan_objective = "O1") {
   # A new instrument built in R from the demo, not an edit of its file.
   attr(ins, "sframe_origin") <- NULL
   # Every block is set, NULL clearing it: the demo's own blocks name the
-  # objectives of its own study (Session 10).
+  # objectives of its own study.
   for (k in seq_along(ins$analysis_plan)) ins$analysis_plan[[k]]["objective"] <- list(plan_objective)
   ins$study <- study %||% list(
     problem = "Students rate course organisation poorly, and no one knows which parts.",
@@ -29,7 +29,7 @@ roundtrip <- function(ins) {
   read_sframe(path)
 }
 
-test_that("D13: sframe_instrument(study = ) stores it, and it survives a write and read", {
+test_that("sframe_instrument(study = ) stores it, and it survives a write and read", {
   ins <- sframe_instrument("S", components = list(sframe_item("q1", "Q?", "text")),
     study = list(problem = "Why?", objectives = list(list(id = "O1", text = "Find out.")),
                  sampling = list(population = "Staff", method = "census", planned_n = 40)))
@@ -42,8 +42,8 @@ test_that("D13: sframe_instrument(study = ) stores it, and it survives a write a
   expect_identical(sframe_content_hash(back), sframe_content_hash(roundtrip(back)))
 })
 
-test_that("D13: an instrument without a study hashes as before, and the study is inside the hash", {
-  # The demos declare a study since Session 10, so the plain instrument has
+test_that("An instrument without a study hashes as before, and the study is inside the hash", {
+  # The demos declare a study, so the plain instrument has
   # it and the plan's objectives removed.
   plain <- sframe_demo("likert_scale")$instrument
   plain$study <- NULL
@@ -54,7 +54,7 @@ test_that("D13: an instrument without a study hashes as before, and the study is
     list(problem = "Another problem.", objectives = list(list(id = "O1", text = "Measure perceived organisation.")))))))
 })
 
-test_that("D13: the validator refuses a malformed study", {
+test_that("The validator refuses a malformed study", {
   bad <- function(study, plan_objective = "O1") {
     v <- validate_sframe(study_instr(study, plan_objective), strict = FALSE)
     expect_false(sframe_is_valid(v))
@@ -71,7 +71,7 @@ test_that("D13: the validator refuses a malformed study", {
   expect_match(bad(list(aims = "x"), plan_objective = NULL), "aims", fixed = TRUE)
 })
 
-test_that("D13: an untraced objective or question and a long problem are notes, not problems", {
+test_that("An untraced objective or question and a long problem are notes, not problems", {
   ins <- study_instr(list(
     problem = paste(rep("word", 160), collapse = " "),
     objectives = list(list(id = "O1", text = "Measure it."), list(id = "O2", text = "Explain it."))))
@@ -86,7 +86,7 @@ test_that("D13: an untraced objective or question and a long problem are notes, 
   expect_length(sframe_notes(validate_sframe(study_instr(), strict = FALSE)), 0L)
 })
 
-test_that("D13: a study change after collection is a design amendment", {
+test_that("A study change after collection is a design amendment", {
   before <- roundtrip(study_instr())
   after <- before
   after$study$objectives[[1]]$text <- "Measure and explain perceived organisation."
@@ -97,7 +97,7 @@ test_that("D13: a study change after collection is a design amendment", {
   expect_identical(sframe_get_amendments(am)$tier, "design")
 })
 
-test_that("D13: the respondent's page never carries the study", {
+test_that("The respondent's page never carries the study", {
   out <- tempfile(fileext = ".html")
   export_survey(study_instr(), output_path = out, open = FALSE)
   page <- paste(readLines(out, warn = FALSE), collapse = "\n")
@@ -105,7 +105,7 @@ test_that("D13: the respondent's page never carries the study", {
   expect_false(grepl("Measure perceived organisation", page, fixed = TRUE))
 })
 
-test_that("D13: SurveyBuilder and Studio carry the study through a save", {
+test_that("SurveyBuilder and Studio carry the study through a save", {
   ins <- study_instr()
   ctx <- builder_context()
   builder_open(ctx, ins)
@@ -120,7 +120,7 @@ test_that("D13: SurveyBuilder and Studio carry the study through a save", {
   expect_identical(again$study, roundtrip(ins)$study)
 })
 
-test_that("D13: an other method is described, and the methods are grouped", {
+test_that("An other method is described, and the methods are grouped", {
   v <- validate_sframe(study_instr(list(sampling = list(method = "other")), plan_objective = NULL),
                        strict = FALSE)
   expect_match(paste(sframe_problems(v), collapse = "\n"), "method_other", fixed = TRUE)
@@ -136,52 +136,52 @@ test_that("D13: an other method is described, and the methods are grouped", {
     sframe_sampling_methods("non_probability"), "census", "other"))
 })
 
-# The Codex review of the sframe-schema study profile (2026-11), each example
-# JSON applied to a 1-item instrument, so the problem under test is the only one.
-codex_instr <- function(json) {
+# The examples for the sframe-schema study profile, each example JSON applied
+# to a 1-item instrument, so the problem under test is the only one.
+profile_instr <- function(json) {
   ins <- sframe_instrument("S", components = list(sframe_item("q1", "Q?", "text")))
   f <- jsonlite::fromJSON(json, simplifyVector = FALSE)
   for (n in names(f)) ins[[n]] <- f[[n]]
   ins
 }
-codex_problems <- function(json) {
-  v <- validate_sframe(codex_instr(json), strict = FALSE)
+profile_problems <- function(json) {
+  v <- validate_sframe(profile_instr(json), strict = FALSE)
   expect_false(sframe_is_valid(v))
   paste(sframe_problems(v), collapse = "\n")
 }
 
 test_that("Profile B1, B2: a plan objective is checked with no study, as \"\" or an objective id", {
-  expect_match(codex_problems(
+  expect_match(profile_problems(
     '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"bad id"}]}'),
     "Plan block P1's objective 'bad id' is not an objective id", fixed = TRUE)
-  expect_match(codex_problems(
+  expect_match(profile_problems(
     '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":1}]}'),
     "Plan block P1's objective must be 1 objective id", fixed = TRUE)
-  expect_match(codex_problems('{"analysis_plan":[{"objective":1}]}'),
+  expect_match(profile_problems('{"analysis_plan":[{"objective":1}]}'),
                "Plan block 1's objective must be 1 objective id", fixed = TRUE)
   # A well formed id with no study, or a study with no objectives, is undeclared.
-  expect_match(codex_problems(
+  expect_match(profile_problems(
     '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
     "Plan block P1 names objective 'O1', which the study does not declare.", fixed = TRUE)
-  expect_match(codex_problems(paste0(
+  expect_match(profile_problems(paste0(
     '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"},',
     '{"id":"P2","method":"frequency","variables":"q1","objective":"O1"}]}')),
     "Plan blocks P1, P2 name objective 'O1', which the study does not declare.", fixed = TRUE)
-  expect_match(codex_problems(
+  expect_match(profile_problems(
     '{"study":{"problem":"Why?"},"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":"O1"}]}'),
     "which the study does not declare", fixed = TRUE)
   # "" names no objective, and a block without one stays valid.
   for (json in c('{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","objective":""}]}',
                  '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1"}]}')) {
-    expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
+    expect_true(sframe_is_valid(validate_sframe(profile_instr(json), strict = FALSE)))
   }
 })
 
 test_that("Profile B3: a hypothesis member that is null or NA is refused, and no hypotheses stay valid", {
   json <- '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":{"null":null}}]}'
-  expect_match(codex_problems(json), "Analysis plan 'P1''s hypotheses hold a null or NA", fixed = TRUE)
+  expect_match(profile_problems(json), "Analysis plan 'P1''s hypotheses hold a null or NA", fixed = TRUE)
   # The same block built in R, where NA_character_ is written as JSON null.
-  ins <- codex_instr(json)
+  ins <- profile_instr(json)
   ins$analysis_plan[[1]]$hypotheses <- list(null = NA_character_, alternative = "A difference.")
   v <- validate_sframe(ins, strict = FALSE)
   expect_false(sframe_is_valid(v))
@@ -191,22 +191,22 @@ test_that("Profile B3: a hypothesis member that is null or NA is refused, and no
   for (json in c('{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1"}]}',
                  '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":null}]}',
                  '{"analysis_plan":[{"id":"P1","method":"frequency","variables":"q1","hypotheses":{"null":"No difference."}}]}')) {
-    expect_true(sframe_is_valid(validate_sframe(codex_instr(json), strict = FALSE)))
+    expect_true(sframe_is_valid(validate_sframe(profile_instr(json), strict = FALSE)))
   }
 })
 
 test_that("Profile S1 to S3: a study, objectives or sampling present and empty is refused, with a message to drop it", {
-  expect_match(codex_problems('{"study":{}}'),
+  expect_match(profile_problems('{"study":{}}'),
                "`study` is present and empty. Drop it", fixed = TRUE)
-  expect_match(codex_problems('{"study":{"objectives":[]}}'),
+  expect_match(profile_problems('{"study":{"objectives":[]}}'),
                "`study$objectives` is present and empty. Drop it", fixed = TRUE)
-  expect_match(codex_problems('{"study":{"sampling":{}}}'),
+  expect_match(profile_problems('{"study":{"sampling":{}}}'),
                "`study$sampling` is present and empty. Drop it", fixed = TRUE)
   # An empty objectives list built in R.
-  ins <- codex_instr('{"study":{"problem":"Why?"}}')
+  ins <- profile_instr('{"study":{"problem":"Why?"}}')
   ins$study$objectives <- list()
   expect_match(paste(sframe_problems(validate_sframe(ins, strict = FALSE)), collapse = "\n"),
                "`study$objectives` is present and empty", fixed = TRUE)
   # No study at all stays valid.
-  expect_true(sframe_is_valid(validate_sframe(codex_instr('{"analysis_plan":[]}'), strict = FALSE)))
+  expect_true(sframe_is_valid(validate_sframe(profile_instr('{"analysis_plan":[]}'), strict = FALSE)))
 })

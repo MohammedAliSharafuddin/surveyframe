@@ -1,6 +1,6 @@
 # tests/testthat/test-shiny-delivery-status.R
 #
-# D4 in Shiny (session 1 follow-up 4). The module's thank-you screen said
+# The delivery status in Shiny. The module's thank-you screen said
 # "Your response has been recorded." whether or not anything was stored, and
 # run_survey() said "Submitted successfully". A module with no on_submit,
 # or run_survey() with save_responses = "none", stores nothing. The status

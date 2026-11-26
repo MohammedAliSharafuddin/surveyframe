@@ -1,6 +1,6 @@
 # tests/testthat/test-plan-dispatch.R
 #
-# How run_analysis_plan() dispatches blocks, batch 2 findings 6, 10, 11, 12.
+# How run_analysis_plan() dispatches blocks.
 #
 # 10. A plan where every block failed returned an ordinary results object, so
 #     a caller treating a normal return as success reported success. Duplicate
@@ -41,7 +41,7 @@ two_group_data <- function() {
 
 # ── 10 ──
 
-test_that("10: results report how many blocks failed", {
+test_that("Results report how many blocks failed", {
   ins <- with_plan(two_group(),
     block("ok", "t_test_ind", list(group = "grp", outcome = "y")),
     block("typo", "t_tset_ind", list(group = "grp", outcome = "y")))
@@ -55,14 +55,14 @@ test_that("10: results report how many blocks failed", {
                "1 of 2 blocks failed")
 })
 
-test_that("10: strict = TRUE turns a failed block into an error", {
+test_that("Strict = TRUE turns a failed block into an error", {
   ins <- with_plan(two_group(),
     block("typo", "t_tset_ind", list(group = "grp", outcome = "y")))
   expect_error(run_analysis_plan(two_group_data(), ins, strict = TRUE),
                "typo", class = "sframe_error")
 })
 
-test_that("10: duplicate block ids are refused", {
+test_that("Duplicate block ids are refused", {
   ins <- with_plan(two_group(),
     block("same", "t_test_ind", list(group = "grp", outcome = "y")),
     block("same", "t_test_ind", list(group = "grp", outcome = "y")))
@@ -70,7 +70,7 @@ test_that("10: duplicate block ids are refused", {
                class = "sframe_error")
 })
 
-test_that("10: a scoring failure is recorded in the results", {
+test_that("A scoring failure is recorded in the results", {
   ins <- sframe_instrument(title = "Clash", components = list(
     sframe_choice_set("ag5", 1:5, as.character(1:5)),
     sframe_item("q1", "One", "likert", choice_set = "ag5", scale_id = "q1"),
@@ -83,7 +83,7 @@ test_that("10: a scoring failure is recorded in the results", {
 
 # ── 11 ──
 
-test_that("11: the t test honours var_equal", {
+test_that("The t test honours var_equal", {
   d <- two_group_data()
   ins <- with_plan(two_group(),
     block("t", "t_test_ind", list(group = "grp", outcome = "y"),
@@ -94,7 +94,7 @@ test_that("11: the t test honours var_equal", {
   expect_equal(res$p, ref$p.value)
 })
 
-test_that("11: a declared alpha of .01 judges p = .025 non-significant", {
+test_that("A declared alpha of .01 judges p = .025 non-significant", {
   ins <- with_plan(two_group(),
     block("t", "t_test_ind", list(group = "grp", outcome = "y"), alpha = 0.01),
     block("a", "anova_one", list(group = "grp", outcome = "y"), alpha = 0.01))
@@ -106,7 +106,7 @@ test_that("11: a declared alpha of .01 judges p = .025 non-significant", {
   expect_match(res[["a"]]$prompt, "did not", fixed = TRUE)
 })
 
-test_that("11: options a method never reads are reported as ignored", {
+test_that("Options a method never reads are reported as ignored", {
   ins <- with_plan(two_group(),
     block("t", "t_test_ind", list(group = "grp", outcome = "y"),
           options = list(var_equal = TRUE, tails = 1)))
@@ -135,21 +135,21 @@ scale_data <- function() {
              b1 = sample(1:5, 30, TRUE), b2 = sample(1:5, 30, TRUE))
 }
 
-test_that("12: an item diagnostics block analyses only the scale it selects", {
+test_that("An item diagnostics block analyses only the scale it selects", {
   ins <- with_plan(two_scales(), block("i", "item_diagnostics", list(scales = "b")))
   res <- run_analysis_plan(scale_data(), ins, scored = FALSE)[["i"]]
   expect_null(res$error)
   expect_setequal(unique(res$table$Scale), "B")
 })
 
-test_that("12: the quality block checks duplicates when respondent ids exist", {
+test_that("The quality block checks duplicates when respondent ids exist", {
   ins <- with_plan(two_scales(), block("q", "quality"))
   res <- run_analysis_plan(scale_data(), ins, scored = FALSE)[["q"]]
   dup <- res$table[res$table$Check == "duplicates", ]
   expect_match(dup$Result, "1 flagged")
 })
 
-test_that("12: an unperformed duplicate check says so", {
+test_that("An unperformed duplicate check says so", {
   ins <- with_plan(two_scales(), block("q", "quality"))
   d <- scale_data()
   d$respondent_id <- NULL
@@ -160,7 +160,7 @@ test_that("12: an unperformed duplicate check says so", {
 
 # ── 6 ──
 
-test_that("6: a factor outcome is analysed on its labels", {
+test_that("A factor outcome is analysed on its labels", {
   d <- two_group_data()
   labelled <- transform(d, y = factor(round(y * 10)))
   ins <- with_plan(two_group(), block("t", "t_test_ind", list(group = "grp", outcome = "y")))
@@ -168,7 +168,7 @@ test_that("6: a factor outcome is analysed on its labels", {
   expect_equal(res$mean1, mean(round(d$y[d$grp == "x"] * 10)))
 })
 
-test_that("6: a text predictor in linear regression stays categorical", {
+test_that("A text predictor in linear regression stays categorical", {
   set.seed(2)
   d <- data.frame(region = rep(c("north", "south", "west"), 20),
                   y = stats::rnorm(60))

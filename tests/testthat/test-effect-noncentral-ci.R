@@ -1,4 +1,4 @@
-# FR-24 (Fable sitting 2), Session CF-B: the intervals for Cramer's V and eta
+# The intervals for Cramer's V and eta
 # squared are noncentrality intervals, as effectsize computes them, and reach
 # 0. The percentile bootstrap gave an exactly independent table V = 0 with
 # 95% CI [0.05, 0.50]. The reference values are effectsize 1.0.3's

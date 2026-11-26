@@ -1,4 +1,4 @@
-# P3-05 (Codex pass 3), Session CF-B: a blank answer is missing in every
+# A blank answer is missing in every
 # column, factors included, and a declared numeric column that stays text
 # says so. A factor column kept its "", and a numeric column with 1 value
 # that did not convert stayed text with its "" and no message.
@@ -23,7 +23,7 @@ test_that("a declared numeric column that stays text warns, naming column and va
 
 test_that("a Windows-1252 file is still read, its bytes as written", {
   # The blank rule tests text byte-wise: trimws() refused text that is not
-  # valid UTF-8 (probe_roundtrip.R windows1252, during CF-B).
+  # valid UTF-8 (probe_roundtrip.R windows1252).
   i <- sframe_instrument("P3", components = list(sframe_item("note", "Note", "text")))
   p <- tempfile(fileext = ".csv")
   con <- file(p, "wb")

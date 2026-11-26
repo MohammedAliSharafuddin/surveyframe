@@ -1,5 +1,5 @@
 # tests/testthat/test-signed-effects.R
-# D1 (CX-11). A two-group effect size keeps its direction: first group minus
+# A two-group effect size keeps its direction: first group minus
 # second, in the declared order. Size labels read the magnitude, intervals
 # are bootstrapped on the signed value, and the text names the higher group.
 

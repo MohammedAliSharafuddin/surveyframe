@@ -218,7 +218,7 @@ sframe_cohens_d <- function(x, y) {
   pooled_sd <- sqrt(((nx - 1) * stats::var(x, na.rm = TRUE) +
                      (ny - 1) * stats::var(y, na.rm = TRUE)) / (nx + ny - 2))
   if (pooled_sd == 0) return(NA_real_)
-  # Signed, first group minus second (D1). Size labels read the magnitude.
+  # Signed, first group minus second. Size labels read the magnitude.
   (mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE)) / pooled_sd
 }
 
@@ -227,7 +227,7 @@ sframe_cohens_d <- function(x, y) {
 # levels, then sorted values. Never row order, so re-sorting the responses
 # cannot flip the sign of a test. Values the choice set does not list follow
 # its codes, numbers in numeric order and other text in radix (code point)
-# order, which no session locale changes (FR-21). With no instrument given,
+# order, which no session locale changes. With no instrument given,
 # the one the plan runner set around the block is used.
 sframe_group_order <- function(x, instrument = .sframe_text_label_env$instrument,
                                group_col = NULL) {
@@ -249,7 +249,7 @@ sframe_group_order <- function(x, instrument = .sframe_text_label_env$instrument
 
 # A block's seed: the plan seed plus a polynomial hash of the block id, both
 # modulo 2^31 - 1, so it is a valid integer seed, the same in every session
-# and for every order of the plan's blocks (FR-33).
+# and for every order of the plan's blocks.
 sframe_block_seed <- function(seed, id) {
   m <- 2147483647
   h <- 0
@@ -261,7 +261,7 @@ sframe_block_seed <- function(seed, id) {
 # else the alpha of the block being run, else .05. Only the t test and the
 # one-way ANOVA read the block's alpha, and the other sentences compared p
 # with a fixed .05, so a block declaring alpha .001 called p = .014
-# significant (FR-25).
+# significant.
 sframe_alpha <- function(options = list()) {
   a <- options$alpha %||% .sframe_text_label_env$alpha %||% 0.05
   if (!is.numeric(a) || length(a) != 1 || !is.finite(a) || a <= 0 || a >= 1) 0.05 else a
@@ -271,7 +271,7 @@ sframe_alpha <- function(options = list()) {
 # A parametric method is pointed to its small-sample alternative. A method
 # already suited to small samples (exact, rank-based or penalised) is named
 # as suited, with the caution that power is low. Before 0.4.3 no result
-# carried an advisory at all, so a block of 18 cases said nothing (J10).
+# carried an advisory at all, so a block of 18 cases said nothing.
 sframe_result_small_sample_advisory <- function(result) {
   test <- as.character(result$test %||% "")[1]
   alternative <- c(
@@ -324,7 +324,7 @@ sframe_higher_group <- function(effect, groups) {
 # short (40 characters or fewer), otherwise its column name in words ("confidence_after" reads
 # "confidence after"). A paired line quoted a whole question, as in 'higher
 # in "After the training, how confident are you applying this skill? (0 to
-# 100)"' (J3).
+# 100)"'.
 sframe_short_var <- function(id) {
   lab <- sframe_text_var(id)
   vapply(seq_along(id), function(k) {
@@ -367,14 +367,13 @@ sframe_p_string <- function(p) {
   if (is.na(p)) return("= NA")
   if (p < .001) return("< .001")
   # APA 7: above .999 is written > .999, since "= 1.000" claims certainty
-  # (FR-32).
   if (p > .999) return("> .999")
   sprintf("= %s", sframe_p_digits(p))
 }
 
 # A p value's digits with no leading zero: 3 decimals, or as many as it takes
 # (up to 6) to stay below the alpha in force when 3 would round up to it, so
-# .04996 beside "significant" no longer reads .050 (FR-32).
+# .04996 beside "significant" no longer reads .050.
 sframe_p_digits <- function(p, alpha = sframe_alpha()) {
   out <- formatC(p, digits = 3, format = "f")
   if (is.finite(p) && p < alpha && as.numeric(out) >= alpha) {
@@ -390,7 +389,7 @@ sframe_p_digits <- function(p, alpha = sframe_alpha()) {
 # Individual test runners
 # ---------------------------------------------------------------------------
 
-# One weight check for every weighted method (D6, CX-09). `w` is the weight
+# One weight check for every weighted method. `w` is the weight
 # column and `column` its name. A negative, non-finite or non-numeric weight,
 # or a usable total of zero, is an `error` string for the block. A missing
 # (NA or blank) weight drops its row: `keep` marks the rows to use, `dropped`
@@ -525,7 +524,7 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
   # Percent of those who answered (valid percent), the denominator of the
   # weighted table and of a descriptives block's counts. It was of every row,
   # missing included, so North was 28.9% here and 36.1% beside it with every
-  # weight 1, and the sentence gave N = 90 where 72 answered (FR-23). The
+  # weight 1, and the sentence gave N = 90 where 72 answered. The
   # missing row keeps its count and has no percentage.
   answered <- sum(tbl[!is.na(names(tbl))])
   missing <- sum(tbl[is.na(names(tbl))])
@@ -573,7 +572,7 @@ sframe_frequency_one <- function(data, col, weights = NULL, instrument = NULL) {
 
 
 # Counts with a Total row and column, and the percentages over the chosen
-# denominator (owner 2026-10-31). Each percentage margin describes its own
+# denominator. Each percentage margin describes its own
 # denominator: the Total row of row percentages is the column distribution,
 # and the Total column of column percentages is the row distribution. The
 # first column holds the row levels, then a column per column level and Total.
@@ -635,7 +634,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   complete <- !is.na(r) & !is.na(c)
   r <- r[complete]; c <- c[complete]
   # Both axes in their declared order and named by their own item's choice
-  # labels (FR-37). The table carried the codes, and the instrument-wide
+  # labels. The table carried the codes, and the instrument-wide
   # lookup after the runner relabels only a code with 1 meaning across every
   # set, so a channel item coded 1 to 3 kept "1", "2", "3" and a 0:1 item
   # showed "No" and "1". sframe_text_value() reads the item's own set.
@@ -651,7 +650,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
                         label_axis(colnames(tbl), vars[2]))
   # 1 category leaves no association to test. chisq.test() of a 1 by k table
   # tests the k counts against equal shares, a goodness-of-fit test that was
-  # reported as a test of association (FR-27).
+  # reported as a test of association.
   constant <- vars[1:2][dim(tbl) < 2]
   if (length(constant) > 0) {
     return(list(test = "crosstab", error = paste0(
@@ -713,7 +712,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
     effect_label = sframe_effect_label(effect, "r"),
     # A simulated p value has no degrees of freedom (chisq.test() gives NA),
     # so the line omits them and says the p value is simulated, where it
-    # printed "chi-square(NA, N = 4)" (P2-09).
+    # printed "chi-square(NA, N = 4)".
     apa      = if (is.na(ct$parameter)) {
       sprintf(
         "\u03c7\u00b2(N = %d) = %.2f, p %s (simulated from %d tables), %s = %.2f%s",
@@ -743,7 +742,7 @@ sframe_run_crosstab <- function(data, vars, options = list()) {
   }
   # The test, N, V and its interval are of the unweighted counts, and the
   # weighted table sits beside them. Neither the sentence nor a note said
-  # which was tested (FR-34).
+  # which was tested.
   if (!is.null(weighted_table)) {
     unweighted <- paste0("The test uses the unweighted counts. The counts weighted by ",
                          sframe_text_var(weights), " are in the weighted table.")
@@ -1322,7 +1321,7 @@ sframe_model_by_id <- function(instrument, id) {
 }
 
 # Why a test could not be computed, in words a researcher can act on. It
-# used to say "Test failed." whatever the cause (Ethos request 6). `numeric`
+# used to say "Test failed." whatever the cause. `numeric`
 # names the columns the test reads as numbers.
 sframe_test_failure <- function(e, data, numeric = character(0)) {
   infinite <- sframe_infinite_columns(data, numeric)
@@ -1501,7 +1500,7 @@ sframe_result_from_report <- function(report, test = report$method %||% "") {
 # a psychometric result, a fitted topic model. They sit in an attribute,
 # which jsonlite::toJSON() leaves out, so every result list serialises as it
 # stands. A fitted stm model inside the list stopped a host serialising the
-# results at all (Ethos request 5). Read them with sframe_runtime().
+# results at all. Read them with sframe_runtime().
 sframe_set_runtime <- function(result, name, value) {
   runtime <- attr(result, "sframe_runtime") %||% list()
   runtime[[name]] <- value
@@ -1634,7 +1633,7 @@ sframe_result_table <- function(result) {
   if (!is.null(result$table) || !is.null(result$error)) return(result$table)
   # A value that rounds to 0 prints as 0.00, not -0.00, and a model
   # coefficient below .01 in size gets 3 decimals, so a slope of 0.004 with
-  # p < .001 no longer prints as 0.00 (FR-32).
+  # p < .001 no longer prints as 0.00.
   fmt <- function(x, d = 2) {
     x <- as.numeric(x)
     s <- formatC(x, digits = d, format = "f")
@@ -1646,7 +1645,7 @@ sframe_result_table <- function(result) {
     ifelse(!is.na(x) & x != 0 & abs(x) < .01, fmt(x, 3), fmt(x))
   }
   # An odds ratio past 999 comes from separation, not from data, and its
-  # digits mean nothing (an OR of 25475448.66, J6): it prints as >999, and
+  # digits mean nothing (an OR of 25475448.66): it prints as >999, and
   # its reciprocal as <0.001.
   or_fmt <- function(x) {
     x <- as.numeric(x)
@@ -1796,8 +1795,8 @@ sframe_result_table <- function(result) {
         b = coef_fmt(b),
         SE = coef_fmt(s),
         z = fmt(b / s),
-        # Numeric, so the APA layer prints it as .032 or <.001 (CX-15), and
-        # SurveyStudio's table does too (J6).
+        # Numeric, so the APA layer prints it as .032 or <.001, and
+        # SurveyStudio's table does too.
         p = 2 * stats::pnorm(-abs(b / s)),
         OR = or_fmt(exp(b)),
         `CI low` = or_fmt(exp(b - crit * s)),
@@ -1921,7 +1920,7 @@ sframe_reliability_apa <- function(result) {
   rr <- sframe_runtime(result, "report")
   if (is.null(rr) || !length(rr)) return(result)
   num <- function(v) sprintf("%.2f", v)
-  # Alpha with its Feldt interval where one was computed (L2).
+  # Alpha with its Feldt interval where one was computed.
   ci <- function(s) {
     if (length(s$alpha_ci) != 2 || any(!is.finite(s$alpha_ci))) return("")
     sprintf(", 95%% CI [%s, %s],", num(s$alpha_ci[[1]]), num(s$alpha_ci[[2]]))
@@ -2047,7 +2046,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
     options$alpha <- block$alpha
   }
   # Every runner's sentence compares p with the block's alpha, read through
-  # sframe_alpha(), including the runners that take no options (FR-25).
+  # sframe_alpha(), including the runners that take no options.
   old_alpha <- .sframe_text_label_env$alpha
   .sframe_text_label_env$alpha <- options$alpha
   on.exit(.sframe_text_label_env$alpha <- old_alpha, add = TRUE)
@@ -2057,7 +2056,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   unread <- sframe_unread_roles_problem(test, roles, block)
   absent <- if (is.null(unread)) sframe_missing_variables_problem(vars, data, instrument)
   # Runners name variables and groups by their labels in result text, set
-  # once here for every runner (CX-20).
+  # once here for every runner.
   result <- if (!is.null(unread)) {
     list(test = test, error = paste0("No variables to analyse: ", unread))
   } else if (!is.null(absent)) {
@@ -2158,7 +2157,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   )
 
   # APA 7 writes a statistic bounded by 1 with no leading zero. Done here,
-  # once, for every runner's text (D9, CX-24).
+  # once, for every runner's text.
   result$apa <- sframe_apa_text(result$apa)
   result$prompt <- sframe_apa_text(result$prompt)
 
@@ -2175,12 +2174,12 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   if (is.null(result$table)) {
     result$table <- tryCatch(sframe_result_table(result), error = function(e) NULL)
   }
-  # A small sample gets an advisory naming what suits it (J10).
+  # A small sample gets an advisory naming what suits it.
   if (is.null(result$error) && is.null(result$advisory)) {
     result$advisory <- sframe_result_small_sample_advisory(result)
   }
   # A multinomial model fits in nnet, a package a reader may not know, so it
-  # carries the R that refits it, as the syntax methods do (CX-14).
+  # carries the R that refits it, as the syntax methods do.
   if (identical(result$test, "regression_logistic_multinomial") &&
       is.null(result$error) && is.null(result$syntax)) {
     result$syntax <- tryCatch(
@@ -2217,7 +2216,7 @@ sframe_run_one_block <- function(block, data, instrument, plots = FALSE,
   result$percent_table <- relabel_levels(result$percent_table)
   # A two-group table's Group column holds the group item's codes, which the
   # lookup above leaves alone when several choice sets share them (1 and 2),
-  # so it read "1" and "2" beside a sentence naming "Returning guest" (G1).
+  # so it read "1" and "2" beside a sentence naming "Returning guest".
   # It is relabelled from the group item's own choice set.
   if (result$test %in% c("t_test_ind", "mann_whitney") &&
       is.data.frame(result$table) && "Group" %in% names(result$table) &&
@@ -2447,7 +2446,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
   # adding, removing or moving a block leaves every other block's bootstrap
   # interval as it was. 1 stream for the whole plan gave a t test's d
   # interval [0.097, 1.221] alone and [0.079, 1.180] after a Spearman block
-  # (FR-33). The caller's stream is restored by sframe_with_seed() above.
+  # The caller's stream is restored by sframe_with_seed() above.
   plan_seed <- .sframe_text_label_env$plan_seed
   results <- lapply(plan, function(block) {
     if (!is.null(plan_seed)) set.seed(sframe_block_seed(plan_seed, block$id))
@@ -2474,7 +2473,7 @@ run_analysis_plan <- function(data, instrument, scored = TRUE, plots = FALSE,
       class = "sframe_error"
     )
   }
-  # Every APA sentence from demonstration data says so (owner 2026-11-14).
+  # Every APA sentence from demonstration data says so.
   if (sframe_is_demo_data(data)) {
     for (k in seq_along(results)) {
       a <- if (is.list(results[[k]])) results[[k]]$apa else NULL
@@ -2587,8 +2586,7 @@ render_results <- function(
   sframe_check_instrument(instrument)
   # The references are written in APA 7 alone. "ama" and "vancouver" passed
   # arg_match() and were never used, so 3 formats gave 1 document and a
-  # methods section could name a style the report never applied (review_040
-  # defect 7).
+  # methods section could name a style the report never applied.
   if (!identical(citation_format, "apa")) {
     shown <- if (is.character(citation_format)) paste(citation_format, collapse = ", ")
              else class(citation_format)[1]
@@ -2645,7 +2643,7 @@ render_results <- function(
     # the result carries (see sframe_result_supplement())
     table_html <- function(tbl, caption = NULL) {
       if (!is.data.frame(tbl)) return("")
-      # Cells as every report engine prints them (CX-15).
+      # Cells as every report engine prints them.
       tbl <- sframe_apa_cells(tbl)
       # Each value is escaped on its own. htmltools_escape() pastes a vector
       # into one string, which put a whole row, and the whole header, in a
@@ -2677,7 +2675,7 @@ render_results <- function(
         headers, rows, foot_html
       )
     }
-    # Every table titled, and numbered once the page is assembled (CX-22).
+    # Every table titled, and numbered once the page is assembled.
     tbl_html <- table_html(r$table, sframe_result_float_title(r, i))
     supplement <- sframe_result_supplement(r)
     if (!is.null(supplement)) {
@@ -2806,7 +2804,7 @@ render_results <- function(
     sections_html, references_html
   )
 
-  # Tables numbered in reading order (CX-22).
+  # Tables numbered in reading order.
   writeLines(sframe_apa_number_floats(html), dest)
   invisible(dest)
 }

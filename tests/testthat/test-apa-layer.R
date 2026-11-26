@@ -1,5 +1,5 @@
 # tests/testthat/test-apa-layer.R
-# The one APA layer (CX-15, CX-22, CX-24, D9): result text, table cells and
+# The one APA layer: result text, table cells and
 # headings, and numbered tables and figures, formatted in one place for
 # every renderer.
 
@@ -39,12 +39,12 @@ test_that("a run block's result text and prompt carry no leading zero on r", {
   expect_match(res$RQ1$prompt, "r\\(38\\) = -?\\.[0-9]{2}")
 })
 
-test_that("table cells: p by its rules, bounded values without a zero, blanks for missing (CX-15)", {
+test_that("table cells: p by its rules, bounded values without a zero, blanks for missing", {
   x <- data.frame(term = c("a", NA, "b"), t = c(2.345, 10, 1),
                   p = c(.004, .00001, 1), r = c(.53, -.2, NA), n = c(10L, 20L, 30L),
                   stringsAsFactors = FALSE)
   out <- sframe_apa_cells(x)
-  # p = 1 is >.999 as APA 7 writes it (FR-32, CF-B), "1.000" until then.
+  # p = 1 is >.999 as APA 7 writes it, "1.000" until then.
   expect_identical(out$p, c(".004", "<.001", ">.999"))
   expect_identical(out$r, c(".53", "-.20", ""))
   expect_identical(out$t, c("2.35", "10.00", "1.00"))
@@ -53,7 +53,7 @@ test_that("table cells: p by its rules, bounded values without a zero, blanks fo
   expect_identical(sframe_p_cell(c(.032, NA)), c(".032", ""))
 })
 
-test_that("every report engine shows a p of .004 as .004 (CX-15)", {
+test_that("every report engine shows a p of .004 as .004", {
   tbl <- data.frame(term = "x", t = 3.1, p = 0.004)
   expect_match(surveyframe:::.render_report_table(tbl, "T"), "<td>.004</td>", fixed = TRUE)
   tpl <- readLines(system.file("templates", "report.qmd", package = "surveyframe"))
@@ -62,7 +62,7 @@ test_that("every report engine shows a p of .004 as .004 (CX-15)", {
   expect_true(all(grepl("sframe_apa_cells(", kables, fixed = TRUE)))
 })
 
-test_that("result text in HTML: italic Latin symbols, subscripts, Greek letters (CX-24)", {
+test_that("result text in HTML: italic Latin symbols, subscripts, Greek letters", {
   expect_identical(
     sframe_apa_html("t(57.30) = 2.10, p = .040, d = 0.55, 95% CI [0.10, 1.00], higher in A"),
     "<em>t</em>(57.30) = 2.10, <em>p</em> = .040, <em>d</em> = 0.55, 95% CI [0.10, 1.00], higher in A")
@@ -82,7 +82,7 @@ test_that("result text in HTML: italic Latin symbols, subscripts, Greek letters 
   expect_identical(sframe_apa_html("a <b> & c"), "a &lt;b&gt; &amp; c")
 })
 
-test_that("each HTML renderer marks up the result text (CX-24)", {
+test_that("each HTML renderer marks up the result text", {
   set.seed(3)
   d <- data.frame(a = 1:40, b = 1:40 + stats::rnorm(40, sd = 15))
   instr <- sframe_instrument("APA", components = list(
@@ -99,7 +99,7 @@ test_that("each HTML renderer marks up the result text (CX-24)", {
   expect_true(any(grepl("<em>r</em>(38) = ", readLines(out), fixed = TRUE)))
 })
 
-test_that("table headings set symbols as APA 7 does and read as words (CX-24)", {
+test_that("table headings set symbols as APA 7 does and read as words", {
   expect_identical(
     sframe_apa_headings(c("p", "t", "df", "missing_prop", "r_s", "research_question",
                           "Pr(>|z|)", "SD", "std.error", "n_items")),
@@ -113,7 +113,7 @@ test_that("table headings set symbols as APA 7 does and read as words (CX-24)", 
   expect_match(html, "<td>.25</td>", fixed = TRUE)
 })
 
-test_that("result text and notes count with real plurals, never (s) (CX-24)", {
+test_that("result text and notes count with real plurals, never (s)", {
   fns <- c("sframe_run_descriptives_result", "sframe_resolve_decision_inputs",
            "sframe_resolve_pairwise_matrix", "sframe_run_anp",
            "sframe_resolve_dematel_matrix")
@@ -123,7 +123,7 @@ test_that("result text and notes count with real plurals, never (s) (CX-24)", {
   }
 })
 
-test_that("tables and figures are numbered in order with titles and alt text (CX-22)", {
+test_that("tables and figures are numbered in order with titles and alt text", {
   html <- paste0(
     "<table><caption class=\"sf-apa-caption\">First</caption></table>",
     "<figure class=\"sf-figure\"><figcaption class=\"sf-apa-caption\">Chart</figcaption><img alt=\"x\"></figure>",
@@ -170,10 +170,10 @@ test_that("tables and figures are numbered in order with titles and alt text (CX
   }
 })
 
-# Session 7. The Quarto report printed plain captions, no figure titles and
+# The Quarto report printed plain captions, no figure titles and
 # images with no alt text, so its tables and figures went unnumbered while the
-# built-in engine's were numbered (CX-22).
-test_that("Quarto's captions and marked figures are numbered, with alt text (CX-22)", {
+# built-in engine's were numbered.
+test_that("Quarto's captions and marked figures are numbered, with alt text", {
   html <- paste0(
     "<table>\n<caption>\nItem-wise missingness\n</caption>\n</table>",
     "<figure class=\"sf-figure figure\" data-alt=\"Bars of q1\"><figcaption class=\"sf-apa-caption\">\nDistribution of q1\n</figcaption>\n",
@@ -190,7 +190,7 @@ test_that("Quarto's captions and marked figures are numbered, with alt text (CX-
   expect_no_match(out, "alt=\"Kept\" alt=", fixed = TRUE)
 })
 
-test_that("the Quarto report numbers its tables and figures as the built-in one does (CX-22)", {
+test_that("the Quarto report numbers its tables and figures as the built-in one does", {
   skip_on_cran()
   skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto is not installed")

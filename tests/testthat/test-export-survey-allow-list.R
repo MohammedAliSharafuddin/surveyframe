@@ -1,6 +1,6 @@
 # tests/testthat/test-export-survey-allow-list.R
 #
-# A shared survey carries only what its page reads (session 7). export_survey()
+# A shared survey carries only what its page reads. export_survey()
 # embedded the whole instrument minus its hash, so anyone given the link could
 # read the instrument's references, analysis plan, hypotheses and amendment
 # history, and the answers to its attention checks, from the page source. The builder's Preview embeds the same list,

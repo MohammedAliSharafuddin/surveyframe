@@ -376,7 +376,7 @@ test_that("each covered method's generated code reproduces its own numbers", {
   }
 })
 
-# ── Coding the generated code copies (Session CF-B, FR-19 to FR-22) ─────────
+# ── Coding the generated code copies ─────────
 # The runners code categories as the instrument declares them: a choice item
 # as a category on its declared order, an ordinal outcome in declared order, a
 # binary model's named event, McNemar's 2 items on 1 order. The generated code

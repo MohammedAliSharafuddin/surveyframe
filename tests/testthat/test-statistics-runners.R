@@ -1,6 +1,6 @@
 # tests/testthat/test-statistics-runners.R
 #
-# Numeric statistics runners, batch 2 findings 13, 14, 22, 23, 24 and 25, each
+# Numeric statistics runners, each
 # pinned against a reference calculation written here.
 #
 # 13. ANCOVA exported a sequential table with group before the covariates, so
@@ -26,7 +26,7 @@ ancova_data <- function(n = 90) {
   data.frame(group = group, cov1 = cov1, cov2 = cov2, y = y)[keep, ]
 }
 
-test_that("13: the ANCOVA group test is adjusted for the covariates", {
+test_that("The ANCOVA group test is adjusted for the covariates", {
   d <- ancova_data()
   res <- sframe_run_ancova(d, list(group = "group", outcome = "y",
                                    covariates = c("cov1", "cov2")))
@@ -39,7 +39,7 @@ test_that("13: the ANCOVA group test is adjusted for the covariates", {
   expect_equal(row$p, ref$`Pr(>F)`[2], tolerance = 1e-8)
 })
 
-test_that("13: the slope check includes an interaction with every covariate", {
+test_that("The slope check includes an interaction with every covariate", {
   d <- ancova_data()
   res <- sframe_run_ancova(d, list(group = "group", outcome = "y",
                                    covariates = c("cov1", "cov2")))
@@ -65,7 +65,7 @@ partial_reference <- function(d, controls, rank_first) {
   list(r = r, df = df, p = 2 * stats::pt(-abs(t), df))
 }
 
-test_that("14: partial Pearson inference uses n - 2 - k degrees of freedom", {
+test_that("Partial Pearson inference uses n - 2 - k degrees of freedom", {
   d <- partial_data()
   res <- sframe_run_partial_correlation(
     d, list(x = "x", y = "y", controls = c("z1", "z2")))
@@ -76,7 +76,7 @@ test_that("14: partial Pearson inference uses n - 2 - k degrees of freedom", {
   expect_equal(res$df, ref$df)
 })
 
-test_that("14: partial Spearman ranks the variables before residualising", {
+test_that("Partial Spearman ranks the variables before residualising", {
   d <- partial_data()
   res <- sframe_run_partial_correlation(
     d, list(x = "x", y = "y", controls = c("z1", "z2")),
@@ -87,14 +87,14 @@ test_that("14: partial Spearman ranks the variables before residualising", {
   expect_equal(res$p, ref$p, tolerance = 1e-10)
 })
 
-test_that("14: an unsupported method is reported", {
+test_that("An unsupported method is reported", {
   res <- sframe_run_partial_correlation(
     partial_data(), list(x = "x", y = "y", controls = "z1"),
     options = list(method = "kendall"))
   expect_false(is.null(res$error))
 })
 
-test_that("22: t-test planning follows alpha, power and effect size", {
+test_that("t-test planning follows alpha, power and effect size", {
   plan <- sframe_sample_size_plan("t_test", d = 0.5, alpha = 0.05, power = 0.80)
   per_group <- ceiling(stats::power.t.test(delta = 0.5, sd = 1, sig.level = 0.05,
                                            power = 0.80)$n)
@@ -108,7 +108,7 @@ test_that("22: t-test planning follows alpha, power and effect size", {
   expect_gt(strict_alpha$estimated_n, plan$estimated_n)
 })
 
-test_that("22: ANOVA planning follows alpha, power and Cohen's f", {
+test_that("ANOVA planning follows alpha, power and Cohen's f", {
   plan <- sframe_sample_size_plan("anova", f = 0.25, groups = 3L, alpha = 0.05, power = 0.80)
   per_group <- ceiling(stats::power.anova.test(
     groups = 3, between.var = 0.25^2 * 3 / 2, within.var = 1,
@@ -116,12 +116,12 @@ test_that("22: ANOVA planning follows alpha, power and Cohen's f", {
   expect_identical(as.integer(plan$estimated_n), as.integer(3 * per_group))
 })
 
-test_that("22: an assumed effect size is stated", {
+test_that("An assumed effect size is stated", {
   plan <- sframe_sample_size_plan("t_test")
   expect_match(paste(plan$warnings, collapse = " "), "0.5")
 })
 
-test_that("23: the Firth likelihood-ratio statistic is twice the log-likelihood gain", {
+test_that("The Firth likelihood-ratio statistic is twice the log-likelihood gain", {
   skip_if_not_installed("logistf")
   set.seed(9)
   d <- data.frame(x = stats::rnorm(40))
@@ -133,7 +133,7 @@ test_that("23: the Firth likelihood-ratio statistic is twice the log-likelihood 
                tolerance = 1e-10)
 })
 
-test_that("24: the residual row of a two-way ANOVA carries no effect size", {
+test_that("The residual row of a two-way ANOVA carries no effect size", {
   set.seed(4)
   d <- data.frame(a = rep(c("x", "y"), 20), b = rep(c("p", "q"), each = 20),
                   y = stats::rnorm(40))
@@ -143,7 +143,7 @@ test_that("24: the residual row of a two-way ANOVA carries no effect size", {
   expect_true(all(!is.na(res$table$partial_eta_sq[res$table$effect != "Residuals"])))
 })
 
-test_that("25: rendered p values keep their precision", {
+test_that("Rendered p values keep their precision", {
   instr <- sframe_instrument(title = "Render", components = list(
     sframe_item("g", "Group", "text")))
   instr$analysis_plan <- list(list(id = "b1", research_question = "Q",

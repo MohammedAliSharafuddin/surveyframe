@@ -1,5 +1,4 @@
-# The per-response identifier, decided by the owner on 2026-09-19 after being
-# deferred three times (A9, batch 5 #12, batch 4 #22).
+# The per-response identifier.
 #
 # The static survey has written a generated respondent_id since the first
 # release. The Shiny path wrote none, so the same instrument produced different

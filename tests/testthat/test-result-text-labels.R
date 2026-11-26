@@ -1,7 +1,7 @@
 # tests/testthat/test-result-text-labels.R
 # Result text and interaction terms showed raw ids, such as attendee_type,
 # in_person and attendee_role:format, where the tables and charts beside
-# them show the instrument's labels (CX-20).
+# them show the instrument's labels.
 
 test_that("result text names variables and groups by their labels", {
   d <- sframe_demo("two_group")
@@ -13,7 +13,7 @@ test_that("result text names variables and groups by their labels", {
   p <- sframe_demo("paired")
   res <- suppressWarnings(run_analysis_plan(p$responses, p$instrument))
   # The paired demo's labels are whole questions, so the sentence names each
-  # measure by its column name in words (J3, Ubuntu review_043).
+  # measure by its column name in words.
   expect_match(res$RQ1$apa, "higher in confidence after", fixed = TRUE)
   expect_false(grepl("confidence_after", res$RQ2$apa, fixed = TRUE))
 
@@ -27,7 +27,7 @@ test_that("result text names variables and groups by their labels", {
 test_that("a reference category is named by its choice label", {
   l <- sframe_demo("logistic")
   res <- suppressWarnings(run_analysis_plan(l$responses, l$instrument))
-  # The first category the choice set declares, workshop (FR-21, CF-B). It
+  # The first category the choice set declares, workshop. It
   # was Keynotes, the first code in alphabetical order, until then.
   expect_match(res$RQ3$apa, "reference category Workshops", fixed = TRUE)
 })

@@ -1,8 +1,8 @@
-# tests/testthat/test-builder-ui2-browser.R
+# tests/testthat/test-builder-screens-browser.R
 #
-# Session UI-2's builder screens in a real Chrome, 1 tab for the file
-# (helper-ui2-browser.R): the citation picker on the plan fields, and the
-# items that follow it in the UI-2 block.
+# SurveyBuilder's screens in a real Chrome, 1 tab for the file
+# (helper-builder-browser.R): the citation picker on the plan fields, and the
+# the screens tested after it.
 #
 # Skipped on CRAN and wherever chromote or Chrome is unavailable.
 
@@ -159,7 +159,7 @@ test_that("the equation button writes $...$ and the preview shows TeX as typed",
                "<code>r &gt; 0.3</code>", fixed = TRUE)
 })
 
-# -- Study (D13) ----------------------------------------------------------------
+# -- Study ----------------------------------------------------------------
 
 test_that("the Study tab edits the study and Other asks for a description", {
   s <- ui2_builder(sframe_references_fixture())
@@ -180,7 +180,8 @@ test_that("the Study tab edits the study and Other asks for a description", {
   expect_identical(st$sampling, list(method = "other", method_other = "Intercept at the exit"))
 })
 
-# -- Centre pane -----------------------------------------------------------------
+# -- Centre pane
+# -----------------------------------------------------------------
 
 centre_instrument <- function() {
   sframe_instrument(
@@ -241,7 +242,7 @@ test_that("the centre has a desktop and a mobile width, and closes with the edit
   expect_false(js(s, "document.getElementById('cvPv').classList.contains('on')"))
 })
 
-# Owner 2026-11-15: at a tablet width the Desktop and Mobile buttons drifted
+# At a tablet width the Desktop and Mobile buttons drifted
 # apart, 1 above the other, beside the hint. They are 1 group, so they share a
 # top edge at every width, standalone and as Studio hosts the builder.
 test_that("the Desktop and Mobile buttons stay in line at 1280, 1024 and 768 px", {
@@ -359,7 +360,8 @@ test_that("Studio host mode sends its need, state and dirty messages", {
 })
 
 
-# -- allow_other and randomise on the exported page --------------------------------
+# -- allow_other and randomise on the exported page
+# --------------------------------
 
 test_that("the exported page draws Other last and shuffles a randomised set once", {
   ins <- sframe_instrument(
@@ -387,7 +389,7 @@ test_that("the exported page draws Other last and shuffles a randomised set once
 })
 
 
-# -- Dialogs (UX-14) ----------------------------------------------------------------
+# -- Dialogs ----------------------------------------------------------------
 
 tab_key <- function(s, shift = FALSE) {
   js(s, sprintf("document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'Tab',shiftKey:%s,bubbles:true,cancelable:true}));1",
@@ -399,7 +401,8 @@ test_that("Tab stays inside an open dialog, and Escape closes it back to its ope
   js(s, "var b=document.getElementById('cfgMoreBtn');b.focus();openChoiceModal();1")
   inside <- "document.getElementById('m-choice').contains(document.activeElement)"
   expect_true(js(s, inside))
-  # The last control, then Tab, is the first. Shift+Tab from the first is the last.
+  # The last control, then Tab, is the first. Shift+Tab from the first is the
+  # last.
   js(s, "var f=document.querySelectorAll('#m-choice .mfoot button');f[f.length-1].focus();1")
   tab_key(s)
   expect_true(js(s, inside))
@@ -441,7 +444,7 @@ test_that("the arrow keys move along the Settings tabs and select each", {
 })
 
 
-# -- Narrow screens (UX-01, UX-08) ---------------------------------------------------
+# -- Narrow screens ---------------------------------------------------
 
 narrow_overflow <- "(function(){var w=innerWidth,n=0;document.querySelectorAll('body *').forEach(function(e){var r=e.getBoundingClientRect();if(r.width>0&&r.right>w+1&&getComputedStyle(e).visibility!=='hidden')n++;});return [document.documentElement.scrollWidth<=w,n];})()"
 
@@ -486,7 +489,7 @@ test_that("inside Studio at 390 wide the builder shows 1 pane at a time", {
 })
 
 
-# -- Reference targets (8b-R) -------------------------------------------------------
+# -- Reference targets -------------------------------------------------------
 
 test_that("References offers the study and a block's hypotheses as cited-by targets", {
   ins <- sframe_references_fixture()

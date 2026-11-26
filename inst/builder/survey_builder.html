@@ -8,7 +8,7 @@
 <style>
 /* inst/builder/design_tokens.css
  *
- * The 1 design system for SurveyStudio and SurveyBuilder (UI-3). Both apps
+ * The 1 design system for SurveyStudio and SurveyBuilder. Both apps
  * take every colour, size and radius from these variables. Studio links this
  * file as sfbuilder/design_tokens.css. The builder carries a copy inlined
  * between its DESIGN_TOKENS_START and DESIGN_TOKENS_END markers, so it still
@@ -17,7 +17,7 @@
  * test-builder-template-sync.R fails.
  *
  * Every text and background pair below meets WCAG 2.2 AA (4.5 to 1 for
- * small text), measured in the browser by the UX-21 contrast test.
+ * small text), measured in the browser by the contrast test.
  */
 :root {
   /* Brand: the 1 primary colour, its hover, a tint for selected and
@@ -97,9 +97,9 @@
   --sf-fs-xl: 18px;
 }
 
-/* -- 3 button levels (UI-3 item 2), the same in both apps -----------------
+/* -- 3 button levels, the same in both apps -----------------
  * Primary: filled, 40 px high, sized to its label, at most 1 per screen,
- *   panel or dialog. It takes over .sf-primary from UI-1 item 12e.
+ *   panel or dialog. It takes over the older .sf-primary rule.
  * Secondary: outline, 36 px high, for every other action beside it.
  * Tertiary: a text link, for small or rare actions.
  * Shiny's own buttons (.btn-default, a dialog's .btn-primary) and Studio's
@@ -306,7 +306,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
   box-shadow:0 1px 3px color-mix(in srgb,var(--sf-black) 10%,transparent)}
 .m-btn:hover:not([aria-pressed=true]){color:var(--t1)}
 .tb-r{justify-self:end;display:flex;align-items:center;gap:8px}
-/* 1 header row (UI-3 item 3): the document and its save state on the left,
+/* 1 header row: the document and its save state on the left,
    the mode switch in the centre, undo, redo and the document actions on the
    right, with the primary Save last, at the far right. */
 .tb-l{justify-self:start;display:flex;align-items:center;gap:12px;min-width:0}
@@ -324,13 +324,13 @@ input,textarea,select{font-family:inherit;font-size:13px}
 
 /* -- Buttons -------------------------------------------------------------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
-  /* 44 px targets (M1, WCAG 2.5.5): the buttons measured 18 to 40 px. */
+  /* 44 px targets (WCAG 2.5.5): the buttons measured 18 to 40 px. */
   min-height:44px;
   padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:500;
   transition:all var(--d1);white-space:nowrap;border:1.5px solid transparent;cursor:pointer}
 .btn:disabled{cursor:not-allowed}
 /* The shared levels in design_tokens.css set 36, 40 and 0 px, which Studio
-   keeps; the builder's own buttons take 44 (M1). */
+   keeps; the builder's own buttons take 44. */
 .btn.sf-secondary,.btn.sf-primary,.btn.sf-tertiary,.btn.btn-outline,.btn.btn-default{min-height:44px}
 .btn-gear .gear-ic{font-size:15px;line-height:1;display:inline-block}
 .btn-gear:hover .gear-ic{transform:rotate(45deg);transition:transform var(--d1)}
@@ -341,11 +341,10 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .sb-top{padding:10px;border-bottom:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .sb-title{padding:4px 8px 6px;color:var(--st);font-size:12px;font-weight:600;
   overflow-wrap:anywhere}
-/* The 1 settings entry point (owner decision 2026-07-11). Owner 2026-11-05:
-   until settings are saved once it is the panel's filled primary and
-   + Add question an outline, then the 2 swap (updPanelLead()). As a
-   secondary it is still a strong row: a teal ground, 40 px, and a line
-   naming what it holds. */
+/* The 1 settings entry point. Until settings are saved once it is the
+   panel's filled primary and + Add question an outline, then the 2 swap
+   (updPanelLead()). As a secondary it is still a strong row: a teal ground,
+   40 px, and a line naming what it holds. */
 .sb-settings-cta{width:100%;display:flex;align-items:center;justify-content:space-between;
   gap:7px;min-height:40px;padding:6px 10px;border-radius:var(--r);text-align:left;
   background:color-mix(in srgb,var(--sf-primary) 22%,var(--sf-nav));color:var(--sf-white);
@@ -380,7 +379,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 /* -- Add-item footer ------------------------------------------------------ */
 .sb-footer{padding:10px;border-top:1px solid color-mix(in srgb,var(--sf-white) 7%,transparent)}
 .fab-row{display:flex;gap:6px}
-/* UI-3 item 4: "+ Add question" is the panel's 1 primary, a menu button
+/* "+ Add question" is the panel's 1 primary, a menu button
    whose menu holds the question types, a section break and a branching
    rule. The configuration menu opens from a text link below it. */
 .sb-footer .sf-primary{width:100%;max-width:none;justify-content:center}
@@ -392,7 +391,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .fi:focus-visible{outline:2px solid var(--sf-white);outline-offset:-2px;background:color-mix(in srgb,var(--sf-white) 7%,transparent);color:var(--cf)}
 .fab-menu{display:none;background:var(--sh);border-radius:var(--r);overflow:hidden;
   border:1px solid color-mix(in srgb,var(--sf-white) 8%,transparent);
-  /* The whole type menu shows without scrolling at 900 px tall (M3): it
+  /* The whole type menu shows without scrolling at 900 px tall: it
      takes the sidebar's height less its header, the + Add question button
      and the link below it, where a fixed 460 px cut the list. */
   max-height:max(240px,calc(100vh - var(--th) - 200px));
@@ -478,7 +477,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .cv-pv.on{display:flex}
 .cv-pv-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:12px;color:var(--t2)}
 /* The 2 width buttons are 1 group that never splits: at a narrow centre the
-   group moves below the hint as a whole (owner 2026-11-15). */
+   group moves below the hint as a whole. */
 .cv-pv-bar .cv-pv-w{display:inline-flex;flex:0 0 auto;gap:6px}
 .cv-pv-bar .cv-pv-w .btn{margin:0;white-space:nowrap}
 .cv-pv-bar .sp{flex:1}
@@ -524,7 +523,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .insp-foot{padding:10px 14px;border-top:1px solid var(--cb);
   display:flex;align-items:center;flex-shrink:0}
 /* A welcome or thank-you page has no Duplicate or Delete: the hidden attribute
-   wins over the footer's display (owner 2026-11-15). */
+   wins over the footer's display. */
 .insp-foot[hidden]{display:none}
 
 /* -- Field groups --------------------------------------------------------- */
@@ -543,13 +542,13 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .field{display:flex;flex-direction:column;gap:3px}
 /* A hidden field stays hidden: display:flex above outranked the hidden
    attribute, so "Describe the method *" showed while the method read Not
-   stated (M2). */
+   stated. */
 .field[hidden]{display:none}
 .fl{font-size:11px;font-weight:600;color:var(--t2);
   display:flex;align-items:center;gap:3px}
 .fr{color:var(--cd);font-size:10px}
-/* A hint beside a label, such as optional: muted, never the red of an error
-   (owner 2026-11-15). --t2 keeps 4.5:1 on the dialog's white. */
+/* A hint beside a label, such as optional: muted, never the red of an error.
+   --t2 keeps 4.5:1 on the dialog's white. */
 .fopt{color:var(--t2);font-size:10px;font-weight:400}
 .fc input,.fc textarea,.fc select{width:100%;border:1.5px solid var(--cb);
   border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--t1);
@@ -658,7 +657,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
    full-height rail beside the panes; .an-split's calc(100% - 44px) height
    always assumed a 44px strip on top). */
 .an-mode{overflow:hidden;flex-direction:column}
-/* Plan's local tabs look like Studio's (UI-3 item 6): the open one underlined. */
+/* Plan's local tabs look like Studio's: the open one underlined. */
 .an-tabs{display:flex;gap:4px;padding:0 10px;border-bottom:1px solid var(--cb);
   background:var(--cf);flex-shrink:0}
 .an-tab{border:none;border-bottom:3px solid transparent;background:none;
@@ -667,7 +666,7 @@ input,textarea,select{font-family:inherit;font-size:13px}
 .an-tab.active{border-bottom-color:var(--t1);color:var(--t1)}
 .an-tab:focus-visible{outline:var(--sf-focus-ring);outline-offset:-3px}
 /* In Plan, + Add plan is the primary, so the item panel's Add question
-   steps down to an outlined button (UI-3 item 6). */
+   steps down to an outlined button. */
 body[data-mode=analyse] .sb-footer .btn.sf-primary,body[data-mode=analyse] .sb-top .btn.sf-primary.sb-settings-cta{background:transparent;border-color:var(--sf-nav-text);color:var(--sf-nav-text);font-size:var(--sf-fs-md);min-height:44px}
 body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav-hover);color:var(--sf-white)}
 /* Two panes: the left column carries variables, the output summary, and the
@@ -815,7 +814,7 @@ body[data-mode=analyse] .sb-footer .btn.sf-primary:hover{background:var(--sf-nav
 .rec-msg{flex:1}
 
 /* -- Keyboard hint -------------------------------------------------------- */
-/* -- Narrow screens (UX-01, UX-08) -----------------------------------------
+/* -- Narrow screens -----------------------------------------
    Design shows 1 pane at a time: the question list, then the editor with
    its live preview below it and a Back control. Preview and Plan take the
    whole width. Nothing is wider than the viewport. */
@@ -896,7 +895,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 <!-- Sidebar -->
 <aside class="sidebar" aria-label="Survey structure">
   <div class="sb-top">
-    <!-- ONE settings entry point (owner decision 2026-07-11): the former
+    <!-- ONE settings entry point: the former
          clickable-title gear and the Welcome/Logo/Thank You strip are
          consolidated into this single primary CTA. Welcome, header/logo,
          and thank-you pages are tabs inside the settings dialog. -->
@@ -913,7 +912,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="sb-body" id="itemList" role="list" aria-label="Survey items"></div>
   <div class="sb-footer">
     <!-- 1 primary, "+ Add question", opens a menu of question types, a
-         section break and a branching rule (UI-3 item 4). Choice sets,
+         section break and a branching rule. Choice sets,
          scales and attention checks open from the text link below it.
          Both follow the menu button pattern. -->
     <div class="fab-menu" id="fabMenu" role="menu" aria-label="Add to the survey">
@@ -969,11 +968,10 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   <div class="mp active" id="mp-build">
     <div class="build-shell">
       <!-- A scroll region, so keyboard users can reach and scroll it (axe
-           scrollable-region-focusable, Ethos request 8, at 390 px). -->
+           scrollable-region-focusable, at 390 px). -->
       <div class="canvas" id="canvas" tabindex="0" role="region" aria-label="Question editing area">
         <!-- Drawn by renderPrompt(): a 3-step checklist until the survey has
-             settings, a question and a save, then the next useful step (UI-3
-             item 5). -->
+             settings, a question and a save, then the next useful step. -->
         <div class="c-prompt" id="cPrompt" aria-live="polite"></div>
         <div class="cv-pv" id="cvPv">
           <div class="cv-pv-bar"><span id="cvPvT">As respondents see it. Edit it on the right.</span><div class="sp"></div>
@@ -1020,7 +1018,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
       <button type="button" class="an-tab" data-an-tab="report" onclick="setAnalyseTab('report')">Expected outputs</button>
       <button type="button" class="an-tab" id="anPrereg" onclick="openSettings('study')">Preregistration fields</button>
     </div>
-    <!-- Two-pane split (owner feedback 2026-07-16): the former right-hand
+    <!-- Two-pane split: the former right-hand
          "Output preview and model builder" column is removed so the plans
          pane is the dominant surface. The Model Builder and the output
          summary live in the left column, below the variable list. -->
@@ -1267,7 +1265,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
     <div class="field"><label class="fl" for="rq-q">Research question <span class="fr">*</span></label><div class="fc"><textarea id="rq-q" rows="3" placeholder="Is there a significant difference in satisfaction between groups?"></textarea></div></div>
     <div class="field" id="rq-obj-field" hidden><label class="fl" for="rq-obj">Objective served</label><div class="fc"><select id="rq-obj"></select></div><span class="fhint">The study objective this research question answers. Objectives are set in Survey settings, Study.</span></div>
     <div class="field"><label class="fl">Variables and roles</label><div class="vcbs" id="rqVarCBs"></div><div class="role-grid" id="rqRoleFields"></div></div>
-    <!-- M5: a method suggested from 2 variables of any kind, before a method
+    <!-- A method suggested from 2 variables of any kind, before a method
          is chosen. The role selects above list only what the current method
          takes, so a likert item could never be picked beside a numeric one
          under the Mann-Whitney placeholder, and no suggestion but term
@@ -1320,7 +1318,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
 </div>
 </div>
 
-<!-- Amendment: a changed save of an opened file (CX-12) -->
+<!-- Amendment: a changed save of an opened file -->
 <div class="mov" id="m-amend">
 <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="am-title">
   <div class="mhdr"><span class="mtitle" id="am-title">This survey has changed since it was opened</span><button type="button" class="mx" aria-label="Cancel" onclick="resAmend(false)">&#215;</button></div>
@@ -1387,7 +1385,7 @@ kbd{display:inline-block;padding:1px 5px;border:1px solid var(--cb);
   --tint-bd:color-mix(in srgb,var(--cp) 30%,#dbe3e6);
   --deep:color-mix(in srgb,var(--cp) 78%,#0c1a1a);
   /* Text on the theme colour, the theme colour as text, and its hover. A
-     light theme switches them at start (UX-21), so text keeps 4.5 to 1. */
+     light theme switches them at start, so text keeps 4.5 to 1. */
   --on-cp:#ffffff;--cp-ink:var(--cp);--cp-hover:var(--deep);
   --cf:#ffffff;--cg:#fbfdfd;--cb:#dfe7ea;
   --t1:#12212b;--t2:#51636f;--t3:#9ab0ba;
@@ -1720,7 +1718,7 @@ const TY       = R.thankyou||{};
 // Apply theme color
 document.documentElement.style.setProperty('--cp', THEME);
 // A light theme cannot carry white text, nor serve as text on white, at
-// 4.5 to 1 (UX-21). Then text on it is dark, and its text and hover
+// 4.5 to 1. Then text on it is dark, and its text and hover
 // shades are mixed towards the dark ink. Other themes keep their colours.
 (function(){
   var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(THEME).trim());if(!m)return;
@@ -1774,7 +1772,7 @@ const respId='R'+Math.random().toString(36).slice(2,10).toUpperCase();
 let screen='welcome';
 let currentPage=1;
 let rankOrders={};
-// Display order (UX-11). A choice set with randomise shows a single choice,
+// Display order. A choice set with randomise shows a single choice,
 // multiple choice or ranking item's options in an order shuffled once per
 // respondent and item, kept for the visit and in a draft. Only the display
 // moves: each option submits its own value, so the codes are the set's
@@ -2212,7 +2210,7 @@ function setResp(id,val){
   if(err)err.classList.remove('show');
   updateBranching();
 }
-// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// "Other, please specify". A choice set with allow_other adds it
 // last, outside any shuffle. A single choice submits the code "other" in
 // <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
 // typed text in <id>__other_text. Typing in the box chooses Other.
@@ -2901,7 +2899,7 @@ function restartSurvey(){
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
-// Show only 1 item (owner 2026-11-01, UX-09). SurveyBuilder's centre pane
+// Show only 1 item. SurveyBuilder's centre pane
 // draws the selected question with this page's own renderer, so there is 1
 // renderer. The builder asks for it with data-only on the body of a preview
 // it writes, and a live survey never takes this mode. The item shows as on
@@ -3860,19 +3858,19 @@ function undo(){if(!hist.length)return;fut.push(JSON.stringify(S));S=JSON.parse(
 function redo(){if(!fut.length)return;hist.push(JSON.stringify(S));S=JSON.parse(fut.pop());selId=null;ra();updHistBtns();}
 function updHistBtns(){var u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');if(u)u.disabled=!hist.length;if(r)r.disabled=!fut.length;studioPostState();}
 function setDirty(){dirty=true;updSave();centreLater();}
-// Opened is its own state: inside a host such as Ethos, "Saved" after
+// Opened is its own state: inside a host application, "Saved" after
 // opening a file reads as saved in the host, and nothing has been saved.
 function updSave(){var e=document.getElementById('saveSt');
   // In Studio the save goes to Studio, so the state is Saved or not.
   if(typeof STUDIO_HOST!=='undefined'&&STUDIO_HOST){e.textContent=dirty?'Unsaved changes':(S.items.length||lastSaved?'Saved':'No changes');e.className='save-st '+(dirty?'dirty':'saved');studioPostDirty();studioPostState();renderPrompt();return;}
   if(!dirty&&lastSaved){e.textContent='Saved '+tAgo(lastSaved);e.className='save-st saved';}else if(!dirty&&openedAt){e.textContent='Opened '+tAgo(openedAt);e.className='save-st';}else if(dirty){e.textContent='Unsaved changes';e.className='save-st dirty';}else{e.textContent='No changes';e.className='save-st';}renderPrompt();}
 function tAgo(d){var s=Math.round((Date.now()-d)/1000);if(s<10)return'just now';if(s<60)return s+'s ago';return Math.round(s/60)+'m ago';}
-// The canvas prompt (UI-3 item 5). A checklist of the 3 first steps, each
+// The canvas prompt. A checklist of the 3 first steps, each
 // ticked once done, with the next step's button in its row, until all 3
 // are done. Then, with no question selected, the next useful step: the
 // analysis plan if there is none, otherwise another question.
-// Survey settings leads the panel until they are saved once (owner
-// 2026-11-05). An opened instrument was set up before, so it counts.
+// Survey settings leads the panel until they are saved once. An opened
+// instrument was set up before, so it counts.
 var settingsSaved=false;
 function updPanelLead(){
   var s=document.getElementById('settingsBtn'),a=document.getElementById('fabMoreBtn');if(!s||!a)return;
@@ -3913,7 +3911,7 @@ function ra(){renderItemList();renderAnalyse();updSave();document.getElementById
 // The header row's document line: the title and the version.
 function updDoc(){var d=document.getElementById('tbDoc');if(d)d.textContent=(S.meta.title||'Untitled Survey')+(S.meta.version?' ('+S.meta.version+')':'');}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-// "1 scale", "0 scales": a count and its noun, singular for 1 only (Codex P1-08).
+// "1 scale", "0 scales": a count and its noun, singular for 1 only.
 function countNoun(n,one,many){return n+' '+(Number(n)===1?one:(many||one+'s'));}
 function gv(id){return(document.getElementById(id)||{}).value||'';}
 function sv(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
@@ -3975,7 +3973,7 @@ function conf2(title,msg,okLbl,val){okLbl=okLbl||'Delete';document.getElementByI
 function resConf(v){var inp=document.getElementById('confIn');if(v&&inp&&!inp.hidden)v=inp.value;document.getElementById('confOv').classList.remove('open');if(_cRes){_cRes(v);_cRes=null;}}
 
 // -- Fab menu toggle --------------------------------------------------------
-// The menu button pattern (UI-3 item 4): Enter, Space or Down opens the
+// The menu button pattern: Enter, Space or Down opens the
 // menu on its first item, Up on its last, the arrows, Home and End move
 // through it, and Escape or Tab closes it, Escape back to its button.
 function menuItems(m){return Array.prototype.slice.call(m.querySelectorAll('[role=menuitem]'));}
@@ -4021,7 +4019,7 @@ function openModal(id){
 }
 // The dialog on top: the one opened last that is still open. Escape closes
 // it through closeModal(), so focus returns where it was, and Tab stays in
-// it (UX-14). Escape used to remove every open dialog's class directly, and
+// it. Escape used to remove every open dialog's class directly, and
 // Tab walked out to the page behind.
 var __modalOpen=[];
 function topModal(){
@@ -4136,7 +4134,7 @@ function settingsInputs(){
   SETTINGS_CHECK.forEach(function(id){var e=document.getElementById(id);o[id]=!!(e&&e.checked);});
   return o;
 }
-// The Settings sections are a tablist (UX-15): buttons with aria-selected and
+// The Settings sections are a tablist: buttons with aria-selected and
 // aria-controls, 1 in the Tab order, and the arrow keys, Home and End move
 // between them. They were divs that answered a click alone.
 function showST(t){
@@ -4203,7 +4201,7 @@ function saveSettings(){
   closeModal('m-settings');settingsSaved=true;updPanelLead();ra();toast('Settings saved','ok');
 }
 
-// -- Study (D13) ----------------------------------------------------------------
+// -- Study ----------------------------------------------------------------
 // The problem, the objectives and the sampling plan, read back from the Study
 // tab in the shape write_sframe() writes: only what is declared, and no study
 // at all when nothing is.
@@ -4255,7 +4253,7 @@ function studyRead(){
   if(Object.keys(pr).length)s.preregistration=pr;
   return Object.keys(s).length?s:null;
 }
-// The preregistration fields of the study (owner 2026-11-14), each an
+// The preregistration fields of the study, each an
 // optional text, as sframe_preregistration_fields lists them in R.
 var PREREG_FIELDS=['exclusion_rules','stopping_rule','primary_outcomes','secondary_outcomes','multiplicity','contingency'];
 // The study as write_sframe() writes it: an empty sampling or objectives
@@ -4285,7 +4283,7 @@ function studyProblems(s){
   });
   return out;
 }
-// The objective a plan block serves (D13). saveRQ() builds the block afresh,
+// The objective a plan block serves. saveRQ() builds the block afresh,
 // so an objective set in R was dropped by any edit here. The select lists the
 // study's objectives, and the block's own objective even when the study no
 // longer declares it, so an edit never changes it unasked.
@@ -4322,7 +4320,7 @@ var REF_ID=/^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~\/-]*[A-Za-z0-9_])?$/;
 // ^(instrument|study|(item|scale|plan|model|hypothesis):.+)$. The study is
 // offered only while there is one, and a plan block's hypotheses only while
 // it declares one, since validate_sframe() reports a target that is not
-// there (8b-R).
+// there.
 function planDeclaresHyp(b){var h=b&&b.hypotheses;if(!h||typeof h!=='object')return false;
   return [h.null,h.alternative].some(function(v){return typeof v==='string'&&v.trim();});}
 function refTargets(){
@@ -4629,7 +4627,7 @@ function sframeNextVersion(v){
   v=String(v||'');var m=/^(.*?)(\d+)$/.exec(v);
   return m?m[1]+(parseInt(m[2],10)+1):(v?v+'.1':'1.0.0');
 }
-// -- Amendments, as amend_sframe() in R records them (CX-12) ----------------
+// -- Amendments, as amend_sframe() in R records them ----------------
 // The content fingerprint R's sframe_content_hash() takes: the payload with
 // its hash, amendment log and references left out.
 function sframeContentHash(payload){
@@ -4699,7 +4697,7 @@ function sframeSuggestVersion(version,tier){
 // True when a save changed only wording: the text of questions, help,
 // options or the title, with the same items, codes and structure. Such a
 // change is a wording correction, so the dialog starts on the pipeline tier,
-// where it started on design for every instrument revision (M6).
+// where it started on design for every instrument revision.
 var SFRAME_WORDING_KEYS=['label','labels','help','placeholder','text','prompt','description','title','instructions','intro','version'];
 function sframeWordingOnly(o,payload,changed){
   if(!changed.length)return false;
@@ -4939,7 +4937,7 @@ function renderItemList(){
   var items=S.items.filter(function(i){return!q||(i.label||'').toLowerCase().includes(q)||(i.id||'').toLowerCase().includes(q);});
   // A list of listitems. Each row holds its own Move, Duplicate and Delete
   // buttons, and an option's children are presentational, so a listbox of
-  // options hid them and axe reported nested-interactive (Codex P1-11). The
+  // options hid them and axe reported nested-interactive. The
   // row chosen for editing carries aria-current. The empty state is a panel
   // of guidance and no list of anything, so the role is dropped while it is
   // showing and restored once there are items. Without this, an empty survey
@@ -4957,7 +4955,7 @@ function renderItemList(){
     var bgs=[];
     if(!isSec&&!isTxt)bgs.push('<span class="badge '+(TB[item.type]||'b-nu')+'">'+esc(TL[item.type]||item.type)+'</span>');
     // A single-choice item on an ordered answer set is ordinal, as the Plan
-    // reads it, and says so in the list (M3).
+    // reads it, and says so in the list.
     if(item.type==='single_choice'&&csOrdered(item.choice_set))bgs.push('<span class="badge b-ord" title="Ordinal: its answer set is ordered">ORD</span>');
     if(item.required)bgs.push('<span class="badge b-req">Required</span>');
     if(sc)bgs.push('<span class="badge b-sc">'+esc(sc.id)+'</span>');
@@ -4974,7 +4972,7 @@ function selItem(id){selId=id;renderItemList();openInsp(id);}
 // Enter or Space opens a question for editing; Alt with an arrow moves it, so
 // ordering has a keyboard route alongside the drag handlers. A bare arrow
 // walks the list, leaving the browser's own Tab order intact.
-// P1-11: a row is 1 Tab stop. Its Move, Duplicate and Delete buttons sit
+// A row is 1 Tab stop. Its Move, Duplicate and Delete buttons sit
 // outside the Tab order (tabindex -1) and are reached with the right arrow
 // from the row; left and right walk them, and Escape or a left arrow past
 // the first goes back to the row. Enter and Space on a button press it.
@@ -5052,7 +5050,7 @@ function openInsp(id){
 function closeInsp(){narrowEditing(false);document.getElementById('inspector').classList.remove('open');document.getElementById('cPrompt').style.display='flex';selId=null;renderItemList();renderCentre();renderPrompt();}
 // -- Welcome and thank-you pages ---------------------------------------------
 // The pages before the first question and after the last, as entries at the
-// ends of the question list (UX-10), with their editor on the right and
+// ends of the question list, with their editor on the right and
 // their preview in the centre. The fields keep the ids the Settings dialog
 // gave them. A field is written only when its value moves from what was
 // shown, so a page left alone keeps the content hash, and a page's object is
@@ -5079,7 +5077,7 @@ function screenVal(fid){
 function openScreenInsp(id){
   var welcome=id==='__welcome';
   // The panel header names the page in full: a welcome or thank-you page has
-  // no item id to show (owner 2026-11-15).
+  // no item id to show.
   document.getElementById('inspId').textContent='';document.getElementById('inspId').hidden=true;
   document.getElementById('inspTypeLbl').textContent=SCREENS[id].label;
   var foot=document.querySelector('.insp-foot');if(foot)foot.hidden=true;
@@ -5095,7 +5093,7 @@ function openScreenInsp(id){
       +area('s-tym','Thank-you message',4)+txt('s-tyu','Redirect URL (optional)','https://example.com/thank-you','url')
       +'<span class="fhint">After submission, respondents are redirected to this URL.</span>'
       +box('s-tydl','Show "Download my response" button');
-  // The same inner padding as a question's field groups (owner 2026-11-15).
+  // The same inner padding as a question's field groups.
   var ib=document.getElementById('inspBody');ib.innerHTML='<div class="fgs-body">'+ib.innerHTML+'</div>';
   screenShown={};Object.keys(SCREEN_FIELDS).forEach(function(fid){
     if(SCREEN_FIELDS[fid][0]!==SCREENS[id].key)return;
@@ -5119,14 +5117,14 @@ function updScreen(fid){
   screenShown[fid]=v;
 }
 // Inside Studio, Collect and References are Studio screens. The builder asks
-// Studio to open one, and Studio's handler is UI-1's.
+// Studio to open one through Studio's own handler.
 function studioGoto(screen){
   if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
   closeModal('m-settings');
   window.parent.postMessage({type:'goto',screen:screen},location.origin);
 }
 
-// On a narrow screen the list and the editor take turns (UX-01, UX-08).
+// On a narrow screen the list and the editor take turns.
 // body.editing shows the editor, and Back returns to the list, to the row of
 // the question that was open.
 function narrowEditing(on){var b=document.body;if(b&&b.classList){if(on)b.classList.add('editing');else b.classList.remove('editing');}}
@@ -5197,7 +5195,7 @@ var PRESET_CHOICE_SETS={
   quality5:{label:'Quality (5-point)',values:[1,2,3,4,5],labels:['Very poor','Poor','Fair','Good','Excellent']},
   nps11:{label:'0-10 recommendation (NPS)',values:[0,1,2,3,4,5,6,7,8,9,10],labels:['0','1','2','3','4','5','6','7','8','9','10']},
   // No before Yes: a binary model's event is the last declared code (glm's
-  // convention, CF-B FR-21, owner 2026-11-13), so Yes is the modelled level.
+  // convention), so Yes is the modelled level.
   yesno:{label:'No / Yes',values:['no','yes'],labels:['No','Yes']},
   yesnounsure:{label:'No / Yes / Unsure',values:['no','yes','unsure'],labels:['No','Yes','Unsure']},
   gender:{label:'Gender',values:['female','male','non_binary','prefer_not_to_say'],labels:['Female','Male','Non-binary','Prefer not to say']},
@@ -5341,7 +5339,7 @@ function updF(id){
   else if(f==='scale_id'){
     // The scale the item names scores it, so it joins that scale's items, as
     // the scale editor sets scale_id on the items it lists. Without this the
-    // item named a scale that never scored it (Fable sitting 1 FR-14).
+    // item named a scale that never scored it.
     v=v||null;
     var named=v?S.scales.find(function(s){return s.id===v;}):null;
     if(named){named.items=asArr(named.items);if(!named.items.includes(S.items[idx].id))named.items.push(S.items[idx].id);}
@@ -5570,7 +5568,7 @@ function saveBranch(){
   var t=gv('br-tgt'),d=gv('br-dep');if(t===d){toast('Choose a different controlling item','err');return;}
   var v=gv('br-val').trim();if(!v){toast('Enter a match value','err');return;}
   // A rule that closes a cycle leaves each item waiting on an answer that
-  // waits on its own, which validate_sframe() notes (Fable sitting 1 FR-14).
+  // waits on its own, which validate_sframe() notes.
   var loop=branchPath(d,t);
   if(loop){toast('This rule would close a cycle: '+[t].concat(loop).join(' depends on ')+'. Choose another controlling item.','err');return;}
   snap();S.branching.push({id:uid(),item_id:t,depends_on:d,operator:gv('br-op'),value:v,action:gv('br-act')});
@@ -5600,8 +5598,8 @@ function saveCheck(){
   var id=gv('ck-id').trim();if(!id){toast('Check ID required','err');return;}
   var pv=gv('ck-pass').trim();var pvArr=pv?pv.split(',').map(function(x){return x.trim();}).map(function(x){return isNaN(x)?x:Number(x);}):null;
   // A pass value that is no code of the item's choice set can never be
-  // answered, so the check would flag every respondent (Fable sitting 1
-  // FR-14). Items with no choice set take any value.
+  // answered, so the check would flag every respondent. Items with no choice
+  // set take any value.
   var ckItem=S.items.find(function(i){return i.id===gv('ck-item');});
   var ckSet=ckItem&&ckItem.choice_set?S.choices.find(function(c){return c.id===ckItem.choice_set;}):null;
   if(ckSet&&pvArr){
@@ -5762,7 +5760,7 @@ function varLevel(id){
 // pairing in sframe_check_model_type().
 function roleOptions(role,selected){var useModels=role.levels&&role.levels.includes('model');var opts=useModels?(S.models||[]).filter(function(m){return !role.modelTypes||role.modelTypes.indexOf(m.type||'')>=0;}).map(function(m){return{id:m.id,label:m.id+' ('+(m.type||'model')+')'};}):getAllVars().filter(function(v){return role.levels.includes('any')||role.levels.includes(v.level)||role.levels.includes(v.kind);});var multi=role.max>1;var html='';if(!multi){html+='<option value=""'+(selected.length?'':' selected')+'>'+(role.min?(useModels?'Choose a saved model':'Choose a variable'):'(none)')+'</option>';}html+=opts.map(function(v){return'<option value="'+esc(v.id)+'"'+(selected.includes(v.id)?' selected':'')+(v.full?' title="'+esc(v.full)+'"':'')+'>'+esc(v.label)+'</option>';}).join('');return html;}
 // A label cut at a word boundary, with an ellipsis, so a role dropdown never
-// stops mid-word (owner 2026-11-15). The full text goes in the option's title.
+// stops mid-word. The full text goes in the option's title.
 function shortLbl(s,n){s=String(s||'');if(s.length<=n)return s;var c=s.slice(0,n);var k=c.lastIndexOf(' ');return(k>n*0.5?c.slice(0,k):c).replace(/[\s,;:.]+$/,'')+'\u2026';}
 function getAllVars(){
   // Matrix, ranking, and multiple-choice items expand to one variable per
@@ -5917,7 +5915,7 @@ function onTestChg(renderRoles){
   validatePlanRoles();
 }
 // A cross-tab and a chi-square carry options$percent, the denominator of the
-// percentages shown beside each count (UX-02). Set only here, where plans are
+// percentages shown beside each count. Set only here, where plans are
 // edited.
 ['crosstab','chi_square'].forEach(function(t){if(ANALYSIS_REGISTRY[t])ANALYSIS_REGISTRY[t].showPercent=true;});
 var TEXT_METHOD_IDS=['term_freq','ngram_freq','term_context','co_occurrence','co_occurrence_network','tidy_sentiment','quanteda_dfm','topic_model_lda','stm_topics'];
@@ -5964,7 +5962,7 @@ function suggestTest(){
     // plan the user (or a saved plan being edited) already chose.
     // The nudge names the text methods without switching to one: switching
     // on open left the plan on term frequency, whose roles list text items
-    // alone, so no other method was ever suggested (M5).
+    // alone, so no other method was ever suggested.
     if(!editRqId&&curMethod==='mann_whitney'&&hasTextItems()){
       msg.textContent='This survey has open-ended text items. For those, '+((ANALYSIS_REGISTRY.term_freq||{}).label)+' is a starting point, under Analysis method. For other questions, pick 2 variables above.';
       box.style.display='flex';
@@ -6107,7 +6105,7 @@ function renderModelBuilder(){
   var model=currentModel(),constructs=model&&model.measurement?model.measurement.constructs||[]:[];
   var opts=constructs.map(function(c){return'<option value="'+esc(c.id)+'">'+esc(c.id)+'</option>';}).join('');
   from.innerHTML=opts;to.innerHTML=opts;
-  // Path to starts on a different construct from Path from (owner 2026-11-15).
+  // Path to starts on a different construct from Path from.
   if(constructs.length>1){from.selectedIndex=0;to.selectedIndex=1;}
   list.innerHTML=models.length?models.map(function(m){var paths=(m.structural&&m.structural.paths)||[];return'<div class="model-row"><strong>'+esc(modelLabel(m))+'</strong><div>'+countNoun((m.measurement&&m.measurement.constructs||[]).length,'construct')+', '+countNoun(paths.length,'path')+'</div><div class="model-paths">'+(paths.length?paths.map(function(p){return'<span class="vchip">'+esc(p.from+' -> '+p.to)+'</span>';}).join(''):'<span class="rq-no-int">No paths yet.</span>')+'</div></div>';}).join(''):'<div class="rq-no-int">No saved models yet.</div>';
 }
@@ -6248,7 +6246,7 @@ function studioPostDirty(){
   window.parent.postMessage({type:'dirty',dirty:dirty},location.origin);
 }
 // Studio's Design head holds this builder's undo, redo and Save to Studio
-// (UI-3 item 3), so the builder sends their state and takes them as commands.
+// so the builder sends their state and takes them as commands.
 function studioPostState(){
   if(typeof STUDIO_HOST==='undefined'||!STUDIO_HOST)return;
   var sb=document.getElementById('saveBtn');
@@ -6256,7 +6254,7 @@ function studioPostState(){
 }
 function studioHostInit(){
   // Studio has its own name, Preview screen and Collect screen, and its
-  // Design head is this builder's header row (UI-3 item 3), so the bar hides.
+  // Design head is this builder's header row, so the bar hides.
   document.querySelector('.topbar').style.display='none';
   document.getElementById('openBtn').style.display='none';
   document.getElementById('exportBtn').style.display='none';

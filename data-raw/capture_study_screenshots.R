@@ -1,6 +1,6 @@
 # data-raw/capture_study_screenshots.R
 # The SurveyStudio screenshots of the 5 stages for each of the 10 study pages
-# (Session 10, plan: demos and website redesign): design, collect, check,
+# design, collect, check,
 # analyse and report, into pkgdown/assets/templates/<demo>/. Site only:
 # pkgdown/ is in .Rbuildignore, so the tarball does not grow. Generated,
 # never hand-captured, so they show what the package draws today.
@@ -73,7 +73,7 @@ for (demo in study_demos) {
     wait_stable(b)
     Sys.sleep(2)
     out <- file.path(out_dir, paste0(stage, ".png"))
-    # The site shows no result numbers (owner 2026-11-14), so Analyse is cut
+    # The site shows no result numbers, so Analyse is cut
     # off below its Declared plan card, above the first result.
     h <- VIEW_H
     if (identical(stage, "analyse")) {

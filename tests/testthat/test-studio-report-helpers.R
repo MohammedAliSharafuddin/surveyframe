@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-report-helpers.R
 #
-# UI-1: what SurveyStudio's Report screen says about the engine and offers as
+# What SurveyStudio's Report screen says about the engine and offers as
 # reference styles (R/studio_report.R). Studio asked Sys.which("quarto"), so it
 # said "no Quarto" where render_report() found the copy bundled with RStudio
 # or Positron. It now asks sframe_quarto_find(), as render_report() does.
@@ -35,7 +35,7 @@ test_that("Studio asks sframe_quarto_find(), never Sys.which()", {
   expect_true(any(grepl("sframe_studio_quarto_note()", src, fixed = TRUE)))
 })
 
-# UI-1 item 3 (UX-02): Analyse shows the declared plan read-only and runs it.
+# Analyse shows the declared plan read-only and runs it.
 
 test_that("the declared plan names each method, or says what is missing", {
   ins <- sframe_demo("factor_structure")$instrument
@@ -114,7 +114,7 @@ test_that("the Quarto report's amendment list carries the plan change text", {
   expect_match(doc, "Plan changed after the responses were loaded: RQ2 changed. Reason: the first wording was too broad.", fixed = TRUE)
 })
 
-# UI-1 item 4 (UX-20): 2 products. The Finished report offers Word and
+# 2 products. The Finished report offers Word and
 # OpenDocument only with Quarto, and the .qmd folder is the Reproduce tab's.
 test_that("the finished report's formats follow Quarto", {
   with_q <- surveyframe:::sframe_studio_report_formats(TRUE)
@@ -133,7 +133,7 @@ test_that("Studio offers the report and its source, and no separate notebook", {
   expect_false(grepl("sframe_analysis_qmd(", src, fixed = TRUE))
 })
 
-# UI-1 item 6 (owner 2026-11-03): the Reference style select.
+# The Reference style select.
 test_that("the style select lists APA 7 first, the bundled styles, then a file", {
   ch <- surveyframe:::sframe_studio_style_choices(TRUE)
   expect_identical(names(ch), c("APA 7", "Chicago author-date", "Harvard", "IEEE",
@@ -151,7 +151,7 @@ test_that("the style select gives render_report() a style name or the file", {
   expect_identical(csl("other", list(datapath = "/tmp/x.csl")), "/tmp/x.csl")
 })
 
-# UI-1 item 8 (UX-03): References is the only place a source is added.
+# References is the only place a source is added.
 test_that("the Report screen has no BibTeX box and cites through the shared picker", {
   src <- paste(readLines(system.file("shiny", "app.R", package = "surveyframe")),
                collapse = "\n")

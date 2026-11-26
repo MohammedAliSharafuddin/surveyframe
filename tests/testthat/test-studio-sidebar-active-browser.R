@@ -1,7 +1,7 @@
 # tests/testthat/test-studio-sidebar-active-browser.R
 #
 # Exactly 1 SurveyStudio sidebar entry looks selected, whichever way a
-# screen is reached (session 7, owner review of f8fe6a6). With Design open,
+# screen is reached. With Design open,
 # Design and Preview Survey both looked selected: an entry under the mouse
 # took the selected look, teal bar and white text, so the selected screen
 # and the hovered one could not be told apart. The test counts the entries

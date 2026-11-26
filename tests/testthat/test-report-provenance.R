@@ -1,6 +1,6 @@
 # tests/testthat/test-report-provenance.R
 #
-# Session 8a, item (e). The report's reproducibility block gave the
+# The report's reproducibility block gave the
 # instrument hash, the engine and the seed, and said nothing of the version
 # or of the amendments the instrument went through, so a reader could not
 # tell a revised instrument from the one first declared. It now gives the
@@ -34,7 +34,7 @@ test_that("(e) the amendment table lists every entry, oldest first", {
 })
 
 test_that("(e) the built-in report gives the version and the amendments", {
-  # With no data the page is the pre-analysis plan (Session 10), which
+  # With no data the page is the pre-analysis plan, which
   # gives the version on its title page and the amendments in their own
   # section, with no provenance table, whose rows describe results.
   ins <- amended_instr()

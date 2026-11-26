@@ -1,6 +1,6 @@
 /* inst/builder/design_tokens.css
  *
- * The 1 design system for SurveyStudio and SurveyBuilder (UI-3). Both apps
+ * The 1 design system for SurveyStudio and SurveyBuilder. Both apps
  * take every colour, size and radius from these variables. Studio links this
  * file as sfbuilder/design_tokens.css. The builder carries a copy inlined
  * between its DESIGN_TOKENS_START and DESIGN_TOKENS_END markers, so it still
@@ -9,7 +9,7 @@
  * test-builder-template-sync.R fails.
  *
  * Every text and background pair below meets WCAG 2.2 AA (4.5 to 1 for
- * small text), measured in the browser by the UX-21 contrast test.
+ * small text), measured in the browser by the contrast test.
  */
 :root {
   /* Brand: the 1 primary colour, its hover, a tint for selected and
@@ -89,9 +89,9 @@
   --sf-fs-xl: 18px;
 }
 
-/* -- 3 button levels (UI-3 item 2), the same in both apps -----------------
+/* -- 3 button levels, the same in both apps -----------------
  * Primary: filled, 40 px high, sized to its label, at most 1 per screen,
- *   panel or dialog. It takes over .sf-primary from UI-1 item 12e.
+ *   panel or dialog. It takes over the older .sf-primary rule.
  * Secondary: outline, 36 px high, for every other action beside it.
  * Tertiary: a text link, for small or rare actions.
  * Shiny's own buttons (.btn-default, a dialog's .btn-primary) and Studio's

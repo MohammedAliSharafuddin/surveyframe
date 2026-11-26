@@ -1,5 +1,5 @@
 # tests/testthat/test-choice-descriptives.R
-# D5 (CX-07). Descriptives of a choice item honour split_by and weights:
+# Descriptives of a choice item honour split_by and weights:
 # counts and percentages per group, weighted when weights are given.
 
 choice_instr <- function() {

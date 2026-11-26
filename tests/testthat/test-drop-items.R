@@ -1,6 +1,6 @@
 # tests/testthat/test-drop-items.R
 #
-# Session 8a, item (c) (owner 2026-11-01). sframe_drop_items(instrument,
+# sframe_drop_items(instrument,
 # items, from) takes items out of the named scales or models, and out of any
 # plan block role that lists them with other variables. The question stays,
 # and so do its responses, and nothing is recorded: amend_sframe() records

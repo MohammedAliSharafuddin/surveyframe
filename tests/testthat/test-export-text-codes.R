@@ -1,4 +1,4 @@
-# P3-03 (Codex pass 3), Session CF-B: export_responses() and the reader share
+# export_responses() and the reader share
 # 1 test for "these codes are numbers". The export tested as.numeric() alone,
 # so codes "01", "02" left as 1 and 2 in .sav and .dta, no longer matching
 # the instrument.

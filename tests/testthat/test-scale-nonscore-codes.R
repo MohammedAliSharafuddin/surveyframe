@@ -1,4 +1,4 @@
-# FR-18 (Fable sitting 2), Session CF-B: a "do not know" code (99) in a scale
+# A "do not know" code (99) in a scale
 # item's choice set is not a score. Its bounds were read as 1 to 99, so a
 # reversed 1 became 99, and an answer of 99 entered the mean.
 
@@ -11,7 +11,7 @@ cfb_dk_instrument <- function() {
 }
 
 test_that("reversal uses the run of scores, not the do-not-know code", {
-  # Fable's reproducer: 27.25 at 2a910b0.
+  # The do-not-know code gave 27.25.
   ins <- cfb_dk_instrument()
   d <- data.frame(s_1 = 4, s_2 = 4, s_3 = 2, s_4 = 1)
   expect_equal(score_scales(d, ins)$sat, 3.75)
@@ -43,7 +43,7 @@ test_that("evenly spaced codes are 1 run, and 0 to 1 stays 1 run", {
 })
 
 test_that("a gap after the run keeps the longer run, and 2 equal runs refuse the scale", {
-  # Coordinator conditions on FR-18 (2026-11-13).
+  # How the run of scores is chosen when codes leave a gap or tie.
   expect_equal(sframe_score_codes(c(1, 2, 3, 7)), 1:3)
   tied <- sframe_score_codes(c(1, 2, 4, 5))
   expect_length(tied, 0)

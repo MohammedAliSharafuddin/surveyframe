@@ -1,5 +1,5 @@
 # tests/testthat/test-weight-check.R
-# D6 (CX-09). One weight check for every weighted method: a negative or
+# One weight check for every weighted method: a negative or
 # non-finite weight and an all-zero total are block errors, and a missing
 # weight drops its row and says so.
 

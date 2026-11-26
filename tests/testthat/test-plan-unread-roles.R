@@ -1,10 +1,10 @@
 # tests/testthat/test-plan-unread-roles.R
 #
-# Ethos request 11 (2026-10-01). A frequency block naming its item under a
+# A frequency block naming its item under a
 # role the method does not read ran on nothing and returned "Frequency
 # distribution for NA (N = 0)" with an empty table and no error.
 # validate_sframe() accepted the block. 0.4.3 taught frequency to read
-# `variables` as well as `variable`, which mended the 3 demos Ethos found,
+# `variables` as well as `variable`, which mended the 3 demos found,
 # but any other role name still ran on nothing.
 
 one_choice_instrument <- function(roles, method = "frequency") {
@@ -25,7 +25,7 @@ responses <- data.frame(q1 = c("1", "2", "1", "1", "2", "2", "1", "2"),
                         q3 = c(2, 4, 4, 1, 5, 5, 3, 3),
                         q4 = c(30, 41, 25, 52, 36, 44, 29, 38))
 
-test_that("11: the validator refuses a block whose roles its method never reads", {
+test_that("The validator refuses a block whose roles its method never reads", {
   v <- validate_sframe(one_choice_instrument(list(items = "q1")), strict = FALSE)
   expect_false(v$valid)
   problems <- unlist(v$problems)
@@ -36,7 +36,7 @@ test_that("11: the validator refuses a block whose roles its method never reads"
   expect_match(problems, "the block names items", fixed = TRUE, all = FALSE)
 })
 
-test_that("11: such a block reports an error, not a result on N = 0", {
+test_that("Such a block reports an error, not a result on N = 0", {
   ins <- one_choice_instrument(list(items = "q1"))
   res <- run_analysis_plan(responses, ins)
   expect_match(res[[1]]$error, "No variables to analyse", fixed = TRUE)
@@ -44,7 +44,7 @@ test_that("11: such a block reports an error, not a result on N = 0", {
   expect_null(res[[1]]$n)
 })
 
-test_that("11: both roles frequency reads validate and run", {
+test_that("Both roles frequency reads validate and run", {
   for (role in c("variable", "variables")) {
     ins <- one_choice_instrument(stats::setNames(list("q1"), role))
     expect_true(validate_sframe(ins, strict = FALSE)$valid)
@@ -54,7 +54,7 @@ test_that("11: both roles frequency reads validate and run", {
   }
 })
 
-test_that("11: the 3 demos Ethos found run their frequency block on data", {
+test_that("The 3 demos found run their frequency block on data", {
   for (demo in c("first_survey", "instrument_revision", "verification")) {
     d <- sframe_demo(demo)
     res <- run_analysis_plan(d$responses, d$instrument)

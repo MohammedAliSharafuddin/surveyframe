@@ -195,7 +195,7 @@ sframe_builder_state_from_instrument <- function(instrument = NULL) {
     # dropped them, and since the amendment hash leaves references out,
     # nothing refused the export that lost them.
     references = instrument$references %||% list(),
-    # The study (D13) is edited in the builder, and kept through a rebuild.
+    # The study is edited in the builder, and kept through a rebuild.
     study = instrument$study,
     # What the instrument was when read from a file, reattached on compose, so
     # a Studio edit of a loaded file is still recognised as a revision.

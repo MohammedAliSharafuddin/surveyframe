@@ -22,7 +22,7 @@ sframe_reference_id_pattern <- "^[A-Za-z0-9_]([A-Za-z0-9_:.#$%&+?<>~/-]*[A-Za-z0
 
 # Where an instrument can cite a reference.
 # hypothesis:<block id> names the hypotheses a plan block declares, and study
-# the study description (8b-R), so both can cite sources.
+# the study description, so both can cite sources.
 sframe_reference_target_pattern <- "^(instrument|study|(item|scale|plan|model|hypothesis):.+)$"
 
 # CSL item types a reference may take. A subset of CSL 1.0.2, the ones a
@@ -610,7 +610,7 @@ sframe_restore_reference <- function(r) {
   structure(r, class = "sf_reference")
 }
 
-# The keys of the references a target cites (8b-R): "instrument", "study",
+# The keys of the references a target cites: "instrument", "study",
 # "item:<id>" and so on. A reference linked to nothing counts as cited by
 # the instrument as a whole, so every reference reaches a site. The Quarto
 # template's cited_keys() applies the same rule.
@@ -820,7 +820,7 @@ sframe_intext_citation <- function(keys) {
 }
 
 # ---------------------------------------------------------------------------
-# References for the built-in HTML engine (D8, CX-10)
+# References for the built-in HTML engine
 #
 # Quarto resolves [@key] and builds the list through pandoc. The built-in
 # engine has no citation processor, so these helpers do the common part of

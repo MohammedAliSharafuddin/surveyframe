@@ -1,6 +1,6 @@
-# tests/testthat/helper-ui2-browser.R
+# tests/testthat/helper-builder-browser.R
 #
-# Session UI-2's browser tests share 1 Chrome tab per app, opened through
+# The builder browser tests share 1 Chrome tab per app, opened through
 # sframe_chrome_session() the first time a test asks for it and closed by
 # ui2_close() at the end of the file. Each test reloads the page, so no state
 # passes from one test to the next, and Chrome starts once per app, not once

@@ -82,7 +82,7 @@ sframe_field_shape_problems <- function(instrument) {
     keep(sframe_scalar_problem(it$label, paste0("Item ", i, "'s label"),
                                allow_empty = TRUE))
     keep(sframe_scalar_problem(it$type, paste0("Item ", i, "'s type")))
-    # Optional, but read as 1 id where given (Fable sitting 1 FR-13).
+    # Optional, but read as 1 id where given.
     for (f in c("choice_set", "scale_id")) {
       if (!is.null(it[[f]])) {
         keep(sframe_scalar_problem(it[[f]], paste0("Item ", i, "'s ", f)))
@@ -109,7 +109,7 @@ sframe_field_shape_problems <- function(instrument) {
                            paste0("Analysis plan block ", i)))
   }
   # A rule names the item it shows or hides and the item it reads, and a
-  # check the item it tests: each is read as 1 id (FR-13).
+  # check the item it tests: each is read as 1 id.
   for (i in seq_along(instrument$branching)) {
     rule <- instrument$branching[[i]]
     bad <- component_problem(rule, paste0("Branching rule ", i))
@@ -184,7 +184,7 @@ sframe_method_role_names <- function(method) {
 # Why a block that names roles gives its method no variables, or NULL when
 # it gives some. A frequency block naming its item under `items` ran on
 # nothing and reported "Frequency distribution for NA (N = 0)" with no
-# error (Ethos request 11).
+# error.
 sframe_unread_roles_problem <- function(method, roles, block) {
   if (!is.list(roles) || length(unlist(roles)) == 0) return(NULL)
   reads <- sframe_method_role_names(method)
@@ -251,7 +251,7 @@ sframe_plan_block_problems <- function(plan, known_methods) {
       }
     }
     # A significance level outside (0, 1) or not a number gave no error and
-    # no change to the result (Fable sitting 1 FR-14).
+    # no change to the result.
     for (a in c("alpha", "options")) {
       val <- if (a == "alpha") block$alpha else if (is.list(block$options)) block$options$alpha
       if (is.null(val)) next
@@ -512,7 +512,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   # A choice set's contents, which validation used to read past entirely.
   choice_content <- unlist(lapply(instrument$choices %||% list(), function(cs) {
     # The constructor refuses this. A set edited or read from a file did not
-    # meet it (FR-14).
+    # meet it.
     p <- if (length(cs$values) != length(cs$labels)) {
       paste0("it has ", sframe_count_noun(length(cs$values), "value"), " and ",
              sframe_count_noun(length(cs$labels), "label"), ", and each option needs both.")
@@ -521,7 +521,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
            sframe_choice_other_problems(cs$values, cs$allow_other, cs$ordered))
     # A code with white space at either end (" 1") is a typing slip: an
     # answer of " 1" read as the number 1, a code the set does not declare
-    # (P3-04). SurveyBuilder trims codes as they are typed.
+    # SurveyBuilder trims codes as they are typed.
     vals <- as.character(cs$values %||% character(0))
     padded <- unique(vals[!is.na(vals) & vals != trimws(vals)])
     if (length(padded) > 0) {
@@ -692,7 +692,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   }
 
   # A scale method score_scales() does not know was scored as the mean with no
-  # word (FR-14).
+  # word.
   for (scale in instrument$scales) {
     m <- scale$method
     if (!is.null(m) && !(is.character(m) && length(m) == 1 && m %in% c("mean", "sum"))) {
@@ -702,11 +702,10 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
   }
   # An item's scale_id names the scale that scores it, so that scale should
-  # list it (FR-14). A missing scale is item_scale_refs above, and a reverse
+  # list it. A missing scale is item_scale_refs above, and a reverse
   # keyed item reverse_item_membership. Otherwise the scale scores its own
   # items list and the scale_id changes no score, so this is a note, not a
   # problem: SurveyBuilder's item editor saved this shape before 0.4.3
-  # (coordinator ruling 2026-11-11).
   for (item in instrument$items) {
     if (is.null(item$scale_id) || isTRUE(item$reverse)) next
     owner <- Filter(function(s) identical(s$id, item$scale_id), instrument$scales)
@@ -719,7 +718,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   }
 
   # A scale item's choice set with codes outside 1 evenly spaced run, such as
-  # 1 to 5 and 99 for "do not know" (FR-18). score_scales() scores the run
+  # 1 to 5 and 99 for "do not know". score_scales() scores the run
   # and reads the other codes as missing, so this is a note: the instrument
   # is valid, and the author learns which codes do not count.
   noted_sets <- character(0)
@@ -765,7 +764,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
         paste0("Branch rule depends_on unknown item '",
                rule$depends_on, "'."))
     }
-    # A rule on its own item shows or hides the item by its own answer (FR-14).
+    # A rule on its own item shows or hides the item by its own answer.
     if (identical(rule$depends_on, rule$item_id)) {
       add("branching_refs",
         paste0("Branch rule on item '", rule$item_id, "' depends on that item itself."))
@@ -798,9 +797,9 @@ validate_sframe <- function(instrument, strict = TRUE) {
     }
   }
   # Items whose rules depend on each other, directly or through others: each
-  # is shown or hidden by an answer that waits on its own (FR-14). A note, not
+  # is shown or hidden by an answer that waits on its own. A note, not
   # a problem, since SurveyBuilder saved cycles before 0.4.3 and now refuses
-  # new ones (coordinator ruling 2026-11-11). A rule on an item asked later is
+  # new ones. A rule on an item asked later is
   # allowed, since on 1 page the answer arrives live.
   for (cycle in sframe_branch_cycles(instrument$branching)) {
     log$notes <- c(log$notes, paste0(
@@ -820,9 +819,9 @@ validate_sframe <- function(instrument, strict = TRUE) {
   }
 
   # A pass value that is no code of its item's choice set can never be
-  # answered, so it flags every respondent (FR-14). Items with no choice set
+  # answered, so it flags every respondent. Items with no choice set
   # are skipped. A note, not a problem, since SurveyBuilder saved such checks
-  # before 0.4.3 and now refuses new ones (coordinator ruling 2026-11-11).
+  # before 0.4.3 and now refuses new ones.
   for (chk in instrument$checks) {
     pv <- as.character(unlist(chk$pass_values %||% list()))
     target <- Filter(function(i) identical(i$id, chk$item_id), instrument$items)
@@ -870,10 +869,9 @@ validate_sframe <- function(instrument, strict = TRUE) {
                                                      recursive = TRUE, use.names = FALSE))
       model_ref_values <- as.character(model_ref_values[!is.na(model_ref_values)])
       data_refs <- setdiff(role_refs, model_ref_values)
-      # A design weight is set by the researcher, not asked, so the weights
-      # role alone may name a column that is not an item (Session 10,
-      # coordinator 2026-11-14). It is noted, never silent, and
-      # run_analysis_plan() refuses it when the responses lack it.
+      # A design weight is set by the researcher, not asked, so the weights role
+      # alone may name a column that is not an item. It is noted, never silent,
+      # and run_analysis_plan() refuses it when the responses lack it.
       weight_refs <- as.character(unlist(block$roles[intersect(role_names, c("weights", "weight"))],
                                          use.names = FALSE))
       weight_refs <- setdiff(weight_refs[!is.na(weight_refs) & nzchar(weight_refs)], known_vars)
@@ -983,7 +981,7 @@ validate_sframe <- function(instrument, strict = TRUE) {
   reference_problems <- sframe_reference_problems(instrument)
   if (length(reference_problems) > 0) add("references", reference_problems)
 
-  # The study (D13): its shape, and the trace from objective to question.
+  # The study: its shape, and the trace from objective to question.
   study_check <- sframe_study_problems(instrument)
   if (length(study_check$problems) > 0) add("study", study_check$problems)
   log$notes <- c(log$notes, study_check$notes)

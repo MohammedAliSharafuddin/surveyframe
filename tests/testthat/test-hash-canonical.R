@@ -1,6 +1,6 @@
 # tests/testthat/test-hash-canonical.R
 # The hash names the canonical form it was taken in, hash.canonical = "rfc8785"
-# (owner, through the coordinator, 2026-11-11, Session CF-A). R, SurveyBuilder
+# R, SurveyBuilder
 # and the verifier page give each file in fixtures/canonical/hash_canonical the
 # verdict verdicts.tsv names: ok, legacy (accepted with "Save it again"), fail
 # (integrity check failed) or refused (a form this version does not know).

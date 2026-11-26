@@ -1,11 +1,11 @@
-# FR-22 (Fable sitting 2) and P2-03 (Codex pass 2), Session CF-B: McNemar's
+# McNemar's
 # table is laid out on 1 order for both items. table() of the 2 columns
 # paired the first row level with the first column level, whatever they
 # were, so the test ran on the wrong cells.
 
 test_that("2 factors with the same labels in opposite level order give base R's aligned test", {
   # probe_numbers.R "McNemar same labels different factor order": 0.8,
-  # p = .371 at 2a910b0, where the aligned table gives 0 and p = 1.
+  # p = .371 before the fix, where the aligned table gives 0 and p = 1.
   d <- data.frame(
     before = factor(c("yes", "yes", "no", "no", "yes", "no"), levels = c("yes", "no")),
     after  = factor(c("yes", "no", "yes", "no", "no", "yes"), levels = c("no", "yes")))
@@ -21,8 +21,8 @@ test_that("2 factors with the same labels in opposite level order give base R's 
 })
 
 test_that("items whose observed categories differ are tested on the declared choice set", {
-  # Fable's FR-22 reproducer: rows (a, b), columns (b, c). At 2a910b0 a 2 by 2
-  # test paired a with b and b with c.
+  # Rows (a, b), columns (b, c). A 2 by 2 test used to pair a with b and b
+  # with c.
   set.seed(202)
   d <- data.frame(c1 = sample(c("a", "b"), 90, TRUE), c2 = sample(c("b", "c"), 90, TRUE))
   cs <- sframe_choice_set("abc", c("a", "b", "c"), c("A", "B", "C"))

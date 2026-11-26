@@ -1,6 +1,6 @@
 # tests/testthat/test-read-responses-boundary.R
 #
-# read_responses(), batch 5 findings 5, 6 and 7.
+# read_responses().
 #
 # 5. read.csv() inferred types, so a respondent id of 001 became 1 and a text
 #    answer of NA became missing. A data frame took a different route, so the
@@ -25,7 +25,7 @@ csv_file <- function(lines) {
   path
 }
 
-test_that("5: identifiers and literal text survive a CSV read", {
+test_that("Identifiers and literal text survive a CSV read", {
   path <- csv_file(c("respondent_id,q1,note,mx__a,mx__b",
                      "001,4,NA,3,2",
                      "002,5,fine,1,5"))
@@ -36,7 +36,7 @@ test_that("5: identifiers and literal text survive a CSV read", {
   expect_identical(res$mx__b, c(2, 5))
 })
 
-test_that("5: CSV, typed data frame and all-character data frame read the same", {
+test_that("CSV, typed data frame and all-character data frame read the same", {
   path <- csv_file(c("respondent_id,q1,note,mx__a,mx__b",
                      "001,4,ok,3,2",
                      "002,,fine,1,5"))
@@ -53,12 +53,12 @@ test_that("5: CSV, typed data frame and all-character data frame read the same",
   expect_identical(from_text, from_csv)
 })
 
-test_that("6: a matrix with a missing row column is reported", {
+test_that("A matrix with a missing row column is reported", {
   path <- csv_file(c("q1,note,mx__a", "4,ok,3"))
   expect_warning(read_responses(path, instrument()), "mx__b")
 })
 
-test_that("6: an unknown suffix does not count as the matrix being present", {
+test_that("An unknown suffix does not count as the matrix being present", {
   path <- csv_file(c("q1,note,mx__zzz", "4,ok,3"))
   # the matrix is reported as an absent item, and the stray column as undeclared
   expect_warning(
@@ -67,7 +67,7 @@ test_that("6: an unknown suffix does not count as the matrix being present", {
     "mx__zzz")
 })
 
-test_that("7: duplicate response headers are refused", {
+test_that("Duplicate response headers are refused", {
   path <- csv_file(c("q1,q1,note,mx__a,mx__b", "4,5,ok,3,2"))
   expect_error(read_responses(path, instrument()), "q1", class = "sframe_error")
   dup <- data.frame(q1 = 4, q1 = 5, check.names = FALSE)

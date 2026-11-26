@@ -2,7 +2,7 @@
 #
 # Open Instrument's status comes from validate_sframe() run on the open
 # instrument, never from the stored meta$validated, which is a cache only
-# (owner 2026-11-10, Codex P1-09). The valid two_group demo showed "Draft"
+# The valid two_group demo showed "Draft"
 # and "Status: fix in Design" with no reason given. studio_schema_status() is
 # parsed from app.R without starting the app.
 
@@ -18,7 +18,7 @@ studio_status_env <- function() {
   env
 }
 
-test_that("a valid instrument reads Schema valid whatever its stored flag says (P1-09)", {
+test_that("a valid instrument reads Schema valid whatever its stored flag says", {
   env <- studio_status_env()
   instr <- sframe_demo("two_group")$instrument
   for (flag in list(TRUE, FALSE, NULL)) {
@@ -30,7 +30,7 @@ test_that("a valid instrument reads Schema valid whatever its stored flag says (
   }
 })
 
-test_that("an invalid instrument reads Fix in Design, with the count and the first problem, though its flag says valid (P1-09)", {
+test_that("an invalid instrument reads Fix in Design, with the count and the first problem, though its flag says valid", {
   env <- studio_status_env()
   instr <- sframe_demo("two_group")$instrument
   type_2 <- instr$items[[2]]$type

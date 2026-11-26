@@ -1,6 +1,6 @@
 # tests/testthat/test-canonical-locale.R
 #
-# Session CI (CI run 42014288465). Canonical JSON sorted its keys with
+# Found on CI. Canonical JSON sorted its keys with
 # order(), which follows LC_COLLATE: a C session put "Scale" before
 # "ceiling_pct", an en_US one after, so a report source rendered by Quarto's
 # R on macOS (en_US) said its numbers differ from the record written under
@@ -44,7 +44,7 @@ test_that("a results record and an instrument hash are the same in every locale"
   expect_identical(with_collate(loc, hash()), with_collate("C", hash()))
 })
 
-# Files hashed before 0.4.3, in the locale's key order (owner, 2026-11-05):
+# Files hashed before 0.4.3, in the locale's key order:
 # accepted with a message to save them again, while a tampered file fails.
 locale_instrument <- function() {
   ins <- sframe_demo("likert_scale")$instrument

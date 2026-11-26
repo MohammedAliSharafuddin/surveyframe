@@ -1,12 +1,11 @@
-# pkgdown/build_docs.R
-# The Docs section of surveyframe.org (Session W, owner 2026-11-14, Quill
-# Forms docs as the model): how to set up each of the 13 answerable question
-# types. For each type it captures 2 screenshots, SurveyStudio's Design screen with the
-# question selected and its settings outlined, and the question as the
-# respondent sees it, into pkgdown/assets/docs/question-types/ (site only),
-# and writes the page, vignettes/articles/docs/question-types/<slug>.Rmd, and
-# the landing page, vignettes/articles/docs.Rmd. Rebuilt at every release,
-# never viewed shot by shot.
+# pkgdown/build_docs.R The Docs section of surveyframe.org: how to set up each
+# of the 13 answerable question types. For each type it captures 2 screenshots,
+# SurveyStudio's Design screen with the question selected and its settings
+# outlined, and the question as the respondent sees it, into
+# pkgdown/assets/docs/question-types/ (site only), and writes the page,
+# vignettes/articles/docs/question-types/<slug>.Rmd, and the landing page,
+# vignettes/articles/docs.Rmd. Rebuilt at every release, never viewed shot by
+# shot.
 #
 # Run from the repository root:  Rscript pkgdown/build_docs.R
 
@@ -121,8 +120,8 @@ wait_for <- function(b, cond, secs = 30) {
 }
 
 demo <- sframe_demo("input_types", preview = FALSE)$instrument
-# The editor shots are taken in SurveyStudio's Design screen (owner
-# 2026-11-15), with its left menu and screen name in view.
+# The editor shots are taken in SurveyStudio's Design screen, with its left
+# menu and screen name in view.
 source(file.path("pkgdown", "studio_capture.R"))
 studio <- studio_open(pkg_root, "input_types")
 b <- studio$b

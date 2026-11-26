@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-collect-browser.R
 #
-# SurveyStudio's Collect screen (session 7): the survey file to deploy, the
+# SurveyStudio's Collect screen: the survey file to deploy, the
 # Google Sheets Apps Script collector with its setup steps, and the way on
 # to reading the sheet's responses. Driven in a real Chrome against the build
 # under test. The downloads are fetched from their links in the page.

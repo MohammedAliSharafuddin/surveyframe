@@ -399,11 +399,10 @@ test_that("a result with no $quotes renders no quotes table (mutation check)", {
 })
 
 # ---------------------------------------------------------------------------
-# Regression: text-family results are not run through the instrument-wide
-# label substitution (review_050 finding: a respondent's own word could
-# collide with an unrelated item's choice CODE and get silently swapped for
-# that item's choice LABEL, reading as thematic signal that was actually a
-# coincidence).
+# Regression: text-family results are not run through the instrument-wide label
+# substitution (a respondent's own word could collide with an unrelated item's
+# choice CODE and get silently swapped for that item's choice LABEL, reading as
+# thematic signal that was actually a coincidence).
 # ---------------------------------------------------------------------------
 
 test_that("term_freq's term column is not relabelled when it collides with an unrelated choice code", {

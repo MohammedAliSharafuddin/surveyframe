@@ -1,5 +1,5 @@
 # tests/testthat/test-humanize-statistics.R
-# CX-21. The label lookup swaps a choice code for its label in a result
+# The label lookup swaps a choice code for its label in a result
 # table. It used to do so in every character cell, so a statistic that
 # happened to equal a code ("Suggested factors" 2) printed as "Disagree".
 

@@ -1,4 +1,4 @@
-# FR-32 (Fable sitting 2), Session CF-B: APA 7 number formatting.
+# APA 7 number formatting.
 
 f <- function(n) get(n, asNamespace("surveyframe"))
 

@@ -40,7 +40,7 @@ test_that("launch_builder_demo() forwards and keeps its old return value", {
   expect_identical(info$demo_file, sframe_demo("input_types")$instrument_path)
 })
 
-# launch_builder(instrument =), Session 10. The copy opens the instrument
+# launch_builder(instrument =). The copy opens the instrument
 # through openSframeText() at start-up, so it is read as an opened file is.
 injected_builder_context <- function(path) {
   skip_if_not_installed("V8")

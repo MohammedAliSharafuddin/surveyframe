@@ -1,10 +1,10 @@
 # tests/testthat/test-codebook-markdown.R
 #
-# Ethos request 9 (2026-10-03). sframe_codebook(format = "md") returned an
+# sframe_codebook(format = "md") returned an
 # object whose printed form was a text table, so a host asking for Markdown
 # captured the console output and offered it as .txt.
 
-test_that("9: format = 'md' carries the codebook as Markdown, and print writes it", {
+test_that("Format = 'md' carries the codebook as Markdown, and print writes it", {
   ins <- sframe_demo("two_group")$instrument
   cb <- sframe_codebook(ins, format = "md")
   expect_type(cb$markdown, "character")
@@ -19,7 +19,7 @@ test_that("9: format = 'md' carries the codebook as Markdown, and print writes i
   expect_identical(nrow(sframe_get_items(cb)), length(ins$items))
 })
 
-test_that("9: a pipe inside a label is escaped, so the table keeps its columns", {
+test_that("A pipe inside a label is escaped, so the table keeps its columns", {
   ins <- sframe_instrument("Pipes", components = list(
     sframe_item("q1", "Either | or", type = "text")))
   md <- sframe_codebook(ins, format = "md")$markdown
@@ -31,7 +31,7 @@ test_that("9: a pipe inside a label is escaped, so the table keeps its columns",
   expect_true(any(grepl("<td>Either \\| or</td>|<td>Either | or</td>", html)))
 })
 
-test_that("9: the html format keeps its compact summary", {
+test_that("The html format keeps its compact summary", {
   cb <- sframe_codebook(sframe_demo("two_group")$instrument)
   expect_null(cb$markdown)
   expect_match(capture.output(print(cb))[1], "^Codebook: ")

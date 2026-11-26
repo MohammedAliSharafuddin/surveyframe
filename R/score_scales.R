@@ -2,7 +2,7 @@
 
 # Column names response data already carries, which an item or scale id must
 # never take, since score_scales() writes each score under its scale's id.
-# data_status marks surveyframe's demonstration data (Session 10), so
+# data_status marks surveyframe's demonstration data, so
 # read_responses() keeps it without being told, and the stamp it causes
 # survives every read of a demo file.
 sframe_reserved_response_columns <- c("respondent_id", "response_id",
@@ -29,7 +29,7 @@ sframe_scale_reverse_ids <- function(instrument, scale) {
 # as long. 1 to 5 with 99 for "do not know" scores 1 to 5, 0 to 100 in steps
 # of 25 scores all 5. A code outside the run is not a score: score_scales()
 # reads it as missing and reversal ignores it. Reading every numeric code as a
-# score made the bounds 1 to 99, so a reversed 1 became 99 (FR-18). NULL when
+# score made the bounds 1 to 99, so a reversed 1 became 99. NULL when
 # the set has no numeric code. When 2 runs are longest (1, 2, 4, 5), which
 # codes are scores is unclear: the result is empty, with the attribute "tie"
 # holding the runs, and scoring refuses the scale.
@@ -136,7 +136,7 @@ sframe_scale_matrix <- function(data, instrument, scale, cols) {
 
 # A declared code outside its choice set's scoring run (sframe_score_codes()),
 # such as 99 for "do not know", is missing in a scale's items, with 1 message
-# per scale naming the codes and how many answers held them (FR-18).
+# per scale naming the codes and how many answers held them.
 sframe_drop_nonscore_codes <- function(out, instrument, scale) {
   dropped <- character(0)
   n <- 0L
@@ -152,7 +152,6 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
     keep <- sframe_score_codes(cs$values)
     # A value the set does not declare, such as 7 on a 1 to 5 item, is
     # missing, with a message. It was scored as 7, and a reversed 0 became 6
-    # (FR-30).
     if (length(declared)) {
       stray <- !is.na(out[[col]]) & !out[[col]] %in% declared
       if (any(stray)) {
@@ -197,7 +196,7 @@ sframe_drop_nonscore_codes <- function(out, instrument, scale) {
 
 # An answer that does not read as a number, such as "4,5", is missing in a
 # scale, with a message naming up to 3 of them. It became NA without a word
-# and counted as unanswered toward min_valid (FR-30).
+# and counted as unanswered toward min_valid.
 sframe_note_unreadable <- function(data, out, scale) {
   bad <- character(0)
   for (col in names(out)) {
@@ -295,7 +294,7 @@ sframe_composite_score <- function(scale_num, scale, scale_item_ids) {
     # A prorated sum: the (weighted) mean of the answered items times the
     # (weighted) number of items, so an unanswered item is not a 0. 5 and 5
     # on 2 of 4 items scored 10, the middle of 4 to 20, where the mean method
-    # gave the top (FR-26). A respondent who answered every item gets the
+    # gave the top. A respondent who answered every item gets the
     # plain sum, as before.
     scores <- scores * sum(all_weights, na.rm = TRUE)
   }

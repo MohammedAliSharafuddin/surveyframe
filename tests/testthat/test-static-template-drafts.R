@@ -1,6 +1,6 @@
 # tests/testthat/test-static-template-drafts.R
 #
-# Codex CX-05, decision D3 (0.4.3). draftKey() hashed the title, version and
+# draftKey() hashed the title, version and
 # items alone, so a changed choice set or consent text resumed an old draft
 # against new meaning. resumeDraft() skipped the consent check in
 # startSurvey(), so a resumed draft never asked for consent.
@@ -40,31 +40,31 @@ revisit <- function(ins, stored) {
     jsonlite::toJSON(stored, auto_unbox = TRUE))))
 }
 
-test_that("CX-05: an unchanged instrument resumes its draft", {
+test_that("An unchanged instrument resumes its draft", {
   stored <- saved_draft(draft_instrument())
   ctx <- revisit(draft_instrument(), stored)
   expect_false(is.null(ctx$get("loadDraft()")))
 })
 
-test_that("CX-05: a changed choice set starts afresh", {
+test_that("A changed choice set starts afresh", {
   stored <- saved_draft(draft_instrument())
   ctx <- revisit(draft_instrument(choices = c(No = "1", Yes = "2")), stored)
   expect_null(ctx$get("loadDraft()"))
 })
 
-test_that("CX-05: changed consent wording starts afresh", {
+test_that("Changed consent wording starts afresh", {
   stored <- saved_draft(draft_instrument())
   ctx <- revisit(draft_instrument(consent_text = "I agree, and may withdraw."),
                  stored)
   expect_null(ctx$get("loadDraft()"))
 })
 
-test_that("CX-05: a draft records that consent was given", {
+test_that("A draft records that consent was given", {
   stored <- saved_draft(draft_instrument())
   expect_true(jsonlite::fromJSON(stored[[1]])$consented)
 })
 
-test_that("CX-05: a draft without recorded consent resumes at the welcome screen", {
+test_that("A draft without recorded consent resumes at the welcome screen", {
   stored <- saved_draft(draft_instrument())
   draft <- jsonlite::fromJSON(stored[[1]])
   draft$consented <- NULL
@@ -80,7 +80,7 @@ test_that("CX-05: a draft without recorded consent resumes at the welcome screen
   expect_identical(ctx$get("responses.q1"), "1")
 })
 
-test_that("CX-05: a draft with recorded consent resumes into the survey", {
+test_that("A draft with recorded consent resumes into the survey", {
   stored <- saved_draft(draft_instrument())
   ctx <- revisit(draft_instrument(), stored)
   ctx$eval("renderScreen(); resumeDraft();")

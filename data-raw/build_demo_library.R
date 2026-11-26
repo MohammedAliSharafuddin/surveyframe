@@ -7,7 +7,7 @@
 # Specification, including every seed and the effect simulated into each
 # dataset, is in the plan this was built from.
 #
-# Tracked on main (owner 2026-11-14) and kept out of the tarball by
+# Tracked on main and kept out of the tarball by
 # .Rbuildignore, as data-raw/ is. It reproduces the committed demo files byte
 # for byte: a demo already in inst/extdata/demos keeps its created_at, the
 # thank-you text the demos shipped with is kept (the package default became
@@ -16,7 +16,7 @@
 # first recorded, and the results table is the package's own
 # sframe_demo_results_table(), which the parity tests read. Each demo's
 # study, author, wording, hypotheses and decision rules come from
-# data-raw/demo_stories.R (Session 10).
+# data-raw/demo_stories.R.
 #
 # Run from the repository root:  Rscript data-raw/build_demo_library.R
 
@@ -109,7 +109,7 @@ mcar <- function(x, p = 0.03) {
 #' Respondent ids and the 2 timestamp columns every collector writes.
 frame_of <- function(n, seed_offset = 0) {
   start <- as.POSIXct("2026-06-01 09:00:00", tz = "UTC") + seed_offset * 60
-  # Demonstration data cannot pass as collected data (owner 2026-11-05):
+  # Demonstration data cannot pass as collected data:
   # DEMO- ids and a data_status column that names it, which surveyframe
   # reads to stamp every output made from it.
   data.frame(
@@ -198,8 +198,7 @@ write_demo <- function(name, instrument, responses, run_plan = TRUE,
   csv_path    <- file.path(out_dir, paste0(name, "_responses.csv"))
   instrument <- apply_story(instrument, demo_stories[[name]])
 
-  # Every unbranded demo ships with welcome, consent and thank-you screens
-  # (0.4.3, Ethos request 3).
+  # Every unbranded demo ships with welcome, consent and thank-you screens.
   if (length(instrument$render) == 0) {
     instrument$render <- surveyframe:::sframe_demo_screens(instrument$meta$title)
     instrument$render$thankyou$message <- shipped_thankyou
@@ -418,7 +417,7 @@ n <- 50
 # Readable row labels, since these become the matrix rows a respondent sees
 # and the expansion column names a reader meets. Spaces are handled, as the
 # bundled input-types fixture already shows with "Staff helpfulness".
-# The parts of a course since Session 10, for the course-evaluation study
+# The parts of a course, for the course-evaluation study
 # page. The values are drawn by position, so only the names changed.
 sessions <- c("Lectures", "Seminars", "Assessment", "Reading materials")
 matrix_likert <- sf_instrument(
@@ -748,7 +747,7 @@ write_demo("logistic", logistic, lg)
 # settle on the right number of factors.
 set.seed(4111)
 n <- 120
-# An employee engagement study (owner 2026-11-15). The item wording, study
+# An employee engagement study. The item wording, study
 # and title come from data-raw/demo_stories.R, which this matches.
 org_items <- c("My work is planned well in advance.", "I know where to find what I need to do my job.",
                "My manager helps when I have a question.", "My workplace suits the work I do.")
@@ -1249,7 +1248,7 @@ write_demo("conversational_branching", conversational_branching, br,
 
 # --- 23. weighted_survey ---------------------------------------------------
 # A sample that over-represents 1 region, and the design weight that brings
-# it back to the population's shares (Session 10). The weight is not a
+# it back to the population's shares. The weight is not a
 # question, so it travels as a metadata column, survey_weight, which
 # sframe_demo() reads for this demo.
 set.seed(4123)
@@ -1295,7 +1294,7 @@ write_demo("weighted_survey", weighted_survey, ws)
 # --- 24. citing_sources ----------------------------------------------------
 # An adapted scale cited where it is used: the source of its items, the
 # method behind its reliability check and the work the study builds on, each
-# listed once at the end of the report (Session 10).
+# listed once at the end of the report.
 set.seed(4124)
 n <- 90
 citing_sources <- sf_instrument(
@@ -1343,7 +1342,7 @@ write_demo("citing_sources", citing_sources, cs)
 
 # --- 25. mediation_moderation ----------------------------------------------
 # Workload raises stress, stress lowers wellbeing, and support from a manager
-# softens the first step (Session 10).
+# softens the first step.
 set.seed(4125)
 n <- 200
 mediation_moderation <- sf_instrument(

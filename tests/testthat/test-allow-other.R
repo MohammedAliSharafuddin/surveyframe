@@ -1,7 +1,7 @@
 # tests/testthat/test-allow-other.R
 #
-# Session O: the R side of a choice set's allow_other ("Other, please
-# specify"). The submitted shape (coordinator, 2026-11-04): a single choice
+# The R side of a choice set's allow_other ("Other, please
+# specify"). The submitted shape: a single choice
 # submits the code "other" in <id> and the typed text in <id>__other_text, a
 # multiple choice submits <id>__other as 1 or 0 beside its option columns and
 # the text in <id>__other_text. The template side is in

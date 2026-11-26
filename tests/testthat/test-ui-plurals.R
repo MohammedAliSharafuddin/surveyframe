@@ -1,7 +1,7 @@
 # tests/testthat/test-ui-plurals.R
 #
 # Studio and the builder print "1 respondent" and "0 respondents", never the
-# template plural "respondent(s)" (Codex P1-08). The source check reads every
+# template plural "respondent(s)". The source check reads every
 # line of app.R and the builder that is not a comment, so a new "(s)" fails
 # here before it reaches a screen.
 
@@ -15,7 +15,7 @@ ui_plural_sites <- function(path) {
   paste0(basename(path), ":", which(hit))
 }
 
-test_that("Studio and the builder hold no '(s)' plural in any string they show (P1-08)", {
+test_that("Studio and the builder hold no '(s)' plural in any string they show", {
   files <- c(
     system.file("shiny", "app.R", package = "surveyframe"),
     system.file("builder", "survey_builder.html", package = "surveyframe"),
@@ -27,7 +27,7 @@ test_that("Studio and the builder hold no '(s)' plural in any string they show (
 
 # Every string constant in the package's R functions, walked from the parsed
 # code so it runs on the installed package. A message counts in words, "1
-# item" and "2 items", never "item(s)" (Session LF, R plurals).
+# item" and "2 items", never "item(s)".
 r_plural_strings <- function() {
   strings <- function(e) {
     if (is.character(e)) return(e)
@@ -48,7 +48,7 @@ r_plural_strings <- function() {
   out
 }
 
-test_that("R messages hold no '(s)' plural (Session LF)", {
+test_that("R messages hold no '(s)' plural", {
   expect_identical(r_plural_strings(), character(0))
 })
 
@@ -69,7 +69,7 @@ ui_roles_env <- function() {
   env
 }
 
-test_that("a role's maximum is counted in words, singular for 1 (P1-08)", {
+test_that("a role's maximum is counted in words, singular for 1", {
   env <- ui_roles_env()
   msg <- env$studio_validate_plan_roles("m", list(x = c("a", "b"), y = c("a", "b", "c", "d")))
   expect_identical(msg$messages, c("Predictor allows at most 1 selection.",

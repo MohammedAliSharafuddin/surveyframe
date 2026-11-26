@@ -1,11 +1,11 @@
-# tests/testthat/test-studio-uf-browser.R
+# tests/testthat/test-studio-accessibility-browser.R
 #
-# Session UF: the Studio minors from Codex pass 1 (P1-06 to P1-12), checked
+# Studio's language, target sizes, wording and empty screens, checked
 # at 1280 and 390 px in a real Chrome against the build under test. Studio
-# and its tab come from ui1_studio() (helper-ui1-browser.R): "none" opens
+# and its tab come from ui1_studio() (helper-studio-browser.R): "none" opens
 # Studio with no instrument, "two_group" with that demo, and
 # "instrument:likert_scale" with an instrument and no responses. The standalone
-# builder (P1-11) comes from ui2_builder(). All are closed at the end of the
+# builder comes from ui2_builder(). All are closed at the end of the
 # file.
 
 skip_if_not_slow()
@@ -16,7 +16,7 @@ skip_if_not_installed("httpuv")
 
 uf_widths <- c(1280, 390)
 
-test_that("Studio's page declares its language as English (P1-06, WCAG 3.1.1)", {
+test_that("Studio's page declares its language as English (WCAG 3.1.1)", {
   b <- ui1_studio("two_group", width = 1280, height = 900)
   expect_identical(ui2_js(b, "document.documentElement.getAttribute('lang')"), "en")
 })
@@ -34,7 +34,7 @@ uf_small_js <- "(function(){
   return out.join('|');
 })()"
 
-test_that("the sidebar's fold buttons and every fold summary are at least 24 px tall, at 1280 and 390 px (P1-07, WCAG 2.5.8)", {
+test_that("the sidebar's fold buttons and every fold summary are at least 24 px tall, at 1280 and 390 px (WCAG 2.5.8)", {
   for (w in uf_widths) {
     b <- ui1_studio("two_group", width = w, height = 900)
     for (screen in sframe_studio_screens()) {
@@ -45,7 +45,7 @@ test_that("the sidebar's fold buttons and every fold summary are at least 24 px 
   }
 })
 
-test_that("Quality counts respondents and rows in words, and no screen shows '(s)' (P1-08)", {
+test_that("Quality counts respondents and rows in words, and no screen shows '(s)'", {
   b <- ui1_studio("two_group", width = 1280, height = 900)
   expect_true(ui1_screen(b, "quality"))
   expect_true(ui2_wait(b, "$('#screen-quality').text().indexOf('flagged as too fast') >= 0", 30))
@@ -59,7 +59,7 @@ test_that("Quality counts respondents and rows in words, and no screen shows '(s
   }
 })
 
-test_that("Open Instrument says Schema valid for the two_group demo, from a validation run (P1-09)", {
+test_that("Open Instrument says Schema valid for the two_group demo, from a validation run", {
   for (w in uf_widths) {
     b <- ui1_studio("two_group", width = w, height = 900)
     expect_true(ui1_screen(b, "open"))
@@ -69,7 +69,7 @@ test_that("Open Instrument says Schema valid for the two_group demo, from a vali
   }
 })
 
-test_that("with no instrument the sidebar says No instrument open, not a draft needing fixes (P1-09)", {
+test_that("with no instrument the sidebar says No instrument open, not a draft needing fixes", {
   b <- ui1_studio("none", width = 1280, height = 900)
   expect_true(ui2_wait(b, "$('.studio-status').text().indexOf('No instrument open') >= 0", 20))
   expect_false(grepl("Draft needs fixes|No valid instrument", ui2_js(b, "$('.studio-status').text()")))
@@ -91,7 +91,7 @@ uf_buttons_js <- "(function(screen){
   return JSON.stringify(out);
 })('%s')"
 
-test_that("with no instrument, the 9 empty screens offer Open Instrument filled and Design secondary (P1-10)", {
+test_that("with no instrument, the 9 empty screens offer Open Instrument filled and Design secondary", {
   empty <- c("collect", "responses", "quality", "dashboard", "reliability",
              "analysis", "export", "references", "amendments")
   for (w in uf_widths) {
@@ -105,13 +105,13 @@ test_that("with no instrument, the 9 empty screens offer Open Instrument filled 
       expect_identical(card$primary, c(TRUE, FALSE), info = paste(w, screen))
       expect_identical(card$filled, c(TRUE, FALSE), info = paste(w, screen))
       expect_true(card$secondary[2], info = paste(w, screen))
-      # 1 filled primary on the screen, the card's (UI-3).
+      # 1 filled primary on the screen, the card's.
       expect_identical(sum(bt$filled), 1L, info = paste(w, screen))
     }
   }
 })
 
-test_that("with an instrument and no responses, Collect is filled and Responses secondary on the screens that need responses (UF follow-up 2)", {
+test_that("with an instrument and no responses, Collect is filled and Responses secondary on the screens that need responses", {
   for (w in uf_widths) {
     b <- ui1_studio("instrument:likert_scale", width = w, height = 900)
     for (screen in c("quality", "reliability", "dashboard")) {
@@ -147,7 +147,7 @@ uf_scroll_js <- "(function(){
   return Array.from(new Set(out)).join('|');
 })()"
 
-test_that("every sideways-scrolling region in Studio can take keyboard focus and is named, at 1280 and 390 px (P1-12)", {
+test_that("every sideways-scrolling region in Studio can take keyboard focus and is named, at 1280 and 390 px", {
   for (w in uf_widths) {
     b <- ui1_studio("two_group", width = w, height = 900)
     for (screen in setdiff(sframe_studio_screens(), "design")) {
@@ -158,7 +158,7 @@ test_that("every sideways-scrolling region in Studio can take keyboard focus and
   }
 })
 
-test_that("the builder's question rows are listitems in a list, the open one aria-current, and the keys work as before, at 1280 and 390 px (P1-11)", {
+test_that("the builder's question rows are listitems in a list, the open one aria-current, and the keys work as before, at 1280 and 390 px", {
   instr <- sframe_demo("two_group")$instrument
   for (w in uf_widths) {
     s <- ui2_builder(instr, width = w, height = 900)

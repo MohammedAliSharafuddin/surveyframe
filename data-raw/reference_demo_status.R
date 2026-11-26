@@ -1,6 +1,6 @@
 # data-raw/reference_demo_status.R
 # The 2 reference datasets' responses are marked as demonstration data, as
-# the teaching demos' are (owner 2026-11-05): DEMO- respondent ids and a
+# the teaching demos' are: DEMO- respondent ids and a
 # data_status column. Edited as text, so every other byte stays. Running it
 # again changes nothing.
 #

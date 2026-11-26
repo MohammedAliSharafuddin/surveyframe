@@ -1,11 +1,11 @@
 # tests/testthat/test-static-template-other.R
 #
-# UX-11: a choice set's allow_other was set in R and the builder, and the
-# survey page never read it. The page now adds "Other, please specify" with
-# a text box, last and outside any shuffle. The submitted shape (coordinator,
-# 2026-11-04): a single choice submits the code "other" in <id> and the text
-# in <id>__other_text, a multiple choice submits <id>__other as 1 or 0 and
-# the text in <id>__other_text. Run under V8 (helper-v8-dom.R).
+# A choice set's allow_other was set in R and the builder, and the survey page
+# never read it. The page now adds "Other, please specify" with a text box, last
+# and outside any shuffle. The submitted shape: a single choice submits the code
+# "other" in <id> and the text in <id>__other_text, a multiple choice submits
+# <id>__other as 1 or 0 and the text in <id>__other_text. Run under V8
+# (helper-v8-dom.R).
 
 other_instrument <- function(allow_other = TRUE, randomise = FALSE) {
   sframe_instrument(

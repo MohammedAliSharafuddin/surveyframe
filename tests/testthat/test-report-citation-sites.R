@@ -1,6 +1,6 @@
 # tests/testthat/test-report-citation-sites.R
 #
-# Session 8b-R, item 5. A report shows each citation where it is used, as
+# A report shows each citation where it is used, as
 # well as in the References list: the instrument's sources under its title,
 # a scale's under its reliability table, an item's and a scale's in the
 # codebook, a plan block's in its section, and the hypotheses' beside the

@@ -1,4 +1,4 @@
-# FR-36 (Fable sitting 2), Session CF-B: the Firth block reads conf_level as
+# The Firth block reads conf_level as
 # well as conf.level.
 
 test_that("conf_level = 0.90 gives a 90% interval", {

@@ -1,5 +1,5 @@
 # pkgdown/build_method_docs.R
-# The Docs section's method-family pages (Session W, owner 2026-11-14): 1
+# The Docs section's method-family pages: 1
 # page per family of analysis methods, each method a section with its Plan
 # dialog in SurveyStudio (roles, alpha, hypotheses and decision rule), what it
 # answers, the family's assumptions, the plan excerpt, a report shell with no
@@ -95,9 +95,8 @@ for (nm in sframe_list_demos()$name) {
   }
 }
 
-# The Plan dialogs are taken in SurveyStudio's Plan screen (owner
-# 2026-11-15), 1280 by 1500 so the whole dialog shows, from the research
-# question to the decision rule, as in the approved sample.
+# The Plan dialogs are taken in SurveyStudio's Plan screen, 1280 by 1500 so
+# the whole dialog shows, from the research question to the decision rule.
 source(file.path("pkgdown", "studio_capture.R"))
 PLAN_H <- 1500L
 # 1 SurveyStudio at a time, reopened only when the demo changes: each is a
@@ -120,7 +119,7 @@ for (fam in names(families)) {
   for (m in f$methods) {
     w <- where[[m]]
     words <- sframe_method_words(m)
-    # pls_sem returns the seminr syntax, as seminr_syntax does (WR608).
+    # pls_sem returns the seminr syntax, as seminr_syntax does.
     if (m %in% syntax_methods && !grepl("syntax", words)) words <- paste(words, "syntax")
     refs <- unlist(sframe_citations_for_test(m))
     refs <- refs[!grepl("^R Core Team|^Sharafuddin", refs)]

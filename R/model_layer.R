@@ -972,7 +972,6 @@ sframe_syntax_cfa <- function(
 sframe_syntax_sem <- function(model, instrument = NULL, standardised = TRUE) {
   # A CFA model has no structural part, so it is sframe_syntax_cfa()'s to
   # write. Accepting it here returned measurement-only syntax headed "CB-SEM"
-  # (J8).
   if (identical((sframe_model_as_list(model)$type %||% "")[1], "cfa")) {
     sframe_abort_validation(paste0(
       "sframe_syntax_sem() writes a structural model and needs a model of ",

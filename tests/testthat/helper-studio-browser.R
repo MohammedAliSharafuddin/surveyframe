@@ -1,13 +1,13 @@
-# tests/testthat/helper-ui1-browser.R
+# tests/testthat/helper-studio-browser.R
 #
-# Session UI-1's Studio browser tests share 1 Studio process and 1 Chrome tab
+# The Studio browser tests share 1 Studio process and 1 Chrome tab
 # per demo, started the first time a test asks for it and closed by
-# ui1_close() at the end of test-studio-ui1-browser.R ("none" opens Studio
+# ui1_close() at the end of test-studio-workflow-browser.R ("none" opens Studio
 # with no instrument, and "instrument:likert_scale" with that demo's
 # instrument and no responses). Studio takes about
 # 35 s to start, and a page load starts it again, so tests move between
 # screens through the sidebar and never reload. The JavaScript helpers are
-# ui2_js() and ui2_wait() from helper-ui2-browser.R.
+# ui2_js() and ui2_wait() from helper-builder-browser.R.
 
 ui1_apps <- new.env(parent = emptyenv())
 
@@ -91,7 +91,7 @@ ui1_reload <- function(demo) {
 }
 
 # The text and background pairs below WCAG 2.2 AA in a document, measured
-# from computed colours (UX-21). Each element with its own visible text is
+# from computed colours. Each element with its own visible text is
 # measured against its background, laid over its ancestors' backgrounds down
 # to white, so a translucent colour is measured as it shows. Large text
 # (24 px, or 18.66 px bold) needs 3 to 1, other text 4.5 to 1. Disabled

@@ -1,4 +1,4 @@
-# FR-25 (Fable sitting 2), Session CF-B: every result sentence compares p with
+# Every result sentence compares p with
 # the block's alpha. Only the t test and the one-way ANOVA read it, so with
 # alpha .001 a Pearson p of .014 was a "significant correlation".
 

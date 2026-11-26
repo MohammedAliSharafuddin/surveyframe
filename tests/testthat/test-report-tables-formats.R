@@ -1,8 +1,7 @@
-# tests/testthat/test-report-codex-p1.R
+# tests/testthat/test-report-tables-formats.R
 #
-# Codex pass 1 at af1f806, report findings P1-01 to P1-05 (Session RF,
-# owner 2026-11-10). Every check uses the two_group demo, in the built-in
-# engine and, on the slow tier, the Quarto engine.
+# The report's tables, headings and formats. Every check uses the two_group
+# demo, in the built-in engine and, on the slow tier, the Quarto engine.
 
 p1_demo <- function() {
   d <- sframe_demo("two_group")
@@ -67,7 +66,7 @@ p1_complete_row <- function(doc) {
   trimws(gsub("<[^>]+>", "", cells))
 }
 
-test_that("P1-01: missing-data patterns store a percentage and a proportion", {
+test_that("missing-data patterns store a percentage and a proportion", {
   d <- p1_demo()
   mr <- sframe_missing_data_results(d$data, d$instrument)
   expect_true(all(c("percent", "prop") %in% names(mr$patterns)))
@@ -76,15 +75,15 @@ test_that("P1-01: missing-data patterns store a percentage and a proportion", {
   expect_equal(mr$patterns$percent, mr$patterns$prop * 100)
 })
 
-test_that("P1-01: the built-in report prints Complete case | 60 | 100", {
+test_that("The built-in report prints Complete case | 60 | 100", {
   expect_identical(p1_complete_row(p1_builtin_html()), c("60", "100"))
 })
 
-test_that("P1-01: the Quarto report prints Complete case | 60 | 100", {
+test_that("The Quarto report prints Complete case | 60 | 100", {
   expect_identical(p1_complete_row(p1_quarto_html()), c("60", "100"))
 })
 
-test_that("P1-02: descriptives count a categorical item's answers as valid", {
+test_that("Descriptives count a categorical item's answers as valid", {
   d <- p1_demo()
   dr <- sframe_descriptives_results(d$data, variables = c("format", "sessions_attended"))
   fmt <- dr$table[dr$table$variable == "format", ]
@@ -100,7 +99,7 @@ test_that("P1-02: descriptives count a categorical item's answers as valid", {
   expect_equal(dr2$table$mean, 7 / 3)
 })
 
-test_that("P1-02: the built-in report gives format 60 valid, 0 missing in both tables", {
+test_that("The built-in report gives format 60 valid, 0 missing in both tables", {
   doc <- p1_builtin_html()
   expect_identical(p1_counts(doc, "Item-wise missingness", "format"),
                    c(valid = "60", missing = "0"))
@@ -109,7 +108,7 @@ test_that("P1-02: the built-in report gives format 60 valid, 0 missing in both t
   expect_true(grepl("does not apply to an item answered with categories", doc, fixed = TRUE))
 })
 
-test_that("P1-02: the Quarto report gives format 60 valid, 0 missing in both tables", {
+test_that("The Quarto report gives format 60 valid, 0 missing in both tables", {
   doc <- p1_quarto_html()
   expect_identical(p1_counts(doc, "Item-wise missingness", "format"),
                    c(valid = "60", missing = "0"))
@@ -118,7 +117,7 @@ test_that("P1-02: the Quarto report gives format 60 valid, 0 missing in both tab
   expect_true(grepl("does not apply to an item answered with categories", doc, fixed = TRUE))
 })
 
-# Column names a report must never print as a heading (Codex P1-03).
+# Column names a report must never print as a heading.
 p1_raw_names <- c("variable", "group", "valid_n", "missing_n", "missing_prop",
                   "missing_pct", "sd", "se", "iqr", "ci_low", "ci_high",
                   "weighted_mean", "scale_id", "n_items", "min_valid",
@@ -129,7 +128,7 @@ p1_headings <- function(doc) {
   trimws(gsub("<[^>]+>", "", th))
 }
 
-test_that("P1-03: 1 label map gives the headings, with italic symbols and the CI level", {
+test_that("1 label map gives the headings, with italic symbols and the CI level", {
   nm <- c("n", "valid_n", "missing_n", "missing_prop", "mean", "sd", "median",
           "iqr", "se", "ci_low", "ci_high", "weighted_mean")
   html <- sframe_apa_col_labels(nm, "html")
@@ -145,20 +144,20 @@ test_that("P1-03: 1 label map gives the headings, with italic symbols and the CI
   expect_identical(surveyframe:::sframe_apa_headings(nm), html)
 })
 
-test_that("P1-03: the built-in report prints no raw column name", {
+test_that("The built-in report prints no raw column name", {
   h <- p1_headings(p1_builtin_html())
   expect_identical(intersect(h, p1_raw_names), character(0))
   expect_false(any(h == ""))
 })
 
-test_that("P1-03: the Quarto HTML report prints no raw column name or row-name column", {
+test_that("The Quarto HTML report prints no raw column name or row-name column", {
   h <- p1_headings(p1_quarto_html())
   expect_identical(intersect(h, p1_raw_names), character(0))
   expect_false(any(h == ""))
   expect_true(all(c("M", "SD", "Mdn", "95% CI lower") %in% h))
 })
 
-# P1-04 and P1-05 read the report in Word, OpenDocument and PDF through Typst
+# The checks below read the report in Word, OpenDocument and PDF through Typst
 # and LaTeX. Each format renders once per test run.
 p1_files <- new.env()
 p1_quarto_file <- function(to) {
@@ -290,7 +289,7 @@ p1_expect_apa_floats <- function(to) {
   }
   tab1 <- grep("^Table 1$", p$text)
   # The two_group demo is demonstration data, so every table title carries
-  # the stamp (owner 2026-11-14, 2fc5fb5).
+  # the stamp.
   expect_identical(p$text[tab1 + 1], "Provenance (demonstration data)")
   # The not-applicable dash and its note print, and no raw column name does.
   all_text <- paste(p$text, collapse = " ")
@@ -300,23 +299,23 @@ p1_expect_apa_floats <- function(to) {
   expect_false(any(grepl("missing_n|valid_n|ci_low|ci_high|missing_prop", p$text)))
 }
 
-test_that("P1-04: Word sets each table and figure number in bold above an italic title", {
+test_that("Word sets each table and figure number in bold above an italic title", {
   p1_expect_apa_floats("docx")
 })
 
-test_that("P1-04: OpenDocument sets each table and figure number in bold above an italic title", {
+test_that("OpenDocument sets each table and figure number in bold above an italic title", {
   p1_expect_apa_floats("odt")
 })
 
-test_that("P1-04: the Typst PDF sets each table and figure number above its title", {
+test_that("The Typst PDF sets each table and figure number above its title", {
   p1_expect_apa_floats("typst")
 })
 
-test_that("P1-04: the LaTeX PDF sets each table and figure number above its title", {
+test_that("The LaTeX PDF sets each table and figure number above its title", {
   p1_expect_apa_floats("latex")
 })
 
-# P1-05: the descriptives table splits in 2 in every format, and no table
+# The descriptives table splits in 2 in every format, and no table
 # in a PDF runs 1 column into the next or past the right margin.
 p1_centre <- c("variable", "n", "valid_n", "missing_n", "mean", "sd", "median",
                "iqr", "min", "max")
@@ -324,7 +323,7 @@ p1_shape <- c("variable", "skewness", "kurtosis", "se", "ci_low", "ci_high")
 p1_titles <- c("Descriptive statistics: centre and spread",
                "Descriptive statistics: shape and interval")
 
-test_that("P1-05: descriptives split into centre and spread, and shape and interval", {
+test_that("Descriptives split into centre and spread, and shape and interval", {
   d <- p1_demo()
   dr <- surveyframe:::sframe_report_descriptives(d$instrument, d$data)
   expect_identical(names(dr$centre), p1_centre)
@@ -350,11 +349,11 @@ p1_expect_split <- function(doc) {
   expect_false(grepl("Weighted", doc, fixed = TRUE))
 }
 
-test_that("P1-05: the built-in report prints the 2 descriptives tables", {
+test_that("The built-in report prints the 2 descriptives tables", {
   p1_expect_split(p1_builtin_html())
 })
 
-test_that("P1-05: the Quarto HTML report prints the 2 descriptives tables", {
+test_that("The Quarto HTML report prints the 2 descriptives tables", {
   p1_expect_split(p1_quarto_html())
 })
 
@@ -405,16 +404,16 @@ p1_expect_no_overlap <- function(to) {
   for (title in p1_titles) expect_true(grepl(title, txt, fixed = TRUE))
 }
 
-test_that("P1-05: no word in the Typst PDF overlaps another or crosses the margin", {
+test_that("No word in the Typst PDF overlaps another or crosses the margin", {
   p1_expect_no_overlap("typst")
 })
 
-test_that("P1-05: no word in the LaTeX PDF overlaps another or crosses the margin", {
+test_that("No word in the LaTeX PDF overlaps another or crosses the margin", {
   p1_expect_no_overlap("latex")
 })
 
 # A float's "Table N" or "Figure N" line and its title share a page with the
-# float (Session UF, the RF follow-up): seen apart at a page foot, Figure 2
+# float: seen apart at a page foot, Figure 2
 # in Typst and Table 2 in LaTeX. On the head's page, something must follow
 # the title above the foot (the table's heading row, or the chart's own
 # text), or there must be at least 200 pt left below it for a chart drawn
@@ -442,10 +441,10 @@ p1_expect_heads_kept <- function(to) {
   expect_identical(stranded, character(0))
 }
 
-test_that("UF: every table and figure number in the Typst PDF shares a page with its float", {
+test_that("Every table and figure number in the Typst PDF shares a page with its float", {
   p1_expect_heads_kept("typst")
 })
 
-test_that("UF: every table and figure number in the LaTeX PDF shares a page with its float", {
+test_that("Every table and figure number in the LaTeX PDF shares a page with its float", {
   p1_expect_heads_kept("latex")
 })

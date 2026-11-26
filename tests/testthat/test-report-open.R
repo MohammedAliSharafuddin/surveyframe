@@ -1,6 +1,6 @@
 # tests/testthat/test-report-open.R
 #
-# Found by the owner, 2026-10-27. render_report() finished with "Report
+# render_report() finished with "Report
 # rendered with the Quarto engine: two_group_report.html", a relative path
 # that left no clue where the file was, said nothing while Quarto worked for
 # a minute, and showed nothing. It now names the full path, says when Quarto

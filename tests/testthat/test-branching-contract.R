@@ -1,4 +1,4 @@
-# Batch 4's findings on branching, where the static survey and the Shiny
+# Findings on branching, where the static survey and the Shiny
 # survey disagreed with each other and with the declaration.
 #
 # #19. The static survey stores a multi-select answer comma-joined and compared
@@ -26,7 +26,7 @@ multi_instrument <- function() {
 
 # ── #19: the static evaluator ────────────────────────────────────────────
 
-test_that("19: a multi-select answer matches a rule on any of its values", {
+test_that("A multi-select answer matches a rule on any of its values", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(multi_instrument())
 
@@ -62,7 +62,7 @@ two_rule_instrument <- function() {
   ))
 }
 
-test_that("20: every rule on an item is kept, and they combine with AND", {
+test_that("Every rule on an item is kept, and they combine with AND", {
   instr <- two_rule_instrument()
   lookup <- sframe_branch_lookup(instr)
   # both rules survive, where the second used to replace the first
@@ -77,7 +77,7 @@ test_that("20: every rule on an item is kept, and they combine with AND", {
   expect_false(visible(list(age = NULL, country = "UK")))
 })
 
-test_that("20: a hidden controlling item counts as unanswered", {
+test_that("A hidden controlling item counts as unanswered", {
   instr <- sframe_instrument("Cascade", components = list(
     sframe_item("own", "Do you own a car?", type = "text"),
     sframe_item("make", "Which make?", type = "text"),
@@ -99,7 +99,7 @@ test_that("20: a hidden controlling item counts as unanswered", {
   expect_false(sframe_item_visible(by_id("year"), stale, lookup))
 })
 
-test_that("20: a rule cycle terminates", {
+test_that("A rule cycle terminates", {
   instr <- sframe_instrument("Cycle", components = list(
     sframe_item("a", "A", type = "text"),
     sframe_item("b", "B", type = "text"),
@@ -113,7 +113,7 @@ test_that("20: a rule cycle terminates", {
 
 # ── #21: conversational navigation respects visibility ───────────────────
 
-test_that("21: the conversational sequence leaves out hidden questions", {
+test_that("The conversational sequence leaves out hidden questions", {
   instr <- multi_instrument()
   lookup <- sframe_branch_lookup(instr)
 

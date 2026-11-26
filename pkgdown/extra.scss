@@ -24,12 +24,12 @@ div.sourceCode > pre.sourceCode > code {
 
 // Web-only pages (vignettes/articles/) are site pages, not package files, so
 // their "Source: vignettes/articles/..." line, a developer cue, is hidden
-// (owner UI check 2026-11-14). The package vignettes keep theirs.
+// The package vignettes keep theirs.
 small.dont-index:has(a[href*="vignettes/articles/"]) {
   display: none;
 }
 
-// A visible keyboard focus ring on every control (Codex WR81, WCAG 2.4.7):
+// A visible keyboard focus ring on every control (WCAG 2.4.7):
 // the theme's ring matched the navbar colour, so it could not be seen.
 // Dark blue #0B3A78 is 11.1:1 on the white page, yellow #f2b705 is 6.1:1 on
 // the dark blue navbar.
@@ -46,7 +46,7 @@ select:focus-visible, textarea:focus-visible {
   box-shadow: none;
 }
 
-// Heading permalinks a keyboard reader can reach (Codex WR82, WCAG 2.1.1):
+// Heading permalinks a keyboard reader can reach (WCAG 2.1.1):
 // pkgdown hides them with display:none until hover, which also takes them out
 // of the tab order. They stay in the tab order, invisible until hovered or
 // focused. pkgdown/extra.js names each one after its heading.
@@ -64,7 +64,7 @@ a.anchor:focus-visible {
   opacity: 1;
 }
 
-// Navbar dropdown text (Codex WR196, WCAG 1.4.3): Flatly's #7b8a8b was 4.3:1
+// Navbar dropdown text (WCAG 1.4.3): Flatly's #7b8a8b was 4.3:1
 // on the dark dropdown surface #212529. #dee2e6 is 11.8:1 there and 8.5:1 on
 // the navbar #0B3A78, where the collapsed mobile menu shows it.
 .navbar .dropdown-menu {
@@ -72,10 +72,9 @@ a.anchor:focus-visible {
   --bs-dropdown-header-color: #dee2e6;
 }
 
-// The "Source:" line under a page title is a developer cue (Codex WR241 to
-// WR244, WR257): hidden on the code of conduct, contributing, licence,
-// security and authors pages too. The package vignettes keep theirs (owner
-// UI check 2026-11-14), so only a link into /vignettes/ outside
+// The "Source:" line under a page title is a developer cue: hidden on the code
+// of conduct, contributing, licence, security and authors pages too. The
+// package vignettes keep theirs, so only a link into /vignettes/ outside
 // vignettes/articles/ stays.
 small.dont-index:not(:has(a[href*="/vignettes/"])) {
   display: none;

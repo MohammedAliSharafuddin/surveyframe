@@ -1,4 +1,4 @@
-# FR-21 (Fable sitting 2) and P2-08 (Codex pass 2), Session CF-B: a binary
+# A binary
 # outcome's modelled level (the event) follows the declared order, never the
 # session locale, and is named. as.factor() modelled the level that sorted
 # last under LC_COLLATE, and a factor with an unused level gave codes 0 and 2.
@@ -50,7 +50,7 @@ test_that("the event is the last declared code, and options$event names another"
 })
 
 test_that("a factor outcome with an unused level fits its 2 observed levels", {
-  # probe_numbers.R P2-08: "y values must be 0 <= y <= 1" at 2a910b0.
+  # The fit failed with "y values must be 0 <= y <= 1".
   d <- cfb_yes_no()
   d$out <- factor(tolower(d$out), levels = c("no", "unused", "yes"))
   r <- cfb_block(d, "regression_logistic_binary", list(predictors = "x", dependent = "out"),

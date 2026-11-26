@@ -1,13 +1,13 @@
 # tests/testthat/test-validate-lets-through.R
-# Fable sitting 1 FR-14. validate_sframe() accepted shapes the rest of the
+# validate_sframe() accepted shapes the rest of the
 # package then ignored or misread: a scale method of "banana" scored as the
 # mean, a plan alpha of 5, -0.05 or "abc" changed nothing, values and labels
 # of different lengths, an unknown branch operator, a branch on its own item,
 # 2 rules in a cycle, a check pass value outside its item's codes, and an item
 # scale_id its scale does not list. The first 5 are problems. The last 3 are
 # notes, since SurveyBuilder saved them before 0.4.3, and the builder now
-# refuses new ones (coordinator rulings 2026-11-11). A rule on an item asked
-# later stays allowed. The other FR-14 rows are in todo_0.4.4.md.
+# refuses new ones. A rule on an item asked
+# later stays allowed.
 
 lt_instr <- function() {
   cs <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
@@ -30,7 +30,7 @@ lt_check <- function(x) {
        notes = sframe_notes(d))
 }
 
-test_that("FR-14: a well-formed rule, a rule on a later item and a check are clean", {
+test_that("A well-formed rule, a rule on a later item and a check are clean", {
   x <- lt_instr()
   x$branching <- list(rule(item_id = "s_1", depends_on = "grp_q", operator = "==", value = "a"),
                       rule(item_id = "grp_q", depends_on = "s_4", operator = ">=", value = 3))
@@ -41,7 +41,7 @@ test_that("FR-14: a well-formed rule, a rule on a later item and a check are cle
   expect_length(r$notes, 0)
 })
 
-test_that("FR-14: 5 shapes are problems naming what is wrong", {
+test_that("5 shapes are problems naming what is wrong", {
   cases <- list(
     "V-07" = list(function(x) { x$scales[[1]]$method <- "banana"; x },
                   "Scale 'sat' has method 'banana'"),
@@ -70,7 +70,7 @@ test_that("FR-14: 5 shapes are problems naming what is wrong", {
   }
 })
 
-test_that("FR-14: a cycle, a pass value outside the codes and a stale scale_id are notes", {
+test_that("A cycle, a pass value outside the codes and a stale scale_id are notes", {
   cases <- list(
     "V-41" = list(function(x) { x$branching <- list(
                     rule(item_id = "s_1", depends_on = "s_2", operator = "==", value = 1),
@@ -101,7 +101,7 @@ test_that("FR-14: a cycle, a pass value outside the codes and a stale scale_id a
   expect_length(lt_check(x)$notes, 0)
 })
 
-test_that("FR-14: SurveyBuilder's item editor adds an item to the scale it names", {
+test_that("SurveyBuilder's item editor adds an item to the scale it names", {
   ctx <- builder_context()
   x <- lt_instr()
   x$items <- c(x$items, list(sframe_item("s_5", "Item 5", type = "likert", choice_set = "ag5")))
@@ -113,7 +113,7 @@ test_that("FR-14: SurveyBuilder's item editor adds an item to the scale it names
   expect_length(sframe_notes(validate_sframe(y, strict = FALSE)), 0)
 })
 
-test_that("FR-14: SurveyBuilder refuses a rule that closes a cycle", {
+test_that("SurveyBuilder refuses a rule that closes a cycle", {
   ctx <- builder_context()
   x <- lt_instr()
   x$branching <- list(rule(item_id = "s_2", depends_on = "s_1", operator = "==", value = 1),
@@ -131,7 +131,7 @@ test_that("FR-14: SurveyBuilder refuses a rule that closes a cycle", {
   expect_identical(ctx$get("S.branching.length"), 3L)
 })
 
-test_that("FR-14: SurveyBuilder refuses a pass value that is no code of the item", {
+test_that("SurveyBuilder refuses a pass value that is no code of the item", {
   ctx <- builder_context()
   builder_open(ctx, lt_instr())
   ctx$eval("sv('ck-id','c1'); document.getElementById('ck-item').value = 's_1'; sv('ck-pass','4, 9');

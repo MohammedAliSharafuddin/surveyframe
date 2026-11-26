@@ -113,7 +113,7 @@ sframe_item_value_labels <- function(instrument, item_id) {
 # than coded values (a text-family result's `term`/`term_a`/`match`
 # column): a respondent's own word can otherwise collide with an unrelated
 # item's choice CODE anywhere in the instrument and get silently swapped
-# for that item's choice LABEL (found in review_050; a comment containing
+# for that item's choice LABEL (a comment containing
 # "pool" read back as "Pool area" because some other item happened to code
 # a choice "pool"). Column names and row names are still relabelled
 # normally; only cell values in an excluded column are left alone, so a
@@ -127,8 +127,8 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
     hit <- dict[x]
     ifelse(is.na(hit), x, unname(hit))
   }
-  # A choice code such as "2" is also a number a statistic can take (CX-21:
-  # "Suggested factors" 2 printed as "Disagree"). Ids relabel in any cell.
+  # A choice code such as "2" is also a number a statistic can take
+  # ("Suggested factors" 2 printed as "Disagree"). Ids relabel in any cell.
   # Codes relabel only in a column of response values: none of its cells is
   # a number that is not a code, and the table is not a statistic and value
   # layout, whose cells are statistics by construction.
@@ -158,7 +158,7 @@ sframe_humanize_table <- function(tbl, lookup, exclude_cols = character(0)) {
 }
 
 # An interaction term such as attendee_role:format as its labels joined by a
-# times sign (CX-20). A cell whose parts are not all ids is left alone.
+# times sign. A cell whose parts are not all ids is left alone.
 sframe_label_terms <- function(x, ids) {
   if (!length(ids)) return(x)
   vapply(x, function(s) {
@@ -170,7 +170,7 @@ sframe_label_terms <- function(x, ids) {
 }
 
 # Result text names a variable by its label in the instrument and a group by
-# its choice label, as the tables and charts beside it do (CX-20). Each
+# its choice label, as the tables and charts beside it do. Each
 # runner puts the name in where it puts the id, so the template's own words
 # stay as they are. The instrument is set once around the runner call.
 .sframe_text_label_env <- new.env(parent = emptyenv())

@@ -1,6 +1,6 @@
 # tests/testthat/test-amendment-preview.R
 #
-# Session 8a, UX-06 and UX-19. Studio's 1 amendment dialog shows what a change
+# Studio's 1 amendment dialog shows what a change
 # touches before it is applied: the fields, the scales whose scoring changes,
 # the models and the plan blocks, whether the change is design tier whatever
 # is chosen, and the version suggested for each tier, with the reason. It all

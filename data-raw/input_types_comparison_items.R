@@ -1,10 +1,9 @@
-# data-raw/input_types_comparison_items.R
-# The all-types demo holds all 13 answerable types (owner 2026-11-05,
-# Session 10): it gains a pairwise comparison on the Saaty scale, 1 on the
-# influence scale and a criteria weight, over 3 features of a visit, with
-# seeded answers appended to its responses file. The existing columns and
-# their bytes are kept, so nothing already in the data changes. Running it
-# again changes nothing. Run it before reference_demo_stories.R.
+# data-raw/input_types_comparison_items.R The all-types demo holds all 13
+# answerable types: it gains a pairwise comparison on the Saaty scale, 1 on the
+# influence scale and a criteria weight, over 3 features of a visit, with seeded
+# answers appended to its responses file. The existing columns and their bytes
+# are kept, so nothing already in the data changes. Running it again changes
+# nothing. Run it before reference_demo_stories.R.
 #
 # Run from the repository root:  Rscript data-raw/input_types_comparison_items.R
 

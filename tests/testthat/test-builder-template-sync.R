@@ -52,7 +52,7 @@ test_that("the builder's field tools match field_tools.js", {
                    info = "Run data-raw/inline_static_template.R to regenerate the builder.")
 })
 
-test_that("the builder's design tokens match design_tokens.css (UI-3)", {
+test_that("the builder's design tokens match design_tokens.css", {
   builder <- asset("builder", "survey_builder.html")
   inlined <- inlined_block(builder, "<!-- DESIGN_TOKENS_START:",
                            "<!-- DESIGN_TOKENS_END -->")

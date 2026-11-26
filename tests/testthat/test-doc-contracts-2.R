@@ -1,18 +1,18 @@
 # tests/testthat/test-doc-contracts-2.R
 #
-# Batch 8 correctness findings, and the codebook and CFA reverse-coding item
-# carried over from the scoring phase.
+# Documentation correctness findings, and the codebook and CFA reverse-coding
+# item carried over from the scoring phase.
 #
-# #10. One shared page documented 15 as.data.frame() methods with materially
+# One shared page documented 15 as.data.frame() methods with materially
 #      different schemas, and said row.names is forwarded where several methods
 #      return their table directly and ignore it.
-# #11. sframe_apa() was documented for analysis results only, though it answers for
+# sframe_apa() was documented for analysis results only, though it answers for
 #      4 standalone reports, and sframe_flagged() returns a union of row positions.
-# #14. The EFA help sent readers to another package for a solution
+# The EFA help sent readers to another package for a solution
 #      sframe_efa_solution() already fits.
-# #16. The package page said every function operates on an instrument, where
+# The package page said every function operates on an instrument, where
 #      the text and bootstrap helpers take plain vectors.
-# #19. The conjoint help said a design becomes part of the instrument contract
+# The conjoint help said a design becomes part of the instrument contract
 #      without showing how, and sframe_instrument() omitted designs from its
 #      components.
 # Carried over: the codebook's reverse column and the CFA syntax comment read
@@ -47,7 +47,7 @@ source_of <- function(file) {
   paste(readLines(p, warn = FALSE), collapse = "\n")
 }
 
-test_that("10: the coercion help describes the schemas and the row.names limit", {
+test_that("The coercion help describes the schemas and the row.names limit", {
   src <- source_of("as_data_frame.R")
   expect_match(src, "row.names", fixed = TRUE)
   expect_match(src, "`sframe_validation`: one row per problem", fixed = TRUE)
@@ -57,7 +57,7 @@ test_that("10: the coercion help describes the schemas and the row.names limit",
                    rownames(as.data.frame(book)))
 })
 
-test_that("11: sframe_apa() answers for standalone reports too, and the help says so", {
+test_that("sframe_apa() answers for standalone reports too, and the help says so", {
   # 4 standalone reports carry an APA sentence, alongside analysis results
   d <- data.frame(a1 = c(1, 5, 3, 4, 2, 5), a2 = c(5, 1, 3, 2, 4, 1))
   ar <- sframe_assumption_results(d, reverse_instrument())
@@ -67,18 +67,18 @@ test_that("11: sframe_apa() answers for standalone reports too, and the help say
   expect_match(src, "row positions", fixed = TRUE)
 })
 
-test_that("14: the EFA help names sframe_efa_solution() as the way to fit one", {
+test_that("The EFA help names sframe_efa_solution() as the way to fit one", {
   src <- source_of("psychometrics.R")
   expect_match(src, "sframe_efa_solution()", fixed = TRUE)
 })
 
-test_that("16: the package page says which functions take plain vectors", {
+test_that("The package page says which functions take plain vectors", {
   src <- source_of("surveyframe-package.R")
   expect_false(grepl("Every function operates on", src, fixed = TRUE))
   expect_match(src, "sframe_list_demos()", fixed = TRUE)
 })
 
-test_that("19: a conjoint design is documented as an instrument component", {
+test_that("A conjoint design is documented as an instrument component", {
   design <- sframe_conjoint_design("d", attributes = list(a = c("x", "y"), b = c("p", "q")),
                                method = "full", seed = 3)
   ins <- sframe_instrument(title = "With design", components = list(

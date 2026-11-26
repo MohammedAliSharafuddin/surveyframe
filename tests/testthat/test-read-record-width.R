@@ -1,4 +1,4 @@
-# P3-01 (Codex pass 3), Session CF-B: a CSV whose data rows are wider than
+# A CSV whose data rows are wider than
 # its header is refused, or, when every row has 1 empty extra field, read
 # with that field dropped. read.csv() made column 1 the row names and moved
 # every answer and the respondent id 1 column left.
@@ -36,7 +36,7 @@ test_that("a short row is refused too, and a quoted field across lines is 1 reco
 })
 
 test_that("a 1-column file keeps an unanswered respondent's blank line", {
-  # P3-02 (Codex pass 3): read.csv() skipped the blank line, so the file read
+  # read.csv() skipped the blank line, so the file read
   # as 2 respondents, first and last.
   i <- sframe_instrument("P3", components = list(sframe_item("note", "Note", "text")))
   p <- tempfile(fileext = ".csv")

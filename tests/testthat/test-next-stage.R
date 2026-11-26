@@ -1,5 +1,5 @@
 # Each stage names the one after it, in an interactive session and for a
-# call made at the console (Session 10, first contact section 5 item 5).
+# call made at the console.
 # Calls are evaluated in the global environment, as typed at the console.
 
 stage_messages <- function(call) {

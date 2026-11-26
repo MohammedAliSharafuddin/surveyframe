@@ -1,6 +1,6 @@
 # R/apa_format.R
 #
-# One APA layer (CX-15, CX-22, CX-24, D9). Each renderer used to format
+# One APA layer. Each renderer used to format
 # result text, table cells and headings on its own, so the built-in engine,
 # render_results() and sframe_format_result() disagreed with each other and with
 # APA 7. Everything a report shows of a statistic goes through here.
@@ -12,7 +12,7 @@
   "tau", "\u03c4", "phi", "\u03c6", "Cramer's V", "Cram\u00e9r's V",
   "\u03b7\u00b2", "partial \u03b7\u00b2", "\u03c9\u00b2", "\u03b1", "\u03c9",
   "Kendall's W",
-  # Cramer's V as the chi-square runner writes it (FR-32). The Wilcoxon
+  # Cramer's V as the chi-square runner writes it. The Wilcoxon
   # signed-rank V is a rank sum printed with no decimals, so it never holds
   # the "0." this drops.
   "V"
@@ -36,7 +36,7 @@ sframe_apa_text <- function(x) {
   regmatches(y, m) <- lapply(regmatches(y, m), function(s) {
     gsub("(?<![0-9.])0\\.(?=[0-9])", ".", s, perl = TRUE)
   })
-  # A value that rounds to 0 is 0.00, never -0.00 (FR-32).
+  # A value that rounds to 0 is 0.00, never -0.00.
   y <- gsub("(?<![0-9.])-((?:0)?\\.0+|0)(?![0-9.])", "\\1", y, perl = TRUE)
   x[ok] <- y
   x
@@ -60,8 +60,7 @@ sframe_drop_old_share_cols <- function(x) {
 }
 
 # Columns of counts, whose whole values print with no decimals, and percent
-# columns, whose whole values did so before and which Codex P1-01 settled as
-# "100".
+# columns, whose whole values did so before and now print as "100".
 .sframe_apa_count_col_re <- paste0(
   "^(n|n[ _]?[0-9]|df|df[0-9]|frequency|count|k|items|rank|row|",
   "respondents|cases|.*_n|n_.*|.*[ _]count|weighted_frequency|",
@@ -83,7 +82,6 @@ sframe_apa_number <- function(v, digits = 2, bounded = FALSE, count = NULL) {
   # Whole numbers print with no decimals only in a column of counts: an
   # integer column or one named as a count. F values of 4 and 9 printed as
   # "4" and "9", and the same column with 1 fractional value as "4.00"
-  # (FR-32).
   if (is.null(count)) count <- is.integer(v)
   whole <- count && all(is.na(v) | !is.finite(v) | v == round(v))
   s <- if (whole) format(v, scientific = FALSE, trim = TRUE)
@@ -174,7 +172,7 @@ sframe_html_heading_md <- function(x) {
 
 # Result text as HTML: escaped, Latin statistical symbols in italics, r_s and
 # d_z with subscripts, tau and phi as Greek letters, chi-square as its symbol
-# (CX-24). A symbol is marked only where a value follows it, so words in the
+# A symbol is marked only where a value follows it, so words in the
 # sentence are left alone.
 sframe_apa_html <- function(x) {
   if (length(x) == 0) return(character(0))
@@ -195,7 +193,7 @@ sframe_apa_html <- function(x) {
 
 # A result sentence as Markdown, its statistical symbols in italics as
 # sframe_apa_html() sets them, for the Quarto report, whose Word, PDF and
-# Typst output set the HTML engine's symbols in roman (L2, CX-24). The text
+# Typst output set the HTML engine's symbols in roman. The text
 # is escaped first, so a label's own * or _ stays literal.
 sframe_apa_markdown <- function(x) {
   if (length(x) == 0) return(character(0))
@@ -233,7 +231,7 @@ sframe_apa_markdown <- function(x) {
 )
 
 # Headings in words for the descriptive and missing-data columns, the same
-# in every report engine and format (Codex P1-03). A statistic symbol is
+# in every report engine and format. A statistic symbol is
 # between asterisks, set in italics. "{level}" is the confidence level.
 .sframe_apa_label_map <- c(
   variable = "Variable", group = "Group", valid_n = "Valid *n*",
@@ -273,7 +271,7 @@ sframe_apa_headings <- function(names, conf_level = 0.95) {
   }, character(1), USE.NAMES = FALSE)
 }
 
-# Tables and figures (CX-22). A renderer marks each table caption and figure
+# Tables and figures. A renderer marks each table caption and figure
 # caption with class "sf-apa-caption" and an already escaped title. Once the
 # document is assembled, sframe_apa_number_floats() numbers them in reading
 # order as APA 7 does: the number in bold, the title in italics on the line
@@ -322,7 +320,7 @@ sframe_apa_number_floats <- function(html) {
        "\\1</em></\\3>", html)
 }
 
-# The Quarto report (CX-22). knitr writes a table's caption as a plain
+# The Quarto report. knitr writes a table's caption as a plain
 # <caption>, and the template wraps each chart in a marked figure carrying its
 # alt text in data-alt, since knitr writes the image with none. Every caption
 # is a numbered table title, and each marked figure's image takes its alt text.

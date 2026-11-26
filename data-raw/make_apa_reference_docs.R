@@ -2,7 +2,7 @@
 #
 # Builds inst/templates/apa-reference.docx and apa-reference.odt, the
 # reference documents Quarto styles a Word or OpenDocument report with
-# (NAMING decision 6). Each starts from pandoc's own default reference
+# Each starts from pandoc's own default reference
 # document, so every style pandoc writes exists, and sets APA 7: Times New
 # Roman 12 throughout, black text, double spacing, a half-inch first-line
 # indent in body text, level 1 headings centred and bold, level 2 bold,

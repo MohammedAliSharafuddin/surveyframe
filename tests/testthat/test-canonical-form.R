@@ -1,7 +1,6 @@
 # tests/testthat/test-canonical-form.R
 # The canonical form R, SurveyBuilder and the verifier page hash: RFC 8785, the
-# JSON Canonicalization Scheme (Codex pass 2 P2-01 and P2-06, Fable sitting 1
-# FR-01, FR-02, FR-03, FR-09, FR-10 and FR-12). The cases are shared with the
+# JSON Canonicalization Scheme. The cases are shared with the
 # JavaScript twins through fixtures/canonical/cases.tsv and run in node.
 
 canon_cases <- function() {
@@ -77,7 +76,7 @@ test_that("the canonical form follows RFC 8785 on every pinned case", {
   }
 })
 
-test_that("null and {} hash differently, as do numbers apart in the 17th digit (P2-01, FR-10)", {
+test_that("null and {} hash differently, as do numbers apart in the 17th digit", {
   h <- function(t) canon_r(t)$hash
   expect_false(identical(h('{"a":null}'), h('{"a":{}}')))
   expect_false(identical(h('{"a":0.1}'), h('{"a":0.10000000000000002}')))
@@ -109,7 +108,7 @@ test_that("the builder and the verifier page carry the same canonical block", {
   expect_identical(block(pages[["builder"]]), block(pages[["verifier"]]))
 })
 
-test_that("a file R writes verifies in both JavaScript twins (FR-01, FR-02, FR-03)", {
+test_that("a file R writes verifies in both JavaScript twins", {
   skip_if_no_node()
   variants <- list(
     weight_1e7 = function(x) { x$scales[[1]]$weights <- c(1e-7, 1, 1, 1); x },
@@ -153,7 +152,7 @@ test_that("a file SurveyBuilder saves reads back verified in R", {
   }
 })
 
-test_that("read_sframe() refuses a file that gives a key twice (FR-12)", {
+test_that("read_sframe() refuses a file that gives a key twice", {
   f <- tempfile(fileext = ".sframe")
   write_sframe(canon_instrument(), f)
   txt <- paste(readLines(f), collapse = "\n")
@@ -163,14 +162,14 @@ test_that("read_sframe() refuses a file that gives a key twice (FR-12)", {
                class = "sframe_import_error")
 })
 
-test_that("an NA where the schema allows null reads back verified, elsewhere it is refused (FR-01)", {
+test_that("an NA where the schema allows null reads back verified, elsewhere it is refused", {
   x <- canon_instrument()
   x$items[[1]]$help <- NA
   x$meta$description <- NA_character_
   f <- tempfile(fileext = ".sframe")
   write_sframe(x, f)
   expect_true(attr(read_sframe(f), "sframe_verified"))
-  # The schema's meta.authors is an array of strings (coordinator ruling).
+  # The schema's meta.authors is an array of strings.
   x$meta$authors <- c("A", NA)
   expect_error(write_sframe(x, tempfile(fileext = ".sframe")),
                "meta.authors holds NA at position 2", class = "sframe_validation_error")
@@ -196,7 +195,7 @@ test_that("a file hashed in the 0.4.3 development form reads with the save-again
   expect_no_message(read_sframe(g), class = "sframe_locale_order_hash")
 })
 
-test_that("read_sframe() refuses an escaped NUL or a lone surrogate (coordinator, after milestone 1)", {
+test_that("read_sframe() refuses an escaped NUL or a lone surrogate", {
   f <- tempfile(fileext = ".sframe")
   x <- canon_instrument()
   x$items[[1]]$label <- "abcXdef"
@@ -212,7 +211,7 @@ test_that("read_sframe() refuses an escaped NUL or a lone surrogate (coordinator
   expect_error(read_sframe(f), "Integrity check failed", class = "sframe_import_error")
 })
 
-test_that("a field with an empty name is refused at write with its path (coordinator, after milestone 4)", {
+test_that("a field with an empty name is refused at write with its path", {
   # jsonlite wrote {"":3} beside a named field as {"3":3}, and alone as [3],
   # so a file read with an empty key changed on writing, with no amendment.
   f <- tempfile(fileext = ".sframe")

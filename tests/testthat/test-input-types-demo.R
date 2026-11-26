@@ -32,7 +32,7 @@ test_that("input-types demo covers all declared item types", {
     "slider",
     "ranking",
     "rating",
-    # Session 10: both pairwise scales and criteria weights (owner 2026-11-05).
+    # Both pairwise scales and criteria weights.
     "pairwise_comparison",
     "criteria_weight",
     "section_break",

@@ -1,6 +1,6 @@
 # tests/testthat/test-report-offline.R
 #
-# A Quarto report renders with no network fetch (session 7). The cosmo
+# A Quarto report renders with no network fetch. The cosmo
 # theme's CSS imported a Google web font, so pandoc fetched it to embed,
 # though the template sets a system font stack. Every report needed the
 # internet and sent Google a request, and a stalled connection hung the

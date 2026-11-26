@@ -1,4 +1,4 @@
-# FR-26 (Fable sitting 2), Session CF-B: a sum score with min_valid below the
+# A sum score with min_valid below the
 # item count is prorated, not a sum with 0 for each unanswered item.
 
 cfb_sum_instrument <- function(weights = NULL) {
@@ -10,7 +10,7 @@ cfb_sum_instrument <- function(weights = NULL) {
 }
 
 test_that("2 top answers of 4 score the top of the sum scale", {
-  # Fable's reproducer: 10 at 2a910b0.
+  # This case gave 10.
   out <- score_scales(data.frame(s_1 = 5, s_2 = 5, s_3 = NA, s_4 = NA), cfb_sum_instrument())
   expect_equal(out$sat, 20)
 })

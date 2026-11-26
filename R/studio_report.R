@@ -1,7 +1,7 @@
 # R/studio_report.R
 #
 # What SurveyStudio's Report screen says and offers about the engine and the
-# reference style (UI-1). Studio runs in the package namespace and calls
+# reference style. Studio runs in the package namespace and calls
 # these, so they are tested without a browser.
 
 # The engine line: Quarto as render_report() finds it, through
@@ -26,7 +26,7 @@ sframe_studio_quarto_note <- function(found = sframe_quarto_find(),
                                 ", writes the report in any reference style."))
 }
 
-# The declared plan as the Analyse screen shows it, read-only (UX-02): the
+# The declared plan as the Analyse screen shows it, read-only: the
 # builder's Plan is the only plan editor, and Analyse runs what it declares.
 # `labels` names each method Studio knows (its analysis registry). A block
 # with no method says so, and a method Studio does not know is shown as
@@ -69,7 +69,7 @@ sframe_studio_plan_change_report <- function(before, after) {
          ". Reason: ")
 }
 
-# The formats the Finished report offers (UX-20). Word and OpenDocument go
+# The formats the Finished report offers. Word and OpenDocument go
 # through Quarto, so without it the choice is HTML and PDF, and the engine
 # line names the remedy. The reproducible source is the Reproduce tab's job,
 # so the .qmd folder is not a format here.
@@ -82,7 +82,7 @@ sframe_studio_report_formats <- function(quarto_ok) {
   }
 }
 
-# The Reference style select on Configure (owner 2026-11-03): APA 7 first,
+# The Reference style select on Configure: APA 7 first,
 # then the other bundled styles, then a .csl file of one's own. Every style
 # but APA 7 needs Quarto, so without it the select offers APA 7 only.
 sframe_studio_style_choices <- function(quarto_ok) {

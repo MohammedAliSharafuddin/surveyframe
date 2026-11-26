@@ -1,4 +1,4 @@
-# FR-30 (Fable sitting 2), Session CF-B: score_scales() reads a value its
+# score_scales() reads a value its
 # item's choice set does not declare, and one that is not a number, as
 # missing, with a message. 7 on a 1 to 5 item was scored as 7, a reversed 0
 # became 6, and "4,5" became NA without a word.

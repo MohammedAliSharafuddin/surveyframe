@@ -1,23 +1,23 @@
-# FR-37 (Codex files review, 2026-11-12), Session CF-B: the chi_square
-# cross-tab labels both axes from their own item's choice set. Workshop G3
-# (channel by return) showed rows "1", "2", "3" and columns "No" and "1".
+# The chi_square
+# cross-tab labels both axes from their own item's choice set. A cross-tab
+# of channel by return showed rows "1", "2", "3" and columns "No" and "1".
 
-cfb_g3_instrument <- function() {
-  ins <- sframe_instrument("G3", components = list(
+crosstab_label_instrument <- function() {
+  ins <- sframe_instrument("B1", components = list(
     sframe_choice_set("chan", 1:3, c("Website", "Agent", "Walk-in")),
     sframe_choice_set("yn", 0:1, c("No", "Yes")),
     sframe_choice_set("ag", 1:5, c("SD", "D", "N", "A", "SA")),
     sframe_item("channel", "Booking channel", "single_choice", choice_set = "chan"),
     sframe_item("ret", "Would return", "single_choice", choice_set = "yn"),
     sframe_item("sat", "Satisfied", "likert", choice_set = "ag")))
-  sframe_plan(ins) <- list(list(id = "G3", research_question = "q", family = "inferential",
+  sframe_plan(ins) <- list(list(id = "B1", research_question = "q", family = "inferential",
                                 method = "chi_square", roles = list(row = "channel", column = "ret"),
                                 options = list(percent = "row")))
   ins
 }
 
 test_that("a 1:k and a 0:1 choice set read through read_responses() label both axes", {
-  ins <- cfb_g3_instrument()
+  ins <- crosstab_label_instrument()
   set.seed(5)
   d <- data.frame(respondent_id = sprintf("%03d", 1:60),
                   channel = sample(1:3, 60, TRUE), ret = sample(0:1, 60, TRUE),
@@ -25,7 +25,7 @@ test_that("a 1:k and a 0:1 choice set read through read_responses() label both a
   p <- tempfile(fileext = ".csv")
   utils::write.csv(d, p, row.names = FALSE)
   resp <- read_responses(p, ins)
-  r <- run_analysis_plan(resp, ins)$G3
+  r <- run_analysis_plan(resp, ins)$B1
   expect_null(r$error)
   expect_identical(rownames(r$table), c("Website", "Agent", "Walk-in"))
   expect_identical(colnames(r$table), c("No", "Yes"))

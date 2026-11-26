@@ -465,7 +465,7 @@ test_that("0.3.3: SurveyBuilder has one settings entry point and one Add-questio
   # fab-row button rather than the whole file).
   fab_row <- sub(".*(<div class=\"fab-row\">.*?</div>).*", "\\1", html)
   expect_false(grepl("qAdd('likert')", fab_row, fixed = TRUE))
-  # Since UI-3 item 5 the empty item list holds text only, and the canvas
+  # The empty item list holds text only, and the canvas
   # checklist holds the next step, so no button repeats the Settings row.
   expect_false(grepl("sb-empty-cta", html, fixed = TRUE))
   expect_match(html, "function renderPrompt()", fixed = TRUE)

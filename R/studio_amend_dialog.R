@@ -1,6 +1,6 @@
 # R/studio_amend_dialog.R
 #
-# SurveyStudio's 1 amendment dialog (session 8a, UX-06 and UX-19). Every
+# SurveyStudio's 1 amendment dialog. Every
 # change Studio records as an amendment opens it: a save from Design on an
 # instrument with a history, a revised file imported on the Amendments
 # screen, and later the Drop from scale, Put back, Quality and Responses and

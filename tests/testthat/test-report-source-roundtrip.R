@@ -1,6 +1,5 @@
 # tests/testthat/test-report-source-roundtrip.R
 #
-# Session LF, the L4 defect (master review step L4, coordinator 2026-11-08).
 # sframe_report_source() said the numbers differed on an untouched folder
 # when the instrument was built in memory and never written, or when the
 # responses were a plain data frame. Export computed the results record from

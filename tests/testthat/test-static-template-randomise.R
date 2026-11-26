@@ -1,6 +1,6 @@
 # tests/testthat/test-static-template-randomise.R
 #
-# UX-11: a choice set's randomise was set in R and the builder, and the
+# A choice set's randomise was set in R and the builder, and the
 # survey page never read it. The page now shows a single choice, multiple
 # choice or ranking item's options in an order shuffled once per respondent,
 # and each option still submits its own value. Run under V8

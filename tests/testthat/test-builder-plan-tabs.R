@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-plan-tabs.R
 #
-# UX-17: the Plan mode's tabs said "Run preview" and "Report outline", so
+# The Plan mode's tabs said "Run preview" and "Report outline", so
 # "preview" named 2 things in the builder. They are "Declared analyses" and
 # "Expected outputs", and Preview means the respondent's survey alone.
 

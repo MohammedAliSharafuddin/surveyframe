@@ -1,6 +1,6 @@
 # data-raw/reference_demo_stories.R
 # The 2 reference datasets get the treatment the teaching demos get from
-# demo_stories.R (Session 10, coordinator 2026-11-14): the placeholder
+# demo_stories.R: the placeholder
 # author, a research-style purpose, a study, and H0, H1 and a decision rule
 # on each block that tests a hypothesis. No generator builds these 2 files,
 # so this reads each committed file, applies its story and writes it again
@@ -70,8 +70,8 @@ reference_stories <- list(
   input_types = list(
     file = "surveyframe_input_types_demo.sframe",
     title = "Visitor experience survey",
-    # The text block read as a placeholder in SurveyStudio's list (owner
-    # 2026-11-15), so it says what a text block does for a respondent.
+    # The text block read as a placeholder in SurveyStudio's list, so it
+    # says what a text block does for a respondent.
     labels = c(info_block = "A text block gives respondents information, such as an instruction or a consent statement. It collects no answer."),
     description = "A visitor experience study of how online information, service and value relate to overall rating and the intention to recommend or reuse a service, asked with every kind of question a survey can hold.",
     study = list(
@@ -113,12 +113,12 @@ for (name in names(reference_stories)) {
   st <- reference_stories[[name]]
   path <- file.path("inst", "extdata", st$file)
   ins <- read_sframe(path)
-  # Written again as the same instrument at 1.0.0, not amended (owner
-  # 2026-11-14): the reference datasets were never a published instrument.
+  # Written again as the same instrument at 1.0.0, not amended: the
+  # reference datasets were never a published instrument.
   attr(ins, "sframe_origin") <- NULL
   st$hyp <- Filter(Negate(is.null), st$hyp)
   ins <- apply_story(ins, st)
-  # A study title in place of the builder's placeholder (owner 2026-11-15),
+  # A study title in place of the builder's placeholder,
   # which the Docs screenshots show in SurveyStudio's header.
   if (!is.null(st$title)) ins$meta$title <- st$title
   for (id in names(st$labels)) {

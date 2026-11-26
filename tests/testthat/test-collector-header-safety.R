@@ -1,6 +1,6 @@
 # tests/testthat/test-collector-header-safety.R
 #
-# Batch 5, finding 12. The Google Sheets collector mapped each submission onto
+# The Google Sheets collector mapped each submission onto
 # the sheet's header after trimming it, with no check for a duplicate or blank
 # heading, and with nothing stopping 2 submissions interleaving while the header
 # was being created or extended. A duplicate heading put the same answer in 2
@@ -17,7 +17,7 @@ seed_header <- function(ctx, header) {
 
 responses_rows <- function(ctx) ctx$get("__ss.sheets['Responses'].rows.length")
 
-test_that("12: a duplicate heading sends the submission to the unmapped sheet", {
+test_that("A duplicate heading sends the submission to the unmapped sheet", {
   ctx <- apps_script_context(c("respondent_id", "q1"))
   seed_header(ctx, c("respondent_id", "q1", "q1"))
   apps_script_post(ctx, c(respondent_id = "r1", q1 = "yes"))
@@ -28,7 +28,7 @@ test_that("12: a duplicate heading sends the submission to the unmapped sheet", 
   expect_true(any(grepl("q1", unlist(unmapped), fixed = TRUE)))
 })
 
-test_that("12: a blank heading between columns is treated as ambiguous", {
+test_that("A blank heading between columns is treated as ambiguous", {
   ctx <- apps_script_context(c("respondent_id", "q1", "q2"))
   seed_header(ctx, c("respondent_id", "", "q2"))
   apps_script_post(ctx, c(respondent_id = "r1", q1 = "a", q2 = "b"))
@@ -37,7 +37,7 @@ test_that("12: a blank heading between columns is treated as ambiguous", {
   expect_false(is.null(ctx$get("__ss.sheets['Unmapped submissions']")))
 })
 
-test_that("12: header work and the append run inside a script lock", {
+test_that("Header work and the append run inside a script lock", {
   ctx <- apps_script_context(c("respondent_id", "q1"))
   apps_script_post(ctx, c(respondent_id = "r1", q1 = "a"))
   apps_script_post(ctx, c(respondent_id = "r2", q1 = "b"))
@@ -45,7 +45,7 @@ test_that("12: header work and the append run inside a script lock", {
   expect_identical(ctx$get("__lock.released"), 2L)
 })
 
-test_that("12: an ordinary header still maps every answer", {
+test_that("An ordinary header still maps every answer", {
   ctx <- apps_script_context(c("respondent_id", "q1"))
   apps_script_post(ctx, c(respondent_id = "r1", q1 = "a"))
   expect_identical(apps_script_cell(ctx, 1, "q1"), "a")

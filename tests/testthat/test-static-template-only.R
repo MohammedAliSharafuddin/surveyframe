@@ -1,7 +1,7 @@
 # tests/testthat/test-static-template-only.R
 #
 # The survey template's show-only mode, which SurveyBuilder's centre pane uses
-# to draw the selected item with the template's own renderer (UX-09). Run
+# to draw the selected item with the template's own renderer. Run
 # under V8 (helper-v8-dom.R). Only a preview takes the mode: a live survey
 # given data-only renders its survey as before.
 

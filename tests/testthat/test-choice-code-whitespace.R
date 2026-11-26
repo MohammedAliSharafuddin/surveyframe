@@ -1,4 +1,4 @@
-# P3-04 (Codex pass 3), Session CF-B: a choice code with white space at
+# A choice code with white space at
 # either end is a validation problem, and the reader compares codes as
 # declared. Trimmed, " 1" counted as numeric and the answer " 1" became 1.
 

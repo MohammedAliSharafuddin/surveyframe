@@ -73,7 +73,7 @@ builder <- replace_block(
   tools_block
 )
 
-# The shared design tokens (UI-3), the same file Studio links.
+# The shared design tokens, the same file Studio links.
 tokens_block <- c("<style>", read_utf8(tokens_path), "</style>")
 builder <- replace_block(
   builder,

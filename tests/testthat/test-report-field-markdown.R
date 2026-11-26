@@ -1,6 +1,6 @@
 # tests/testthat/test-report-field-markdown.R
 #
-# Session 8b-R, item 10 (owner 2026-11-04). The research question, H0, H1,
+# The research question, H0, H1,
 # decision rule, interpretation, study problem and deviation report may hold
 # Markdown. Plain prose prints exactly as typed. Formatting gives the same
 # result in both engines. Equations render in every Quarto format, offline,

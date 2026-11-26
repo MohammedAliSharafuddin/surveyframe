@@ -1,5 +1,5 @@
 # tests/testthat/test-syntax-ancova-covariates.R
-# CX-02. The ANCOVA code sframe_syntax_result() writes carries every declared
+# The ANCOVA code sframe_syntax_result() writes carries every declared
 # covariate, so it reproduces the runner's adjusted group F with 2 covariates.
 
 test_that("ANCOVA syntax writes every covariate and matches the runner", {

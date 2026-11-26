@@ -1,13 +1,12 @@
 # tests/testthat/fixtures/make_t1_expected_flags.R
 #
-# Not run by the tests. Rebuilds t1_expected_flags.csv beside it from the Codex
-# T1 oracle output (session 8a), read-only, with the 6 PLS rows corrected.
+# Not run by the tests. Rebuilds t1_expected_flags.csv beside it from the
+# oracle output, read-only, with the 6 PLS rows corrected.
 # The oracle read column 1 of seminr's loadings matrix only, so it_1 to it_3
 # and sa_1 to sa_3 read 0. Each item's loading is now its own construct's.
-# Run from the package root. The Codex folder is a sibling of the repository
-# unless SF_CODEX_PREP_DIR names it.
-src <- Sys.getenv("SF_CODEX_PREP_DIR", "../surveyframe-codex-prep-2026-11")
-if (!dir.exists(src)) stop("Codex T1 folder not found: ", src, ". Set SF_CODEX_PREP_DIR.")
+# Run from the package root, with SF_ORACLE_DIR naming the oracle folder.
+src <- Sys.getenv("SF_ORACLE_DIR", "")
+if (!nzchar(src) || !dir.exists(src)) stop("Oracle folder not found: ", src, ". Set SF_ORACLE_DIR.")
 x <- utils::read.csv(file.path(src, "t1_expected_flags.csv"), stringsAsFactors = FALSE)
 ext <- file.path(src, "src", "inst", "extdata", "demos")
 instr <- jsonlite::fromJSON(file.path(ext, "sem_pls.sframe"), simplifyVector = FALSE)

@@ -1,5 +1,5 @@
 # tests/testthat/test-kendall-report.R
-# D9 (CX-17). Kendall's tau reports tau, interval, p and N with no df.
+# Kendall's tau reports tau, interval, p and N with no df.
 # Pearson and Spearman keep r(df) and r_s(df).
 
 kendall_data <- function() {

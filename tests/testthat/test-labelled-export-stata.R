@@ -1,6 +1,6 @@
 # tests/testthat/test-labelled-export-stata.R
 #
-# Ethos request 15 (2026-10-02). write_dta() received character value labels
+# write_dta() received character value labels
 # from export_responses(), so a choice set coded a and b with labels A
 # and B read back in Stata as A = 0 and B = 0. SPSS was correct.
 
@@ -12,7 +12,7 @@ text_coded <- function() {
 }
 answers <- data.frame(fmt = c("in_person", "online", NA, "hybrid", "online"))
 
-test_that("15: text codes reach Stata as 1, 2, 3 in the set's order, with labels", {
+test_that("Text codes reach Stata as 1, 2, 3 in the set's order, with labels", {
   skip_if_not_installed("haven")
   path <- tempfile(fileext = ".dta")
   export_responses(answers, text_coded(), path)
@@ -24,7 +24,7 @@ test_that("15: text codes reach Stata as 1, 2, 3 in the set's order, with labels
                    c("In person", "Online", NA, "Hybrid", "Online"))
 })
 
-test_that("15: SPSS keeps the text codes with their labels", {
+test_that("SPSS keeps the text codes with their labels", {
   skip_if_not_installed("haven")
   path <- tempfile(fileext = ".sav")
   export_responses(answers, text_coded(), path)
@@ -34,7 +34,7 @@ test_that("15: SPSS keeps the text codes with their labels", {
   expect_identical(unname(attr(back$fmt, "labels")), c("online", "in_person", "hybrid"))
 })
 
-test_that("15: a code the set lacks leaves the Stata column as text", {
+test_that("A code the set lacks leaves the Stata column as text", {
   skip_if_not_installed("haven")
   path <- tempfile(fileext = ".dta")
   odd <- data.frame(fmt = c("online", "elsewhere"))

@@ -1,6 +1,6 @@
 # SurveyBuilder edits study$preregistration on its Study tab, which Studio's
 # Plan screen and the builder's Plan mode open with "Preregistration fields"
-# (owner 2026-11-14). Run under V8 through helper-v8-builder.R.
+# Run under V8 through helper-v8-builder.R.
 
 prereg_file_instrument <- function() {
   ins <- sframe_demo("two_group", preview = FALSE)$instrument

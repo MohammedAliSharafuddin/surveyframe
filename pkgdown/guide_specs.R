@@ -1,5 +1,5 @@
 # pkgdown/guide_specs.R
-# The task each how-to guide teaches (Codex website review WR609 to WR635):
+# The task each how-to guide teaches:
 # the reader's outcome, the SurveyStudio steps for that task, and R code for
 # that task. Sourced by pkgdown/build_guides.R, which adds the example study,
 # the result shell and the links. Every step names a screen or control that

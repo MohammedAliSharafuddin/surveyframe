@@ -1,4 +1,4 @@
-# Batch 7 #14: a pairwise comparison renders both a radio strip and a select
+# a pairwise comparison renders both a radio strip and a select
 # of the same anchors, and the CSS shows one or the other by viewport width.
 # Each wrote the response and left its counterpart alone, so crossing the
 # breakpoint after answering revealed the other control still showing its
@@ -35,7 +35,7 @@ select_value <- function(ctx, row_key) {
                   row_key))
 }
 
-test_that("14: both controls carry a data key naming their row", {
+test_that("Both controls carry a data key naming their row", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(pairwise_instrument())
   html <- static_render_item(ctx, "pw")
@@ -45,7 +45,7 @@ test_that("14: both controls carry a data key naming their row", {
   expect_equal(length(gregexpr("setPairwise(", html, fixed = TRUE)[[1]]), 18)
 })
 
-test_that("14: answering through one control moves the other", {
+test_that("Answering through one control moves the other", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(pairwise_instrument())
   key <- "pw__cost__vs__speed"
@@ -62,7 +62,7 @@ test_that("14: answering through one control moves the other", {
   expect_equal(select_value(ctx, key), "-9")
 })
 
-test_that("14: an influence scale syncs the same way", {
+test_that("An influence scale syncs the same way", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(pairwise_instrument(scale = "influence"))
   key <- "pw__cost__to__speed"
@@ -75,7 +75,7 @@ test_that("14: an influence scale syncs the same way", {
   expect_equal(select_value(ctx, key), "0")
 })
 
-test_that("14: a sync with no controls on screen is harmless", {
+test_that("A sync with no controls on screen is harmless", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(pairwise_instrument())
   expect_no_error(ctx$eval("setPairwise('pw__cost__vs__speed', 1);"))

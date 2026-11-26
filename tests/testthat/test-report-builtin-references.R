@@ -1,6 +1,6 @@
 # tests/testthat/test-report-builtin-references.R
 #
-# D8 / CX-10. Without Quarto the built-in HTML engine was never given the
+# Without Quarto the built-in HTML engine was never given the
 # instrument's references, so [@key] citations printed raw and no References
 # list appeared.
 
@@ -23,7 +23,7 @@ built_in <- function(ins, ..., interpretations = list()) {
   paste(readLines(path, warn = FALSE), collapse = "\n")
 }
 
-test_that("D8: citations resolve to (Author, Year) in text", {
+test_that("Citations resolve to (Author, Year) in text", {
   refs <- surveyframe:::sframe_reference_index(refs_instrument())
   f <- surveyframe:::sframe_resolve_citations
   expect_equal(f("See [@cronbach_1951].", refs), "See (Cronbach, 1951).")
@@ -32,7 +32,7 @@ test_that("D8: citations resolve to (Author, Year) in text", {
   expect_match(f("x [@nope_1999] y", refs), "nope_1999", fixed = TRUE)
 })
 
-test_that("D8: the built-in report lists instrument and extra references in APA 7", {
+test_that("The built-in report lists instrument and extra references in APA 7", {
   extra <- list(sframe_reference("web_2021", "A web page", author = "{World Health Organization}",
                              year = 2021, type = "webpage", url = "https://example.org/x"))
   html <- built_in(refs_instrument(), references = extra)
@@ -47,7 +47,7 @@ test_that("D8: the built-in report lists instrument and extra references in APA 
                 regexpr("Field, A.", html, fixed = TRUE))
 })
 
-test_that("D8: citations in printed text resolve and none print raw", {
+test_that("Citations in printed text resolve and none print raw", {
   ins <- refs_instrument()
   ins$items[[1]]$label <- paste(ins$items[[1]]$label, "[@cronbach_1951]")
   html <- built_in(ins)
@@ -55,14 +55,14 @@ test_that("D8: citations in printed text resolve and none print raw", {
   expect_match(html, "(Cronbach, 1951)", fixed = TRUE)
 })
 
-test_that("D8: interpretations with citations are resolved when the plan prints them", {
+test_that("Interpretations with citations are resolved when the plan prints them", {
   ins <- refs_instrument()
   txt <- surveyframe:::sframe_resolve_citations(
     "Reliable [@cronbach_1951, p. 300].", surveyframe:::sframe_reference_index(ins))
   expect_equal(txt, "Reliable (Cronbach, 1951, p. 300).")
 })
 
-test_that("D8: the common CSL types format, and an unformattable entry shows a note", {
+test_that("The common CSL types format, and an unformattable entry shows a note", {
   f <- surveyframe:::sframe_format_reference_html
   chap <- sframe_reference("c1", "A chapter", author = c("Lee, K.", "Roe, J."), year = 2019,
                        type = "chapter", container = "The big book", editor = "Poe, E.",
@@ -79,7 +79,7 @@ test_that("D8: the common CSL types format, and an unformattable entry shows a n
   expect_match(html, "could not be formatted", fixed = TRUE)
 })
 
-test_that("D8: render_report forwards references to the built-in engine", {
+test_that("render_report forwards references to the built-in engine", {
   withr_free <- options(surveyframe.use_quarto = FALSE)
   on.exit(options(withr_free), add = TRUE)
   out <- tempfile(fileext = ".html")

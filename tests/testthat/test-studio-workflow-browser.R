@@ -1,9 +1,9 @@
-# tests/testthat/test-studio-ui1-browser.R
+# tests/testthat/test-studio-workflow-browser.R
 #
-# Session UI-1's SurveyStudio screens in a real Chrome, against the build
-# under test. The tests share 1 Studio per demo (helper-ui1-browser.R) and run
-# in order, so a later test starts from the state an earlier one left, and
-# each says what it expects to find.
+# SurveyStudio's screens in a real Chrome, against the build under test. The
+# tests share 1 Studio per demo (helper-studio-browser.R) and run in order, so a
+# later test starts from the state an earlier one left, and each says what it
+# expects to find.
 
 skip_on_cran()
 skip_if_not_slow()
@@ -373,8 +373,8 @@ test_that("each screen has exactly 1 primary action, visible without scrolling a
   }
   expect_true(ui1_screen(b, "design"))
   doc <- "document.getElementById('design_frame').contentWindow.document"
-  # Save to Studio sits at the far right of Design's head row since UI-3
-  # item 3, where the builder's bar was merged in, and is its only primary.
+  # Save to Studio sits at the far right of Design's head row, where the
+  # builder's bar was merged in, and is its only primary.
   expect_true(ui2_wait(b, paste0("(function(){ try { var t = ", doc, ".querySelector('.topbar'); return !!t && t.offsetParent === null; } catch (e) { return false; } })()"), 60))
   expect_identical(ui2_js(b, "$('#screen-design .sf-primary:visible').attr('id')"), "design_save")
   expect_identical(ui2_js(b, "$('#screen-design .sf-primary:visible').length"), 1L)
@@ -461,12 +461,12 @@ test_that("at 1920 px every primary action, Save to Studio included, sizes to it
   }
 })
 
-# Contrast (UX-21): every visible text and background pair, measured from
+# Contrast: every visible text and background pair, measured from
 # computed colours, meets WCAG 2.2 AA on every Studio screen and Report tab,
 # in the hosted builder's Build and Plan, and in the survey template at the
 # default, darkest, lightest and Studio's teal theme. Last but one, since
 # the template pages replace Studio in the tab.
-test_that("every Studio screen, the hosted builder and the template meet AA contrast (UX-21)", {
+test_that("every Studio screen, the hosted builder and the template meet AA contrast", {
   fails <- list()
   measure <- function(where, d) {
     if (nrow(d)) fails[[where]] <<- d

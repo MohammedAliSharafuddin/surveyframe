@@ -1,4 +1,4 @@
-# FR-20 (Fable sitting 2), Session CF-B: a single_choice or multiple_choice
+# A single_choice or multiple_choice
 # item enters a model as a category, whatever its codes, with its reference
 # category named. Region coded 1, 2, 3 entered as 1 slope.
 

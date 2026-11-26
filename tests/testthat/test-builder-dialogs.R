@@ -1,9 +1,9 @@
 # tests/testthat/test-builder-dialogs.R
 #
-# UX-14: every SurveyBuilder dialog is a labelled modal dialog. Only Settings
+# Every SurveyBuilder dialog is a labelled modal dialog. Only Settings
 # had a label, Escape removed every dialog's class directly so focus was
 # lost, and Tab walked out to the page behind. Escape and Tab are checked in
-# a real Chrome in test-builder-ui2-browser.R.
+# a real Chrome in test-builder-screens-browser.R.
 
 test_that("all 7 dialogs say they are modal and name their title", {
   src <- sframe_installed_text("inst", "builder", "survey_builder.html")
@@ -29,7 +29,7 @@ test_that("Escape closes the top dialog through closeModal(), and Tab is kept in
   expect_match(src, "if(e.key==='Tab'){var tm=topModal();if(tm)trapTab(e,tm);}", fixed = TRUE)
 })
 
-# UX-15: the Settings sections were divs that answered a click alone.
+# The Settings sections were divs that answered a click alone.
 test_that("the Settings sections are a tablist of buttons, each naming its panel", {
   src <- sframe_installed_text("inst", "builder", "survey_builder.html")
   expect_match(src, '<div class="stabs" role="tablist" aria-label="Survey settings sections"', fixed = TRUE)

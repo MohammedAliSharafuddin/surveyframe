@@ -1,7 +1,7 @@
 # R/drop_items.R
 #
-# Dropping an item from a scale or a model after the item analysis flags it
-# (session 8a, item c). The question stays in the instrument and its answers
+# Dropping an item from a scale or a model after the item analysis flags it.
+# The question stays in the instrument and its answers
 # stay in the data, so the drop is reversible and the item can still be
 # reported. Recording the change is amend_sframe()'s job, not this one's.
 

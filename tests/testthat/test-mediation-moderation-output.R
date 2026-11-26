@@ -1,4 +1,4 @@
-# Batch 4 #28 and #29: both runners retain information their own prompt asks a
+# Both runners retain information their own prompt asks a
 # reader to report, and neither the table nor the report carried it.
 #
 # #28. The mediation table gives Direct, Indirect and Total with no variable
@@ -33,7 +33,7 @@ mod_result <- function() {
     d, list(predictor = "x", moderator = "w", outcome = "y"))
 }
 
-test_that("28: the mediation table names its paths and its variables", {
+test_that("The mediation table names its paths and its variables", {
   res <- med_result()
   tbl <- surveyframe:::sframe_result_table(res)
   expect_true(is.data.frame(tbl))
@@ -54,7 +54,7 @@ test_that("28: the mediation table names its paths and its variables", {
   expect_true(any(nzchar(tbl[["95% CI"]])))
 })
 
-test_that("28: two models with the same product read differently", {
+test_that("Two models with the same product read differently", {
   res <- med_result()
   tbl <- surveyframe:::sframe_result_table(res)
   a_row <- as.numeric(tbl$Estimate[grepl("^a ", tbl$Effect)])
@@ -68,7 +68,7 @@ test_that("28: two models with the same product read differently", {
   expect_equal(sign(b_row), sign(res$b_path))
 })
 
-test_that("29: the moderation result carries its conditional slopes as a table", {
+test_that("The moderation result carries its conditional slopes as a table", {
   res <- mod_result()
   expect_true(is.data.frame(res$conditional_effects))
   # the supplementary table the report renders, with the moderator's own values
@@ -80,7 +80,7 @@ test_that("29: the moderation result carries its conditional slopes as a table",
   expect_equal(nrow(sup$table), nrow(res$conditional_effects))
 })
 
-test_that("29: the report renders the conditional slopes", {
+test_that("The report renders the conditional slopes", {
   src <- sframe_source_text("R", "reporting.R")
   qmd <- sframe_installed_text("inst", "templates",
                                    "report.qmd")

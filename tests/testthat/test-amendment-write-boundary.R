@@ -6,14 +6,14 @@
 #     as happily. The help promised read_sframe() rejected any edit that did not
 #     go through amend_sframe(), which only held for edits made to the file on
 #     disk.
-# Batch 5, finding 8. amend_sframe() fingerprinted the after-state before
+# amend_sframe() fingerprinted the after-state before
 #     validation set meta$validated, so new_hash described a state that was
 #     never written.
-# Batch 5, finding 9. The caller chose the tier, so a plan or model change could
+# The caller chose the tier, so a plan or model change could
 #     be recorded as "pipeline" with no deviation report.
-# Batch 5, finding 4. sframe_link_git_commit() returned HEAD with linked = TRUE without
+# sframe_link_git_commit() returned HEAD with linked = TRUE without
 #     comparing the instrument to anything in the repository.
-# G5 and G3. The provenance, read and write help promised more than the code does.
+# The provenance, read and write help promised more than the code does.
 
 base_instrument <- function(label = "How satisfied are you?") {
   sframe_instrument(title = "Revisions", components = list(
@@ -95,10 +95,10 @@ test_that("E2: new_instrument = TRUE declares a changed file a new instrument", 
   expect_identical(read_sframe(path)$items[[1]]$label, "A new study")
 })
 
-# Codex CX-12, decision D2. new_instrument = TRUE accepted the title and
+# new_instrument = TRUE accepted the title and
 # version of the file read, so 2 different files could claim to be one
 # instrument. A new instrument needs a new title or version, as in the builder.
-test_that("CX-12: new_instrument = TRUE refuses the title and version read", {
+test_that("new_instrument = TRUE refuses the title and version read", {
   loaded <- read_sframe(written(base_instrument()))
   loaded$items[[1]]$label <- "A new study"
   expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
@@ -106,7 +106,7 @@ test_that("CX-12: new_instrument = TRUE refuses the title and version read", {
                class = "sframe_validation_error", regexp = "version")
 })
 
-test_that("CX-12: new_instrument = TRUE on unchanged content says to drop the flag", {
+test_that("new_instrument = TRUE on unchanged content says to drop the flag", {
   loaded <- read_sframe(written(base_instrument()))
   expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
                             new_instrument = TRUE),
@@ -116,7 +116,7 @@ test_that("CX-12: new_instrument = TRUE on unchanged content says to drop the fl
   expect_no_error(write_sframe(loaded, tempfile(fileext = ".sframe")))
 })
 
-test_that("CX-12: changed content with the same version keeps the version message", {
+test_that("Changed content with the same version keeps the version message", {
   loaded <- read_sframe(written(base_instrument()))
   loaded$items[[1]]$label <- "A new study"
   err <- expect_error(write_sframe(loaded, tempfile(fileext = ".sframe"),
@@ -126,7 +126,7 @@ test_that("CX-12: changed content with the same version keeps the version messag
   expect_false(grepl("Nothing changed", conditionMessage(err), fixed = TRUE))
 })
 
-test_that("CX-12: new_instrument = TRUE takes a new title or a new version", {
+test_that("new_instrument = TRUE takes a new title or a new version", {
   loaded <- read_sframe(written(base_instrument()))
   loaded$items[[1]]$label <- "A new study"
   retitled <- loaded
@@ -139,7 +139,7 @@ test_that("CX-12: new_instrument = TRUE takes a new title or a new version", {
                                new_instrument = TRUE))
 })
 
-test_that("CX-12: new_instrument = TRUE on an instrument built in R needs no change", {
+test_that("new_instrument = TRUE on an instrument built in R needs no change", {
   expect_no_error(write_sframe(base_instrument(), tempfile(fileext = ".sframe"),
                                new_instrument = TRUE))
 })
@@ -148,7 +148,7 @@ test_that("E2: a freshly built instrument writes with no amendment needed", {
   expect_no_error(written(base_instrument()))
 })
 
-test_that("8: an amendment's new_hash is the content that is written", {
+test_that("An amendment's new_hash is the content that is written", {
   previous <- base_instrument()
   after <- base_instrument("Built fresh")
   amended <- amend_sframe(previous, after, reason_code = "instrument_revision",
@@ -157,7 +157,7 @@ test_that("8: an amendment's new_hash is the content that is written", {
   expect_identical(sframe_get_amendments(back)$new_hash, sframe_content_hash(back))
 })
 
-test_that("9: a plan change cannot be recorded as a pipeline amendment", {
+test_that("A plan change cannot be recorded as a pipeline amendment", {
   previous <- base_instrument()
   after <- base_instrument()
   after$analysis_plan <- list(list(id = "b1", research_question = "Q",
@@ -172,7 +172,7 @@ test_that("9: a plan change cannot be recorded as a pipeline amendment", {
     "deviation_report", class = "sframe_error")
 })
 
-test_that("4: sframe_link_git_commit() verifies the instrument only against a committed file", {
+test_that("sframe_link_git_commit() verifies the instrument only against a committed file", {
   skip_if(!nzchar(Sys.which("git")), "git not available")
   repo <- tempfile("repo"); dir.create(repo)
   git <- function(...) system2("git", c("-C", shQuote(repo), ...), stdout = TRUE, stderr = TRUE)
@@ -195,7 +195,7 @@ test_that("4: sframe_link_git_commit() verifies the instrument only against a co
   expect_match(pointer$reason, "path")
 })
 
-test_that("G5 and G3: provenance, read and write help promise only what the code does", {
+test_that("Provenance, read and write help promise only what the code does", {
   src <- function(f) {
     p <- sframe_source_path("R", f)
     skip_if(is.na(p), "no source tree here")
@@ -246,7 +246,7 @@ test_that("E2: a broken link inside the amendment log is refused on its own", {
                "out of sequence", class = "sframe_error")
 })
 
-# CX-01. amend_sframe() took previous_hash from whatever `previous` held. A
+# amend_sframe() took previous_hash from whatever `previous` held. A
 # file read, edited in memory and then amended got a log starting from the
 # edited state, which no file ever held, and the edit itself went
 # undisclosed. The anchor is the content read, or the last amendment's
@@ -259,7 +259,7 @@ amend_label <- function(previous, label) {
                reason_text = "Clarified wording.", deviation_report = "Wording only.")
 }
 
-test_that("CX-01: amend_sframe() refuses a previous edited since it was read", {
+test_that("amend_sframe() refuses a previous edited since it was read", {
   loaded <- read_sframe(written(base_instrument()))
   edited <- loaded
   edited$items[[1]]$label <- "Quietly changed"
@@ -267,7 +267,7 @@ test_that("CX-01: amend_sframe() refuses a previous edited since it was read", {
                class = "sframe_validation_error", regexp = "changed since it was read")
 })
 
-test_that("CX-01: amend_sframe() refuses a previous edited since its last amendment", {
+test_that("amend_sframe() refuses a previous edited since its last amendment", {
   path <- tempfile(fileext = ".sframe")
   write_sframe(amend_label(read_sframe(written(base_instrument())), "First"), path)
   loaded <- read_sframe(path)
@@ -276,14 +276,14 @@ test_that("CX-01: amend_sframe() refuses a previous edited since its last amendm
                class = "sframe_validation_error", regexp = "last recorded amendment")
 })
 
-test_that("CX-01: the first amendment of a file read starts from the content read", {
+test_that("The first amendment of a file read starts from the content read", {
   loaded <- read_sframe(written(base_instrument()))
   amended <- amend_label(loaded, "Openly changed")
   expect_identical(amended$amendments[[1]]$previous_hash,
                    attr(loaded, "sframe_origin")$content_hash)
 })
 
-test_that("CX-01: the write boundary refuses a first entry with another anchor", {
+test_that("The write boundary refuses a first entry with another anchor", {
   loaded <- read_sframe(written(base_instrument()))
   amended <- amend_label(loaded, "Openly changed")
   amended$amendments[[1]]$previous_hash <- strrep("0", 64)
@@ -291,12 +291,12 @@ test_that("CX-01: the write boundary refuses a first entry with another anchor",
                class = "sframe_validation_error", regexp = "content read from")
 })
 
-test_that("CX-01: an instrument built in R, with no file, still amends", {
+test_that("An instrument built in R, with no file, still amends", {
   amended <- amend_label(base_instrument(), "Openly changed")
   expect_no_error(write_sframe(amended, tempfile(fileext = ".sframe")))
 })
 
-# Session 2 review blocker. A file changed by hand and read with
+# A file changed by hand and read with
 # verify = FALSE is marked unverified. One amendment then laundered it: the
 # write boundary refused an unverified origin only when it had no amendment
 # log, and amend_sframe() accepted an unverified `previous`, so the new file
@@ -325,7 +325,7 @@ test_that("the write boundary refuses entries appended to an unverified read", {
                class = "sframe_validation_error", regexp = "integrity hash")
 })
 
-# Fable sitting 1 FR-05. A file with a log, its log edited as text and read
+# A file with a log, its log edited as text and read
 # with verify = FALSE, was written back with that log, since the entry
 # fingerprints the write compares were taken from the same unchecked read, and
 # the new file read back verified with the rewritten sign-off.
@@ -349,7 +349,7 @@ log_edited_read <- function(path, edit) {
   suppressWarnings(read_sframe(g, verify = FALSE))
 }
 
-test_that("FR-05: a log edited as text and read unverified is not written back", {
+test_that("A log edited as text and read unverified is not written back", {
   path <- two_entry_file()
   edits <- list(
     signoff = function(t) sub('"signoff": "none"', '"signoff": "Prof. Reviewer, 2026-11-01"', t, fixed = TRUE),
@@ -368,7 +368,7 @@ test_that("FR-05: a log edited as text and read unverified is not written back",
   }
 })
 
-test_that("FR-05: the same read writes as a new instrument with a new log", {
+test_that("The same read writes as a new instrument with a new log", {
   y <- log_edited_read(two_entry_file(), function(t)
     sub('"signoff": "none"', '"signoff": "Prof. Reviewer, 2026-11-01"', t, fixed = TRUE))
   expect_error(write_sframe(y, tempfile(fileext = ".sframe"), new_instrument = TRUE),
@@ -382,12 +382,12 @@ test_that("FR-05: the same read writes as a new instrument with a new log", {
   expect_length(z$amendments, 0)
 })
 
-# Fable sitting 1 FR-16. The write boundary rests on the sframe_origin
+# The write boundary rests on the sframe_origin
 # attribute, which base subsetting drops. No structural change in 0.4.3: the
 # help says which calls keep it and which drop it, and this test holds the
 # help to what the code does.
 
-test_that("FR-16: the help names the calls that keep and drop sframe_origin", {
+test_that("The help names the calls that keep and drop sframe_origin", {
   loaded <- read_sframe(written(base_instrument()))
   kept <- list(
     validate = as_sframe(validate_sframe(loaded)),

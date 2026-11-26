@@ -70,7 +70,7 @@ test_that("a strong within-subject effect is detected", {
 })
 
 test_that("the runner fits the subject id as a factor, not a covariate", {
-  # Batch 6 #9: this test used to build its own factor and assert it was one,
+  # This test used to build its own factor and assert it was one,
   # which is true by construction and cannot detect the conversion being
   # removed from the runner. The fitted result distinguishes the two:
   # Error(.subject / condition) with a factor gives exactly 2 strata and 22

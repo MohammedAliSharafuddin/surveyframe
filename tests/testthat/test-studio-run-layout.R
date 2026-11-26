@@ -3,7 +3,7 @@
 # SurveyStudio drew each run result inside the middle third of the Analysis
 # Plan screen, about 230 px wide at 1440, so a result table printed "120" one
 # digit per line and clipped its p column. Found capturing the vignette
-# screenshots, 2026-10-25. Results take a full-width row. Since UI-1 (UX-02)
+# screenshots, 2026-10-25. Results take a full-width row. Now
 # Analyse has no columns and no Plan tab: the declared plan sits in its own
 # card above the results, and the results are always drawn.
 

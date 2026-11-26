@@ -5,7 +5,7 @@
 # does, so the app calls internal helpers directly with no `:::` and no
 # copies. Before 0.4.3 it ran app.R through shiny::runApp() on the folder,
 # where only exported functions were visible, and the installed app failed
-# at start-up when it called an internal one (owner, 2026-10-27). That the
+# at start-up when it called an internal one. That the
 # installed app starts is checked in a browser by
 # test-studio-screens-browser.R, which launches it from the build under test.
 

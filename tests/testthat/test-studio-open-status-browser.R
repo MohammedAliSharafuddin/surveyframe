@@ -1,7 +1,7 @@
 # tests/testthat/test-studio-open-status-browser.R
 #
 # The Open Instrument screen says where the open instrument came from
-# (session 7, owner review of f8fe6a6): "Loaded from R" for one launch_studio()
+# "Loaded from R" for one launch_studio()
 # was given, "File checked: hash verified" for an opened file, "Saved from
 # Design: hash verified" for a Design save, and the failure wording when a
 # check fails. A Design save showed "Not verified", though its hash was
@@ -66,7 +66,7 @@ test_that("the Open Instrument screen says where the instrument came from", {
   js("$('.studio-nav-item a[data-tab=\"design\"]').click(); true")
   expect_true(wait(paste0(frame, ".S && ", frame, ".S.items.length > 0")))
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Saved in Design'; w.saveSframe(); true"))
-  # The demo has a history, so the save opens the amendment dialog (8a).
+  # The demo has a history, so the save opens the amendment dialog.
   expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
   js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait("((document.getElementById('design_status')||{}).innerText||'').indexOf('Saved in Design') >= 0"))

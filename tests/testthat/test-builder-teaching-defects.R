@@ -33,7 +33,7 @@ js <- function(session, code) {
   session$Runtime$evaluate(code, returnByValue = TRUE)$result$value
 }
 
-test_that("6: the sidebar shows the injected title on first load", {
+test_that("The sidebar shows the injected title on first load", {
   session <- open_demo_builder()
   on.exit(session$close(), add = TRUE)
   title <- sframe_demo("input_types")$instrument$meta$title
@@ -42,7 +42,7 @@ test_that("6: the sidebar shows the injected title on first load", {
                    title)
 })
 
-test_that("4: a plan saved with `outcome` opens with that outcome selected", {
+test_that("A plan saved with `outcome` opens with that outcome selected", {
   session <- open_demo_builder()
   on.exit(session$close(), add = TRUE)
 
@@ -64,7 +64,7 @@ test_that("4: a plan saved with `outcome` opens with that outcome selected", {
   expect_identical(outcome, "overall_rating")
 })
 
-test_that("1: the frequency role takes more than one variable", {
+test_that("The frequency role takes more than one variable", {
   session <- open_demo_builder()
   on.exit(session$close(), add = TRUE)
 
@@ -78,7 +78,7 @@ test_that("1: the frequency role takes more than one variable", {
   expect_identical(picked, "true:visit_type,visit_purpose")
 })
 
-test_that("7: the role dropdowns stay inside the analysis plan dialog", {
+test_that("The role dropdowns stay inside the analysis plan dialog", {
   session <- open_demo_builder()
   on.exit(session$close(), add = TRUE)
 

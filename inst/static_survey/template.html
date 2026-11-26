@@ -13,7 +13,7 @@
   --tint-bd:color-mix(in srgb,var(--cp) 30%,#dbe3e6);
   --deep:color-mix(in srgb,var(--cp) 78%,#0c1a1a);
   /* Text on the theme colour, the theme colour as text, and its hover. A
-     light theme switches them at start (UX-21), so text keeps 4.5 to 1. */
+     light theme switches them at start, so text keeps 4.5 to 1. */
   --on-cp:#ffffff;--cp-ink:var(--cp);--cp-hover:var(--deep);
   --cf:#ffffff;--cg:#fbfdfd;--cb:#dfe7ea;
   --t1:#12212b;--t2:#51636f;--t3:#9ab0ba;
@@ -346,7 +346,7 @@ const TY       = R.thankyou||{};
 // Apply theme color
 document.documentElement.style.setProperty('--cp', THEME);
 // A light theme cannot carry white text, nor serve as text on white, at
-// 4.5 to 1 (UX-21). Then text on it is dark, and its text and hover
+// 4.5 to 1. Then text on it is dark, and its text and hover
 // shades are mixed towards the dark ink. Other themes keep their colours.
 (function(){
   var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(THEME).trim());if(!m)return;
@@ -400,7 +400,7 @@ const respId='R'+Math.random().toString(36).slice(2,10).toUpperCase();
 let screen='welcome';
 let currentPage=1;
 let rankOrders={};
-// Display order (UX-11). A choice set with randomise shows a single choice,
+// Display order. A choice set with randomise shows a single choice,
 // multiple choice or ranking item's options in an order shuffled once per
 // respondent and item, kept for the visit and in a draft. Only the display
 // moves: each option submits its own value, so the codes are the set's
@@ -838,7 +838,7 @@ function setResp(id,val){
   if(err)err.classList.remove('show');
   updateBranching();
 }
-// "Other, please specify" (UX-11). A choice set with allow_other adds it
+// "Other, please specify". A choice set with allow_other adds it
 // last, outside any shuffle. A single choice submits the code "other" in
 // <id>, a multiple choice submits <id>__other as 1 or 0, and both submit the
 // typed text in <id>__other_text. Typing in the box chooses Other.
@@ -1527,7 +1527,7 @@ function restartSurvey(){
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
-// Show only 1 item (owner 2026-11-01, UX-09). SurveyBuilder's centre pane
+// Show only 1 item. SurveyBuilder's centre pane
 // draws the selected question with this page's own renderer, so there is 1
 // renderer. The builder asks for it with data-only on the body of a preview
 // it writes, and a live survey never takes this mode. The item shows as on

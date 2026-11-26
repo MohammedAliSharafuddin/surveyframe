@@ -4,7 +4,7 @@
 # "detritus in the temp directory" and which fills a user's temp folder.
 # render_report(format = "pdf") runs Chrome with a TMPDIR of its own and
 # removes it. These tests used to look in tempdir(), where Chrome never
-# writes, so they passed either way (Session CI).
+# writes, so they passed either way.
 
 test_that("Chrome's own TMPDIR is set for the call, then removed and restored", {
   vars <- c("TMPDIR", "TMP", "TEMP")

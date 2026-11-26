@@ -1,10 +1,10 @@
 # tests/testthat/test-builder-study.R
 #
-# D13 in SurveyBuilder: the Study tab of Survey settings edits the study an
-# instrument serves, the problem, the objectives and the sampling plan, run
-# under V8 (helper-v8-builder.R). What it saves goes back through
-# read_sframe() and validate_sframe(). A study left alone keeps its content
-# hash, and the builder refuses what the validator would.
+# The study in SurveyBuilder: the Study tab of Survey settings edits the study
+# an instrument serves, the problem, the objectives and the sampling plan, run
+# under V8 (helper-v8-builder.R). What it saves goes back through read_sframe()
+# and validate_sframe(). A study left alone keeps its content hash, and the
+# builder refuses what the validator would.
 
 study_instrument <- function(study = NULL, objective = NULL) {
   block <- list(id = "rq1", research_question = "Does satisfaction differ by group?",

@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-export-browser.R
 #
-# SurveyStudio's Export screen (session 7): the report options
+# SurveyStudio's Export screen: the report options
 # render_report() takes, a line naming the engine that will write the
 # report, the analysis notebook as one zip, and a screen short enough to
 # read. With the input_types demo's 36 research questions it was 43,730 px
@@ -60,7 +60,7 @@ test_that("the Export screen offers the report options and stays short", {
                "rpt_csl", "rpt_style")) {
     expect_true(js(paste0("document.getElementById('", id, "') !== null")), info = id)
   }
-  # UI-1 (UX-03): the Further references box went, so a source is added under
+  # The Further references box went, so a source is added under
   # References only. It was in the list above until then.
   expect_false(js("document.getElementById('rpt_bibtex') !== null"))
   expect_true(wait("$('#export_engine_note').text().indexOf('built-in engine') >= 0"))
@@ -73,8 +73,8 @@ test_that("the Export screen offers the report options and stays short", {
   expect_match(report, "A title set on the Export screen", fixed = TRUE)
   expect_false(grepl("Show R code", report, fixed = TRUE))
 
-  # The reproducible source comes as 1 zip holding the .qmd folder (UI-1,
-  # UX-20: it replaced the analysis notebook card, whose zip this checked).
+  # The reproducible source comes as 1 zip holding the .qmd folder (it replaced
+  # the analysis notebook card, whose zip this checked).
   expect_true(wait("!!$('#download_source_btn').attr('href') && $('#download_source_btn').attr('href') !== '#'"))
   zip_b64 <- js(paste0(
     "fetch($('#download_source_btn').attr('href')).then(function(r) { return r.arrayBuffer(); })",

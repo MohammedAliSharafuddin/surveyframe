@@ -4,7 +4,7 @@
 # rewrites it, because check.names defaults to TRUE, so "q1__Row one" arrives
 # as "q1__Row.one" and read_responses() rejects it as undeclared. Nothing about
 # the old message told the researcher that R had rewritten their header, so it
-# read as a declaration problem they did not have. Found during the D2.6 audit.
+# read as a declaration problem they did not have.
 
 spaced_instrument <- function() {
   sframe_instrument(
@@ -70,7 +70,7 @@ test_that("a genuinely undeclared column does not get the repair hint", {
 })
 
 test_that("matrix and ranking items analyse end to end once names survive", {
-  # D2.6 asked whether these types work without extra hand-coding. They do,
+  # These types work without extra hand-coding,
   # provided the header is not rewritten on the way in.
   for (ty in c("matrix", "ranking")) {
     comps <- list(sframe_choice_set("cs", 1:3, c("Low", "Mid", "High")))

@@ -163,7 +163,7 @@ launch_studio <- function(
   )
 
   # runApp() attaches shiny with require(), which printed "Loading required
-  # package: shiny" on every start (N1).
+  # package: shiny" on every start.
   suppressPackageStartupMessages(shiny::runApp(
     appDir = sframe_studio_app(),
     port = port,

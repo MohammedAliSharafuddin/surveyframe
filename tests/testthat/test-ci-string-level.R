@@ -1,4 +1,4 @@
-# B-04 (Fable sitting 2 p12, owner 2026-11-13), Session CF-B: an interval
+# An interval
 # prints its own level. sframe_ci_string() printed 95% for a 90% bootstrap
 # interval, since only the noncentrality intervals recorded their level.
 

@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-amend.R
 #
-# Session 8a, CX-12 (replaces D2's interim save). SurveyBuilder saved changed
+# SurveyBuilder saved changed
 # content of an opened file only as a new instrument. It now offers a third
 # way, "Record an amendment": the entry is built as amend_sframe() builds it,
 # with the same content fingerprints, changed fields, tier rule and version
@@ -36,7 +36,7 @@ opened_from_file <- function(instrument) {
   read_sframe(path)
 }
 
-test_that("CX-12: a recorded amendment reads back verified and matches amend_sframe()", {
+test_that("A recorded amendment reads back verified and matches amend_sframe()", {
   ins <- sframe_demo("likert_scale")$instrument
   ctx <- amend_context("{ mode:'amend', reason_code:'other', reason_text:'Clarified the wording.',
                           tier:'pipeline', version:'1.0.1' }")
@@ -86,7 +86,7 @@ test_that("a builder amendment is verified and listed after its disk round trip"
   expect_identical(amendments$new_hash, sframe_content_hash(verified))
 })
 
-test_that("CX-12: the dialog is told what changed, the tier and the suggested version", {
+test_that("The dialog is told what changed, the tier and the suggested version", {
   ctx <- amend_context("null")
   builder_open(ctx, sframe_demo("likert_scale")$instrument)
   ctx$eval("S.items[0].label = 'Changed';")
@@ -101,7 +101,7 @@ test_that("CX-12: the dialog is told what changed, the tier and the suggested ve
   expect_true(info$can_amend)
 })
 
-test_that("CX-12: Cancel saves nothing and changes nothing", {
+test_that("Cancel saves nothing and changes nothing", {
   ctx <- amend_context("null")
   builder_open(ctx, sframe_demo("likert_scale")$instrument)
   ctx$eval("S.items[0].label = 'Changed';")
@@ -110,7 +110,7 @@ test_that("CX-12: Cancel saves nothing and changes nothing", {
   expect_null(ctx$get("S._carry.amendments"))
 })
 
-test_that("CX-12: a scale or plan change is design tier and needs a deviation report", {
+test_that("A scale or plan change is design tier and needs a deviation report", {
   ins <- sframe_demo("likert_scale")$instrument
   ctx <- amend_context("{ mode:'amend', reason_code:'data_correction',
                           reason_text:'Dropped an item.', tier:'pipeline' }")
@@ -132,7 +132,7 @@ test_that("CX-12: a scale or plan change is design tier and needs a deviation re
   expect_identical(log$new_hash, sframe_content_hash(back))
 })
 
-test_that("CX-12: a second amendment follows the first", {
+test_that("A second amendment follows the first", {
   ins <- sframe_demo("likert_scale")$instrument
   ctx <- amend_context("{ mode:'amend', reason_code:'other', reason_text:'One.', tier:'pipeline' }")
   builder_open(ctx, ins)
@@ -148,7 +148,7 @@ test_that("CX-12: a second amendment follows the first", {
   expect_no_error(write_sframe(back, tempfile(fileext = ".sframe")))
 })
 
-test_that("CX-12: a file whose hash does not match offers only a new instrument", {
+test_that("A file whose hash does not match offers only a new instrument", {
   path <- tempfile(fileext = ".sframe")
   write_sframe(sframe_demo("likert_scale")$instrument, path)
   j <- jsonlite::fromJSON(path, simplifyVector = FALSE)
@@ -160,7 +160,7 @@ test_that("CX-12: a file whose hash does not match offers only a new instrument"
   expect_false(ctx$get("__amendCalls")$can_amend)
 })
 
-test_that("CX-12: the builder's version suggestion is R's", {
+test_that("The builder's version suggestion is R's", {
   ctx <- builder_context()
   for (v in c("1.0.0", "2.3.4", "1.2", "3", "", "draft")) {
     for (tier in c("design", "pipeline")) {
@@ -172,7 +172,7 @@ test_that("CX-12: the builder's version suggestion is R's", {
   }
 })
 
-test_that("CX-12: the builder's content fingerprint is R's on a larger demo", {
+test_that("The builder's content fingerprint is R's on a larger demo", {
   ins <- sframe_demo("tourism_services")$instrument
   ctx <- amend_context("{ mode:'amend', reason_code:'model_respecification',
                           reason_text:'Plan block dropped.', deviation_report:'RQ dropped.' }")
@@ -185,7 +185,7 @@ test_that("CX-12: the builder's content fingerprint is R's on a larger demo", {
   expect_identical(log$tier, "design")
 })
 
-test_that("CX-12: read_sframe() warns on a log that does not end at the content", {
+test_that("read_sframe() warns on a log that does not end at the content", {
   ins <- opened_from_file(sframe_demo("likert_scale")$instrument)
   after <- ins
   after$items[[1]]$label <- "Changed"

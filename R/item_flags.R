@@ -1,6 +1,6 @@
 # R/item_flags.R
 #
-# The items an item analysis would send for review (session 8a, item d).
+# The items an item analysis would send for review.
 # Each cut-off is the usual one with its source, and a flag is a prompt to
 # look again, never a deletion rule: content, wording, reverse keying and the
 # model's purpose decide. Checked against psych, lavaan and seminr called

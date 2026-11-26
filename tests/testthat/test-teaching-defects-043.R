@@ -51,7 +51,7 @@ plan_block <- function(id, method, roles) {
 
 # ── 1 ──
 
-test_that("1: a frequency block gives one table per variable", {
+test_that("A frequency block gives one table per variable", {
   ins <- teaching_instrument(list(
     plan_block("RQ1", "frequency", list(variable = c("gender", "region")))))
   res <- run_analysis_plan(teaching_data(), ins)$RQ1
@@ -68,7 +68,7 @@ test_that("1: a frequency block gives one table per variable", {
   expect_match(res$apa, "\"Region\"", fixed = TRUE)
 })
 
-test_that("1: a frequency block reads the `variables` role as well", {
+test_that("A frequency block reads the `variables` role as well", {
   ins <- teaching_instrument(list(
     plan_block("RQ1", "frequency", list(variables = "gender"))))
   res <- run_analysis_plan(teaching_data(), ins)$RQ1
@@ -81,7 +81,7 @@ test_that("1: a frequency block reads the `variables` role as well", {
 
 # ── 2 ──
 
-test_that("2: frequency shows choice labels and keeps the code as a column", {
+test_that("Frequency shows choice labels and keeps the code as a column", {
   ins <- teaching_instrument(list(
     plan_block("RQ1", "frequency", list(variable = "region"))))
   res <- run_analysis_plan(teaching_data(), ins)$RQ1
@@ -96,7 +96,7 @@ test_that("2: frequency shows choice labels and keeps the code as a column", {
   expect_identical(north$Frequency, 3L)
 })
 
-test_that("2: a declared choice with no responses still appears, at 0", {
+test_that("A declared choice with no responses still appears, at 0", {
   dat <- teaching_data()
   dat$region[dat$region == 3] <- 2
   ins <- teaching_instrument(list(
@@ -110,7 +110,7 @@ test_that("2: a declared choice with no responses still appears, at 0", {
 
 # ── 3 ──
 
-test_that("3: descriptives never reports a mean for a nominal item", {
+test_that("Descriptives never reports a mean for a nominal item", {
   ins <- teaching_instrument(list(
     plan_block("RQ1", "descriptives", list(variables = c("gender", "age")))))
   res <- run_analysis_plan(teaching_data(), ins)$RQ1
@@ -131,7 +131,7 @@ test_that("3: descriptives never reports a mean for a nominal item", {
   expect_match(res$note, "\"Gender\" is a choice item", fixed = TRUE)
 })
 
-test_that("3: descriptives on choice items alone gives counts, not an error", {
+test_that("Descriptives on choice items alone gives counts, not an error", {
   ins <- teaching_instrument(list(
     plan_block("RQ1", "descriptives",
                list(variables = c("gender", "contact__email",
@@ -148,7 +148,7 @@ test_that("3: descriptives on choice items alone gives counts, not an error", {
 
 # ── 8 ──
 
-test_that("8: the printed report says how to check a short scale", {
+test_that("The printed report says how to check a short scale", {
   ins <- sframe_instrument(title = "Short scale", components = list(
     sframe_choice_set("ag", values = 1:5, labels = c("SD", "D", "N", "A", "SA")),
     sframe_item("s1", "One", "likert", choice_set = "ag"),

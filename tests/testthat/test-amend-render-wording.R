@@ -1,11 +1,11 @@
 # tests/testthat/test-amend-render-wording.R
 #
-# Ethos request 10 (2026-10-01). The welcome, consent and thank-you wording
-# sits inside the hash, so changing it needs an amendment. Ethos edited the
-# JSON directly until it found that. amend_sframe()'s help now names the
-# intended path, and this holds the path to working.
+# The welcome, consent and thank-you wording sits inside the hash, so changing
+# it needs an amendment. A host application edited the JSON directly until it
+# found that. amend_sframe()'s help now names the intended path, and this holds
+# the path to working.
 
-test_that("10: reworded consent goes through a pipeline amendment and writes", {
+test_that("Reworded consent goes through a pipeline amendment and writes", {
   ins <- sframe_demo("first_survey", branded = TRUE)$instrument
   ins$meta$version <- "1.0.1"
   path <- tempfile(fileext = ".sframe")
@@ -23,7 +23,7 @@ test_that("10: reworded consent goes through a pipeline amendment and writes", {
                    "I agree to take part.")
 })
 
-test_that("10: the same edit without an amendment is refused", {
+test_that("The same edit without an amendment is refused", {
   ins <- sframe_demo("first_survey", branded = TRUE)$instrument
   ins$meta$version <- "1.0.1"
   path <- tempfile(fileext = ".sframe")
@@ -33,7 +33,7 @@ test_that("10: the same edit without an amendment is refused", {
   expect_error(write_sframe(published, path, overwrite = TRUE), "amend_sframe")
 })
 
-test_that("10: amend_sframe()'s help names the path for screen wording", {
+test_that("amend_sframe()'s help names the path for screen wording", {
   rd <- sframe_source_text("man/amend_sframe.Rd")
   expect_match(rd, "Wording on the participant's screens", fixed = TRUE)
   expect_match(rd, "pipeline-tier amendment", fixed = TRUE)

@@ -1,9 +1,9 @@
 # tests/testthat/test-quarto-find.R
 #
-# Session 8b-R, item 1 (PREP-01, Codex T3). render_report() found Quarto with
+# render_report() found Quarto with
 # Sys.which("quarto") alone, so the copies RStudio and Positron bundle, which
 # neither puts on the PATH, were never used, and QUARTO_PATH was ignored. The
-# finder follows the T3 search order: QUARTO_PATH, the PATH, RSTUDIO_QUARTO,
+# finder follows this search order: QUARTO_PATH, the PATH, RSTUDIO_QUARTO,
 # then RStudio's and Positron's bundled copies. A candidate counts only when
 # `quarto --version` runs and exits 0.
 
@@ -34,7 +34,7 @@ restore_env <- function(old) {
   }
 }
 
-test_that("the candidates follow the T3 search order", {
+test_that("the candidates follow the search order", {
   skip_on_os("windows")
   old <- set_env(QUARTO_PATH = "/x/quarto", RSTUDIO_QUARTO = "/y/quarto")
   on.exit(restore_env(old), add = TRUE)

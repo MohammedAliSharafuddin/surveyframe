@@ -81,7 +81,6 @@ sframe_reliability_results <- function(
       result$alpha_std  <- a$total$std.alpha
       # Feldt's (1965) 95% interval, the one psych::alpha.ci() gives, from
       # the F distribution on n - 1 and (n - 1)(k - 1) degrees of freedom
-      # (L2).
       result$alpha_ci <- sframe_alpha_ci(result$alpha, result$n, result$n_items)
       # Alpha with each item left out, for sframe_item_flags().
       result$alpha_if_deleted <- stats::setNames(a$alpha.drop$raw_alpha, rownames(a$alpha.drop))
@@ -239,7 +238,7 @@ sframe_item_results <- function(data, instrument, scales = NULL) {
         ceiling_prop = if (is.null(bounds)) NA_real_ else mean(vals == bounds[2]),
         n_missing    = sum(is.na(oriented[[col]]))
       )
-      # floor_pct and ceiling_pct hold percentages, as their names say (I5)
+      # floor_pct and ceiling_pct hold percentages, as their names say
       d$floor_pct <- 100 * d$floor_prop
       d$ceiling_pct <- 100 * d$ceiling_prop
       d

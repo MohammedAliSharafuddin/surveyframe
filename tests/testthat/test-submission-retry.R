@@ -1,4 +1,4 @@
-# Batch 4 #22: submission appended to CSV and then called on_submit, both
+# Submission appended to CSV and then called on_submit, both
 # inside one error handler. Where the append succeeded and the callback
 # failed, the participant saw "Could not save response" and stayed on the
 # form. Submitting again appended the same answers a second time, so a
@@ -10,7 +10,7 @@ retry_instrument <- function() {
   ))
 }
 
-test_that("22: a saved row is written once, whatever the callback does", {
+test_that("A saved row is written once, whatever the callback does", {
   path <- tempfile(fileext = ".csv")
   row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
@@ -31,7 +31,7 @@ test_that("22: a saved row is written once, whatever the callback does", {
   expect_equal(nrow(utils::read.csv(path)), 1)
 })
 
-test_that("22: a retry that succeeds completes the submission", {
+test_that("A retry that succeeds completes the submission", {
   path <- tempfile(fileext = ".csv")
   row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())
@@ -50,7 +50,7 @@ test_that("22: a retry that succeeds completes the submission", {
   expect_equal(nrow(utils::read.csv(path)), 1)
 })
 
-test_that("22: the two failures are told apart", {
+test_that("The two failures are told apart", {
   # a directory where a file has to go, so the write cannot succeed
   path <- tempfile(); dir.create(path)
   row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
@@ -85,7 +85,7 @@ test_that("22: the two failures are told apart", {
   expect_match(res2$message, "saved", fixed = TRUE)
 })
 
-test_that("22: with no callback, one save completes the submission", {
+test_that("With no callback, one save completes the submission", {
   path <- tempfile(fileext = ".csv")
   row <- sframe_response_row(retry_instrument(), list(q1 = "fine"),
                              list(), Sys.time())

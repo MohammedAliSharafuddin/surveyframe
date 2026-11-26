@@ -1,6 +1,6 @@
 # tests/testthat/test-demo-results-parity.R
 #
-# Batch 5, finding 15. Every demo ships <demo>_results.csv, the numbers
+# Every demo ships <demo>_results.csv, the numbers
 # surveyframe produced, so a reader can check them in other software. Nothing
 # compared those snapshots with what the package computes, so a corrected
 # statistic left a stale reference result shipping beside it.
@@ -11,7 +11,7 @@
 
 skip_on_cran()
 
-test_that("15: every shipped demo result matches what the package computes now", {
+test_that("Every shipped demo result matches what the package computes now", {
   dir <- sframe_demo_dir()
   idx <- sframe_demo_index()
   mismatches <- character(0)
@@ -57,7 +57,7 @@ test_that("15: every shipped demo result matches what the package computes now",
   expect_identical(mismatches, character(0))
 })
 
-test_that("15: demo snapshots omit platform-dependent network coordinates", {
+test_that("Demo snapshots omit platform-dependent network coordinates", {
   res <- list(RQ1 = list(
     block_id = "RQ1",
     test = "co_occurrence_network",

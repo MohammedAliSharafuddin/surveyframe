@@ -1,7 +1,7 @@
 # tests/testthat/test-read-text-verify.R
 #
-# Ethos request 4 (2026-10-01). read_sframe() read only a file path and always
-# verified the hash. Ethos keeps instruments as JSON in PostgreSQL, wrote a
+# read_sframe() read only a file path and always
+# verified the hash. A host that keeps instruments as JSON in a database wrote a
 # temporary file to read one, and rebuilt a payload without a matching hash by
 # hand, dropping models, branching, checks and render settings.
 
@@ -11,7 +11,7 @@ demo_json <- function() {
   paste(readLines(path), collapse = "\n")
 }
 
-test_that("4: a payload held in memory reads with no file, verified", {
+test_that("A payload held in memory reads with no file, verified", {
   ins <- read_sframe(text = demo_json())
   expect_s3_class(ins, "sframe")
   expect_true(attr(ins, "sframe_verified"))
@@ -20,13 +20,13 @@ test_that("4: a payload held in memory reads with no file, verified", {
   expect_error(read_sframe(path = "x.sframe", text = demo_json()), "not both")
 })
 
-test_that("4: an edited payload is refused by default", {
+test_that("An edited payload is refused by default", {
   edited <- sub("Event feedback", "Event feedback, edited", demo_json(), fixed = TRUE)
   expect_error(read_sframe(text = edited), "Integrity check failed",
                class = "sframe_import_error")
 })
 
-test_that("4: verify = FALSE reads it, warns, and marks it unverified", {
+test_that("Verify = FALSE reads it, warns, and marks it unverified", {
   edited <- sub("Event feedback", "Event feedback, edited", demo_json(), fixed = TRUE)
   expect_warning(ins <- read_sframe(text = edited, verify = FALSE),
                  class = "sframe_unverified_warning")
@@ -37,7 +37,7 @@ test_that("4: verify = FALSE reads it, warns, and marks it unverified", {
   expect_match(capture.output(print(ins)), "unverified", all = FALSE)
 })
 
-test_that("4: a payload with no hash at all reads with verify = FALSE", {
+test_that("A payload with no hash at all reads with verify = FALSE", {
   parsed <- jsonlite::fromJSON(demo_json(), simplifyVector = FALSE)
   parsed$hash <- NULL
   txt <- jsonlite::toJSON(parsed, auto_unbox = TRUE, null = "null", digits = NA)
@@ -47,12 +47,12 @@ test_that("4: a payload with no hash at all reads with verify = FALSE", {
   expect_false(attr(ins, "sframe_verified"))
 })
 
-test_that("4: an unverified instrument is written only as a new instrument", {
+test_that("An unverified instrument is written only as a new instrument", {
   edited <- sub("Event feedback", "Event feedback, edited", demo_json(), fixed = TRUE)
   ins <- suppressWarnings(read_sframe(text = edited, verify = FALSE))
   path <- tempfile(fileext = ".sframe")
   expect_error(write_sframe(ins, path), "new_instrument = TRUE")
-  # A new instrument also needs a version of its own (CX-12).
+  # A new instrument also needs a version of its own.
   ins$meta$version <- "1.0.1"
   expect_no_error(write_sframe(ins, path, new_instrument = TRUE))
   expect_true(attr(read_sframe(path), "sframe_verified"))

@@ -64,7 +64,7 @@ sframe_code_predictor_fn <- c(
 # generators that fit from a data frame. `coding` is the runner's
 # predictor_coding: each categorical predictor with its levels, the first the
 # reference, so a choice item coded 1, 2, 3 enters as a category, as in the
-# runner (FR-20), and the reference is the same in every locale.
+# runner, and the reference is the same in every locale.
 sframe_code_predictors <- function(frame, predictors, coding = list()) {
   numeric <- setdiff(predictors, names(coding))
   c(sframe_code_predictor_fn,
@@ -234,7 +234,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
       outcome <- vars[length(vars)]
       predictors <- vars[-length(vars)]
       # The runner models its named event as 1 and the other level as 0
-      # (FR-21), in every locale.
+      # in every locale.
       c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
         sprintf("# The event: \"%s\" is 1, \"%s\" is 0.", result$event, result$reference_level),
         sprintf("model_data[[\"%s\"]] <- as.integer(as.character(model_data[[\"%s\"]]) == \"%s\")",
@@ -249,7 +249,7 @@ sframe_syntax_call <- function(result, frame = "scored") {
       outcome <- vars[1]
       predictors <- vars[-1]
       c(sframe_code_predictors(frame, predictors, result$predictor_coding %||% list()),
-        "# The outcome in the order its choice set declares (FR-19).",
+        "# The outcome in the order its choice set declares.",
         sframe_code_factor("model_data", outcome, result$outcome_levels, ordered = TRUE),
         sprintf("fit <- MASS::polr(%s, data = model_data, Hess = TRUE)",
                 sframe_code_formula(outcome, predictors)),
@@ -385,7 +385,7 @@ sframe_syntax_result <- function(x, which = NULL, data_expr = "scored",
 
   question <- as.character(x$research_question %||% "")[1]
   # Comments wrap at 72 characters: a code block does not wrap in a PDF, so
-  # a long research question ran past the page edge (P1-05, 2026-11-14).
+  # a long research question ran past the page edge.
   lines <- c(
     if (nzchar(question)) strwrap(question, width = 72, prefix = "# "),
     strwrap(sframe_syntax_note(x), width = 72, prefix = "# "),

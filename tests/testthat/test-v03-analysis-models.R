@@ -371,7 +371,7 @@ test_that("builder registry declares roles and conditional significance level", 
   expect_match(html, "seminr_syntax", fixed = TRUE)
 })
 
-# UI-1 (UX-02): the role-based planner is the builder's Plan only. Studio
+# The role-based planner is the builder's Plan only. Studio
 # keeps the registry for method names and the builder state it saves, and
 # no longer edits the plan or the models itself.
 test_that("the role-based analysis planner lives in the builder, which Studio embeds", {

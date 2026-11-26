@@ -4,7 +4,7 @@
 # they still fit the instrument: the same item ids and the same choice codes.
 # A label, wording, help text or branding edit keeps them. An item or a
 # choice code added, removed or renamed clears them, with a message saying
-# what changed (session 7, the owner's decision).
+# what changed.
 
 test_that("a label edit leaves the responses fitting the instrument", {
   old <- sframe_demo("likert_scale")$instrument
@@ -112,7 +112,7 @@ test_that("a Design save keeps or clears the loaded responses in Studio", {
   # A label edit: the responses stay.
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Label edit';",
             "w.S.items[0].label = 'Reworded in Design'; w.saveSframe(); true"))
-  # The demo has a history, so the save opens the amendment dialog (8a).
+  # The demo has a history, so the save opens the amendment dialog.
   expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
   js("$('#amend_dlg-as_new').click(); true")
   # Saved as a new instrument, it has no history, so the next save applies.

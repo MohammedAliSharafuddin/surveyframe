@@ -1,6 +1,6 @@
 # tests/testthat/test-plot-fit.R
 # Charts exported at the default 6.5 by 4 inches clipped long titles,
-# subtitles, choice labels and legends at the edges (CX-23). The shared
+# subtitles, choice labels and legends at the edges. The shared
 # finishing step wraps the text to the export width.
 
 long_title <- paste("Distribution of the very long variable name that describes",

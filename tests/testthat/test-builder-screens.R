@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-screens.R
 #
-# UX-10: the welcome and thank-you pages are entries at the ends of
+# The welcome and thank-you pages are entries at the ends of
 # SurveyBuilder's question list, with their editor on the right, where they
 # were tabs of the Survey settings dialog. Run under V8 (helper-v8-builder.R).
 # A page left alone keeps the content hash, and an edit writes that field and

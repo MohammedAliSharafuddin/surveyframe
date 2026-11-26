@@ -1,4 +1,4 @@
-# Batch 1's remaining correctness findings on the instrument core.
+# Remaining correctness findings on the instrument core.
 #
 # #6.  The 15-type enum and the per-type configuration were checked at
 #      construction alone, so a mutated instrument revalidated clean.
@@ -17,7 +17,7 @@ base_item <- function(...) sframe_item("q1", "How satisfied are you?",
 
 instr_of <- function(...) sframe_instrument("Core", components = list(...))
 
-test_that("6: a mutated item type and its configuration are revalidated", {
+test_that("A mutated item type and its configuration are revalidated", {
   # the enum, which only the constructor enforced
   instr <- instr_of(base_item())
   instr$items[[1]]$type <- "checkbox"
@@ -62,7 +62,7 @@ test_that("6: a mutated item type and its configuration are revalidated", {
   expect_true(validate_sframe(ok, strict = FALSE)$valid)
 })
 
-test_that("7: a choice set has to carry usable, unique codes", {
+test_that("A choice set has to carry usable, unique codes", {
   expect_error(sframe_choice_set("amb", values = c("yes", "yes"),
                           labels = c("Agree", "Disagree")),
                class = "sframe_error")
@@ -78,7 +78,7 @@ test_that("7: a choice set has to carry usable, unique codes", {
   expect_false(validate_sframe(instr, strict = FALSE)$valid)
 })
 
-test_that("10: an ambiguous code keeps its code, and context gives its label", {
+test_that("An ambiguous code keeps its code, and context gives its label", {
   instr <- instr_of(
     sframe_choice_set("agree", values = 1:2, labels = c("Strongly disagree", "Agree")),
     sframe_choice_set("freq",  values = 1:2, labels = c("Daily", "Weekly")),
@@ -105,7 +105,7 @@ test_that("10: an ambiguous code keeps its code, and context gives its label", {
   expect_equal(unname(sframe_label_lookup(plain)[["1"]]), "Strongly disagree")
 })
 
-test_that("11: a literal comma in a branch value survives", {
+test_that("A literal comma in a branch value survives", {
   # I() marks the value as literal, so the legacy split leaves it alone
   expect_equal(sframe_branch_in_values(I("Food, drink")), "Food, drink")
 
@@ -122,7 +122,7 @@ test_that("11: a literal comma in a branch value survives", {
   expect_equal(sframe_branch_in_values(b$value), "Food, drink")
 })
 
-test_that("12: a check has to be usable and uniquely identified", {
+test_that("A check has to be usable and uniquely identified", {
   expect_error(sframe_attention_check("attn1", type = "attention", item_id = "q5"),
                class = "sframe_error")
 
@@ -132,7 +132,7 @@ test_that("12: a check has to be usable and uniquely identified", {
   expect_false(validate_sframe(instr, strict = FALSE)$valid)
 })
 
-test_that("13: a branch has an identity, and lists are named by it", {
+test_that("A branch has an identity, and lists are named by it", {
   b <- sframe_branch("q2", depends_on = "q1", operator = "==", value = "yes")
   expect_true(nzchar(sframe_id(b)))
 
@@ -148,7 +148,7 @@ test_that("13: a branch has an identity, and lists are named by it", {
     strict = FALSE)$valid)
 })
 
-test_that("14: the tables say they are summaries and name the full record", {
+test_that("The tables say they are summaries and name the full record", {
   src <- sframe_source_text("R", "as_data_frame.R")
   expect_match(src, "summary", fixed = TRUE)
   expect_match(src, "sframe_get_items()", fixed = TRUE)

@@ -1,7 +1,7 @@
 # tests/testthat/test-studio-next-stage-browser.R
 #
 # Every SurveyStudio screen that has nothing to show yet names the next
-# stage and links to it (session 7). With no instrument, each screen past
+# stage and links to it. With no instrument, each screen past
 # Design and Open Instrument points to those 2. With an instrument and no
 # responses, the screens that need responses point to Collect and
 # Responses. Driven in a real Chrome against the build under test.

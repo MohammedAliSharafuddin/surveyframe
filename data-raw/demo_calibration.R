@@ -2,7 +2,7 @@
 # Calibration targets for the demo simulators (plan step 2, 2026-11-26).
 #
 # The demos ship surveyframe's own simulated data, never a published dataset
-# (owner 2026-11-26). What the simulators borrow from published data is its
+# What the simulators borrow from published data is its
 # shape: how answers spread over the categories of an item, how items of 1
 # scale correlate, and how scales and constructs relate. This script reads 2
 # published datasets, both dev-only (psych and seminr are never needed to

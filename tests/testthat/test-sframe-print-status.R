@@ -2,10 +2,10 @@
 #
 # print(), format() and summary() of an sframe give the status from
 # validate_sframe() run on the object, as Studio's Open Instrument does
-# (studio_schema_status(), Codex P1-09), never from the stored
+# (studio_schema_status()), never from the stored
 # meta$validated, which is a cache only. Counts are in words, "1 block" and
 # "2 blocks" in print() and summary(), "1 analysis block" in format(), never
-# "block(s)" (coordinator 2026-11-11, UF follow-up 1).
+# "block(s)".
 
 print_status_instr <- function() sframe_demo("two_group")$instrument
 

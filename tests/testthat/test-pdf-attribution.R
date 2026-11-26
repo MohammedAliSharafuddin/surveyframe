@@ -1,4 +1,4 @@
-# Batch 4 #14: a PDF report recursively rendered the HTML and threw that return
+# a PDF report recursively rendered the HTML and threw that return
 # value away, then returned a bare path. The engine attribute the HTML path
 # attaches was lost, so a reader could not tell which engine built the content,
 # and the message announced the intermediate HTML path rather than the PDF that
@@ -9,7 +9,7 @@ pdf_instrument <- function() {
     sframe_item("q1", "A number", type = "numeric")))
 }
 
-test_that("14: an HTML report records its engine", {
+test_that("An HTML report records its engine", {
   rlang::local_options(surveyframe.use_quarto = FALSE)  # not a Quarto test (session T)
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   out <- tempfile(fileext = ".html")
@@ -18,7 +18,7 @@ test_that("14: an HTML report records its engine", {
   expect_true(attr(res, "engine") %in% c("quarto", "html"))
 })
 
-test_that("14: a PDF records the engine that built its content, and the print step", {
+test_that("A PDF records the engine that built its content, and the print step", {
   skip_on_cran()
   skip_if_not_slow()
   skip_if_not_installed("pagedown")
@@ -26,7 +26,7 @@ test_that("14: a PDF records the engine that built its content, and the print st
           !nzchar(Sys.which("chromium")) &&
           !nzchar(Sys.which("chromium-browser")),
           "no local Chrome")
-  # The pagedown route is the PDF route without Quarto (8b-R item 3).
+  # The pagedown route is the PDF route without Quarto.
   rlang::local_options(surveyframe.use_quarto = FALSE)
 
   out <- tempfile(fileext = ".pdf")
@@ -40,7 +40,7 @@ test_that("14: a PDF records the engine that built its content, and the print st
   expect_equal(attr(res, "converter"), "pagedown")
 })
 
-test_that("14: the announced path is the one that was asked for", {
+test_that("The announced path is the one that was asked for", {
   skip_on_cran()
   skip_if_not_slow()
   skip_if_not_installed("pagedown")
@@ -48,7 +48,7 @@ test_that("14: the announced path is the one that was asked for", {
           !nzchar(Sys.which("chromium")) &&
           !nzchar(Sys.which("chromium-browser")),
           "no local Chrome")
-  # The pagedown route is the PDF route without Quarto (8b-R item 3).
+  # The pagedown route is the PDF route without Quarto.
   rlang::local_options(surveyframe.use_quarto = FALSE)
 
   out <- tempfile(fileext = ".pdf")

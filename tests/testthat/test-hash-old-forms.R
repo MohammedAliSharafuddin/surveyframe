@@ -1,5 +1,5 @@
 # tests/testthat/test-hash-old-forms.R
-# Hashes taken before 0.4.3 (Fable sitting 1 FR-08 and FR-11): a file hashed
+# Hashes taken before 0.4.3: a file hashed
 # in an English collation reads in a C session, and the verifier page's legacy
 # hash is R's.
 
@@ -7,7 +7,7 @@ old_form_instrument <- function() {
   cs <- sframe_choice_set("ag5", 1:5, c("SD", "D", "N", "A", "SA"))
   it <- sframe_item("q1", "Item", type = "likert", choice_set = "ag5")
   x <- sframe_instrument("Old forms", components = list(cs, it))
-  # Keys that sort differently in en_US and in C (Fable p04 L-05).
+  # Keys that sort differently in en_US and in C.
   x$meta$Zeta <- "z"
   x$meta$alpha <- "a"
   x$meta$a_b <- "b"
@@ -15,7 +15,7 @@ old_form_instrument <- function() {
   x
 }
 
-test_that("a file hashed before 0.4.3 in en_US order reads in a C session (FR-08)", {
+test_that("a file hashed before 0.4.3 in en_US order reads in a C session", {
   keys <- c("Zeta", "alpha", "a_b", "ab")
   skip_if(identical(surveyframe:::sframe_collate_order(keys, "en_US"), order(keys, method = "radix")),
           "no en_US collation here")
@@ -30,7 +30,7 @@ test_that("a file hashed before 0.4.3 in en_US order reads in a C session (FR-08
   expect_identical(Sys.getlocale("LC_COLLATE"), "C")
 })
 
-test_that("the verifier page's legacy hash is R's (FR-11)", {
+test_that("the verifier page's legacy hash is R's", {
   skip_if(!nzchar(Sys.which("node")), "node is not installed")
   page <- test_path("..", "..", "pkgdown", "extra", "verify", "index.html")
   skip_if(!file.exists(page), "the verifier page is not in this tree")

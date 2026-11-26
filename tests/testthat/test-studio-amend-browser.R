@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-amend-browser.R
 #
-# Session 8a, CX-12, UX-05, UX-06 and UX-19. A save from Design of an
+# A save from Design of an
 # instrument with a history opens Studio's 1 amendment dialog, which shows
 # what the change touches and the version suggested, then records the
 # amendment with amend_sframe(), or saves a new instrument, or cancels. The

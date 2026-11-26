@@ -1,6 +1,6 @@
 # tests/testthat/test-report-csl-styles.R
 #
-# Session 8b-R, item 6 (owner 2026-11-03). render_report(csl = ) takes a style
+# render_report(csl = ) takes a style
 # name, "apa" (the default), "chicago-author-date", "harvard", "ieee" or
 # "mla", or a path to a .csl file. The style used is copied into the .qmd
 # report folder, and its name and sha256 go into the results record and the

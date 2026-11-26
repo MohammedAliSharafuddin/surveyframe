@@ -1,6 +1,6 @@
 # tests/testthat/test-report-svg-device.R
 #
-# Session CI (CI run 41984181153). On a Mac without XQuartz, R's own svg()
+# Found on CI. On a Mac without XQuartz, R's own svg()
 # cannot load Cairo: capabilities("cairo") still says TRUE, svg() only warns
 # and opens nothing, so knitr wrote no figure and Quarto's Typst route, which
 # draws SVG by default, stopped with "file not found". render_report() now

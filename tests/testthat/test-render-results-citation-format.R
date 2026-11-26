@@ -1,4 +1,4 @@
-# review_040 defect 7 (owner 2026-11-13), Session CF-B: render_results()
+# render_results()
 # accepted citation_format "ama" and "vancouver" and never used them, so 3
 # formats gave 1 document. Only "apa" is accepted now.
 

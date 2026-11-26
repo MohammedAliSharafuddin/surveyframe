@@ -3,7 +3,7 @@
 # Figure size, resolution and format, for the report and for charts saved as
 # files. A journal asks for figures at a stated resolution and width, often
 # 300 dpi for print and sometimes TIFF, PDF or SVG, and render_report() fixed
-# its own output (Ethos request 19).
+# its own output.
 
 .sframe_figure_formats <- c("png", "svg", "pdf", "tiff", "jpeg")
 
@@ -160,7 +160,7 @@ sframe_wrap_text <- function(x, chars) {
 
 # Fits a finished chart to the export width, so the default 6.5 by 4 inch
 # figure no longer clips titles, subtitles, captions, axis text or legends
-# at its edges (CX-23). Wraps the plot labels and long discrete labels,
+# at its edges. Wraps the plot labels and long discrete labels,
 # lays a long legend out over as many rows as it needs, and keeps a margin
 # round the plot. `width` is in inches and defaults to the figure settings
 # in force, then 6.5. Anything that is not a ggplot is returned unchanged.
@@ -246,7 +246,7 @@ sframe_fit_plot <- function(p, width = NULL) {
   if (legend_shown) {
     p <- p + ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
     # The title above the keys, not to their left, where a long title pushed
-    # the keys off the right edge and lost its own start off the left (K3).
+    # the keys off the right edge and lost its own start off the left.
     # ggplot2 before 3.5.0 sets it on the guide, above.
     if (utils::packageVersion("ggplot2") >= "3.5.0") {
       p <- p + ggplot2::theme(legend.title.position = "top")

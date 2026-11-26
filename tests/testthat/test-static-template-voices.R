@@ -1,6 +1,6 @@
 # tests/testthat/test-static-template-voices.R
 #
-# D4: the thank-you screen has 2 voices. The package writes one status line
+# The thank-you screen has 2 voices. The package writes one status line
 # per delivery state, and the researcher's message sits below it in every
 # state except a failed send. The default message claims nothing.
 
@@ -19,7 +19,7 @@ voices_submit <- function(message = NULL, sender = NULL) {
   ctx
 }
 
-test_that("D4: no collector and no message claims nothing was recorded", {
+test_that("No collector and no message claims nothing was recorded", {
   ctx <- voices_submit()
   expect_identical(ctx$get("deliveryState"), "local")
   html <- voices_html(ctx)
@@ -28,13 +28,13 @@ test_that("D4: no collector and no message claims nothing was recorded", {
   expect_match(html, "Thank you for participating.", fixed = TRUE)
 })
 
-test_that("D4: a custom message shows in the local state", {
+test_that("A custom message shows in the local state", {
   html <- voices_html(voices_submit("Contact Dr Ames on 0123."))
   expect_match(html, "Contact Dr Ames on 0123.", fixed = TRUE)
   expect_match(html, "has not been sent", fixed = TRUE)
 })
 
-test_that("D4: a custom message shows in the confirmed state, under the status", {
+test_that("A custom message shows in the confirmed state, under the status", {
   ctx <- voices_submit("Debrief text.", sender = "return Promise.resolve(true);")
   expect_identical(ctx$get("deliveryState"), "confirmed")
   html <- voices_html(ctx)
@@ -44,7 +44,7 @@ test_that("D4: a custom message shows in the confirmed state, under the status",
             regexpr("Debrief text.", html, fixed = TRUE))
 })
 
-test_that("D4: the sent state, as a Sheets endpoint reaches it, keeps the message", {
+test_that("The sent state, as a Sheets endpoint reaches it, keeps the message", {
   ctx <- voices_submit("Debrief text.", sender = "return Promise.resolve(false);")
   expect_identical(ctx$get("deliveryState"), "sent")
   html <- voices_html(ctx)
@@ -52,7 +52,7 @@ test_that("D4: the sent state, as a Sheets endpoint reaches it, keeps the messag
   expect_match(html, "Debrief text.", fixed = TRUE)
 })
 
-test_that("D4: a failed send hides the custom message", {
+test_that("A failed send hides the custom message", {
   ctx <- voices_submit("Debrief text.", sender = "return Promise.reject(new Error('x'));")
   expect_identical(ctx$get("deliveryState"), "failed")
   html <- voices_html(ctx)
@@ -61,7 +61,7 @@ test_that("D4: a failed send hides the custom message", {
   expect_match(html, "Try sending again", fixed = TRUE)
 })
 
-test_that("D4: a preview says nothing was sent", {
+test_that("A preview says nothing was sent", {
   ctx <- static_survey_context(voices_instrument("Debrief text."), preview = TRUE)
   ctx$eval("responses['q1'] = 'fine'; doSubmit();")
   html <- voices_html(ctx)
@@ -69,7 +69,7 @@ test_that("D4: a preview says nothing was sent", {
   expect_no_match(html, "no online collector", fixed = TRUE)
 })
 
-test_that("D4: a preview export keeps the message the researcher wrote", {
+test_that("A preview export keeps the message the researcher wrote", {
   out <- tempfile(fileext = ".html")
   export_survey(voices_instrument("Debrief text."), output_path = out,
                        preview = TRUE, open = FALSE)

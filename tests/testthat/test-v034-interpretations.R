@@ -66,7 +66,7 @@ test_that("fallback report pairs the override with the planned decision rule", {
   expect_match(friendly, "above the rule threshold")
 
   fast <- rq_chunk(html, "RQ 1: How fast")
-  # D12: the decision rule is declared before the data, so it prints with
+  # The decision rule is declared before the data, so it prints with
   # or without a written interpretation.
   expect_match(fast, "Planned decision rule:")
   expect_no_match(fast, "Interpretation")
@@ -80,7 +80,7 @@ test_that("NULL interpretations prints the decision rules and no interpretation"
 })
 
 test_that("a report with no data is the plan: decision rules, and no interpretation", {
-  # With no data render_report() writes the pre-analysis plan (Session 10).
+  # With no data render_report() writes the pre-analysis plan.
   # An interpretation is written after the results, so the plan prints each
   # block's decision rule and leaves interpretations to the results report.
   fx <- interp_fixture()

@@ -1,4 +1,4 @@
-# FR-23 (Fable sitting 2), Session CF-B: a frequency table's percentages are
+# A frequency table's percentages are
 # of those who answered, as the weighted table and a descriptives block's
 # counts are, and the sentence gives that N with the missing count. North was
 # 28.9% in the table, 36.1% beside it, and the sentence said N = 90 where 72

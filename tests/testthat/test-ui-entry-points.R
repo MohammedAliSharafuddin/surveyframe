@@ -1,4 +1,4 @@
-# Batch 7's findings on the researcher-facing entry points.
+# Findings on the researcher-facing entry points.
 #
 # #22. SurveyStudio's preview gate told a researcher to add an item in "Build
 #      Survey", a screen Studio does not have. The Open screen already routes
@@ -13,7 +13,7 @@ app_source <- function() {
   sframe_installed_text("inst", "shiny", "app.R")
 }
 
-test_that("22: the preview gate names a route Studio has", {
+test_that("The preview gate names a route Studio has", {
   src <- app_source()
   expect_false(grepl("Build Survey", src, fixed = TRUE))
   # It links to the Design screen, which holds the builder where questions
@@ -22,7 +22,7 @@ test_that("22: the preview gate names a route Studio has", {
   expect_match(src, "open a file that has them.\"), c(\"design\", \"open\")", fixed = TRUE)
 })
 
-test_that("22: every screen the app names is one it has", {
+test_that("Every screen the app names is one it has", {
   src <- app_source()
   # the tab set the navigation builds, as launch_studio() also validates
   screens <- sframe_studio_screens()

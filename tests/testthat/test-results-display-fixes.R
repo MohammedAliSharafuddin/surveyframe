@@ -1,6 +1,6 @@
-# tests/testthat/test-review-043-ubuntu.R
-# The R-side defects the Ubuntu run of review_043 at 8676a43 found
-# (CLAUDE_UBUNTU_REVIEW_8676a43.md), one test or more each.
+# tests/testthat/test-results-display-fixes.R
+# Fixes to results, tables and their display on the R side, with one test or
+# more each.
 
 u43_display_instrument <- function() {
   sframe_instrument("Display items", components = list(
@@ -10,14 +10,14 @@ u43_display_instrument <- function() {
     sframe_item("age", "Age", type = "numeric")))
 }
 
-test_that("G1: a run_survey() response row has no column for display items", {
+test_that("A run_survey() response row has no column for display items", {
   row <- sframe_response_row(u43_display_instrument(),
                              list(q1 = "fine", age = 30), list(), Sys.time())
   expect_false(any(c("sec_1", "intro") %in% names(row)))
   expect_true(all(c("q1", "age") %in% names(row)))
 })
 
-test_that("N5: the blank response template follows the instrument's columns", {
+test_that("The blank response template follows the instrument's columns", {
   ins <- u43_display_instrument()
   cols <- sframe_response_template_columns(ins)
   expect_identical(cols, c("respondent_id", "started_at", "submitted_at", "q1", "age"))
@@ -34,7 +34,7 @@ test_that("N5: the blank response template follows the instrument's columns", {
                     names(demo$responses)))
 })
 
-test_that("H2: a rewritten header names check.names = FALSE", {
+test_that("A rewritten header names check.names = FALSE", {
   ins <- sframe_instrument("H2", components = list(
     sframe_item("sat_1", "Satisfied", type = "numeric"),
     sframe_item("sat_2", "Return", type = "numeric")))
@@ -48,7 +48,7 @@ test_that("H2: a rewritten header names check.names = FALSE", {
   expect_match(conditionMessage(err2), "check.names = FALSE", fixed = TRUE)
 })
 
-test_that("I5: missing_pct is a percentage, and tables show missing_prop once", {
+test_that("missing_pct is a percentage, and tables show missing_prop once", {
   demo <- sframe_demo("likert_scale", preview = FALSE)
   mr <- sframe_missing_data_results(demo$responses, demo$instrument)
   expect_equal(mr$item_missing$missing_pct, 100 * mr$item_missing$missing_prop)
@@ -56,7 +56,7 @@ test_that("I5: missing_pct is a percentage, and tables show missing_prop once", 
   expect_false("missing_pct" %in% names(shown))
 })
 
-test_that("I6: the assumption advisory fires when normality clearly fails", {
+test_that("The assumption advisory fires when normality clearly fails", {
   set.seed(3)
   d <- data.frame(y = c(rexp(80, 1) ^ 2, rexp(80, 1) ^ 2),
                   g = rep(c("a", "b"), each = 80))
@@ -71,7 +71,7 @@ test_that("I6: the assumption advisory fires when normality clearly fails", {
   expect_false(grepl("clearly fails", ar2$advisory %||% ""))
 })
 
-test_that("J3: the paired line names the measure briefly, higher in the larger mean", {
+test_that("The paired line names the measure briefly, higher in the larger mean", {
   set.seed(5)
   n <- 30
   before <- rnorm(n, 50, 10)
@@ -91,7 +91,7 @@ test_that("J3: the paired line names the measure briefly, higher in the larger m
   expect_match(r$apa, "higher in confidence after", fixed = TRUE)
 })
 
-test_that("J5: a partial correlation given roles$variables says what it needs", {
+test_that("A partial correlation given roles$variables says what it needs", {
   set.seed(6)
   d <- data.frame(a = rnorm(40), b = rnorm(40), c = rnorm(40))
   r <- cfb_block(d, "partial_correlation", list(variables = c("a", "b"), controls = "c"),
@@ -101,7 +101,7 @@ test_that("J5: a partial correlation given roles$variables says what it needs", 
   expect_false(grepl("undefined columns", r$error))
 })
 
-test_that("J6: the multinomial carries syntax, formatted p and a separation warning", {
+test_that("The multinomial carries syntax, formatted p and a separation warning", {
   skip_if_not_installed("nnet")
   set.seed(7)
   n <- 90
@@ -118,7 +118,7 @@ test_that("J6: the multinomial carries syntax, formatted p and a separation warn
   expect_false(grepl("Intercept", res$separation, fixed = TRUE))
   expect_false(any(suppressWarnings(as.numeric(tb$OR)) > 999, na.rm = TRUE))
   # through the plan, it gains the R that refits it
-  ins <- sframe_instrument("J6", components = list(
+  ins <- sframe_instrument("Multinomial", components = list(
     sframe_item("y", "Outcome", type = "text"), cfb_num("x")))
   set.seed(8)
   d2 <- data.frame(y = sample(c("a", "b", "c"), 120, replace = TRUE), x = rnorm(120))
@@ -128,13 +128,13 @@ test_that("J6: the multinomial carries syntax, formatted p and a separation warn
   expect_true(is.character(r2$syntax) && nzchar(r2$syntax))
 })
 
-test_that("J8: sframe_syntax_sem() refuses a CFA model", {
+test_that("sframe_syntax_sem() refuses a CFA model", {
   m <- sframe_model_spec("m1", type = "cfa",
                          constructs = list(F1 = c("a", "b", "c")))
   expect_error(sframe_syntax_sem(m), "sframe_syntax_cfa")
 })
 
-test_that("J10: a small sample gets an advisory, and Firth gives LR chi-square, df and p", {
+test_that("A small sample gets an advisory, and Firth gives LR chi-square, df and p", {
   skip_if_not_installed("logistf")
   set.seed(9)
   n <- 18
@@ -151,7 +151,7 @@ test_that("J10: a small sample gets an advisory, and Firth gives LR chi-square, 
   expect_match(r2$advisory, "Spearman")
 })
 
-test_that("L2: result sentences set their symbols in italics for every engine", {
+test_that("Result sentences set their symbols in italics for every engine", {
   md <- surveyframe:::sframe_apa_markdown("t(29) = -2.10, p = .045, d = 0.38, N = 30")
   expect_match(md, "*t*(29)", fixed = TRUE)
   expect_match(md, "*p* = ", fixed = TRUE)
@@ -159,7 +159,7 @@ test_that("L2: result sentences set their symbols in italics for every engine", 
   expect_match(md, "*N* = ", fixed = TRUE)
 })
 
-test_that("L2: the alpha result carries Feldt's interval", {
+test_that("The alpha result carries Feldt's interval", {
   demo <- sframe_demo("likert_scale", preview = FALSE)
   rr <- sframe_reliability_results(demo$responses, demo$instrument)
   s <- rr[[1]]
@@ -171,22 +171,22 @@ test_that("L2: the alpha result carries Feldt's interval", {
   expect_equal(unname(s$alpha_ci[[1]]), unname(ref$lower.ci), tolerance = 1e-6)
 })
 
-test_that("K3: the cross-tab chart keeps the option order, sized 6.5 by 4", {
+test_that("The cross-tab chart keeps the option order, sized 6.5 by 4", {
   skip_if_not_installed("ggplot2")
   expect_identical(formals(sframe_save_figures)$width, 6.5)
   expect_identical(formals(sframe_save_figures)$height, 4)
-  ins <- sframe_instrument("K3", components = list(
+  ins <- sframe_instrument("B1", components = list(
     sframe_choice_set("yn", 0:1, c("No", "Yes")),
     sframe_choice_set("ag", 1:5, c("Strongly disagree", "Disagree", "Neutral",
                                    "Agree", "Strongly agree")),
     sframe_item("ret", "Would return", "single_choice", choice_set = "yn"),
     sframe_item("sat", "How satisfied were you with the stay overall, all things considered?",
                 "likert", choice_set = "ag")))
-  sframe_plan(ins) <- list(list(id = "K3", research_question = "q", family = "inferential",
+  sframe_plan(ins) <- list(list(id = "B1", research_question = "q", family = "inferential",
                                 method = "chi_square", roles = list(row = "ret", column = "sat")))
   set.seed(5)
   d <- data.frame(ret = sample(0:1, 80, TRUE), sat = sample(1:5, 80, TRUE))
-  r <- suppressWarnings(run_analysis_plan(d, ins, plots = TRUE, scored = FALSE))$K3
+  r <- suppressWarnings(run_analysis_plan(d, ins, plots = TRUE, scored = FALSE))$B1
   expect_null(r$error)
   p <- surveyframe:::sframe_plot_crosstab(r)
   expect_identical(levels(p$data$Column),
@@ -196,8 +196,8 @@ test_that("K3: the cross-tab chart keeps the option order, sized 6.5 by 4", {
   expect_match(fp$labels$fill, "\n")
 })
 
-test_that("L11: the codebook items table carries each item's help text", {
-  ins <- sframe_instrument("L11", components = list(
+test_that("The codebook items table carries each item's help text", {
+  ins <- sframe_instrument("Help text", components = list(
     sframe_item("age", "Age", type = "numeric", help = "In whole years."),
     sframe_item("q1", "How was it?", type = "text")))
   cb <- sframe_codebook(ins)
@@ -208,7 +208,7 @@ test_that("L11: the codebook items table carries each item's help text", {
   expect_match(md, "In whole years.", fixed = TRUE)
 })
 
-test_that("L9: a section left out drops its heading in the report template", {
+test_that("A section left out drops its heading in the report template", {
   qmd <- readLines(system.file("templates", "report.qmd", package = "surveyframe"))
   heads <- grep("^## (Codebook|Data Quality|Missing Data|Descriptives|Reliability|Analysis Plan|Model Appendix) \\{", qmd)
   expect_length(heads, 0)
@@ -216,14 +216,14 @@ test_that("L9: a section left out drops its heading in the report template", {
   expect_true(any(grepl("eval=isTRUE(params$include_quality)", qmd, fixed = TRUE)))
 })
 
-test_that("L1: the report's start message names the Quarto version", {
+test_that("The report's start message names the Quarto version", {
   src <- paste(deparse(render_report), collapse = "\n")
   expect_match(src, "Rendering the report with Quarto", fixed = TRUE)
   expect_match(src, "quarto$version", fixed = TRUE)
 })
 
-test_that("G1: a two-group table names its groups by their labels", {
-  ins <- sframe_instrument("G1", components = list(
+test_that("A two-group table names its groups by their labels", {
+  ins <- sframe_instrument("B1", components = list(
     sframe_choice_set("yn", 1:2, c("First visit", "Returning guest")),
     sframe_choice_set("ag", 1:5, c("SD", "D", "N", "A", "SA")),
     sframe_item("visit", "Visit", "single_choice", choice_set = "yn"),
@@ -231,10 +231,10 @@ test_that("G1: a two-group table names its groups by their labels", {
   set.seed(12)
   d <- data.frame(visit = rep(1:2, each = 30), sat = sample(1:5, 60, TRUE))
   for (m in c("t_test_ind", "mann_whitney")) {
-    sframe_plan(ins) <- list(list(id = "G1", research_question = "q",
+    sframe_plan(ins) <- list(list(id = "B1", research_question = "q",
                                   family = "inferential", method = m,
                                   roles = list(group = "visit", outcome = "sat")))
-    r <- suppressWarnings(run_analysis_plan(d, ins, scored = FALSE))$G1
+    r <- suppressWarnings(run_analysis_plan(d, ins, scored = FALSE))$B1
     expect_null(r$error, info = m)
     expect_identical(r$table$Group, c("First visit", "Returning guest"), info = m)
   }
@@ -257,7 +257,7 @@ test_that("Studio names the chosen file when it does not open as an instrument",
   expect_false(grepl(basename(tmp), msg2, fixed = TRUE))
 })
 
-test_that("M6: a wording-only save starts the builder's amendment dialog on pipeline", {
+test_that("A wording-only save starts the builder's amendment dialog on pipeline", {
   ctx <- builder_context()
   builder_open(ctx, sframe_demo("likert_scale", preview = FALSE)$instrument)
   info <- function() ctx$eval("JSON.stringify(sframeAmendInfo(S._origin, sframePayload()))")
@@ -270,7 +270,7 @@ test_that("M6: a wording-only save starts the builder's amendment dialog on pipe
   expect_false(jsonlite::fromJSON(info())$wording_only)
 })
 
-test_that("J6: an uncentred predictor's large intercept is not called separation", {
+test_that("An uncentred predictor's large intercept is not called separation", {
   skip_if_not_installed("nnet")
   d <- sframe_demo("logistic", preview = FALSE)
   expect_no_warning(run_analysis_plan(d$responses, d$instrument),

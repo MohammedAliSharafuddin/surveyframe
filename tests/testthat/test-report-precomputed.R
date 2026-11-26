@@ -5,7 +5,7 @@
 # the codebook display table, the plan results with their supplement tables,
 # and every distribution chart. The template only prints. Before 0.4.3 the
 # template ran the analysis plan and drew the charts itself through exported
-# copies of internal helpers, so the 2 engines could disagree (CX-15).
+# copies of internal helpers, so the 2 engines could disagree.
 
 skip_if_not_installed("ggplot2")
 

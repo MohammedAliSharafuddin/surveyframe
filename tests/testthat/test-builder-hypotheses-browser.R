@@ -1,9 +1,9 @@
-# tests/testthat/test-builder-d12-browser.R
+# tests/testthat/test-builder-hypotheses-browser.R
 #
-# D12 in a real Chrome: the Plan editor's H0, H1 and decision rule fields
-# save exactly what was typed, nothing from the placeholders, and an
-# untouched plan block carrying the old fixed sentences saves with its
-# content hash unchanged and without the "save as a new instrument" dialog.
+# Declared hypotheses in a real Chrome: the Plan editor's H0, H1 and decision
+# rule fields save exactly what was typed, nothing from the placeholders, and an
+# untouched plan block carrying the old fixed sentences saves with its content
+# hash unchanged and without the "save as a new instrument" dialog.
 #
 # Skipped on CRAN and wherever chromote or Chrome is unavailable.
 
@@ -60,7 +60,7 @@ d12_save <- function(session) {
 
 d12_instrument <- function(plan = list()) {
   sframe_instrument(
-    "D12 browser", version = "1.0.0",
+    "Hypotheses browser", version = "1.0.0",
     components = list(
       sframe_item("score", "Score", type = "numeric"),
       sframe_item("group", "Group", type = "single_choice", choice_set = "yn"),

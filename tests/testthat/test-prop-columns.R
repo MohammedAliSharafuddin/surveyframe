@@ -1,7 +1,7 @@
 # tests/testthat/test-prop-columns.R
 # The floor, ceiling and missing shares are proportions, so their columns are
 # named floor_prop, ceiling_prop and missing_prop. The _pct columns hold the
-# same shares as percentages (I5), and tables show the _prop column alone.
+# same shares as percentages, and tables show the _prop column alone.
 
 likert_demo <- function() sframe_demo("likert_scale")
 

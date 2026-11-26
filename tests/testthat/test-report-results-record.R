@@ -1,6 +1,6 @@
 # tests/testthat/test-report-results-record.R
 #
-# Session 8b-R, item 2 (NAMING decision 6, SSR 6.0 Layer 4). Every report
+# Every report
 # gets a results record beside it, <name>_results.json, the plan results as
 # canonical JSON, and a manifest, <name>_manifest.json, with the sha256 of the
 # instrument content, the responses, the results record and the output as
@@ -83,7 +83,7 @@ test_that("a codebook-only report records no responses and an empty result list"
   man <- jsonlite::fromJSON(p[["manifest"]], simplifyVector = FALSE)
   ids <- vapply(man$objects, `[[`, "", "object_id")
   expect_false("responses" %in% ids)
-  # With no data the page is the pre-analysis plan (Session 10), which
+  # With no data the page is the pre-analysis plan, which
   # carries no results rows.
   doc <- paste(readLines(out, warn = FALSE), collapse = "\n")
   expect_false(grepl("Responses sha256", doc, fixed = TRUE))

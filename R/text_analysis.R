@@ -16,8 +16,8 @@
 # sframe_humanize_table()'s `exclude_cols` in sframe_run_one_block() so
 # those columns are not relabelled: a free-text word can otherwise collide
 # with an unrelated item's choice CODE anywhere in the instrument and get
-# silently swapped for that item's choice LABEL (found in review_050; a
-# comment containing "pool" read back as "Pool area" because some other
+# silently swapped for that item's choice LABEL (a comment containing
+# "pool" read back as "Pool area" because some other
 # item happened to code a choice "pool" -- confirmed with a mutation
 # check). Ids not listed here (tidy_sentiment, quanteda_dfm) have no
 # free-text column in $table and so need no exclusion; a genuinely coded
@@ -701,15 +701,14 @@ sframe_extract_quotes <- function(model, text, n_quotes = 3L) {
   respondent_map <- model$fit$respondent
   k <- fit$settings$dim$K
 
-  # findThoughts() takes `texts` aligned 1:1 with the model's own document
-  # rows (fit-document order), which is exactly what respondent_map indexes
-  # into; `text` is indexed by original row. A sframe_clean_text()
-  # vector drops blank/missing rows, so its positions do NOT equal
-  # original row numbers once any earlier row was dropped (found in
-  # review_050: passing it as though it did silently attributed a quote
-  # to the wrong respondent). Its `respondent` attribute gives the true
-  # row-to-position map; a raw vector has none, so it is assumed to
-  # already be indexed 1:1 by row.
+  # findThoughts() takes `texts` aligned 1:1 with the model's own document rows
+  # (fit-document order), which is exactly what respondent_map indexes into;
+  # `text` is indexed by original row. A sframe_clean_text() vector drops
+  # blank/missing rows, so its positions do NOT equal original row numbers once
+  # any earlier row was dropped (passing it as though it did silently attributed
+  # a quote to the wrong respondent). Its `respondent` attribute gives the true
+  # row-to-position map; a raw vector has none, so it is assumed to already be
+  # indexed 1:1 by row.
   text_respondent <- attr(text, "respondent")
   text <- as.character(text)
   if (!is.null(text_respondent)) {

@@ -1,6 +1,6 @@
 # tests/testthat/test-labelled-export-names.R
 #
-# D10 / CX-18. Matrix row columns such as `session__Reading materials` and long
+# Matrix row columns such as `session__Reading materials` and long
 # MCDA pair names broke or were silently cut in SPSS and Stata files.
 
 valid_name <- function(nm, limit) {
@@ -20,7 +20,7 @@ export_demo <- function(name, ext) {
   list(path = out, msgs = msgs, demo = demo)
 }
 
-test_that("D10: matrix_likert and mcdm_choice export to SPSS and Stata", {
+test_that("matrix_likert and mcdm_choice export to SPSS and Stata", {
   skip_if_not_installed("haven")
   for (nm in c("matrix_likert", "mcdm_choice")) {
     for (ext in c(".sav", ".dta")) {
@@ -45,7 +45,7 @@ test_that("D10: matrix_likert and mcdm_choice export to SPSS and Stata", {
   }
 })
 
-test_that("D10: renamed names stay unique and labels are kept", {
+test_that("Renamed names stay unique and labels are kept", {
   skip_if_not_installed("haven")
   ins <- sframe_instrument("Dup", components = list(
     sframe_item("q", "Question", type = "matrix", choice_set = "s",
@@ -61,7 +61,7 @@ test_that("D10: renamed names stay unique and labels are kept", {
   expect_identical(attr(back[[1]], "label"), "Question: Row one!")
 })
 
-test_that("D10: a long variable label is cut for Stata and reported", {
+test_that("A long variable label is cut for Stata and reported", {
   skip_if_not_installed("haven")
   long <- strrep("word ", 30)
   ins <- sframe_instrument("Long", components = list(
@@ -81,7 +81,7 @@ test_that("D10: a long variable label is cut for Stata and reported", {
   expect_true("variable label" %in% attr(out, "renamed")$kind)
 })
 
-test_that("D10: nothing to change means no message and no attribute rows", {
+test_that("Nothing to change means no message and no attribute rows", {
   skip_if_not_installed("haven")
   path <- tempfile(fileext = ".sav")
   msgs <- character()

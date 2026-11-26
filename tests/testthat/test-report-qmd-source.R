@@ -1,6 +1,6 @@
 # tests/testthat/test-report-qmd-source.R
 #
-# Session 8b-R, item 3 (NAMING decision 6). render_report(format = "qmd")
+# render_report(format = "qmd")
 # writes a folder holding report.qmd, the .sframe, the responses, the
 # bibliography and its style, the results record and manifest.json, with no
 # _quarto.yml. The .qmd recomputes every number from the folder's own files,
@@ -99,7 +99,7 @@ test_that("a title holding a quote, a colon, a hash and a newline then --- leave
   s <- write_source(title = title)
   qmd <- file.path(s$dir, "report.qmd")
   # The source is built from demonstration data, so the title carries the
-  # stamp (owner 2026-11-14, 2fc5fb5). The front matter stays whole.
+  # stamp. The front matter stays whole.
   expect_identical(front_value(qmd, "title"), paste0(title, " (demonstration data)"))
   expect_identical(front_value(qmd, "bibliography"), "references.json")
   expect_identical(sum(grepl("^title: ", front_lines(qmd))), 1L)
@@ -174,7 +174,7 @@ test_that("the report source renders with Quarto and checks itself", {
   expect_match(doc, sframe_hash_value(s$d$instrument), fixed = TRUE)
 })
 
-test_that("an edited or deleted results record is reported though the numbers match (P2-02, FR-04)", {
+test_that("an edited or deleted results record is reported though the numbers match", {
   s <- write_source()
   rec <- file.path(s$dir, "report_results.json")
   p <- prov_of(s$dir)
@@ -193,7 +193,7 @@ test_that("an edited or deleted results record is reported though the numbers ma
   expect_match(p$value[["Results record"]], "^report_results.json is missing \\(recorded [0-9a-f]{64}\\)$")
 })
 
-test_that("the bibliography and the interpretations are in the manifest and the check (FR-17)", {
+test_that("the bibliography and the interpretations are in the manifest and the check", {
   plan_id <- sframe_demo("likert_scale")$instrument$analysis_plan[[1]]$id
   s <- write_source(interpretations = stats::setNames(list("As planned."), plan_id))
   ids <- vapply(jsonlite::read_json(file.path(s$dir, "manifest.json"))$objects,
@@ -220,7 +220,7 @@ test_that("the bibliography and the interpretations are in the manifest and the 
   expect_match(p2$value[["Interpretations"]], "^interpretations.json, added since export \\(now [0-9a-f]{64}\\)$")
 })
 
-test_that("the responses sha256 keeps type and full precision, and times in UTC (FR-15)", {
+test_that("the responses sha256 keeps type and full precision, and times in UTC", {
   h <- function(...) surveyframe:::sframe_responses_sha256(data.frame(..., stringsAsFactors = FALSE))
   expect_false(identical(h(x = NA_real_), h(x = NaN)))
   expect_false(identical(h(x = NA_real_), h(x = Inf)))

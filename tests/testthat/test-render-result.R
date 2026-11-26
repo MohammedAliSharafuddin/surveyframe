@@ -1,12 +1,12 @@
 # tests/testthat/test-render-result.R
 #
-# Ethos request 1 (2026-10-01). The function that picks a result's chart was
-# internal, so Ethos kept its own map from method to chart and its own table
-# formatting, and frequencies, crosstabs, correlations, regressions,
-# moderation, mediation, item diagnostics and repeated measures got no chart
-# there. sframe_format_result() renders one result with the report's own code.
+# The function that picks a result's chart was internal, so a host application
+# kept its own map from method to chart and its own table formatting, and
+# frequencies, crosstabs, correlations, regressions, moderation, mediation, item
+# diagnostics and repeated measures got no chart there. sframe_format_result()
+# renders one result with the report's own code.
 
-test_that("1: sframe_format_result() gives the table, caption, note and chart", {
+test_that("sframe_format_result() gives the table, caption, note and chart", {
   skip_if_not_installed("ggplot2")
   d <- sframe_demo("two_group")
   res <- run_analysis_plan(d$responses, d$instrument)
@@ -20,7 +20,7 @@ test_that("1: sframe_format_result() gives the table, caption, note and chart", 
   expect_match(out$html, "data:image/png;base64,", fixed = TRUE)
 })
 
-test_that("1: the chart is the one run_analysis_plan(plots = TRUE) draws", {
+test_that("The chart is the one run_analysis_plan(plots = TRUE) draws", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
   for (demo in c("first_survey", "likert_scale", "categorical", "correlation_regression",
@@ -40,7 +40,7 @@ test_that("1: the chart is the one run_analysis_plan(plots = TRUE) draws", {
   }
 })
 
-test_that("1: png and svg write the chart to a file, and an error is shown", {
+test_that("Png and svg write the chart to a file, and an error is shown", {
   skip_if_not_installed("ggplot2")
   d <- sframe_demo("two_group")
   res <- run_analysis_plan(d$responses, d$instrument)

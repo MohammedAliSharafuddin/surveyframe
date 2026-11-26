@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-crosstab-percent.R
 #
-# UX-02: a cross-tab or chi-square plan block carries options$percent (row,
+# A cross-tab or chi-square plan block carries options$percent (row,
 # column or total), and the builder's plan dialog is where it is set. Run
 # under V8 (helper-v8-builder.R). The options are read from the builder's
 # state, since the V8 page has no role selects for read_sframe() to accept.

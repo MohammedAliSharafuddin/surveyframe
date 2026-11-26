@@ -1,4 +1,4 @@
-# Batch 4 #15 and #16: how the Quarto renderer is invoked, and what the report
+# How the Quarto renderer is invoked, and what the report
 # claims about its own provenance.
 #
 # #15. Parameter values were joined into "-P name:value" strings and handed to
@@ -22,7 +22,7 @@ seed_instrument <- function(with_plan = TRUE) {
   instr
 }
 
-test_that("15: every parameter argument survives a space", {
+test_that("Every parameter argument survives a space", {
   params <- list(
     instrument_path = "/tmp/a folder/instr.rds",
     include_codebook = TRUE,
@@ -39,7 +39,7 @@ test_that("15: every parameter argument survives a space", {
   expect_match(seed_arg, "^[\"'].*[\"']$|^'.*'$")
 })
 
-test_that("15: only the path parameters are normalised", {
+test_that("Only the path parameters are normalised", {
   # normalizePath() used to run over every character value. On Linux it
   # returns a non-existent relative path unchanged, so the effect is invisible
   # here; on Windows it rewrites separators and can prepend the working
@@ -60,14 +60,14 @@ test_that("15: only the path parameters are normalised", {
                "not applicable, no analysis plan run", fixed = TRUE)
 })
 
-test_that("15: a logical is passed as quarto reads it", {
+test_that("A logical is passed as quarto reads it", {
   args <- sframe_quarto_param_args(list(include_codebook = TRUE,
                                         include_analysis = FALSE))
   expect_true(any(grepl("include_codebook:true", args, fixed = TRUE)))
   expect_true(any(grepl("include_analysis:false", args, fixed = TRUE)))
 })
 
-test_that("16: a report that ran no analysis claims no seed", {
+test_that("A report that ran no analysis claims no seed", {
   instr <- seed_instrument()
   data <- data.frame(q1 = c(1, 2, 3))
 
@@ -81,7 +81,7 @@ test_that("16: a report that ran no analysis claims no seed", {
                "not applicable, no analysis plan run")
 })
 
-test_that("16: the existing reasons for no seed still hold", {
+test_that("The existing reasons for no seed still hold", {
   instr <- seed_instrument()
   expect_equal(sframe_report_seed(NULL, instr, include_analysis = TRUE),
                "not applicable, no analysis plan run")

@@ -1,14 +1,13 @@
 # tests/testthat/test-studio-design-host-browser.R
 #
-# The builder inside SurveyStudio's Design screen (session 7, owner review of
-# f8fe6a6). Studio has its own name, its own Preview Survey screen and its
-# own Collect screen, so inside Studio the builder drops its brand, its
-# Preview mode and its Export survey button. Its save state reads "Saved" or
-# "Unsaved changes", and Studio's line reads "Editing: <title> (<version>)",
-# with a reminder only while the builder has unsaved changes. The builder on
-# its own keeps all of these. Its Analyse mode is "Plan" in both, after the
-# stages Design, Plan, Preview and Collect. Driven in a real Chrome against
-# the build under test.
+# The builder inside SurveyStudio's Design screen. Studio has its own name, its
+# own Preview Survey screen and its own Collect screen, so inside Studio the
+# builder drops its brand, its Preview mode and its Export survey button. Its
+# save state reads "Saved" or "Unsaved changes", and Studio's line reads
+# "Editing: <title> (<version>)", with a reminder only while the builder has
+# unsaved changes. The builder on its own keeps all of these. Its Analyse mode
+# is "Plan" in both, after the stages Design, Plan, Preview and Collect. Driven
+# in a real Chrome against the build under test.
 
 test_that("inside Studio the builder is a Design screen, not a second app", {
   skip_on_cran()
@@ -75,7 +74,7 @@ test_that("inside Studio the builder is a Design screen, not a second app", {
   expect_match(js("document.getElementById('design_unsaved').innerText"),
                "Unsaved changes", fixed = TRUE)
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Saved in Design'; w.saveSframe(); true"))
-  # The demo has a history, so the save opens the amendment dialog (8a).
+  # The demo has a history, so the save opens the amendment dialog.
   expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
   js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait(paste0(status, ".indexOf('Editing: Saved in Design') >= 0")))
@@ -103,7 +102,7 @@ test_that("the builder on its own keeps its brand, Preview and Export survey", {
                                    "\"); return !!e && e.offsetParent !== null; })()"))
   expect_true(shown(".tb-brand"))
   expect_true(shown(".m-btn[data-mode='preview']"))
-  # UI-1 item 12b: the standalone builder keeps its Build/Plan switch.
+  # The standalone builder keeps its Build/Plan switch.
   expect_true(shown(".tb-modes"))
   expect_true(shown("#exportBtn"))
   expect_true(shown("#openBtn"))

@@ -1,6 +1,6 @@
 # tests/testthat/test-decision-methods-math.R
 #
-# Decision method mathematics, batch 3 findings 6, 7, 8, 10, 11 and 15.
+# Decision method mathematics.
 #
 # 6.  ANP declared convergence when the uniform starting vector stopped moving,
 #     which a periodic network like rows (0, 1), (1, 0) and a reducible one
@@ -21,20 +21,20 @@ labelled <- function(m, prefix = "N") {
   m
 }
 
-test_that("6: a periodic network gets its stationary priorities and says how", {
+test_that("A periodic network gets its stationary priorities and says how", {
   fit <- sframe_anp_compute(labelled(matrix(c(0, 1, 1, 0), 2, 2)))
   expect_null(fit$error)
   expect_equal(unname(fit$weights), c(0.5, 0.5))
   expect_identical(fit$limit_method, "cesaro")
 })
 
-test_that("6: a reducible network is refused, since its limit depends on the start", {
+test_that("A reducible network is refused, since its limit depends on the start", {
   fit <- sframe_anp_compute(labelled(diag(3)))
   expect_false(is.null(fit$error))
   expect_match(fit$error, "reducible")
 })
 
-test_that("6: a primitive network keeps its limit supermatrix result", {
+test_that("A primitive network keeps its limit supermatrix result", {
   m <- labelled(matrix(c(0.2, 0.5, 0.3,  0.6, 0.1, 0.3,  0.3, 0.3, 0.4), 3, 3))
   fit <- sframe_anp_compute(m)
   expect_null(fit$error)
@@ -43,7 +43,7 @@ test_that("6: a primitive network keeps its limit supermatrix result", {
   expect_equal(unname(fit$weights), unname(limit[, 1] / sum(limit[, 1])), tolerance = 1e-8)
 })
 
-test_that("7: DEMATEL explains an undefined total relation", {
+test_that("DEMATEL explains an undefined total relation", {
   res <- sframe_run_dematel(data.frame(), list(),
                             list(matrix = matrix(c(0, 1, 1, 0), 2, 2),
                                  criteria = c("A", "B")), NULL)
@@ -51,7 +51,7 @@ test_that("7: DEMATEL explains an undefined total relation", {
   expect_match(res$error, "spectral radius")
 })
 
-test_that("8: DEMATEL names no strongest cause when no relation is net causal", {
+test_that("DEMATEL names no strongest cause when no relation is net causal", {
   # Symmetric, so every net relation is 0, with unequal row sums so the
   # total relation exists.
   sym <- matrix(c(0, 1, 2, 1, 0, 1, 2, 1, 0), 3, 3)
@@ -70,20 +70,20 @@ ranking_opts <- function(matrix_rows, extra = list()) {
     extra)
 }
 
-test_that("10: WASPAS refuses values outside its positive domain", {
+test_that("WASPAS refuses values outside its positive domain", {
   res <- sframe_run_waspas(data.frame(), list(),
                            ranking_opts(list(-2, -1)), NULL)
   expect_false(is.null(res$error))
   expect_match(res$error, "positive")
 })
 
-test_that("10: every method refuses infinite performance values", {
+test_that("Every method refuses infinite performance values", {
   res <- sframe_run_topsis(data.frame(), list(),
                            ranking_opts(list(c(1, Inf), c(2, 3))), NULL)
   expect_false(is.null(res$error))
 })
 
-test_that("11: blend parameters outside 0 to 1 are refused", {
+test_that("Blend parameters outside 0 to 1 are refused", {
   rows <- list(c(3, 5), c(4, 2), c(5, 1))
   expect_match(sframe_run_vikor(data.frame(), list(),
                                 ranking_opts(rows, list(v = 1.5)), NULL)$error, "v")
@@ -91,7 +91,7 @@ test_that("11: blend parameters outside 0 to 1 are refused", {
                                  ranking_opts(rows, list(lambda = -0.2)), NULL)$error, "lambda")
 })
 
-test_that("11: PROMETHEE thresholds must be ordered and non-negative", {
+test_that("PROMETHEE thresholds must be ordered and non-negative", {
   rows <- list(c(3, 5), c(4, 2), c(5, 1))
   bad <- list(list(preference = 1, indifference = -2),
               list(preference = 1, indifference = 0.5))
@@ -107,14 +107,14 @@ test_that("11: PROMETHEE thresholds must be ordered and non-negative", {
   expect_false(is.null(res2$error))
 })
 
-test_that("11: ELECTRE cutoffs outside 0 to 1 are refused", {
+test_that("ELECTRE cutoffs outside 0 to 1 are refused", {
   rows <- list(c(3, 5), c(4, 2), c(5, 1))
   res <- sframe_run_electre(data.frame(), list(),
                             ranking_opts(rows, list(concordance_threshold = 1.4)), NULL)
   expect_false(is.null(res$error))
 })
 
-test_that("15: the ELECTRE kernel is Roy's kernel on an acyclic graph", {
+test_that("The ELECTRE kernel is Roy's kernel on an acyclic graph", {
   opts <- list(matrix = list(c(3, 2, 0), c(2, 1, 1), c(1, 0, 2)),
                alternatives = c("A", "B", "C"), criteria = c("x", "y", "z"),
                weights = c(0.4, 0.4, 0.2),
@@ -126,7 +126,7 @@ test_that("15: the ELECTRE kernel is Roy's kernel on an acyclic graph", {
   expect_setequal(names(res$kernel)[res$kernel], c("A", "C"))
 })
 
-test_that("15: a cyclic outranking graph reports no kernel", {
+test_that("A cyclic outranking graph reports no kernel", {
   cyc <- matrix(FALSE, 3, 3, dimnames = list(c("A", "B", "C"), c("A", "B", "C")))
   cyc["A", "B"] <- TRUE; cyc["B", "C"] <- TRUE; cyc["C", "A"] <- TRUE
   k <- sframe_electre_kernel(cyc)

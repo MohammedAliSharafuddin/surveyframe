@@ -652,7 +652,7 @@ sframe_plot_crosstab <- function(result, palette = c("web", "print")) {
   names(long) <- c("Row", "Column", "Count")
   # Both axes keep the table's order, the order the instrument declares its
   # options in, so a Likert legend reads Strongly disagree to Strongly agree
-  # and not alphabetically (K3).
+  # and not alphabetically.
   long$Row <- factor(long$Row, levels = unique(rownames(tbl)))
   long$Column <- factor(long$Column, levels = unique(colnames(tbl)))
   y_label <- "Count"
@@ -1406,7 +1406,7 @@ sframe_plot_regression_diagnostics <- function(result, palette = c("web", "print
                  y = "Standardised residuals") +
     theme_surveyframe(palette = palette)
 
-  # Fitted to the export width like every plan chart (CX-23).
+  # Fitted to the export width like every plan chart.
   lapply(list(residuals_fitted = residuals_fitted, qq = qq,
               scale_location = scale_location, leverage = leverage), sframe_fit_plot)
 }
@@ -2991,7 +2991,7 @@ sframe_plot_sentiment <- function(result, palette = c("web", "print")) {
 }
 
 
-# --- Regression charts (Session 10, first contact section 4a) ----------------
+# --- Regression charts ----------------
 
 # Standardised estimates with their confidence intervals, 1 row per
 # predictor, beside the observed-against-fitted chart of a linear regression

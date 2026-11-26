@@ -1,5 +1,5 @@
 # tests/testthat/test-build-under-test-child.R
-# Session 3, build-under-test regression. A child R process started from a
+# A child R process started from a
 # test, as Quarto and Studio start one, must load the build under test: its
 # first library is the build library and its surveyframe carries the source
 # commit. Quick, renders nothing.

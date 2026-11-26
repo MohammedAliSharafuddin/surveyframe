@@ -1,6 +1,6 @@
 # tests/testthat/test-report-exploratory.R
 #
-# Session 8b-R, item 9 (owner 2026-11-04). A block whose result carries a
+# A block whose result carries a
 # significance test (a p value) and that declared no H0 and no H1 prints
 # "Exploratory: no hypothesis declared before the data" before its result,
 # in both engines, and the results record carries the same flag. The 2

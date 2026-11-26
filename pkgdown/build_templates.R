@@ -1,10 +1,9 @@
-# pkgdown/build_templates.R
-# The 10 questionnaire templates of surveyframe.org (renamed from study pages,
-# owner 2026-11-14) (Session W, plan: demos and
-# website redesign). The pkgdown workflow runs it before building the site,
-# so the generated files below are not tracked (.gitignore), only the pages
-# and the screenshots. For each study it writes, into pkgdown/assets/templates/
-# <demo>/ (copied to the site root, never into the tarball):
+# pkgdown/build_templates.R The 10 questionnaire templates of surveyframe.org
+# (renamed from study pages). The pkgdown workflow runs it before building the
+# site, so the generated files below are not tracked (.gitignore), only the
+# pages and the screenshots. For each study it writes, into
+# pkgdown/assets/templates/ <demo>/ (copied to the site root, never into the
+# tarball):
 #   preview.html   the questionnaire as respondents see it, which collects nothing
 #   plan.html      the pre-analysis plan, render_report(instrument) with no data
 #   <demo>.sframe  the instrument, to download (never responses or results)
@@ -80,7 +79,7 @@ studies <- list(
                "Can I run the whole study in SurveyStudio?" = "Yes. The model layer opens in SurveyStudio from RStudio's Addins menu."))
 )
 
-# The fields the templates are grouped by (owner 2026-11-14).
+# The fields the templates are grouped by.
 hubs <- c(psychology = "Psychology and measurement", education = "Education",
           business = "Business", "events-tourism" = "Events and tourism",
           "research-methods" = "Research methods")

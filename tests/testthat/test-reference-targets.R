@@ -1,6 +1,6 @@
 # tests/testthat/test-reference-targets.R
 #
-# Session 8b-R, item 4. A source can be cited by the hypotheses of a plan
+# A source can be cited by the hypotheses of a plan
 # block, `hypothesis:<block id>`, and by the study description, `study`, as
 # well as by the instrument, an item, a scale, a plan block or a model.
 # validate_sframe() checks that each target exists: the block for a

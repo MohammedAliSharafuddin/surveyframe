@@ -1,4 +1,4 @@
-# Batch 7 #10 and #11: what a participant using a screen reader or a keyboard
+# What a participant using a screen reader or a keyboard
 # is told, in the exported static survey.
 #
 # #10. Single-choice and multiple-choice groups carried option labels with no
@@ -21,7 +21,7 @@ a11y_instrument <- function(required = TRUE) {
   ))
 }
 
-test_that("10: a choice group carries its question as its name", {
+test_that("A choice group carries its question as its name", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(a11y_instrument())
 
@@ -34,7 +34,7 @@ test_that("10: a choice group carries its question as its name", {
   expect_match(multi, 'aria-labelledby="q_many"', fixed = TRUE)
 })
 
-test_that("10: a rating names its question and says what is chosen", {
+test_that("A rating names its question and says what is chosen", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(a11y_instrument())
   ctx$eval("responses['rate'] = '3';")
@@ -51,7 +51,7 @@ test_that("10: a rating names its question and says what is chosen", {
   expect_match(chosen, 'data-v="3"', fixed = TRUE)
 })
 
-test_that("10: setting a rating moves the reported state", {
+test_that("Setting a rating moves the reported state", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(a11y_instrument())
   key <- "rate"
@@ -64,7 +64,7 @@ test_that("10: setting a rating moves the reported state", {
   expect_equal(states, c("false", "false", "false", "true", "false"))
 })
 
-test_that("11: validation focuses the control it is complaining about", {
+test_that("Validation focuses the control it is complaining about", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(a11y_instrument())
   ctx$eval("screen='survey'; renderScreen();")
@@ -73,7 +73,7 @@ test_that("11: validation focuses the control it is complaining about", {
   expect_equal(ctx$get("__lastFocused"), "item_pick")
 })
 
-test_that("11: the error is tied to the control that has it", {
+test_that("The error is tied to the control that has it", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(a11y_instrument())
   html <- static_render_item(ctx, "pick")
@@ -83,7 +83,7 @@ test_that("11: the error is tied to the control that has it", {
   expect_match(html, 'id="err_pick"', fixed = TRUE)
 })
 
-test_that("11: changing page moves focus to the new heading", {
+test_that("Changing page moves focus to the new heading", {
   skip_if_not_installed("V8")
   paged <- sframe_instrument("Paged", components = list(
     sframe_item("a", "First", type = "text", page = 1),
@@ -95,7 +95,7 @@ test_that("11: changing page moves focus to the new heading", {
   expect_equal(ctx$get("__lastFocused"), "page-heading")
 })
 
-# Batch 7 #15: the Likert strip scrolls horizontally with a minimum width per
+# The Likert strip scrolls horizontally with a minimum width per
 # option. At the mobile minimum of 50px, 7 options need 350px and the builder's
 # 11-point NPS preset needs 550px before gaps, so the full range cannot fit a
 # 390px viewport and a participant saw part of the scale with both endpoints off
@@ -118,7 +118,7 @@ mobile_block <- function(html) {
   at[[1]]
 }
 
-test_that("15: the Likert scale stacks below 600px", {
+test_that("The Likert scale stacks below 600px", {
   nps <- sframe_instrument("NPS", components = list(
     sframe_choice_set("nps", values = 0:10, labels = as.character(0:10)),
     sframe_item("rec", "How likely are you to recommend us?", type = "likert",
@@ -134,7 +134,7 @@ test_that("15: the Likert scale stacks below 600px", {
   expect_match(block, "min-height:44px", fixed = TRUE)
 })
 
-test_that("15: all 11 NPS points are rendered, so none is lost", {
+test_that("All 11 NPS points are rendered, so none is lost", {
   skip_if_not_installed("V8")
   nps <- sframe_instrument("NPS", components = list(
     sframe_choice_set("nps", values = 0:10, labels = as.character(0:10)),

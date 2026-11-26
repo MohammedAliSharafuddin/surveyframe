@@ -1,4 +1,4 @@
-# FR-33 (Fable sitting 2), Session CF-B: each block's random stream is seeded
+# Each block's random stream is seeded
 # from the plan seed and its block id, so a block's bootstrap interval does
 # not change when another block is put before it. The d interval of a t test
 # was [0.097, 1.221] alone and [0.079, 1.180] after a Spearman block.

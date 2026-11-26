@@ -1,6 +1,6 @@
 # tests/testthat/test-result-serialisable.R
 #
-# Ethos request 5 (2026-10-01). In the open_text demo, stm_topics returned
+# In the open_text demo, stm_topics returned
 # its fitted model inside the result list, and jsonlite could not write it,
 # so a host serialising the results failed. 20 blocks across the demos had
 # the same trouble through the classed report each psychometric result
@@ -15,7 +15,7 @@ serialises <- function(result) {
   }, error = function(e) conditionMessage(e)))
 }
 
-test_that("5: a descriptives and a quality result serialise as they stand", {
+test_that("A descriptives and a quality result serialise as they stand", {
   d <- sframe_demo("first_survey")
   res <- run_analysis_plan(d$responses, d$instrument)
   for (r in res) expect_true(serialises(r), info = r$block_id)
@@ -25,7 +25,7 @@ test_that("5: a descriptives and a quality result serialise as they stand", {
   expect_null(rq2$report_obj)
 })
 
-test_that("5: an EFA readiness result keeps KMO as plain numbers", {
+test_that("An EFA readiness result keeps KMO as plain numbers", {
   skip_if_not_installed("psych")
   d <- sframe_demo("factor_structure")
   res <- run_analysis_plan(d$responses, d$instrument)
@@ -35,7 +35,7 @@ test_that("5: an EFA readiness result keeps KMO as plain numbers", {
   expect_null(oldClass(efa$kmo))
 })
 
-test_that("5: every demo's plan results serialise", {
+test_that("Every demo's plan results serialise", {
   skip_on_cran()
   for (demo in with(sframe_list_demos(), name[focus != "reference"])) {
     d <- sframe_demo(demo)
@@ -44,7 +44,7 @@ test_that("5: every demo's plan results serialise", {
   }
 })
 
-test_that("5: a fitted topic model stays in the session, outside the list", {
+test_that("A fitted topic model stays in the session, outside the list", {
   skip_on_cran()
   skip_if_not_installed("stm")
   skip_if_not_installed("tidytext")

@@ -1,4 +1,4 @@
-# Batch 7 #16 and #17: SurveyBuilder's question list could be worked only with
+# SurveyBuilder's question list could be worked only with
 # a pointer.
 #
 # #16. A question row was a non-focusable div with a click handler, so there was
@@ -17,7 +17,7 @@ builder_source <- function() {
   sframe_installed_text("inst", "builder", "survey_builder.html")
 }
 
-test_that("16: a question row can be reached and chosen by keyboard", {
+test_that("A question row can be reached and chosen by keyboard", {
   src <- builder_source()
   row <- regmatches(src, regexpr("return pd\\+'<div class=\"ic'.*?';", src))[[1]]
   expect_true(nzchar(row))
@@ -26,12 +26,12 @@ test_that("16: a question row can be reached and chosen by keyboard", {
   expect_match(row, 'tabindex="0"', fixed = TRUE)
   expect_match(row, "onkeydown=", fixed = TRUE)
   # the chosen row says so, rather than relying on colour alone, with
-  # aria-current, since a listitem takes no aria-selected (Codex P1-11)
+  # aria-current, since a listitem takes no aria-selected
   expect_match(row, "aria-current", fixed = TRUE)
   expect_false(grepl("aria-selected", row, fixed = TRUE))
 })
 
-test_that("16: the key handler selects on Enter and Space and moves with arrows", {
+test_that("The key handler selects on Enter and Space and moves with arrows", {
   src <- builder_source()
   expect_match(src, "function itemRowKey(", fixed = TRUE)
   handler <- regmatches(src, regexpr("function itemRowKey\\((?s).*?\\n\\}", src,
@@ -42,7 +42,7 @@ test_that("16: the key handler selects on Enter and Space and moves with arrows"
   expect_match(handler, "moveItemBy", fixed = TRUE)
 })
 
-test_that("16: ordering has named buttons, not drag alone", {
+test_that("Ordering has named buttons, not drag alone", {
   src <- builder_source()
   row <- regmatches(src, regexpr("return pd\\+'<div class=\"ic'.*?';", src))[[1]]
   expect_match(row, 'aria-label="Move question up"', fixed = TRUE)
@@ -58,7 +58,7 @@ test_that("16: ordering has named buttons, not drag alone", {
   expect_match(mover, "return", fixed = TRUE)
 })
 
-test_that("17: a modal takes focus and gives it back", {
+test_that("A modal takes focus and gives it back", {
   src <- builder_source()
   opener <- regmatches(src, regexpr("function openModal\\((?s).*?\\n\\}", src,
                                     perl = TRUE))[[1]]
@@ -71,11 +71,11 @@ test_that("17: a modal takes focus and gives it back", {
   expect_match(closer, "focus()", fixed = TRUE)
 })
 
-test_that("16: the list and its rows are a matching pair of roles", {
+test_that("The list and its rows are a matching pair of roles", {
   src <- builder_source()
   # a list of listitems. A listbox of options held the rows' Move, Duplicate
   # and Delete buttons inside each option, and an option's children are
-  # presentational, so axe reported nested-interactive (Codex P1-11).
+  # presentational, so axe reported nested-interactive.
   expect_match(src, 'id="itemList" role="list"', fixed = TRUE)
   expect_match(src, "el.setAttribute('role','list')", fixed = TRUE)
   expect_false(grepl("role=\"option\" tabindex=\"0\"", src, fixed = TRUE))
@@ -104,10 +104,10 @@ test_that("the builder's own script parses", {
                         catch (e) { return false; } })()"))
 })
 
-# Ethos request 8 (2026-10-01): at 390 px, axe reported
+# At 390 px, axe reported
 # scrollable-region-focusable on #canvas, a scroll region a keyboard user
 # could neither reach nor scroll.
-test_that("Ethos 8: the canvas scroll region is focusable and named", {
+test_that("The canvas scroll region is focusable and named", {
   src <- builder_source()
   canvas <- regmatches(src, regexpr('<div class="canvas" id="canvas"[^>]*>', src))
   expect_length(canvas, 1L)

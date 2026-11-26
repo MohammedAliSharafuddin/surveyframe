@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # Browser tests run on Ubuntu release alone (owner, 2026-11-05).
+          # Browser tests run on Ubuntu release alone.
           - { os: ubuntu-latest,  r: "release", browser: "true"  }
           - { os: ubuntu-latest,  r: "devel",   browser: "false" }
           - { os: windows-latest, r: "release", browser: "false" }

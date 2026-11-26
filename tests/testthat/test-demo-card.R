@@ -1,5 +1,5 @@
 # sframe_demo() at the console printed every response, 125 to 1,112 lines a
-# demo. It now prints a short card (Session 10), and the parts are unchanged.
+# demo. It now prints a short card, and the parts are unchanged.
 
 test_that("every demo prints a card of at most 15 lines", {
   for (name in sframe_list_demos()$name) {

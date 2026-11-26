@@ -2,11 +2,11 @@
 #
 # Every shipped demo can take one further amendment and be written.
 #
-# Ethos request 2 (2026-10-01): sframe_demo("instrument_revision") recorded
+# sframe_demo("instrument_revision") recorded
 # an amendment whose new_hash its content did not hash to, because the file
 # was built with code from before the content hash settled. amend_sframe()
 # on it then failed with "The amendment log is out of sequence at entry 2",
-# and so did write_sframe() after any change. Ethos opens every demo as a
+# and so did write_sframe() after any change. A host may open every demo as a
 # starting point and amends it, so a demo that refuses an amendment is a
 # demo a researcher cannot begin from.
 

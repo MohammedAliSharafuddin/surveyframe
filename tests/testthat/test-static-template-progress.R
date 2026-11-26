@@ -1,4 +1,4 @@
-# Batch 7's findings on what the static survey tells a participant about
+# Findings on what the static survey tells a participant about
 # their own progress, run under V8 against the stub DOM (helper-v8-dom.R).
 #
 # #12. Progress counted the parent response key for every type but matrix, and
@@ -33,7 +33,7 @@ progress_label <- function(ctx) {
   ctx$get("__els['progTitle'] ? __els['progTitle'].textContent : ''")
 }
 
-test_that("12: a completed comparison and allocation count as answered", {
+test_that("A completed comparison and allocation count as answered", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(mixed_instrument())
   ctx$eval("screen='survey';")
@@ -58,7 +58,7 @@ test_that("12: a completed comparison and allocation count as answered", {
   expect_equal(progress_label(ctx), "4 of 4 answered")
 })
 
-test_that("12: returning to a filled allocation shows its real total", {
+test_that("Returning to a filled allocation shows its real total", {
   skip_if_not_installed("V8")
   ctx <- static_survey_context(mixed_instrument())
   set_response(ctx, "cw__cost", "60")
@@ -69,7 +69,7 @@ test_that("12: returning to a filled allocation shows its real total", {
   expect_match(html, "Total: 100 / 100", fixed = TRUE)
 })
 
-test_that("13: a rating reveals the question that depends on it", {
+test_that("A rating reveals the question that depends on it", {
   skip_if_not_installed("V8")
   instr <- sframe_instrument("Branching", components = list(
     sframe_item("rate", "Rate us", type = "rating", rating_max = 5),
@@ -88,7 +88,7 @@ test_that("13: a rating reveals the question that depends on it", {
   expect_false(ctx$get("document.getElementById('item_why').classList.contains('hidden')"))
 })
 
-test_that("13: a rating that hides a question hides it at once", {
+test_that("A rating that hides a question hides it at once", {
   skip_if_not_installed("V8")
   instr <- sframe_instrument("Branching", components = list(
     sframe_item("rate", "Rate us", type = "rating", rating_max = 5),

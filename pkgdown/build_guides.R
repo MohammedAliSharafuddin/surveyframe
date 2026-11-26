@@ -1,9 +1,9 @@
 # pkgdown/build_guides.R
-# The how-to guides of surveyframe.org (Session W, plan: method guides): 1
+# The how-to guides of surveyframe.org: 1
 # web-only page per teaching demo, vignettes/articles/guides/<slug>.Rmd, with
 # a task-shaped title, the reader's outcome, the example study in its own
 # sentence, the SurveyStudio steps for that task, the R code for that task
-# (both from pkgdown/guide_specs.R, Codex website review WR609 to WR635), and,
+# (both from pkgdown/guide_specs.R), and,
 # for an analysis, a result shell that names what each research question
 # reports without a number (the site shows no simulated numbers). Plus the
 # index, vignettes/articles/guides.Rmd, grouped by the reader's task. The
@@ -40,7 +40,7 @@ guides <- c(
   verification = "How to prove a questionnaire file is the one you planned",
   citing_sources = "How to cite the sources of a scale and a method"
 )
-# The index groups the guides by the reader's task (WR568).
+# The index groups the guides by the reader's task.
 groups <- list(
   "Run a complete study" = "first_survey",
   "Design the questionnaire" = c("branching", "branded_survey", "conversational_survey", "conversational_branching"),

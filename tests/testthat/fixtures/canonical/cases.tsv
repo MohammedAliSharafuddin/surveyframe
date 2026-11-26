@@ -1,6 +1,6 @@
 # Payloads hashed by R, the builder and the verifier page (test-canonical-form.R).
 # Columns, tab separated: id, JSON text, and where given the RFC 8785 string it must give.
-# Ids: B- from Fable sitting 1 probe p01 part B, C- from Codex pass 2, R- RFC 8785 itself.
+# Ids: B- and C- are number and string probes, R- are from RFC 8785 itself.
 B-01	{"probe":0.1}	{"probe":0.1}
 B-02	{"probe":0.30000000000000004}	{"probe":0.30000000000000004}
 B-03	{"probe":0.3333333333333333}	{"probe":0.3333333333333333}

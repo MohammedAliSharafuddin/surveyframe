@@ -1,8 +1,8 @@
-# Session CF-B minors on the chi-square block: FR-27 (a constant variable)
-# and P2-09 (a simulated p value prints no df).
+# Guards on the chi-square block: a constant variable, and a simulated p
+# value that prints no df.
 
 test_that("a constant variable is refused, not tested for goodness of fit", {
-  # FR-27: chi-square(2, N = 90) = 6.67, p = .036, V = NA at 2a910b0.
+  # chi-square(2, N = 90) = 6.67, p = .036, V = NA before the fix.
   d <- data.frame(g2 = "a", g3 = as.character(rep(1:3, c(40, 30, 20))))
   r <- cfb_block(d, "chi_square", list(row = "g2", column = "g3"),
                  sframe_item("g2", "Constant", type = "text"), sframe_item("g3", "g3", type = "text"))
@@ -10,7 +10,7 @@ test_that("a constant variable is refused, not tested for goodness of fit", {
 })
 
 test_that("a simulated chi-square omits df and says the p value is simulated", {
-  # P2-09: chi-square(NA, N = 4) at 2a910b0.
+  # chi-square(NA, N = 4) before the fix.
   f <- get("sframe_run_crosstab", asNamespace("surveyframe"))
   set.seed(1)
   r <- f(data.frame(x = c("a", "a", "b", "b"), y = c("c", "d", "c", "d")), c("x", "y"),
@@ -22,7 +22,7 @@ test_that("a simulated chi-square omits df and says the p value is simulated", {
 })
 
 test_that("a weighted chi-square says it tests the unweighted counts", {
-  # FR-34: no word at 2a910b0.
+  # No word before the fix.
   set.seed(2)
   d <- data.frame(a = sample(c("x", "y"), 40, TRUE), b = sample(c("u", "v"), 40, TRUE),
                   w = runif(40, 0.5, 2))

@@ -2,13 +2,13 @@
 #
 # Opening a file in SurveyBuilder, run under V8 (helper-v8-builder.R).
 #
-# Ethos request 21 (2026-10-03), found building a study inside Ethos. Opening
+# Found building a study inside a host application. Opening
 # a .sframe replaced unsaved changes without asking. The inspector kept
 # showing an item the opened file did not have. And the status then read
 # "Saved just now", although nothing had been saved anywhere, which inside a
 # host reads as saved in the host.
 
-test_that("21: Open asks before discarding unsaved changes", {
+test_that("Open asks before discarding unsaved changes", {
   ctx <- builder_context()
   ctx$call("setDirty")
   ctx$call("openFile")
@@ -24,14 +24,14 @@ test_that("21: Open asks before discarding unsaved changes", {
   expect_identical(ctx$get("__clicks"), "fileInput")
 })
 
-test_that("21: Open goes straight to the file chooser when nothing is unsaved", {
+test_that("Open goes straight to the file chooser when nothing is unsaved", {
   ctx <- builder_context()
   ctx$eval("dirty = false;")
   ctx$call("openFile")
   expect_identical(ctx$get("__clicks"), "fileInput")
 })
 
-test_that("21: opening a file clears the inspector and says Opened", {
+test_that("Opening a file clears the inspector and says Opened", {
   ctx <- builder_context()
   builder_open(ctx, sframe_demo("two_group")$instrument)
   ctx$eval("selId = S.items[0].id; document.getElementById('inspector').classList.add('open');")
@@ -43,7 +43,7 @@ test_that("21: opening a file clears the inspector and says Opened", {
   expect_no_match(status, "Saved")
 })
 
-test_that("21: after a save the status says Saved again", {
+test_that("After a save the status says Saved again", {
   ctx <- builder_context()
   builder_open(ctx, sframe_demo("first_survey")$instrument)
   ctx$eval("lastSaved = Date.now(); updSave();")

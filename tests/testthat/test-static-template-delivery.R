@@ -1,4 +1,4 @@
-# Batch 7 #8: the static survey told a participant their response had been
+# The static survey told a participant their response had been
 # recorded before it knew whether it had been delivered.
 #
 # The POST is no-cors, so the browser never sees the collector's answer and
@@ -28,7 +28,7 @@ submit_with <- function(fails, endpoint = "https://example.com/collect",
 
 app_html <- function(ctx) ctx$get("document.getElementById('app').innerHTML")
 
-test_that("8: a failed delivery says so, and keeps the response reachable", {
+test_that("A failed delivery says so, and keeps the response reachable", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = TRUE)
 
@@ -42,7 +42,7 @@ test_that("8: a failed delivery says so, and keeps the response reachable", {
   expect_match(html, "Try sending again", fixed = TRUE)
 })
 
-test_that("8: a failed delivery cancels the redirect", {
+test_that("A failed delivery cancels the redirect", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = TRUE,
                      thankyou = list(redirect_url = "https://example.com/next"))
@@ -50,7 +50,7 @@ test_that("8: a failed delivery cancels the redirect", {
   expect_equal(ctx$get("window.location.href"), "")
 })
 
-test_that("8: retrying sends the same response again", {
+test_that("Retrying sends the same response again", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = TRUE)
   expect_equal(ctx$get("__posts.length"), 1)
@@ -63,7 +63,7 @@ test_that("8: retrying sends the same response again", {
                ctx$get("JSON.parse(__posts[1].body).q1"))
 })
 
-test_that("8: a delivery that left the browser reports what it can", {
+test_that("A delivery that left the browser reports what it can", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE)
   # "sent" is as much as a no-cors POST can establish: the request left
@@ -81,7 +81,7 @@ test_that("8: a delivery that left the browser reports what it can", {
 # claimed "your response has been recorded" on that state, hid the download,
 # offered a reload that discards the only copy, and auto-redirected away from it.
 
-test_that("8: an unconfirmed send does not claim the response was recorded", {
+test_that("An unconfirmed send does not claim the response was recorded", {
   skip_if_not_installed("V8")
   html <- app_html(submit_with(fails = FALSE))
 
@@ -90,7 +90,7 @@ test_that("8: an unconfirmed send does not claim the response was recorded", {
   expect_match(html, "cannot confirm", fixed = TRUE)
 })
 
-test_that("8: an unconfirmed send keeps the response downloadable", {
+test_that("An unconfirmed send keeps the response downloadable", {
   skip_if_not_installed("V8")
   # the designer left the download off, and it is offered anyway, because this
   # page is holding the only copy anyone can prove exists
@@ -98,7 +98,7 @@ test_that("8: an unconfirmed send keeps the response downloadable", {
   expect_match(html, "Download my response", fixed = TRUE)
 })
 
-test_that("8: an unconfirmed send is never auto-redirected past", {
+test_that("An unconfirmed send is never auto-redirected past", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE,
                      thankyou = list(redirect_url = "https://example.com/next"))
@@ -108,7 +108,7 @@ test_that("8: an unconfirmed send is never auto-redirected past", {
   expect_match(app_html(ctx), "https://example.com/next", fixed = TRUE)
 })
 
-test_that("8: restarting over an unconfirmed send asks before discarding it", {
+test_that("Restarting over an unconfirmed send asks before discarding it", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE)
   ctx$eval("__confirmAnswer = false; __reloads = 0; restartSurvey();")
@@ -122,7 +122,7 @@ test_that("8: restarting over an unconfirmed send asks before discarding it", {
   expect_equal(ctx$get("__reloads"), 1)
 })
 
-test_that("8: with no collector the screen still offers the download", {
+test_that("With no collector the screen still offers the download", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE, endpoint = "")
   expect_equal(ctx$get("deliveryState"), "local")
@@ -130,7 +130,7 @@ test_that("8: with no collector the screen still offers the download", {
   expect_match(app_html(ctx), "Download my response", fixed = TRUE)
 })
 
-test_that("8: a local survey with no collector still redirects", {
+test_that("A local survey with no collector still redirects", {
   skip_if_not_installed("V8")
   # With no endpoint there is nothing to be unconfirmed about, and the download
   # is the documented way the response travels, so the offer stays on screen and
@@ -145,13 +145,14 @@ test_that("8: a local survey with no collector still redirects", {
 
 # Reopened again: the first pass at gate 2 changed only the DEFAULT message, on
 # the reasoning that a designer's own wording was their claim to make. That was
-# wrong. The package is the thing that knows receipt is unconfirmed, and a custom
-# message asserting storage produced a screen that said "your response has been
-# recorded" and "cannot confirm" at the same time. D4 keeps the 2 voices apart:
-# the status line is the package's, and the message is shown below it, so the
-# guidance is that a message should not state delivery (see the help).
+# wrong. The package is the thing that knows receipt is unconfirmed, and a
+# custom message asserting storage produced a screen that said "your response
+# has been recorded" and "cannot confirm" at the same time. The 2 voices are now
+# kept apart: the status line is the package's, and the message is shown below
+# it, so the guidance is that a message should not state delivery (see the
+# help).
 
-test_that("8: an unconfirmed send keeps the package's status beside a custom message", {
+test_that("An unconfirmed send keeps the package's status beside a custom message", {
   skip_if_not_installed("V8")
   ctx <- submit_with(fails = FALSE, thankyou = list(
     message = "Thank you. Contact the team with questions."))
@@ -163,7 +164,7 @@ test_that("8: an unconfirmed send keeps the package's status beside a custom mes
   expect_match(html, "Download my response", fixed = TRUE)
 })
 
-test_that("8: a custom message still shows where delivery is not in doubt", {
+test_that("A custom message still shows where delivery is not in doubt", {
   skip_if_not_installed("V8")
   # No collector, so nothing was sent and nothing is being claimed about it. The
   # researcher's own wording is what the participant should read.
@@ -172,7 +173,7 @@ test_that("8: a custom message still shows where delivery is not in doubt", {
   expect_match(app_html(ctx), "email the file", fixed = TRUE)
 })
 
-test_that("8: an unconfirmed send does not offer a destructive restart", {
+test_that("An unconfirmed send does not offer a destructive restart", {
   skip_if_not_installed("V8")
   # The review's gate: no "Submit another response" on a state that cannot
   # establish the answers are stored. A researcher on a shared device reloads.

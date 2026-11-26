@@ -1,9 +1,9 @@
 # pkgdown/studio_capture.R
-# Captures SurveyStudio's Design screen for the Docs pages (owner 2026-11-15):
+# Captures SurveyStudio's Design screen for the Docs pages:
 # the question-type editor shots (build_docs.R) and the method Plan cards
 # (build_method_docs.R) are taken inside SurveyStudio, with its left menu and
 # screen name in view, the way data-raw/capture_study_screenshots.R takes the
-# 5 stage shots (Session 10). SurveyStudio runs in a background process and
+# 5 stage shots. SurveyStudio runs in a background process and
 # chromote drives the SurveyBuilder that its Design screen holds in an iframe.
 
 stopifnot(requireNamespace("chromote", quietly = TRUE),

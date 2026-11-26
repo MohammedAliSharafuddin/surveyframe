@@ -1,10 +1,9 @@
-# tests/testthat/test-review043-browser.R
+# tests/testthat/test-studio-builder-fixes-browser.R
 #
-# The SurveyStudio and SurveyBuilder defects of the Ubuntu run of review_043
-# at 8676a43 (CLAUDE_UBUNTU_REVIEW_8676a43.md), checked in a real Chrome
-# against the build under test: N5's blank CSV, Quality's wording (N6), the
-# Responses error that stays (N3), and the builder's targets, Tab stops,
-# hidden field, ORD badge and suggestions (M1 to M5).
+# Fixes to SurveyStudio and SurveyBuilder, checked in a real Chrome against
+# the build under test: the blank CSV on Responses, Quality's wording, the
+# Responses error that stays, and the builder's targets, Tab stops, hidden
+# field, ORD badge and suggestions.
 
 skip_if_not_slow()
 skip_on_cran()
@@ -12,7 +11,7 @@ skip_if_not_installed("chromote")
 skip_if_not_installed("callr")
 skip_if_not_installed("httpuv")
 
-test_that("N5: the blank CSV on Responses holds the open instrument's columns", {
+test_that("The blank CSV on Responses holds the open instrument's columns", {
   b <- ui1_studio("two_group", width = 1280, height = 900)
   expect_true(ui1_screen(b, "responses"))
   expect_true(ui2_wait(b, "!!document.getElementById('download_sample_csv') && document.getElementById('download_sample_csv').getAttribute('href').indexOf('download') >= 0", 20))
@@ -25,7 +24,7 @@ test_that("N5: the blank CSV on Responses holds the open instrument's columns", 
   expect_false(grepl("information_channels", head, fixed = TRUE))
 })
 
-test_that("N6: Quality never prints NA%, words no duplicates, and leads with its chart", {
+test_that("Quality never prints NA%, words no duplicates, and leads with its chart", {
   b <- ui1_studio("two_group", width = 1280, height = 900)
   expect_true(ui1_screen(b, "quality"))
   expect_true(ui2_wait(b, "$('#screen-quality').text().indexOf('Duplicates and missingness') >= 0", 30))
@@ -37,7 +36,7 @@ test_that("N6: Quality never prints NA%, words no duplicates, and leads with its
   expect_true(ui2_js(b, "(function(){ var c = document.getElementById('studio_quality_chart'), t = document.getElementById('quality_output'); return !!(c.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING); })()"))
 })
 
-test_that("N3: a response file with the wrong columns leaves its reason on Responses", {
+test_that("A response file with the wrong columns leaves its reason on Responses", {
   b <- ui1_studio("two_group", width = 1280, height = 900)
   expect_true(ui1_screen(b, "responses"))
   f <- tempfile(fileext = ".csv")
@@ -71,14 +70,14 @@ rb_instrument <- function() {
     sframe_item("why", "Why?", type = "text")))
 }
 
-test_that("M1: the builder's buttons are at least 44 px tall", {
+test_that("The builder's buttons are at least 44 px tall", {
   s <- ui2_builder(rb_instrument(), width = 1400, height = 900)
   expect_true(ui2_wait(s, "document.querySelectorAll('#itemList .ic').length > 2", 20))
   small <- ui2_js(s, "(function(){ var out = []; document.querySelectorAll('.topbar .btn, .m-btn, #undoBtn, #redoBtn, .sidebar .btn, #itemList .ib').forEach(function(e){ var r = e.getBoundingClientRect(); if (r.width > 0 && r.height < 43.5) out.push((e.id || e.className) + ':' + Math.round(r.height)); }); return out.join(', '); })()")
   expect_identical(small, "")
 })
 
-test_that("P1-11: a question row is 1 Tab stop, with arrows into its buttons", {
+test_that("A question row is 1 Tab stop, with arrows into its buttons", {
   s <- ui2_builder(rb_instrument(), width = 1280, height = 900)
   expect_true(ui2_wait(s, "document.querySelectorAll('#itemList .ic').length > 2", 20))
   expect_identical(ui2_js(s, "document.querySelectorAll('#itemList .ic .ib:not([tabindex=\"-1\"])').length"), 0L)
@@ -93,7 +92,7 @@ test_that("P1-11: a question row is 1 Tab stop, with arrows into its buttons", {
   expect_identical(ui2_js(s, "document.activeElement.getAttribute('data-id')"), id)
 })
 
-test_that("M2 and M3: the method description stays hidden, and an ordered single choice shows ORD", {
+test_that("The method description stays hidden, and an ordered single choice shows ORD", {
   s <- ui2_builder(rb_instrument(), width = 1400, height = 900)
   expect_true(ui2_wait(s, "document.querySelectorAll('#itemList .ic').length > 2", 20))
   expect_identical(ui2_js(s, "getComputedStyle(document.getElementById('s-other-f')).display"), "none")
@@ -106,7 +105,7 @@ test_that("M2 and M3: the method description stays hidden, and an ordered single
   expect_true(ui2_js(s, "(function(){ var m = document.getElementById('fabMenu'); return m.scrollHeight <= m.clientHeight + 1; })()"))
 })
 
-test_that("M5: the Plan dialog suggests a method from 2 variables of any kind", {
+test_that("The Plan dialog suggests a method from 2 variables of any kind", {
   s <- ui2_builder(rb_instrument(), width = 1400, height = 900)
   expect_true(ui2_wait(s, "document.querySelectorAll('#itemList .ic').length > 2", 20))
   ui2_js(s, "setMode('analyse'); openRQModal(); true")

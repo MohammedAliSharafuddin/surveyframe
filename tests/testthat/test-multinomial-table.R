@@ -1,6 +1,6 @@
 # tests/testthat/test-multinomial-table.R
 #
-# CX-14. The multinomial logistic runner gave a coefficient matrix and no
+# The multinomial logistic runner gave a coefficient matrix and no
 # table: no standard errors, z, p or confidence intervals, and the reference
 # category was only implied. sframe_format_result() also dropped a result's syntax.
 
@@ -14,7 +14,7 @@ mn_data <- function() {
   data.frame(y = as.character(y), x = x, z = z, stringsAsFactors = FALSE)
 }
 
-test_that("CX-14: the multinomial result carries a full table against a named reference", {
+test_that("The multinomial result carries a full table against a named reference", {
   skip_if_not_installed("nnet")
   d <- mn_data()
   res <- sframe_run_multinomial_logistic(d, list(dependent = "y", predictors = c("x", "z")))
@@ -43,7 +43,7 @@ test_that("CX-14: the multinomial result carries a full table against a named re
   expect_equal(as.numeric(row1$`CI low`), round(lo, 2))
 })
 
-test_that("CX-14: sframe_format_result() carries the result's syntax", {
+test_that("sframe_format_result() carries the result's syntax", {
   res <- list(test = "cfa_lavaan_syntax", block_id = "B1",
               syntax = "f =~ a + b", apa = "CFA lavaan syntax generated.")
   out <- sframe_format_result(res, data.frame(a = 1), format = "png")

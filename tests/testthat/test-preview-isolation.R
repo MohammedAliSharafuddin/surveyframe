@@ -1,4 +1,4 @@
-# Batch 7 #20: SurveyStudio exported the real instrument into its preview
+# SurveyStudio exported the real instrument into its preview
 # iframe without overriding the endpoint, while the text beside it said
 # anything entered stays in the preview. The exporter falls back to the
 # instrument's configured Google Sheets endpoint, so a configured instrument
@@ -24,13 +24,13 @@ exported <- function(...) {
   paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 }
 
-test_that("20: a deployable export still carries its collector", {
+test_that("A deployable export still carries its collector", {
   html <- exported(collector_instrument())
   expect_match(html, "macros/s/LIVE/exec", fixed = TRUE)
   expect_match(html, "https://example.com/next", fixed = TRUE)
 })
 
-test_that("20: a preview export carries no collector and no redirect", {
+test_that("A preview export carries no collector and no redirect", {
   html <- exported(collector_instrument(), preview = TRUE)
   expect_false(grepl("macros/s/LIVE/exec", html, fixed = TRUE))
   expect_false(grepl("https://example.com/next", html, fixed = TRUE))
@@ -38,28 +38,28 @@ test_that("20: a preview export carries no collector and no redirect", {
   expect_match(html, "Preview", fixed = TRUE)
 })
 
-test_that("20: a preview refuses a supplied endpoint", {
+test_that("A preview refuses a supplied endpoint", {
   expect_error(
     exported(collector_instrument(), preview = TRUE,
              endpoint_url = "https://example.com/collect"),
     class = "sframe_error")
 })
 
-test_that("20: the preview still renders every question", {
+test_that("The preview still renders every question", {
   html <- exported(collector_instrument(), preview = TRUE)
   expect_match(html, "How was it?", fixed = TRUE)
 })
 
-test_that("20: Studio's preview asks for an isolated export", {
+test_that("Studio's preview asks for an isolated export", {
   src <- sframe_installed_text("inst", "shiny", "app.R")
   expect_match(src, "preview = TRUE", fixed = TRUE)
 })
 
-# CX-03 (Codex 0.4.3): the preview removed the endpoint and redirect, but a
+# The preview removed the endpoint and redirect, but a
 # host that defines window.sframeSendResponse still made hasCollector() true,
 # so a preview answer reached the host's real data while the page said
 # nothing was sent.
-test_that("CX-03: a preview never calls a host sender", {
+test_that("A preview never calls a host sender", {
   ctx <- static_survey_context(collector_instrument(), preview = TRUE,
     pre = "window.__rows = 0; window.sframeSendResponse = function(row){ window.__rows++; return Promise.resolve(true); };")
   expect_false(ctx$get("hasCollector()"))
@@ -68,7 +68,7 @@ test_that("CX-03: a preview never calls a host sender", {
   expect_identical(ctx$get("deliveryState"), "local")
 })
 
-test_that("CX-03: a deployable export still uses a host sender", {
+test_that("A deployable export still uses a host sender", {
   ctx <- static_survey_context(collector_instrument(),
     pre = "window.__rows = 0; window.sframeSendResponse = function(row){ window.__rows++; return Promise.resolve(true); };")
   ctx$eval("responses['q1'] = 'test'; doSubmit();")

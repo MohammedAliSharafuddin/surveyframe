@@ -1,7 +1,7 @@
-# tests/testthat/test-studio-ui3-browser.R
+# tests/testthat/test-studio-design-system-browser.R
 #
-# Session UI-3: 1 design system for Studio and the builder. Studio and its
-# Chrome tab come from ui1_studio() (helper-ui1-browser.R), shared across the
+# 1 design system for Studio and the builder. Studio and its
+# Chrome tab come from ui1_studio() (helper-studio-browser.R), shared across the
 # tests here and closed at the end of the file.
 
 skip_if_not_slow()
@@ -61,7 +61,7 @@ ui3_await_levels <- function(b, screen, secondary = FALSE, timeout = 20) {
   lv
 }
 
-test_that("every Studio screen has exactly 1 filled primary, 40 px high and sized to its label (UI-3 item 2)", {
+test_that("every Studio screen has exactly 1 filled primary, 40 px high and sized to its label", {
   b <- ui1_studio("factor_structure", width = 1280, height = 900)
   for (screen in setdiff(sframe_studio_screens(), "design")) {
     expect_true(ui1_screen(b, screen), info = screen)
@@ -85,7 +85,7 @@ test_that("every Studio screen has exactly 1 filled primary, 40 px high and size
   }
 })
 
-test_that("Design and Plan have 1 header row, with undo, redo and Save to Studio at the far right (UI-3 item 3)", {
+test_that("Design and Plan have 1 header row, with undo, redo and Save to Studio at the far right", {
   b <- ui1_studio("factor_structure", width = 1280, height = 900)
   expect_true(ui1_screen(b, "design"))
   frame <- "document.getElementById('design_frame').contentWindow"
@@ -107,13 +107,13 @@ test_that("Design and Plan have 1 header row, with undo, redo and Save to Studio
   expect_lte(p$slack, 2)
   expect_identical(ui2_js(b, "$('#design_saved').text()"), "Saved")
   # An edit in the builder: undo turns on and the state reads Unsaved changes.
-  ui2_js(b, paste0("var w=", frame, "; w.snap(); w.S.meta.description = 'UI-3 header test'; true"))
+  ui2_js(b, paste0("var w=", frame, "; w.snap(); w.S.meta.description = 'Header test'; true"))
   expect_true(ui2_wait(b, "!$('#design_undo').prop('disabled') && $('#design_unsaved').is(':visible') && !$('#design_saved').is(':visible')", 10))
   # Studio's Undo reaches the builder, and Redo turns on.
   ui2_js(b, "$('#design_undo').click(); true")
-  expect_true(ui2_wait(b, paste0("(", frame, ".S.meta.description || '') !== 'UI-3 header test' && !$('#design_redo').prop('disabled')"), 10))
+  expect_true(ui2_wait(b, paste0("(", frame, ".S.meta.description || '') !== 'Header test' && !$('#design_redo').prop('disabled')"), 10))
   ui2_js(b, "$('#design_redo').click(); true")
-  expect_true(ui2_wait(b, paste0(frame, ".S.meta.description === 'UI-3 header test'"), 10))
+  expect_true(ui2_wait(b, paste0(frame, ".S.meta.description === 'Header test'"), 10))
   ui2_js(b, "$('#design_undo').click(); true")
   # Plan: the same row, titled Plan.
   ui2_js(b, "$('.studio-nav a[data-nav=\"plan\"]').click(); true")
@@ -125,7 +125,7 @@ test_that("Design and Plan have 1 header row, with undo, redo and Save to Studio
   expect_true(ui2_wait(b, "$('#design_title').text() === 'Design'", 20))
 })
 
-test_that("the standalone builder keeps its switch and has the same row, Save .sframe at the far right (UI-3 item 3)", {
+test_that("the standalone builder keeps its switch and has the same row, Save .sframe at the far right", {
   s <- ui2_builder()
   order <- ui2_js(s, "Array.prototype.map.call(document.querySelector('.topbar').children, function(e){ return e.className; }).join('|')")
   expect_identical(order, "tb-l|tb-modes|tb-r")
@@ -138,7 +138,7 @@ test_that("the standalone builder keeps its switch and has the same row, Save .s
   expect_true(all(lv$filled == (lv$level == "primary")))
 })
 
-test_that("the builder panel has 1 filled button, Survey settings until saved once and then + Add question, whose menu holds Section and Branch (UI-3 item 4, owner 2026-11-05)", {
+test_that("the builder panel has 1 filled button, Survey settings until saved once and then + Add question, whose menu holds Section and Branch", {
   s <- ui2_builder()
   # A new survey: Survey settings is the panel's filled primary, with the line
   # naming what it holds, and + Add question an outline.
@@ -194,13 +194,14 @@ test_that("the builder panel has 1 filled button, Survey settings until saved on
   expect_identical(ui2_js(s, "document.activeElement.id"), "cfgMoreBtn")
 })
 
-test_that("the empty canvas is a 3-step checklist, then names the next useful step (UI-3 item 5)", {
+test_that("the empty canvas is a 3-step checklist, then names the next useful step", {
   s <- ui2_builder()
   steps <- function() ui2_js(s, "Array.prototype.map.call(document.querySelectorAll('#cPrompt .c-step'), function(e){ return e.className.replace('c-step', '').trim() || 'todo'; }).join('|')")
   go <- function() ui2_js(s, "(document.getElementById('cStepGo') || {}).textContent || ''")
   expect_identical(steps(), "next|todo|todo")
   expect_identical(go(), "Open survey settings")
-  # The step button is secondary: the panel and the head keep the only primaries.
+  # The step button is secondary: the panel and the head keep the only
+  # primaries.
   expect_true(ui2_js(s, "document.getElementById('cStepGo').classList.contains('sf-secondary')"))
   expect_identical(ui2_js(s, "document.querySelectorAll('.sb-empty-cta').length"), 0L)
   ui2_js(s, "openSettings('meta'); saveSettings(); 1")
@@ -222,7 +223,7 @@ test_that("the empty canvas is a 3-step checklist, then names the next useful st
   expect_identical(go(), "Add a question")
 })
 
-test_that("in Studio the canvas step Open Plan opens Plan through the sidebar (UI-3 item 5)", {
+test_that("in Studio the canvas step Open Plan opens Plan through the sidebar", {
   b <- ui1_studio("factor_structure", width = 1280, height = 900)
   expect_true(ui1_screen(b, "design"))
   frame <- "document.getElementById('design_frame').contentWindow"
@@ -236,7 +237,7 @@ test_that("in Studio the canvas step Open Plan opens Plan through the sidebar (U
   expect_true(ui1_screen(b, "design"))
 })
 
-test_that("every Studio screen follows the same rules: 1 tab style, tiles that fit, a disabled primary with a visible reason (UI-3 item 6)", {
+test_that("every Studio screen follows the same rules: 1 tab style, tiles that fit, a disabled primary with a visible reason", {
   b <- ui1_studio("factor_structure", width = 1280, height = 900)
   # Explore's view tabs are underlined as the Report's are, not filled.
   expect_true(ui1_screen(b, "dashboard"))
@@ -256,10 +257,10 @@ test_that("every Studio screen follows the same rules: 1 tab style, tiles that f
   }
 })
 
-# UX-21 on the final tokens: the UI-1 contrast test measures every Studio
-# screen and the hosted builder. This adds the standalone builder in the
-# states UI-3 drew: the checklist, both menus open, and the next step.
-test_that("the standalone builder meets AA contrast in its new states (UI-3 item 7)", {
+# Contrast on the final tokens: the Studio contrast test measures every Studio
+# screen and the hosted builder. This adds the standalone builder in its new
+# states: the checklist, both menus open, and the next step.
+test_that("the standalone builder meets AA contrast in its new states", {
   s <- ui2_builder()
   states <- c(checklist = "1",
               add_menu = "S.meta.title = 'X'; ra(); openMenu('fabMenu', 'fabMoreBtn'); 1",

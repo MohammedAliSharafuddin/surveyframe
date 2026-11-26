@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-hypotheses.R
 #
-# D12. The Plan editor had no hypothesis field, yet saving a test that carries
+# The Plan editor had no hypothesis field, yet saving a test that carries
 # hypotheses wrote two fixed sentences the researcher never wrote. The editor
 # now has optional H0 and H1 fields, shown for those methods only. Only what
 # the researcher typed is saved, and the placeholder examples are never saved.

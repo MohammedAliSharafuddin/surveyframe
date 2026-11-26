@@ -1,14 +1,14 @@
-# tests/testthat/test-studio-d12-browser.R
+# tests/testthat/test-studio-hypotheses-browser.R
 #
-# The D12 Analysis Plan editor in a real Chrome. Test 1 types H0, leaves H1
-# empty, types a decision rule, adds an independent t test block and saves
-# the .sframe the way Studio does (the Download button), then reads the file
-# back. Test 2 opens a file carrying the old fixed hypothesis sentences and
+# The Analysis Plan editor's hypotheses in a real Chrome. Test 1 types H0,
+# leaves H1 empty, types a decision rule, adds an independent t test block and
+# saves the .sframe the way Studio does (the Download button), then reads the
+# file back. Test 2 opens a file carrying the old fixed hypothesis sentences and
 # saves it untouched, which must leave the content hash alone and raise no
 # prompt to save it as a new instrument.
 
 d12_instrument <- function(plan = NULL) {
-  ins <- sframe_instrument(title = "D12 browser", components = list(
+  ins <- sframe_instrument(title = "Hypotheses browser", components = list(
     sframe_choice_set("grp", values = c("a", "b"), labels = c("Group A", "Group B")),
     sframe_item("grp", "Which group are you in?", "single_choice", choice_set = "grp"),
     sframe_item("score", "Your score", "numeric")))
@@ -88,10 +88,9 @@ d12_open_export <- function(js) {
   testthat::expect_true(js(open))
 }
 
-# UI-1 (UX-02): Studio's Analyse no longer edits the plan, so the test that
-# typed H0, H1 and the decision rule there went. The builder's Plan is the
-# only plan editor, and test-builder-d12-browser.R checks those fields reach
-# the saved block.
+# Studio's Analyse no longer edits the plan, so the test that typed H0, H1 and
+# the decision rule there went. The builder's Plan is the only plan editor, and
+# test-builder-hypotheses-browser.R checks those fields reach the saved block.
 
 test_that("a file with the old fixed hypotheses saves untouched with the same hash", {
   old <- list(list(

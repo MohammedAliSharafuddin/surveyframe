@@ -1,6 +1,5 @@
 # R/plan_document.R
-# The pre-analysis plan (Session 10, owner 2026-11-10, coordinator spec and
-# ruling 2026-11-14): render_report(instrument) with no data writes a plan a
+# The pre-analysis plan: render_report(instrument) with no data writes a plan a
 # student can submit to OSF, Zenodo or an ethics committee, not a results
 # page. 1 document, built here as a list of blocks, written as Markdown for
 # Quarto (HTML, PDF, Word, OpenDocument) and as HTML for the built-in

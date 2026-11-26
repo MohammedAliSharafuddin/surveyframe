@@ -1,4 +1,4 @@
-# Batch 4 #10: a multiple-choice question posts one indicator column per option,
+# a multiple-choice question posts one indicator column per option,
 # named item__option, and never a column under its own id. The distribution
 # section required the parent column and skipped the item, so every collected
 # multi-select vanished from the report. A supplied joined value was also counted
@@ -32,7 +32,7 @@ rendered <- function(instr, data) {
   paste(readLines(out, warn = FALSE), collapse = "\n")
 }
 
-test_that("10: a collected multi-select appears in the distributions", {
+test_that("A collected multi-select appears in the distributions", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   html <- rendered(multi_instrument(), multi_responses())
   # the label alone proves nothing: the codebook names every item whether or
@@ -42,14 +42,14 @@ test_that("10: a collected multi-select appears in the distributions", {
   expect_match(html, "What do you use it for?", fixed = TRUE)
 })
 
-test_that("10: the report states the denominator, since answers overlap", {
+test_that("The report states the denominator, since answers overlap", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   html <- rendered(multi_instrument(), multi_responses())
   # 4 respondents, 7 selections between them
   expect_match(html, "4 respondents, who could pick more than one", fixed = TRUE)
 })
 
-test_that("10: an item with no indicator columns is left out quietly", {
+test_that("An item with no indicator columns is left out quietly", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   instr <- multi_instrument()
   data <- multi_responses()
@@ -57,7 +57,7 @@ test_that("10: an item with no indicator columns is left out quietly", {
   expect_no_error(rendered(instr, data))
 })
 
-test_that("10: a single-choice item is unaffected", {
+test_that("A single-choice item is unaffected", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   instr <- sframe_instrument("Single", components = list(
     sframe_choice_set("uses", values = c("a", "b"), labels = c("Yes", "No")),

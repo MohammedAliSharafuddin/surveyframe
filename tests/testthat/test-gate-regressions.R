@@ -26,14 +26,14 @@ simple_instrument <- function() {
 
 # ── 1. every validation exit honours strict mode and the stamp ────────────
 
-test_that("1: strict mode aborts on a malformed field", {
+test_that("Strict mode aborts on a malformed field", {
   instr <- as_sframe(validate_sframe(simple_instrument(), strict = TRUE))
   instr$items[[1]]$label <- NA_character_
   expect_error(validate_sframe(instr, strict = TRUE),
                class = "sframe_validation_error")
 })
 
-test_that("1: a malformed field clears a stamp the instrument already carried", {
+test_that("A malformed field clears a stamp the instrument already carried", {
   instr <- as_sframe(validate_sframe(simple_instrument(), strict = TRUE))
   expect_true(isTRUE(sframe_meta(instr)$validated))
 
@@ -43,7 +43,7 @@ test_that("1: a malformed field clears a stamp the instrument already carried", 
   expect_false(isTRUE(sframe_meta(sframe_object(res))$validated))
 })
 
-test_that("1: the writer refuses an instrument that failed the shape gate", {
+test_that("The writer refuses an instrument that failed the shape gate", {
   instr <- as_sframe(validate_sframe(simple_instrument(), strict = TRUE))
   instr$items[[1]]$label <- NA_character_
   res <- validate_sframe(instr, strict = FALSE)
@@ -64,14 +64,14 @@ scale_instrument <- function(scale_id = "site") {
     sframe_scale(scale_id, "Scale", items = c("q1", "q2", "q3"))))
 }
 
-test_that("2: a scale ID matching a collected column is refused", {
+test_that("A scale ID matching a collected column is refused", {
   d <- data.frame(site = c("north", "south"), q1 = c(4, 2), q2 = c(5, 1),
                   q3 = c(3, 2), stringsAsFactors = FALSE)
   expect_error(score_scales(d, scale_instrument("site")),
                class = "sframe_validation_error")
 })
 
-test_that("2: the metadata the collision would have replaced is still there", {
+test_that("The metadata the collision would have replaced is still there", {
   d <- data.frame(branch = c("north", "south"), q1 = c(4, 2), q2 = c(5, 1),
                   q3 = c(3, 2), stringsAsFactors = FALSE)
   out <- score_scales(d, scale_instrument("site"), keep_items = TRUE,
@@ -80,7 +80,7 @@ test_that("2: the metadata the collision would have replaced is still there", {
   expect_false(is.null(out$site))
 })
 
-test_that("2: re-scoring an already-scored frame is refused, not silent", {
+test_that("re-scoring an already-scored frame is refused, not silent", {
   d <- data.frame(q1 = c(4, 2), q2 = c(5, 1), q3 = c(3, 2))
   once <- score_scales(d, scale_instrument("site"), keep_items = TRUE)
   expect_false(is.null(once$site))
@@ -105,7 +105,7 @@ rated_data <- function() {
              quality__A = c(1, 1), quality__B = c(5, 5))
 }
 
-test_that("3: named weights align to a collected performance matrix", {
+test_that("Named weights align to a collected performance matrix", {
   res <- surveyframe:::sframe_resolve_decision_inputs(
     rated_data(), list(performance_items = c("price", "quality")),
     list(weights = c(quality = 0.9, price = 0.1)),
@@ -117,7 +117,7 @@ test_that("3: named weights align to a collected performance matrix", {
   expect_equal(unname(res$weights[["quality"]]), 0.9)
 })
 
-test_that("3: named criterion directions align the same way", {
+test_that("Named criterion directions align the same way", {
   res <- surveyframe:::sframe_resolve_decision_inputs(
     rated_data(), list(performance_items = c("price", "quality")),
     list(weights = c(price = 0.5, quality = 0.5),
@@ -127,7 +127,7 @@ test_that("3: named criterion directions align the same way", {
   expect_equal(unname(res$criteria_types[["quality"]]), "benefit")
 })
 
-test_that("3: an unnamed weight vector is still taken in criterion order", {
+test_that("An unnamed weight vector is still taken in criterion order", {
   res <- surveyframe:::sframe_resolve_decision_inputs(
     rated_data(), list(performance_items = c("price", "quality")),
     list(weights = c(0.3, 0.7)), rated_instrument(), method = "TOPSIS")
@@ -152,7 +152,7 @@ amended_file <- function() {
   path
 }
 
-test_that("4: rewriting a recorded amendment's author is refused", {
+test_that("Rewriting a recorded amendment's author is refused", {
   path <- amended_file()
   loaded <- read_sframe(path)
   expect_equal(loaded$amendments[[1]]$author, "Alice")
@@ -163,14 +163,14 @@ test_that("4: rewriting a recorded amendment's author is refused", {
   expect_equal(read_sframe(path)$amendments[[1]]$author, "Alice")
 })
 
-test_that("4: rewriting a recorded reason is refused too", {
+test_that("Rewriting a recorded reason is refused too", {
   path <- amended_file()
   loaded <- read_sframe(path)
   loaded$amendments[[1]]$reason_text <- "a different reason"
   expect_error(write_sframe(loaded, path, overwrite = TRUE))
 })
 
-test_that("4: an untouched log still writes", {
+test_that("An untouched log still writes", {
   path <- amended_file()
   loaded <- read_sframe(path)
   expect_no_error(write_sframe(loaded, path, overwrite = TRUE))
@@ -178,7 +178,7 @@ test_that("4: an untouched log still writes", {
 
 # ── 6 and 7. malformed fields and blocks are diagnosed, never raised ──────
 
-test_that("6: a numeric ID is a reported problem", {
+test_that("A numeric ID is a reported problem", {
   instr <- simple_instrument()
   instr$items[[1]]$id <- 123
   res <- expect_no_error(validate_sframe(instr, strict = FALSE))
@@ -186,7 +186,7 @@ test_that("6: a numeric ID is a reported problem", {
   expect_match(paste(res$problems, collapse = " "), "must be text", fixed = TRUE)
 })
 
-test_that("6: a component that is no list is a reported problem", {
+test_that("A component that is no list is a reported problem", {
   for (slot in c("items", "choices", "scales")) {
     instr <- simple_instrument()
     instr[[slot]] <- list("not a component")
@@ -197,14 +197,14 @@ test_that("6: a component that is no list is a reported problem", {
   }
 })
 
-test_that("7: a plan block that is no list is diagnosed, never dereferenced", {
+test_that("A plan block that is no list is diagnosed, never dereferenced", {
   instr <- simple_instrument()
   instr$analysis_plan <- list("nonsense")
   res <- expect_no_error(validate_sframe(instr, strict = FALSE))
   expect_false(res$valid)
 })
 
-test_that("7: an empty role list assigns nothing", {
+test_that("An empty role list assigns nothing", {
   instr <- simple_instrument()
   instr$analysis_plan <- list(list(id = "RQ1", method = "descriptives",
                                    roles = list()))
@@ -214,7 +214,7 @@ test_that("7: an empty role list assigns nothing", {
                fixed = TRUE)
 })
 
-test_that("7: a block with real roles still validates", {
+test_that("A block with real roles still validates", {
   instr <- simple_instrument()
   instr$analysis_plan <- list(list(id = "RQ1", method = "descriptives",
                                    roles = list(variables = "q1")))

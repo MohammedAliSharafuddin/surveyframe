@@ -1,4 +1,4 @@
-# Batch 1's correctness findings on the instrument core.
+# Correctness findings on the instrument core.
 #
 # #3. A failed non-strict validation left meta$validated = TRUE on the
 #     instrument it carried, so the diagnostic said invalid while the object
@@ -15,7 +15,7 @@ one_item <- function() {
   ))
 }
 
-test_that("3: a failed validation clears the validated stamp", {
+test_that("A failed validation clears the validated stamp", {
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
   expect_true(isTRUE(sframe_meta(instr)$validated))
 
@@ -34,7 +34,7 @@ test_that("3: a failed validation clears the validated stamp", {
   expect_false(isTRUE(sframe_meta(as_sframe(res))$validated))
 })
 
-test_that("3: validation clears a stamp it finds already set", {
+test_that("Validation clears a stamp it finds already set", {
   # reaching the stamp without the setter, which is the case the setter's own
   # fix would otherwise hide
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
@@ -46,7 +46,7 @@ test_that("3: validation clears a stamp it finds already set", {
   expect_false(isTRUE(sframe_meta(sframe_object(res))$validated))
 })
 
-test_that("3: the print status follows the diagnostic", {
+test_that("The print status follows the diagnostic", {
   instr <- as_sframe(validate_sframe(one_item(), strict = TRUE))
   sframe_plan(instr) <- list(list(id = "RQ1", method = "descriptives",
                               roles = list(variables = "nowhere")))
@@ -54,7 +54,7 @@ test_that("3: the print status follows the diagnostic", {
   expect_false(grepl("\\bvalid\\b", out))
 })
 
-test_that("4: a malformed plan block is a validation problem", {
+test_that("A malformed plan block is a validation problem", {
   instr <- one_item()
   instr$analysis_plan <- list(list())
   res <- validate_sframe(instr, strict = FALSE)
@@ -90,7 +90,7 @@ test_that("4: a malformed plan block is a validation problem", {
   expect_true(validate_sframe(instr5, strict = FALSE)$valid)
 })
 
-test_that("5: malformed scalar fields are reported, never raised", {
+test_that("Malformed scalar fields are reported, never raised", {
   # an empty ID reached a vapply() length mismatch
   instr <- one_item()
   instr$items[[1]]$id <- character(0)

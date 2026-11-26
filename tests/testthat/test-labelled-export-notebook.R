@@ -1,6 +1,6 @@
 # tests/testthat/test-labelled-export-notebook.R
 #
-# Batch 5, findings 13 and 14.
+# Labelled export and notebook fixes, numbered as below.
 #
 # 13. export_responses() attached value labels only to a base item column
 #     holding numbers. Matrix cells, which hold the same choice codes, got none,
@@ -33,7 +33,7 @@ responses <- function() {
              mc__a = c(1, 0), mc__b = c(1, 1))
 }
 
-test_that("13: matrix cells carry value labels and their row wording", {
+test_that("Matrix cells carry value labels and their row wording", {
   back <- exported(responses())
   expect_identical(unname(attr(back$mx__price, "labels")), c(1, 2, 3))
   expect_identical(names(attr(back$mx__price, "labels")), c("Disagree", "Neutral", "Agree"))
@@ -41,13 +41,13 @@ test_that("13: matrix cells carry value labels and their row wording", {
   expect_match(attr(back$mx__service, "label"), "service")
 })
 
-test_that("13: a multiple-choice column names its option", {
+test_that("A multiple-choice column names its option", {
   back <- exported(responses())
   expect_match(attr(back$mc__a, "label"), "Apple")
   expect_match(attr(back$mc__b, "label"), "Banana")
 })
 
-test_that("13: numeric codes held as text still receive their labels", {
+test_that("Numeric codes held as text still receive their labels", {
   text <- responses()
   text$q1 <- as.character(text$q1)
   text$mx__price <- as.character(text$mx__price)
@@ -56,7 +56,7 @@ test_that("13: numeric codes held as text still receive their labels", {
   expect_identical(names(attr(back$mx__price, "labels")), c("Disagree", "Neutral", "Agree"))
 })
 
-test_that("13: the Stata route carries the same labels", {
+test_that("The Stata route carries the same labels", {
   back <- exported(responses(), "dta")
   expect_identical(names(attr(back$mx__price, "labels")), c("Disagree", "Neutral", "Agree"))
 })
@@ -68,13 +68,13 @@ notebook <- function(title) {
   paths$qmd
 }
 
-test_that("14: a title with quotes and backslashes keeps the notebook header valid", {
+test_that("A title with quotes and backslashes keeps the notebook header valid", {
   title <- "The \"best\" survey \\ 2026"
   qmd <- notebook(title)
   expect_identical(rmarkdown::yaml_front_matter(qmd)$title, title)
 })
 
-test_that("14: a failed block is shown with its error, and the report chunk runs", {
+test_that("A failed block is shown with its error, and the report chunk runs", {
   qmd <- notebook("Plain")
   src <- paste(readLines(qmd, warn = FALSE), collapse = "\n")
   run_chunk <- regmatches(src, regexpr("(?s)```\\{r run\\}.*?```", src, perl = TRUE))

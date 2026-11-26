@@ -1,13 +1,13 @@
 # tests/testthat/test-crosstab-percent.R
 #
-# Cross-tab percentages and totals (owner 2026-10-31). crosstab and
-# chi_square take options$percent = "row", "column" or "total", and every
-# result carries a totals row and column. The percentages follow their
-# denominator: the Total row of row percentages is the column distribution,
-# and the Total column of column percentages is the row distribution.
-# Expected values: Codex T2 (base R prop.table() and addmargins(), surveyframe
-# not loaded), copied unchanged into fixtures/t2_crosstab_expected.csv: 3
-# demo pairs, 30 rows, with a zero cell in `paired`.
+# Cross-tab percentages and totals. crosstab and chi_square take options$percent
+# = "row", "column" or "total", and every result carries a totals row and
+# column. The percentages follow their denominator: the Total row of row
+# percentages is the column distribution, and the Total column of column
+# percentages is the row distribution. Expected values: an independent oracle
+# (base R prop.table() and addmargins(), surveyframe not loaded), copied
+# unchanged into fixtures/t2_crosstab_expected.csv: 3 demo pairs, 30 rows, with
+# a zero cell in `paired`.
 
 t2 <- utils::read.csv(test_path("fixtures", "t2_crosstab_expected.csv"), stringsAsFactors = FALSE)
 pairs <- unique(t2[c("dataset", "row_var", "col_var")])

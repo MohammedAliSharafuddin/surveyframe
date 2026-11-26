@@ -1,4 +1,4 @@
-# Each teaching demo tells a study (Session 10, owner 2026-11-14): a
+# Each teaching demo tells a study: a
 # placeholder author, a research-style purpose, the study's problem,
 # objectives and sampling, and H0, H1 and a decision rule on each inferential
 # block, so its pre-analysis plan shows every section.

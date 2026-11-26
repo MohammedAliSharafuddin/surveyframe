@@ -1,4 +1,4 @@
-# FR-35 (Fable sitting 2), Session CF-B: the ordinal logistic table gives p
+# The ordinal logistic table gives p
 # values and intervals, and no odds ratio for the thresholds.
 
 test_that("slopes have p and an interval, thresholds have no odds ratio", {

@@ -1,6 +1,6 @@
 # tests/testthat/test-amend-version.R
 #
-# Session 8a, item (b) (owner 2026-11-01). amend_sframe() gains `version`:
+# amend_sframe() gains `version`:
 # NULL keeps the instrument's version, a string sets it, and when the version
 # is unchanged a message suggests the next one. A design amendment moves the
 # minor number (1.0.0 to 1.1.0), a pipeline amendment the patch number

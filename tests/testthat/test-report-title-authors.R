@@ -1,6 +1,6 @@
 # tests/testthat/test-report-title-authors.R
 #
-# Ethos request 23 (2026-10-03). The Quarto report was titled "Survey Research
+# The Quarto report was titled "Survey Research
 # Report" and carried a "Published" line, whatever the study was called and
 # whoever wrote it, and render_report() took no title or author.
 
@@ -11,7 +11,7 @@ titled_instrument <- function() {
   ins
 }
 
-test_that("23: the built-in engine uses the instrument's title and authors", {
+test_that("The built-in engine uses the instrument's title and authors", {
   path <- tempfile(fileext = ".html")
   surveyframe:::.render_report_html(titled_instrument(), output_path = path,
                                     include_analysis = FALSE, title = "Session format and satisfaction",
@@ -21,7 +21,7 @@ test_that("23: the built-in engine uses the instrument's title and authors", {
   expect_match(html, "Rahman, A., Lee, K.", fixed = TRUE)
 })
 
-test_that("23: the Quarto report takes title and authors, and says Rendered", {
+test_that("The Quarto report takes title and authors, and says Rendered", {
   skip_on_cran()
   skip_if_not_slow()
   skip_if(!nzchar(Sys.which("quarto")), "Quarto not installed")

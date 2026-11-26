@@ -1,5 +1,5 @@
 # Every help page's example ends with something to look at and at most 40
-# console lines (Session 10, owner 2026-11-11). sframe_plan() printed 1,647
+# console lines. sframe_plan() printed 1,647
 # lines, run_analysis_plan() 138 and sframe_item_results() 83, and 5 design
 # constructors printed nothing. This reruns the measurement over man/, with
 # \donttest run as RStudio's Run examples does and \dontrun left out, so a new

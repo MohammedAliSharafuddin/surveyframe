@@ -160,7 +160,7 @@ sframe_codebook <- function(instrument, format = c("html", "md")) {
     class = "sframe_codebook"
   )
   # format = "md" used to change nothing, so a host asking for Markdown got
-  # the printed text table (Ethos request 9).
+  # the printed text table.
   if (identical(format, "md")) out$markdown <- sframe_codebook_markdown(out)
   out
 }
@@ -477,18 +477,18 @@ render_report <- function(
     open              = interactive()
 ) {
   sframe_check_instrument(instrument)
-  # Figure size, resolution and format (Ethos request 19). The built-in engine
+  # Figure size, resolution and format. The built-in engine
   # reads them from .sframe_figure_env, the Quarto template from its params.
   figures <- sframe_figure_settings(figures)
   old_figures <- .sframe_figure_env$settings
   .sframe_figure_env$settings <- figures
   on.exit(.sframe_figure_env$settings <- old_figures, add = TRUE)
   # The study's own title and authors, where every report read "Survey
-  # Research Report" whatever the study (Ethos request 23).
+  # Research Report" whatever the study.
   report_title <- as.character(title %||% (if (is.null(data)) sframe_plan_title(instrument)) %||%
                                  instrument$meta$title %||% "Survey report")[1]
   # Demonstration data stamps the title, and every table and figure title
-  # through the captions both engines build (owner 2026-11-05).
+  # through the captions both engines build.
   demo_data <- sframe_is_demo_data(data)
   old_demo <- .sframe_demo_env$on
   .sframe_demo_env$on <- demo_data
@@ -520,11 +520,11 @@ render_report <- function(
   dest <- output_file %||% output_path %||%
     tempfile(fileext = paste0(".", format))
   dest <- path.expand(dest)
-  # The citation style: a bundled name or a .csl file, never fetched (8b-R).
+  # The citation style: a bundled name or a .csl file, never fetched.
   csl_style <- sframe_resolve_csl(csl)
   style_obj <- list(sframe_style_manifest_object(csl_style))
 
-  # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies (T3).
+  # QUARTO_PATH, the PATH, then RStudio's and Positron's bundled copies.
   use_quarto <- isTRUE(getOption("surveyframe.use_quarto", TRUE))
   quarto <- if (use_quarto) sframe_quarto_find() else list(path = NA_character_)
   quarto_bin <- quarto$path
@@ -540,7 +540,7 @@ render_report <- function(
              "https://quarto.org/docs/get-started/ or use format = 'html'."),
       class = c("sframe_missing_quarto", "sframe_error"))
   }
-  # PDF (owner 2026-10-31, coordinator 2026-11-04): Quarto through LaTeX when
+  # PDF: Quarto through LaTeX when
   # a LaTeX engine is found, else through the Typst Quarto bundles, and
   # without Quarto the built-in page printed by pagedown.
   quarto_to <- format
@@ -628,7 +628,7 @@ render_report <- function(
   output_name <- basename(dest)
 
   # The plan results, computed once for both engines and the results record
-  # (8b-R, NAMING decision 6). The record holds the numbers a reviewer
+  # The record holds the numbers a reviewer
   # verifies, and the provenance block in the report gives its sha256. The
   # report source computes its record from the files it writes, read back.
   plan_results <- NULL
@@ -648,7 +648,7 @@ render_report <- function(
                           Filter(Negate(is.null), lapply(names(.sframe_citation_csl),
                                                          sframe_builtin_reference)))
 
-  # The Quarto source (NAMING decision 6): a folder that renders the report
+  # The Quarto source: a folder that renders the report
   # again from its own .sframe and responses, and checks its numbers.
   if (identical(format, "qmd")) {
     folder <- sub("\\.qmd$", "", dest)
@@ -721,7 +721,7 @@ render_report <- function(
       tmp_interp <- ""
     }
     # What each block declared, and its written interpretation, computed here
-    # (D12). Quarto renders against the installed package, so the template
+    # Quarto renders against the installed package, so the template
     # calls exported functions only and reads these as data.
     tmp_decl <- tempfile(fileext = ".rds")
     saveRDS(sframe_plan_declarations(instrument, interpretations,
@@ -768,7 +768,7 @@ render_report <- function(
       fig_height          = as.character(figures$height %||% ""),
       fig_dpi             = as.character(figures$dpi %||% ""),
       fig_format          = if (identical(figures$format, "svg")) "svg" else "",
-      # Which Quarto rendered the report, and where it was found (T3).
+      # Which Quarto rendered the report, and where it was found.
       quarto_found        = sframe_quarto_label(quarto)
     )
 
@@ -820,7 +820,7 @@ render_report <- function(
     out_ext <- if (identical(format, "html")) "html" else format
     rendered <- file.path(render_dir, paste0("report.", out_ext))
     # Quarto prints nothing while it works, which for a minute looks like a hang.
-    # Names the version, which decides what the report can do (L1).
+    # Names the version, which decides what the report can do.
     q_version <- quarto$version %||% NA_character_
     rlang::inform(paste0("Rendering the report with Quarto",
                          if (!is.na(q_version) && nzchar(q_version)) paste0(" ", q_version) else "",
@@ -850,7 +850,7 @@ render_report <- function(
 
     if (isTRUE(quarto_ok)) {
       # Numbered tables and figures with titles and alt text, as the
-      # built-in engine writes them (CX-22).
+      # built-in engine writes them.
       if (identical(format, "html")) {
         html <- readLines(rendered, warn = FALSE, encoding = "UTF-8")
         writeLines(sframe_quarto_apa_floats(html), rendered, useBytes = TRUE)
@@ -918,7 +918,7 @@ sframe_scale_sources_html <- function(instrument, scale_ids) {
   sprintf("<p class=\"tbl-note\"><em>Sources.</em> %s.</p>", paste(parts, collapse = "; "))
 }
 
-# The banner at the top of a built-in report (owner 2026-10-31). Quarto is the
+# The banner at the top of a built-in report. Quarto is the
 # report engine, and the built-in engine writes a short plain results page
 # with no parity promise, so the page says so and where to get Quarto.
 sframe_builtin_banner <- function(plan = FALSE) {
@@ -1068,10 +1068,10 @@ sframe_clean_interpretations <- function(interpretations) {
   meta <- instrument$meta %||% list()
   sections <- character(0)
 
-  # What the report was built from, first (NAMING decision 6).
-  # With no data the report is the pre-analysis plan (Session 10), built by
+  # What the report was built from, first.
+  # With no data the report is the pre-analysis plan, built by
   # sframe_plan_blocks() as the Quarto template builds it, with no results rows.
-  # Demonstration data says so first (owner 2026-11-05).
+  # Demonstration data says so first.
   demo_lead <- if (sframe_is_demo_data(data)) {
     sprintf("<p class=\"sf-banner\" role=\"note\"><strong>%s.</strong> Every number, table and figure here was computed from it.</p>",
             sframe_demo_data_status)
@@ -1121,7 +1121,7 @@ sframe_clean_interpretations <- function(interpretations) {
         )
       }
       # Where each scale and item comes from, cited in text, as the Quarto
-      # report lists them (8b-R).
+      # report lists them.
       sources <- c(
         vapply(instrument$scales %||% list(), function(sc) {
           cite <- sframe_cite_text(sframe_cited_keys(instrument, paste0("scale:", sc$id)))
@@ -1287,7 +1287,7 @@ sframe_clean_interpretations <- function(interpretations) {
       )
     )
 
-    # Citations and the References list (D8). The built-in engine has no
+    # Citations and the References list. The built-in engine has no
     # citation processor, so [@key] is resolved here and the list is APA 7.
     ref_index <- sframe_reference_index(instrument, references)
     body_text <- paste(sections, collapse = "\n")
@@ -1380,7 +1380,7 @@ sframe_clean_interpretations <- function(interpretations) {
     paste(c(demo_lead, sections), collapse = "\n")
   )
 
-  # Every table and figure numbered in reading order (CX-22).
+  # Every table and figure numbered in reading order.
   writeLines(sframe_apa_number_floats(html), output_path)
   invisible(output_path)
 }
@@ -1398,8 +1398,8 @@ sframe_clean_interpretations <- function(interpretations) {
 
   # What the block declared before the data prints above its result, and
   # the interpretation below it, labelled as written after the results. An
-  # interpretation never stands in for an empty decision rule (D12).
-  # The sources of the hypotheses beside them, then the block's own (8b-R).
+  # interpretation never stands in for an empty decision rule.
+  # The sources of the hypotheses beside them, then the block's own.
   declaration_html <- function(b) {
     id <- as.character(b$block_id %||% b$id %||% "")[1]
     paste0(sframe_declaration_html(b, keys),
@@ -1456,7 +1456,7 @@ sframe_clean_interpretations <- function(interpretations) {
     vapply(seq_along(results), function(i) {
       result <- results[[i]]
       # The table and chart are titled by the block and its question, as
-      # sframe_format_result() titles them, not by a generic "Results table" (CX-22).
+      # sframe_format_result() titles them, not by a generic "Results table".
       rq_label <- sframe_result_float_title(result, i)
       table_html <- ""
       if (is.data.frame(result$table)) {
@@ -1561,7 +1561,7 @@ sframe_clean_interpretations <- function(interpretations) {
   paste(c("<h2>Analysis Plan</h2>", sframe_study_html(instrument, keys), blocks), collapse = "\n")
 }
 
-# The study at the head of the plan section (D13 in the report, 8b-R): the
+# The study at the head of the plan section: the
 # problem, its sources, and the trace from objectives to research questions.
 sframe_study_html <- function(instrument, keys = sframe_md_keys(instrument)) {
   s <- sframe_report_study(instrument)
@@ -1654,13 +1654,12 @@ sframe_study_html <- function(instrument, keys = sframe_md_keys(instrument)) {
   )
 }
 
-# The descriptives as both report engines print them, for the instrument's
-# items in the data, in 2 tables so that each fits a page in every format
-# (Codex P1-05, owner): centre and spread (counts, M, SD, Mdn, IQR, range),
-# then shape and interval (skewness, kurtosis, SE, the CI and, when weights
-# are given, the weighted mean). An item answered with categories keeps its
-# counts, and its numeric cells show a dash, which the note explains (Codex
-# P1-02). The group column goes when there is no split.
+# The descriptives as both report engines print them, for the instrument's items
+# in the data, in 2 tables so that each fits a page in every format centre and
+# spread (counts, M, SD, Mdn, IQR, range), then shape and interval (skewness,
+# kurtosis, SE, the CI and, when weights are given, the weighted mean). An item
+# answered with categories keeps its counts, and its numeric cells show a dash,
+# which the note explains. The group column goes when there is no split.
 sframe_report_descriptives <- function(instrument, data, weights = NULL) {
   ids <- intersect(vapply(instrument$items, function(i) i$id, character(1)),
                    colnames(data))
@@ -1722,7 +1721,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
   }
   if (is.list(results)) {
     # The table and chart titles, escaped for the template's HTML, as
-    # the built-in engine titles them (CX-22).
+    # the built-in engine titles them.
     results <- Map(function(r, i) {
       sup <- sframe_result_supplement(r)
       if (!is.null(sup)) sup$caption_html <- htmltools_escape(sup$caption)
@@ -1732,7 +1731,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
       r$caption_text <- title
       r$research_question_md <- sframe_field_md_line(r$research_question, keys)
       # The result sentence and its advisory with italic symbols in every
-      # engine (L2, CX-24).
+      # engine.
       if (!is.null(r$apa)) r$apa_md <- sframe_apa_markdown(r$apa)
       if (!is.null(r$advisory)) r$advisory_md <- sframe_apa_markdown(r$advisory)
       r$exploratory <- sframe_result_exploratory(r)
@@ -1750,7 +1749,7 @@ sframe_report_content <- function(instrument, data = NULL, plot_palette = "web",
   for (k in seq_along(charts)) {
     charts[[k]]$figure_open <- sframe_apa_figure_open(charts[[k]]$title, charts[[k]]$alt)
   }
-  # Why a straight-lining chart is absent, escaped for the template (8b-R).
+  # Why a straight-lining chart is absent, escaped for the template.
   quality_note <- NULL
   if (!is.null(data)) {
     qr <- tryCatch(sframe_quality_results(data, instrument), error = function(e) NULL)
@@ -2049,10 +2048,9 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
   force(code)
 }
 
-# An item's coded values as its choice labels, in the choice set's order, so
-# a chart shows "In person" where the data hold "in_person" (Ethos request
-# 20). Codes the set lacks, and every code outside a labelled plot call, stay
-# as they are.
+# An item's coded values as its choice labels, in the choice set's order, so a
+# chart shows "In person" where the data hold "in_person". Codes the set lacks,
+# and every code outside a labelled plot call, stay as they are.
 .sframe_plot_value_labels <- function(item_id, codes) {
   labs <- sframe_item_value_labels(.sframe_plot_label_env$instrument, item_id)
   codes <- as.character(codes)
@@ -2081,7 +2079,7 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
   }
 
   # Cells as every report engine prints them: p by its own rules, the rest to
-  # 2 decimals, blanks for missing values (CX-15).
+  # 2 decimals, blanks for missing values.
   x <- sframe_apa_cells(x)
 
   has_pval <- any(grepl(
@@ -2091,7 +2089,7 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
   ))
 
   # Headings from the APA layer: symbols set as APA 7 sets them, other names
-  # in words, unless the caller supplies its own (CX-24).
+  # in words, unless the caller supplies its own.
   display_names <- if (is.null(col.names)) sframe_apa_headings(colnames(x)) else
     htmltools_escape_each(col.names)
 
@@ -2110,7 +2108,7 @@ sframe_report_charts <- function(instrument, data, plot_palette = "web") {
     collapse = "\n"
   )
 
-  # Numbered with the rest of the document's tables (CX-22).
+  # Numbered with the rest of the document's tables.
   cap_html <- if (!is.null(caption) && nzchar(caption)) sframe_apa_caption(caption) else ""
 
   tbl_html <- sprintf(

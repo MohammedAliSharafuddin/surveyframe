@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-references-browser.R
 #
-# SurveyStudio's References screen (owner decision 2026-10-25), driven in a
+# SurveyStudio's References screen, driven in a
 # real Chrome: paste BibTeX, add it, see it listed, remove it. The rebuild
 # that carries references into the open instrument is tested without a
 # browser in test-studio-roundtrip-content.R.

@@ -1,5 +1,5 @@
 # data-raw/demo_stories.R
-# The study each demo tells (Session 10, owner 2026-11-13 and 2026-11-14):
+# The study each demo tells:
 # a research-style purpose, the study's problem, objectives and sampling,
 # a placeholder author, the question wording for its use case, and H0, H1
 # and a decision rule on each inferential block, so each demo's
@@ -359,7 +359,7 @@ apply_story <- function(instrument, story) {
   instrument$meta$authors <- demo_author
   if (!is.null(story$description)) instrument$meta$description <- story$description
   # A story's own title, which the welcome page shows too when it carried the
-  # build's title (owner 2026-11-15, factor_structure as an employee study).
+  # build's title (factor_structure as an employee study).
   if (!is.null(story$title)) {
     old <- instrument$meta$title
     instrument$meta$title <- story$title

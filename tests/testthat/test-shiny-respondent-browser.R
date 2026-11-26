@@ -275,7 +275,7 @@ test_that("A7: the embedded module collects advanced items in a real browser", {
   expect_match(page_js(s, "document.body.innerText"), "Thank You")
 })
 
-test_that("UX-11: Other, please specify in the Shiny survey reaches the row", {
+test_that("Other, please specify in the Shiny survey reaches the row", {
   instr <- sframe_instrument(title = "Other", components = list(
     sframe_choice_set("src", 1:2, c("Website", "A friend"), allow_other = TRUE),
     sframe_item("heard", "Where did you hear of us?", "single_choice",

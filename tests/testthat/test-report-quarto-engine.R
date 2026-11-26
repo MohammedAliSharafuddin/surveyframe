@@ -1,6 +1,6 @@
 # tests/testthat/test-report-quarto-engine.R
 #
-# Session 8b-R, item 1 (owner 2026-10-31). Quarto is the report engine.
+# Quarto is the report engine.
 # Without it the built-in engine writes a short plain results page under a
 # banner that says how to get the full report. The sections only the
 # built-in engine had (the Quality summary table and Respondent-wise

@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-item-flags.R
 #
-# UI-1: SurveyStudio's Drop from scale and Put back, and the Amendments
+# SurveyStudio's Drop from scale and Put back, and the Amendments
 # screen's history and version line. Drop opens the 1 amendment dialog with
 # the change from sframe_drop_items() and the reason from sframe_item_flags().
 # Put back is a second amendment built from the before state Studio keeps in

@@ -1,7 +1,6 @@
+# pkgdown/postbuild.R Finishes the built site in docs/ after pkgdown and the
+# verifier copy. Run from the repository root, after build_site:  Rscript
 # pkgdown/postbuild.R
-# Finishes the built site in docs/ after pkgdown and the verifier copy (Codex
-# website review WR92, WR93, WR191). Run from the repository root, after
-# build_site:  Rscript pkgdown/postbuild.R
 #
 # 1. llms.txt reads in the reader's order: the home page, then the articles
 #    (Templates, How-to guides, Documentation and the rest, in _pkgdown.yml's
@@ -72,7 +71,7 @@ for (p in pages) {
   head_end <- grep("</head>", h, fixed = TRUE)[1]
   if (is.na(head_end)) next
   # A reference page's title, "Title \u2014 name" from pkgdown, reads
-  # "Title (name)" in <title> and og:title (Codex WR561): no dash on the site.
+  # "Title (name)" in <title> and og:title: no dash on the site.
   h <- gsub("(<title>|og:title\" content=\")([^<\"]*?) \u2014 ([A-Za-z0-9._]+)", "\\1\\2 (\\3)", h, perl = TRUE)
   writeLines(h, f, useBytes = TRUE)
   url <- paste0(site, sub("(^|/)index\\.html$", "\\1", p))

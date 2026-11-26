@@ -1,6 +1,6 @@
 # tests/testthat/test-static-template-host-delivery.R
 #
-# Ethos request 7 (2026-10-01). The static template posts no-cors, so it can
+# The static template posts no-cors, so it can
 # never read the collector's answer. Every respondent was told the page could
 # not confirm storage, even on a host that confirms. The thank-you screen said
 # "recorded" while the send was still in flight, "Submit another response"
@@ -19,7 +19,7 @@ memory_storage <- "window.localStorage = { _d:{},
   setItem:function(k,v){ this._d[k] = String(v); },
   removeItem:function(k){ delete this._d[k]; } };"
 
-test_that("7: a send in flight shows a sending screen, never 'recorded'", {
+test_that("A send in flight shows a sending screen, never 'recorded'", {
   ctx <- static_survey_context(host_instrument(),
     pre = "window.sframeSendResponse = function(row){ return new Promise(function(){}); };")
   ctx$eval("responses['q1'] = 'fine'; doSubmit();")
@@ -29,7 +29,7 @@ test_that("7: a send in flight shows a sending screen, never 'recorded'", {
   expect_no_match(html, "recorded", fixed = TRUE)
 })
 
-test_that("7: a host that confirms delivery is shown as recorded", {
+test_that("A host that confirms delivery is shown as recorded", {
   ctx <- static_survey_context(host_instrument(),
     pre = "window.__sent = null; window.sframeSendResponse = function(row){ window.__sent = row; return Promise.resolve({confirmed: true}); };")
   ctx$eval("responses['q1'] = 'fine'; doSubmit();")
@@ -41,7 +41,7 @@ test_that("7: a host that confirms delivery is shown as recorded", {
   expect_match(html, "Submit another response", fixed = TRUE)
 })
 
-test_that("7: a host that cannot confirm is unconfirmed, and a rejection fails", {
+test_that("A host that cannot confirm is unconfirmed, and a rejection fails", {
   ctx <- static_survey_context(host_instrument(),
     pre = "window.sframeSendResponse = function(row){ return Promise.resolve(false); };")
   ctx$eval("responses['q1'] = 'fine'; doSubmit();")
@@ -53,14 +53,14 @@ test_that("7: a host that cannot confirm is unconfirmed, and a rejection fails",
   expect_identical(ctx2$get("deliveryState"), "failed")
 })
 
-test_that("7: thankyou$show_restart = FALSE hides Submit another response", {
+test_that("thankyou$show_restart = FALSE hides Submit another response", {
   ctx <- static_survey_context(host_instrument(list(thankyou = list(show_restart = FALSE))),
     pre = "window.sframeSendResponse = function(row){ return Promise.resolve(true); };")
   ctx$eval("responses['q1'] = 'fine'; doSubmit();")
   expect_no_match(app_html(ctx), "Submit another response", fixed = TRUE)
 })
 
-test_that("7: with save_draft, answers survive a closed tab and resume", {
+test_that("With save_draft, answers survive a closed tab and resume", {
   render <- list(save_draft = TRUE,
                  welcome = list(title = "Hi", intro_text = "Welcome."))
   ctx <- static_survey_context(host_instrument(render), pre = memory_storage)
@@ -83,7 +83,7 @@ test_that("7: with save_draft, answers survive a closed tab and resume", {
   expect_length(ctx2$get("Object.keys(window.localStorage._d)"), 0L)
 })
 
-test_that("7: drafts stay off unless the instrument asks for them", {
+test_that("Drafts stay off unless the instrument asks for them", {
   ctx <- static_survey_context(host_instrument(), pre = memory_storage)
   ctx$eval("startSurvey(); responses['q1'] = 'x'; saveDraft();")
   expect_length(ctx$get("Object.keys(window.localStorage._d)"), 0L)

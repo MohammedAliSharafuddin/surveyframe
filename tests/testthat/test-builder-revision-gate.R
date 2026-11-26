@@ -1,14 +1,14 @@
 # tests/testthat/test-builder-revision-gate.R
 #
-# Codex CX-12, decision D2 (0.4.3, interim). openSframeText() checked the
+# openSframeText() checked the
 # file's hash on open and forgot it, and saveSframe() hashed whatever the
 # builder held, so an edited instrument saved as verified with no amendment.
 # The builder now keeps the content it opened. Saving changed content of a
 # file that had a hash asks for a new instrument, a new version with no
-# amendment log, or cancels. Session 8a adds the third way, an amendment,
+# amendment log, or cancels. The third way, an amendment, is
 # tested in test-builder-amend.R.
 
-# The amendment dialog (8a) answers "Save as a new instrument" with the
+# The amendment dialog answers "Save as a new instrument" with the
 # version `answer`, or Cancel when `answer` is "false". `value` records the
 # version the dialog offered.
 gate_context <- function(answer = "false") {
@@ -27,14 +27,14 @@ gate_instrument <- function() {
     sframe_item("q1", "How was it?", type = "text")))
 }
 
-test_that("CX-12: an opened file saved unchanged needs no dialog", {
+test_that("An opened file saved unchanged needs no dialog", {
   ctx <- gate_context()
   builder_open(ctx, gate_instrument())
   expect_true(gate(ctx))
   expect_length(ctx$get("__dialogs"), 0L)
 })
 
-test_that("CX-12: changed content of an opened file asks, and Cancel saves nothing", {
+test_that("Changed content of an opened file asks, and Cancel saves nothing", {
   ctx <- gate_context("false")
   builder_open(ctx, gate_instrument())
   ctx$eval("S.items[0].label = 'Undisclosed builder label';")
@@ -46,7 +46,7 @@ test_that("CX-12: changed content of an opened file asks, and Cancel saves nothi
   expect_identical(ctx$get("S.meta.version"), "1.2.0")
 })
 
-test_that("CX-12: Save as a new instrument takes the new version and drops the log", {
+test_that("Save as a new instrument takes the new version and drops the log", {
   ctx <- gate_context("'1.3.0'")
   builder_open(ctx, gate_instrument())
   ctx$eval("S.items[0].label = 'Changed'; S._carry.amendments = [{ new_hash:'x' }];")
@@ -57,7 +57,7 @@ test_that("CX-12: Save as a new instrument takes the new version and drops the l
   expect_null(saved$amendments)
 })
 
-test_that("CX-12: a new instrument needs a changed title or version", {
+test_that("A new instrument needs a changed title or version", {
   ctx <- gate_context("'1.2.0'")
   builder_open(ctx, gate_instrument())
   ctx$eval("S.items[0].label = 'Changed';")
@@ -68,7 +68,7 @@ test_that("CX-12: a new instrument needs a changed title or version", {
   expect_true(gate(ctx2))
 })
 
-test_that("CX-12: after a save, the saved file is the new origin", {
+test_that("After a save, the saved file is the new origin", {
   ctx <- gate_context("'1.3.0'")
   builder_open(ctx, gate_instrument())
   ctx$eval("S.items[0].label = 'Changed';
@@ -79,7 +79,7 @@ test_that("CX-12: after a save, the saved file is the new origin", {
   expect_length(ctx$get("__dialogs"), 0L)
 })
 
-test_that("CX-12: a survey built from scratch saves without a dialog", {
+test_that("A survey built from scratch saves without a dialog", {
   ctx <- gate_context()
   ctx$eval("S.items.push({ id:'q1', type:'text', label:'New' });")
   expect_true(gate(ctx))

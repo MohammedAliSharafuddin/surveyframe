@@ -1,5 +1,5 @@
 # tests/testthat/test-syntax-predictor-coding.R
-# Session 3 syntax gap. Every regression runner codes its predictors through
+# Every regression runner codes its predictors through
 # sframe_predictor_frame(), and the code sframe_syntax_result() writes codes them the
 # same way, so a number-like text predictor enters both as a number and the
 # generated code reproduces the package's coefficients.

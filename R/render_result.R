@@ -1,11 +1,11 @@
 # R/render_result.R
 #
 # One analysis result rendered as the report renders it: the formatted table,
-# its caption and note, any second table, and the chart. A host such as Ethos
+# its caption and note, any second table, and the chart. A host application
 # kept its own map from method to chart and its own table formatting, a
-# second copy of the report's choices that drifted with each release (Ethos
-# request 1). This draws on the report's own code, so a host and the report
-# show the same thing.
+# second copy of the report's choices that drifted with each release. This
+# draws on the report's own code, so a host and the report show the same
+# thing.
 
 #' Render one analysis result as the report does
 #'
@@ -118,7 +118,7 @@ sframe_format_result <- function(result, data, instrument = NULL,
       on.exit(.sframe_figure_env$settings <- old, add = TRUE)
       parts <- c(
         sprintf("<h3>%s</h3>", htmltools_escape(caption)),
-        # What the block declared before the data, above the result (D12).
+        # What the block declared before the data, above the result.
         sframe_declaration_html(result),
         if (nzchar(out$apa)) sprintf("<p class=\"sf-apa\">%s</p>", sframe_apa_html(out$apa)),
         if (is.data.frame(table)) .render_report_table(table, caption = caption, note = out$note),
@@ -132,7 +132,7 @@ sframe_format_result <- function(result, data, instrument = NULL,
                   htmltools_escape(interp))
         }
       )
-      # Numbered as the first table and figure of a document of its own (CX-22).
+      # Numbered as the first table and figure of a document of its own.
       out$html <- sframe_apa_number_floats(paste0(
         "<section class=\"sf-result\">", paste(parts, collapse = "\n"), "</section>"))
       # A decision rule or note may cite a source as [@key]. The report resolves

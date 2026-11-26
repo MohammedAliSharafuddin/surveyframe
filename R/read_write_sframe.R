@@ -104,12 +104,11 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
       sframe_restore_analysis_block
     )),
     models = unname(lapply(instrument$models %||% list(), sframe_model_plain)),
-    # Written in the shape it holds. sframe_instrument() makes an empty render an
-    # empty named list, written as {}, which is what render is: it was
-    # written as [], which a host reading the JSON took for a list (Ethos
-    # request 3). An instrument read from a file written with [] keeps [], so
-    # it re-serialises to the hash its file stores, and its amendment log
-    # still matches.
+    # Written in the shape it holds. sframe_instrument() makes an empty render
+    # an empty named list, written as {}, which is what render is: it was
+    # written as [], which a host reading the JSON took for a list. An
+    # instrument read from a file written with [] keeps [], so it re-serialises
+    # to the hash its file stores, and its amendment log still matches.
     render = instrument$render %||% list()
   )
 
@@ -143,7 +142,7 @@ sframe_serialization_payload <- function(instrument, hash_value = "", box = TRUE
   # `references` (0.4.3) follows the same rule again: an instrument that cites
   # nothing hashes exactly as it did before references existed. See
   # R/references.R for why the cite links live on the reference.
-  # `study` (D13, 0.4.3), the same rule: written only when declared.
+  # `study`, the same rule: written only when declared.
   study <- sframe_study_plain(instrument$study)
   if (!is.null(study)) payload$study <- study
 
@@ -255,7 +254,7 @@ sframe_with_locale_order <- function(code) {
 # The values fun() gives in every earlier form: RFC 8785 without
 # hash.canonical, the 0.4.3 development form,
 # then the pre-0.4.3 form in the session's, the C and the en_US collation, so a
-# file hashed in an English session is recognised in a C one (FR-08).
+# file hashed in an English session is recognised in a C one.
 sframe_old_form_values <- function(fun) {
   unique(c(
     sframe_in_form("jcs0", fun),
@@ -281,7 +280,7 @@ sframe_abort_canonical <- function(msg) {
 
 # The 0.4.3 development and pre-0.4.3 canonical payload, kept to recognise
 # files hashed in those forms. It mapped null to {}, so a null changed to {}
-# kept its hash (P2-01).
+# kept its hash.
 sframe_canonical_payload <- function(x) {
   if (is.null(x)) {
     return(sframe_json_object())
@@ -405,7 +404,7 @@ sframe_jcs <- function(x, path = "$") {
 # An escape R cannot hold: jsonlite cuts a string at an escaped NUL and turns a
 # lone surrogate into "?" or bytes that are not UTF-8, so 2 different texts
 # would read and hash the same in R. Checked on the raw text, and refused in R,
-# SurveyBuilder and the verifier page alike (coordinator 2026-11-11).
+# SurveyBuilder and the verifier page alike.
 # Returns c(kind, what), or NULL.
 sframe_escape_problem <- function(text) {
   odd <- "(?<!\\\\)(?:\\\\\\\\)*"
@@ -422,7 +421,7 @@ sframe_escape_problem <- function(text) {
 }
 
 # The first duplicate key in a parsed file, as c(key, path), or NULL. R keeps both
-# and the JavaScript twins the last, so such a file is refused (FR-12).
+# and the JavaScript twins the last, so such a file is refused.
 sframe_duplicate_key <- function(x, path = "$") {
   if (!is.list(x)) return(NULL)
   nm <- names(x)
@@ -441,7 +440,7 @@ sframe_duplicate_key <- function(x, path = "$") {
 # Doubles written in the canonical number form, so the file holds the same
 # digits the hash was taken over. jsonlite with digits = NA keeps 15
 # significant digits and C's exponent form (1e-07), which the JavaScript twins
-# read differently (P2-06, FR-03). A number JSON cannot hold is refused with
+# read differently. A number JSON cannot hold is refused with
 # its field named.
 sframe_json_numbers <- function(x, path = "$") {
   if (is.list(x) && !is.data.frame(x)) {
@@ -450,7 +449,7 @@ sframe_json_numbers <- function(x, path = "$") {
     # empty name under its position ({"":3} beside a named field becomes
     # {"3":3}) or, when every name is empty, as an array, so content read from
     # a file would change on writing with no amendment. Refused with its path,
-    # as an NA is (coordinator 2026-11-11, after CF-A milestone 4).
+    # as an NA is.
     if (length(nm) > 0 && !all(nzchar(nm))) {
       sframe_abort_canonical(sprintf(paste0(
         "The field at %s[%d] has an empty name. A .sframe file cannot hold an ",
@@ -483,7 +482,7 @@ sframe_json_numbers <- function(x, path = "$") {
 
 # An NA is written as null only where the bundled schema (the published
 # instrument profile) allows null for that field, and refused with the field
-# named anywhere else (coordinator 2026-11-11, after CF-A milestone 1). A field
+# named anywhere else. A field
 # the schema does not describe takes any value, null among them.
 sframe_bundled_schema <- function() {
   if (is.null(.sframe_order_env$schema)) {
@@ -586,7 +585,7 @@ sframe_hash_payload <- function(payload, parsed = FALSE) {
 # The hash of files written before canonical serialisation: jsonlite's
 # defaults, keys in file order, null as {}, numbers with 4 decimals. Read only,
 # never written. 4 decimals means 2 numbers that agree to 4 decimals hash the
-# same in this form (FR-11).
+# same in this form.
 sframe_legacy_hash_payload <- function(payload) {
   payload$hash$value <- ""
   json_for_hash <- jsonlite::toJSON(payload, auto_unbox = TRUE, pretty = FALSE)
@@ -1049,7 +1048,7 @@ sframe_validate_parsed_payload <- function(parsed, path, require_hash = TRUE) {
 #' print(instr)
 #' @family Design functions
 read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE) {
-  # A payload held in memory (Ethos request 4), so a host need not write a
+  # A payload held in memory, so a host need not write a
   # temporary file to read it faithfully.
   if (!is.null(text)) {
     if (!is.null(path)) {
@@ -1095,7 +1094,7 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
   )
 
   # A key given twice: R would keep the first and JavaScript the last, so the
-  # file means 2 things (FR-12).
+  # file means 2 things.
   dup <- sframe_duplicate_key(parsed)
   if (!is.null(dup)) {
     sframe_abort_import(
@@ -1187,7 +1186,7 @@ read_sframe <- function(path = NULL, validate = TRUE, text = NULL, verify = TRUE
       amendments = lapply(parsed$amendments %||% list(), sframe_restore_amendment),
       # Absent in every file written before 0.4.3, same precedent again.
       references = lapply(parsed$references %||% list(), sframe_restore_reference),
-      # D13, 0.4.3. Absent in older files.
+      # The study, from 0.4.3. Absent in older files.
       study = sframe_restore_study(parsed$study)
     ),
     class = "sframe"

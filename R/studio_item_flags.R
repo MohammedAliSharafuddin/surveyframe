@@ -1,14 +1,14 @@
 # R/studio_item_flags.R
 #
-# SurveyStudio's Drop from scale and Put back (UI-1, owner 2026-11-01, moved
-# from 8a). Under a result that sframe_item_flags() reads, each flagged item
-# gets "Drop from scale", which opens the 1 amendment dialog with the change
-# from sframe_drop_items() and the flag's reason filled in. Put back is a
-# second amendment, so history is never deleted. An amendment entry records
-# no before state, so Studio keeps the instrument from before each drop it
-# records in the session, keyed by the entry's new hash, and Put back copies
-# the parts the drop changed back from it. After a reopen that state is gone,
-# and the item goes back through Design instead.
+# SurveyStudio's Drop from scale and Put back. Under a result that
+# sframe_item_flags() reads, each flagged item gets "Drop from scale", which
+# opens the 1 amendment dialog with the change from sframe_drop_items() and the
+# flag's reason filled in. Put back is a second amendment, so history is never
+# deleted. An amendment entry records no before state, so Studio keeps the
+# instrument from before each drop it records in the session, keyed by the
+# entry's new hash, and Put back copies the parts the drop changed back from it.
+# After a reopen that state is gone, and the item goes back through Design
+# instead.
 
 # The flagged rows of 1 plan result, or an empty data frame for a result
 # sframe_item_flags() does not read. A flag with no item (AVE, HTMT) has

@@ -1,6 +1,6 @@
 # tests/testthat/test-studio-design-browser.R
 #
-# SurveyStudio's Design screen (session 7): the SurveyBuilder in an iframe.
+# SurveyStudio's Design screen: the SurveyBuilder in an iframe.
 # Studio sends it the open instrument, and a save in the builder becomes the
 # open instrument. Both sides take a message only from the other window on
 # the same origin. Driven in a real Chrome against the build under test.
@@ -119,7 +119,7 @@ test_that("the Design screen opens the instrument and a save becomes the open in
 
   # A save of changed content becomes the open instrument.
   js(paste0("var w=", frame, "; w.S._origin = null; w.S.meta.title = 'Renamed in Design'; w.saveSframe(); true"))
-  # The demo has a history, so the save opens the amendment dialog (8a).
+  # The demo has a history, so the save opens the amendment dialog.
   expect_true(wait("$('#amend_dlg-as_new').is(':visible')"))
   js("$('#amend_dlg-as_new').click(); true")
   expect_true(wait(paste0(status, ".indexOf('Renamed in Design') >= 0")))

@@ -8,7 +8,7 @@
 # declares it: a scale's reverse_items, and items whose own scale_id names
 # that scale with reverse = TRUE.
 #
-# Batch 2, finding 7. With no declared numeric bounds, reversal used the
+# With no declared numeric bounds, reversal used the
 # observed minimum and maximum, so a response's reversed value changed as
 # respondents were added. Reversal now needs declared bounds.
 
@@ -95,7 +95,7 @@ test_that("B2: validation rejects an item reversed within a scale that omits it"
   expect_match(paste(v$problems, collapse = " "), "x1")
 })
 
-test_that("finding 7: reversal uses declared bounds, never the sample's range", {
+test_that("Reversal uses declared bounds, never the sample's range", {
   ins <- sframe_instrument(title = "Bounds", components = list(
     agree(),
     sframe_item("r1", "Reversed", "likert", choice_set = "ag5", scale_id = "s"),
@@ -109,7 +109,7 @@ test_that("finding 7: reversal uses declared bounds, never the sample's range", 
   expect_equal(score_scales(few, ins)$s, c((4 + 3) / 2, (2 + 3) / 2))
 })
 
-test_that("finding 7: a slider item reverses on its declared slider bounds", {
+test_that("A slider item reverses on its declared slider bounds", {
   ins <- sframe_instrument(title = "Slider", components = list(
     sframe_item("s1", "Slider", "slider", slider_min = 0, slider_max = 10,
             scale_id = "s", reverse = TRUE),
@@ -121,7 +121,7 @@ test_that("finding 7: a slider item reverses on its declared slider bounds", {
   expect_equal(score_scales(d, ins)$s, c((7 + 5) / 2, (6 + 5) / 2))
 })
 
-test_that("finding 7: reversing an item with no declared bounds is an error", {
+test_that("Reversing an item with no declared bounds is an error", {
   ins <- sframe_instrument(title = "No bounds", components = list(
     sframe_item("n1", "Number", "numeric", scale_id = "s", reverse = TRUE),
     sframe_item("n2", "Number", "numeric", scale_id = "s"),

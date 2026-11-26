@@ -1,6 +1,6 @@
 # tests/testthat/test-sheets-sharing-guidance.R
 #
-# G9. The export_google_sheet() help told researchers the collection sheet
+# The export_google_sheet() help told researchers the collection sheet
 # "must be shared so that anyone with the link can edit". That instructs a
 # researcher to make participant data world readable and world writable, and
 # the collector never needed it: the generated Apps Script is bound to the

@@ -313,9 +313,9 @@ read_responses <- function(
 # a numeric round trip. Codes like "01" read as numbers would lose their
 # leading zero, so they are text. The codes are compared as declared:
 # trimmed, " 1" counted as numeric and the answer " 1" became 1, a code the
-# set does not hold (P3-04). The 1 test for the reader and
+# set does not hold. The 1 test for the reader and
 # export_responses(), which tested as.numeric() alone and wrote "01", "02"
-# to .sav and .dta as 1 and 2 (P3-03).
+# to .sav and .dta as 1 and 2.
 sframe_codes_are_numbers <- function(values) {
   if (is.numeric(values)) return(TRUE)
   codes <- as.character(values)
@@ -381,7 +381,7 @@ sframe_resolve_delim <- function(path, delim = NULL) {
 
 # TRUE where a value is a blank answer: an empty string, or only white
 # space. The 1 rule for a blank answer, in the reader and at the top of every
-# analysis runner (P3-05, P2-04).
+# analysis runner.
 sframe_is_blank <- function(x) {
   if (!is.character(x) && !is.factor(x)) return(rep(FALSE, length(x)))
   x <- as.character(x)
@@ -402,7 +402,7 @@ sframe_blank_to_na <- function(x) {
 # Blank to NA first, for every text or factor column, then the declared
 # numeric columns to numbers. A factor column kept its "" (only text columns
 # were cleaned), and a declared numeric column with 1 value that did not
-# convert stayed text, kept its "", and said nothing (P3-05). It now gives a
+# convert stayed text, kept its "", and said nothing. It now gives a
 # warning naming the column and up to 3 of the values.
 sframe_convert_declared_columns <- function(data, instrument, response_items,
                                             dec = ".") {
@@ -443,7 +443,7 @@ sframe_convert_declared_columns <- function(data, instrument, response_items,
 }
 
 # Reads a delimited response file as text, every record checked against the
-# header's width first (P3-01). read.csv() took a file whose data rows had 1
+# header's width first. read.csv() took a file whose data rows had 1
 # field more than the header (a trailing separator, as spreadsheets write) and
 # made its first column the row names: every answer and the respondent id
 # moved 1 column left, with no warning. A record of another width is refused,
@@ -465,7 +465,7 @@ sframe_read_csv_records <- function(x, sep) {
   if (!any(wrong)) {
     if (!identical(header, 1L)) return(read_text())
     # In a file of 1 column, an unanswered respondent's row is a blank line,
-    # which read.csv() skipped, so the respondent was lost (P3-02). Blank
+    # which read.csv() skipped, so the respondent was lost. Blank
     # lines are kept, except those after the last line holding anything.
     data <- read_text(blank.lines.skip = FALSE)
     trailing <- length(widths) - max(which(!is.na(widths) & widths > 0))

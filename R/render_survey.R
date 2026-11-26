@@ -237,7 +237,7 @@ sframe_response_row <- function(instrument, input_values, branch_lookup,
   expanded_items <- Filter(function(i) i$type %in% expanded_types,
                            instrument$items)
   # Section breaks and text blocks collect nothing, so they get no column,
-  # as on the static page and in the Google Sheet (G1).
+  # as on the static page and in the Google Sheet.
   plain_items <- Filter(function(i) !i$type %in% c(expanded_types,
                                                    "section_break", "text_block"),
                         instrument$items)
@@ -352,7 +352,7 @@ sframe_delivery_outcome <- function(output_path, on_submit) {
   else "none"
 }
 
-# The status line of a Shiny thank-you screen (D4). It is the package's own
+# The status line of a Shiny thank-you screen. It is the package's own
 # voice, kept apart from the researcher's message below it, so a survey that
 # stores nothing says so.
 sframe_delivery_status <- function(outcome) {
@@ -467,7 +467,7 @@ sframe_blank_date_input <- function(tag) {
 # every control is drawn with its answer restored. A control drawn at its
 # default reports that default to the server when it binds, so drawing a
 # page again without restoring would erase what the participant entered.
-# "Other, please specify" (UX-11), drawn as the static survey draws it: the
+# "Other, please specify", drawn as the static survey draws it: the
 # code "other" last in the options, outside any shuffle, and a text box under
 # them whose input is <id>__other_text. Typing in the box chooses Other.
 sframe_other_label <- "Other, please specify"

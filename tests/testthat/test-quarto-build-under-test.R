@@ -1,6 +1,6 @@
 # tests/testthat/test-quarto-build-under-test.R
 #
-# Session 2, third report (2026-10-30). Quarto renders in its own R process,
+# Quarto renders in its own R process,
 # which loaded the surveyframe installed earlier rather than the source under
 # test. The report now records the surveyframe version and, where the install
 # carries one, its commit (labelled -dirty when built from uncommitted
@@ -44,7 +44,7 @@ test_that("the Quarto report was rendered by the build under test", {
   }
 })
 
-# Session 2, fourth report. The browser tests started Studio and the survey
+# The browser tests started Studio and the survey
 # with pkgload::load_all() from source, the pattern behind 7f846f7, where a
 # browser test passed while the installed Studio could not start.
 test_that("no test starts a child process with load_all()", {
@@ -56,7 +56,7 @@ test_that("no test starts a child process with load_all()", {
   expect_identical(basename(files[uses]), character(0))
 })
 
-# Session 5. The fast tier makes no source install, so a test that renders
+# The fast tier makes no source install, so a test that renders
 # through Quarto or starts Chrome or a callr process would run the installed
 # copy there. Every file that does must call skip_if_not_slow().
 test_that("every Quarto, Chrome or callr test belongs to the slow tier", {

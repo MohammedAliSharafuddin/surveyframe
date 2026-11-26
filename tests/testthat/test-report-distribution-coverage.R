@@ -1,4 +1,4 @@
-# Batch 4 #17 and #18: what the distribution section does when an optional
+# What the distribution section does when an optional
 # package is missing, and which palette its figures use.
 #
 # #17. The report grouped a scale's Likert items into one chart, and every
@@ -17,7 +17,7 @@ engine_sources <- function() {
                                     "report.qmd"))
 }
 
-test_that("18: both engines forward the palette to the diverging chart", {
+test_that("Both engines forward the palette to the diverging chart", {
   src <- engine_sources()
   expect_match(src$r, "sframe_draw_likert_diverging(freq, theme,", fixed = TRUE)
   expect_match(src$r, "palette = plot_palette", fixed = TRUE)
@@ -25,7 +25,7 @@ test_that("18: both engines forward the palette to the diverging chart", {
   expect_match(src$qmd, "chart$draw()", fixed = TRUE)
 })
 
-test_that("17: a grouped item falls through when ggplot2 is absent", {
+test_that("A grouped item falls through when ggplot2 is absent", {
   src <- engine_sources()
   # the skip is conditional on a grouped chart being possible
   expect_match(src$r, "if (has_ggplot) {", fixed = TRUE)
@@ -37,7 +37,7 @@ test_that("17: a grouped item falls through when ggplot2 is absent", {
                      src$r, fixed = TRUE))
 })
 
-test_that("17: every Likert item in a scale is drawn, with ggplot2 present", {
+test_that("Every Likert item in a scale is drawn, with ggplot2 present", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("ggplot2")
   demo <- sframe_demo("tourism_services")
@@ -56,12 +56,12 @@ test_that("17: every Likert item in a scale is drawn, with ggplot2 present", {
   }
 })
 
-# Batch 4 #23: the quanteda DFM runner's own table carries the response count,
+# The quanteda DFM runner's own table carries the response count,
 # feature count and sparsity, and the leading features it asks a reader to
 # review sit in $top_features. Neither report engine rendered that table, so the
 # prompt asked for something the report did not supply.
 
-test_that("23: both engines render a result's supplementary table", {
+test_that("Both engines render a result's supplementary table", {
   src <- engine_sources()
   # one shared helper decides what a result shows besides its main table, so
   # the 2 engines cannot drift on it
@@ -74,7 +74,7 @@ test_that("23: both engines render a result's supplementary table", {
   expect_match(helper, "result$top_features", fixed = TRUE)
 })
 
-test_that("23: the leading features reach a rendered report", {
+test_that("The leading features reach a rendered report", {
   skip_on_cran()  # renders a report or runs a full plan: slow on CRAN's machines
   skip_if_not_installed("quanteda")
   demo <- sframe_demo("open_text")
@@ -100,7 +100,7 @@ test_that("23: the leading features reach a rendered report", {
 # The Quarto template runs in a separate R session against the INSTALLED
 # package, so every function it calls has to be exported. A template calling an
 # internal through ::: fails there, and render_report() falls back to the
-# built-in HTML engine without saying why, which batch 4 #15 describes. That
+# built-in HTML engine without saying why. That
 # fallback produces equivalent content, so no content assertion catches it:
 # adding a call to an internal silently cost the Quarto path, and did until
 # this test existed.

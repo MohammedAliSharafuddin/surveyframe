@@ -1,7 +1,6 @@
 # tests/testthat/test-report-formats.R
 #
-# Session 8b-R, item 3 (NAMING decision 6, owner 2026-10-31, coordinator
-# 2026-11-04). render_report() writes HTML, PDF, Word (.docx) and OpenDocument
+# render_report() writes HTML, PDF, Word (.docx) and OpenDocument
 # (.odt). Word and ODT go through Quarto, styled by the bundled APA 7
 # reference documents. PDF goes through Quarto and LaTeX when a LaTeX engine
 # is found, through Quarto's Typst otherwise, and without Quarto through the

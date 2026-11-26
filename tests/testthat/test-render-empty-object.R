@@ -1,11 +1,11 @@
 # tests/testthat/test-render-empty-object.R
 #
-# Ethos request 3 (2026-10-01), second half. An empty render was written as
+# An empty render was written as
 # [], which a host reading the JSON took for a list. It is now {}. Files and
 # amendment logs written with [] must keep working: a file verifies as it was
 # written, and an amendment recorded against the [] form still matches.
 
-test_that("3: an empty render is written as {}", {
+test_that("An empty render is written as {}", {
   ins <- sframe_instrument("Plain", components = list(sframe_item("q1", "Q", type = "text")))
   path <- tempfile(fileext = ".sframe")
   write_sframe(ins, path)
@@ -14,7 +14,7 @@ test_that("3: an empty render is written as {}", {
   expect_s3_class(read_sframe(path), "sframe")
 })
 
-test_that("3: a file whose log was recorded with render as [] takes a further amendment", {
+test_that("A file whose log was recorded with render as [] takes a further amendment", {
   ins <- sframe_instrument("Legacy", components = list(sframe_item("q1", "Q", type = "text")))
   revised <- ins
   revised$meta$description <- "First revision"

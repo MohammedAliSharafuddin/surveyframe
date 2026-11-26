@@ -64,12 +64,12 @@ test_that("a .sframe file with an amendment round-trips its amendments key again
   expect_true(all(required_entry_keys %in% names(entry)))
 })
 
-# Ethos request 29 (2026-10-06). The bundled copy did not require
+# The bundled copy did not require
 # sframe_format and lacked references, while sframe-schema's instrument
 # profile required the first and documented the second, so a file could be
 # valid by one and invalid by the other. The bundled copy is now the profile,
 # copied by data-raw/sync_sframe_schema.R.
-test_that("29: the bundled schema is sframe-schema's instrument profile", {
+test_that("The bundled schema is sframe-schema's instrument profile", {
   bundled <- schema_path()
   skip_if(!nzchar(bundled), "schema not found via system.file()")
   profile <- test_path("..", "..", "..", "sframe-schema", "schema",
@@ -78,7 +78,7 @@ test_that("29: the bundled schema is sframe-schema's instrument profile", {
   expect_identical(readLines(bundled, warn = FALSE), readLines(profile, warn = FALSE))
 })
 
-test_that("29: the bundled schema documents every field write_sframe() can write", {
+test_that("The bundled schema documents every field write_sframe() can write", {
   schema <- jsonlite::fromJSON(schema_path(), simplifyVector = FALSE)
   expect_true(all(c("sframe_format", "references", "designs", "amendments") %in%
                     names(schema$properties)))

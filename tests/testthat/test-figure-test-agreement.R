@@ -1,4 +1,4 @@
-# Batch 4's findings where a figure summarised a different population, or used a
+# Findings where a figure summarised a different population, or used a
 # reference the data cannot be judged against.
 #
 # #11. The repeated-measures runner drops any respondent missing a measure, and
@@ -20,7 +20,7 @@ repeated_data <- function() {
   )
 }
 
-test_that("11: the figure uses the cases the test used", {
+test_that("The figure uses the cases the test used", {
   skip_if_not_installed("ggplot2")
   d <- repeated_data()
   result <- list(test = "friedman", vars = c("t1", "t2", "t3"),
@@ -39,7 +39,7 @@ test_that("11: the figure uses the cases the test used", {
   expect_match(p$labels$caption %||% "", "complete", ignore.case = TRUE)
 })
 
-test_that("11: with nothing missing, the figure is unchanged", {
+test_that("With nothing missing, the figure is unchanged", {
   skip_if_not_installed("ggplot2")
   d <- data.frame(t1 = c(1, 2, 3), t2 = c(2, 3, 4), t3 = c(3, 4, 5))
   result <- list(test = "friedman", vars = c("t1", "t2", "t3"), apa = "x")
@@ -48,7 +48,7 @@ test_that("11: with nothing missing, the figure is unchanged", {
   expect_equal(p$data$value, c(2, 3, 4))
 })
 
-test_that("12: a raw-variable Q-Q plot uses a fitted reference line", {
+test_that("A raw-variable Q-Q plot uses a fitted reference line", {
   skip_if_not_installed("ggplot2")
   set.seed(42)
   d <- data.frame(score = stats::rnorm(200, mean = 100, sd = 10))
@@ -72,7 +72,7 @@ test_that("12: a raw-variable Q-Q plot uses a fitted reference line", {
   expect_match(qq$labels$caption, "quartiles", fixed = TRUE)
 })
 
-test_that("12: a standardised variable still gets a line near y = x", {
+test_that("A standardised variable still gets a line near y = x", {
   skip_if_not_installed("ggplot2")
   set.seed(7)
   d <- data.frame(z = stats::rnorm(300))
@@ -83,7 +83,7 @@ test_that("12: a standardised variable still gets a line near y = x", {
   expect_lt(abs(ab$data$slope - stats::sd(d$z)), 0.1)
 })
 
-# Batch 4 #13: the network runner stores Louvain cluster IDs, and the plot
+# The network runner stores Louvain cluster IDs, and the plot
 # renumbered them by size while titling the legend "Cluster", so the cluster a
 # table called 2 could appear as Cluster 1 in the figure.
 
@@ -102,7 +102,7 @@ network_result <- function() {
                           n = c(4, 2), stringsAsFactors = FALSE))
 }
 
-test_that("13: the figure calls a cluster what the table calls it", {
+test_that("The figure calls a cluster what the table calls it", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("igraph")
   p <- sframe_plot_cooccurrence_network(network_result(), palette = "print")

@@ -4,7 +4,7 @@
 #     as "items": "sat_1" where the published instrument profile requires an
 #     array. Singletons are legal instruments. The builder already wrote true
 #     arrays, so the 2 routes also hashed the same instrument differently.
-# Batch 5, finding 10. The reader, the bundled schema and the published profile
+# The reader, the bundled schema and the published profile
 #     disagreed on required fields, the reader never checked sframe_format, and
 #     the bundled schema said render must be an object while the writer can
 #     emit an empty array.
@@ -84,7 +84,7 @@ test_that("E1: a singleton instrument is a serialisation fixed point", {
   expect_identical(again$parsed$hash$value, first$parsed$hash$value)
 })
 
-test_that("10: the reader accepts a minimal profile file with only the core fields", {
+test_that("The reader accepts a minimal profile file with only the core fields", {
   minimal <- list(sframe_format = "1.0", hash = list(algo = "sha256", value = ""),
                   meta = list(title = "Minimal"),
                   items = list(list(id = "q1", label = "Q1", type = "text")))
@@ -96,7 +96,7 @@ test_that("10: the reader accepts a minimal profile file with only the core fiel
   expect_length(ins$items, 1)
 })
 
-test_that("10: a file from a newer major format version is refused clearly", {
+test_that("A file from a newer major format version is refused clearly", {
   p <- written(singleton_instrument())
   parsed <- p$parsed
   parsed$sframe_format <- "2.0"
@@ -106,7 +106,7 @@ test_that("10: a file from a newer major format version is refused clearly", {
   expect_error(read_sframe(p$path), "2.0", class = "sframe_error")
 })
 
-test_that("10: the bundled schema agrees with the reader and the writer", {
+test_that("The bundled schema agrees with the reader and the writer", {
   path <- system.file("schema", "sframe_schema.json", package = "surveyframe")
   skip_if(!nzchar(path), "bundled schema not found")
   schema <- jsonlite::fromJSON(path, simplifyVector = FALSE)
@@ -115,7 +115,7 @@ test_that("10: the bundled schema agrees with the reader and the writer", {
   expect_false(grepl("byte-identical", schema$properties$hash$description, fixed = TRUE))
 })
 
-test_that("10: the profile checker here matches the published profile's required fields", {
+test_that("The profile checker here matches the published profile's required fields", {
   profile <- test_path("..", "..", "..", "sframe-schema", "schema",
                        "sframe-instrument.schema.json")
   skip_if(!file.exists(profile), "sframe-schema repository not beside this one")

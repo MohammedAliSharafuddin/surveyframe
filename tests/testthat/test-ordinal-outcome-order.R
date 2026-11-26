@@ -1,4 +1,4 @@
-# FR-19 (Fable sitting 2), Session CF-B: an ordinal outcome is ordered as its
+# An ordinal outcome is ordered as its
 # choice set declares, not alphabetically. ordered() of low, medium, high gave
 # high < low < medium and reversed the slope's sign.
 

@@ -1,4 +1,4 @@
-# Batch 2's remaining correctness findings on the quality report.
+# Remaining correctness findings on the quality report.
 #
 # #8. An expected column absent from the export left both the numerator and
 #     the denominator, so a partial export read as more complete than the
@@ -25,7 +25,7 @@ quality_instrument <- function() {
   ))
 }
 
-test_that("8: a column the export left out is reported, not ignored", {
+test_that("A column the export left out is reported, not ignored", {
   instr <- quality_instrument()
   # sat_4 never reached the export at all
   data <- data.frame(sat_1 = c(5, 4, 3), sat_2 = c(5, 4, 3),
@@ -39,7 +39,7 @@ test_that("8: a column the export left out is reported, not ignored", {
   expect_equal(unname(qr$missing$item_miss_rate[["sat_4"]]), 1)
 })
 
-test_that("8: a complete export reports no absent column", {
+test_that("A complete export reports no absent column", {
   instr <- quality_instrument()
   data <- data.frame(sat_1 = c(5, 4), sat_2 = c(5, 4),
                      sat_3 = c(5, 4), sat_4 = c(5, NA))
@@ -48,7 +48,7 @@ test_that("8: a complete export reports no absent column", {
   expect_equal(unname(qr$missing$respondent_miss), c(0, 0.25))
 })
 
-test_that("9: straight-lining needs the declared minimum of answers", {
+test_that("straight-lining needs the declared minimum of answers", {
   instr <- quality_instrument()
   data <- data.frame(
     sat_1 = c(3, 3, 5),
@@ -68,7 +68,7 @@ test_that("9: straight-lining needs the declared minimum of answers", {
   expect_equal(sl$flag_rate, 0.5)
 })
 
-test_that("9: a lower minimum admits the shorter response", {
+test_that("A lower minimum admits the shorter response", {
   instr <- quality_instrument()
   data <- data.frame(sat_1 = c(3, 5), sat_2 = c(3, 4),
                      sat_3 = c(NA, 3), sat_4 = c(NA, 2))

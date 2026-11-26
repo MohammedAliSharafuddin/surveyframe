@@ -10,7 +10,7 @@ sframe_new_problem_log <- function() {
   log <- new.env(parent = emptyenv())
   log$check    <- character(0)
   log$problems <- character(0)
-  # Notes are said, not counted: they never fail a check (D13).
+  # Notes are said, not counted: they never fail a check.
   log$notes <- character(0)
   log
 }

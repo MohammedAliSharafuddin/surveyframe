@@ -4,9 +4,9 @@
 # checking only that each name was a prefix plus a number. c("Q1", "Q3") became
 # multi_items("Q", 1:3), which adds Q2 to the fitted model whenever Q2 is in the
 # data.
-# Batch 2 finding 20. An indirect effect was accepted when a path along its
+# An indirect effect was accepted when a path along its
 # route was never declared, and the syntax multiplied a label no path carries.
-# Batch 2 finding 21. A total effect was written once per indirect effect, so
+# A total effect was written once per indirect effect, so
 # 2 parallel mediators gave total_A_C twice, each holding 1 indirect effect.
 
 test_that("C2: non-contiguous indicators are written out exactly", {
@@ -44,7 +44,7 @@ three_constructs <- function(ids) {
   lapply(ids, function(id) sframe_construct(id, items = paste0(tolower(id), 1:3)))
 }
 
-test_that("20: an indirect effect along an undeclared path is rejected", {
+test_that("An indirect effect along an undeclared path is rejected", {
   m <- sframe_model_spec(
     id = "m1", type = "cb_sem", engine = "lavaan",
     constructs = three_constructs(c("SAT", "TRU", "LOY")),
@@ -58,7 +58,7 @@ test_that("20: an indirect effect along an undeclared path is rejected", {
   expect_error(sframe_syntax_sem(m), class = "sframe_error")
 })
 
-test_that("21: parallel mediators give one total effect holding every route", {
+test_that("Parallel mediators give one total effect holding every route", {
   m <- sframe_model_spec(
     id = "m2", type = "cb_sem", engine = "lavaan",
     constructs = three_constructs(c("SAT", "TRU", "VAL", "LOY")),

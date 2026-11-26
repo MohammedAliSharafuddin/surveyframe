@@ -1,6 +1,6 @@
 # R/report_source.R
 #
-# The Quarto source of a report (session 8b-R, NAMING decision 6).
+# The Quarto source of a report.
 # render_report(format = "qmd") writes a folder that renders the report again
 # in RStudio or Positron:
 #   report.qmd            the report template, its front matter holding the
@@ -44,7 +44,7 @@ sframe_qmd_set_params <- function(lines, values) {
 # Export computes the results record from this right after writing the files,
 # and sframe_report_source() computes it again from the same call, so the two
 # records come from the same objects. Computed from the objects in memory, the
-# record differed on an untouched folder (master review L4): the written
+# record differed on an untouched folder: the written
 # instrument gains normalised fields, so its hash changes, and write.csv()
 # keeps 15 significant digits, so a statistic moves in its last digit.
 sframe_source_state <- function(dir, include_analysis = TRUE, plot_palette = "web") {
@@ -102,7 +102,7 @@ sframe_write_report_source <- function(dir, instrument, data, front,
   file.copy(file.path(template_dir, c("report.scss", "apa-reference.docx", "apa-reference.odt")),
             dir, overwrite = TRUE)
   # The style used, bundled or the researcher's own, named for it, so a rerun
-  # formats with that copy (owner 2026-11-03).
+  # formats with that copy.
   style_file <- paste0(style$name, ".csl")
   sframe_bibliography(instrument, extra = bibliography_extra,
                       file = path("references"))
@@ -128,7 +128,6 @@ sframe_write_report_source <- function(dir, instrument, data, front,
                              sframe_style_manifest_object(style, style_file)))
   # The bibliography and the written interpretations are read by the report
   # too, so an emptied bibliography or an added interpretation is reported
-  # (Fable FR-17).
   if (file.exists(path("references"))) {
     objects <- c(objects, list(obj("references", "bibliography_csl_json", "references")))
   }
@@ -234,8 +233,8 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
   now_qmd <- sframe_sha256_file(path("qmd"))
   now_resp <- if (file.exists(path("responses"))) sframe_sha256_file(path("responses")) else NA_character_
   # Each file the report reads as recorded: the results record itself, which
-  # numbers_match never opens (Codex P2-02, Fable FR-04), the bibliography and
-  # the interpretations (FR-17). NA where a file is absent or not recorded.
+  # numbers_match never opens, the bibliography and
+  # the interpretations. NA where a file is absent or not recorded.
   file_state <- function(key) {
     now <- if (file.exists(path(key))) sframe_sha256_file(path(key)) else NA_character_
     rec <- recorded[[key]]
@@ -283,7 +282,7 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
       } else {
         paste0(now_resp, ", which differs from the file exported (", recorded$responses %||% "none", ")")
       },
-      # numbers_match recomputes the analysis plan alone (Fable FR-07).
+      # numbers_match recomputes the analysis plan alone.
       if (check$numbers_match) "The analysis plan results match the recorded results" else {
         sprintf("The analysis plan results differ from the recorded results (recorded %s, now %s)",
                 rec_results, now_record)
@@ -309,7 +308,7 @@ sframe_report_source <- function(dir = ".", include_analysis = TRUE, plot_palett
     stringsAsFactors = FALSE
   )
 
-  # Field text may cite any work in the folder's bibliography (8b-R).
+  # Field text may cite any work in the folder's bibliography.
   bib <- path("references")
   keys <- unique(c(sframe_md_keys(instrument), if (file.exists(bib)) {
     vapply(jsonlite::fromJSON(bib, simplifyVector = FALSE), function(x) as.character(x$id %||% ""), character(1))

@@ -1,6 +1,6 @@
 # tests/testthat/test-builder-role-aliases.R
 #
-# CX-16. A mediation block written in R names its roles x, mediator and y.
+# A mediation block written in R names its roles x, mediator and y.
 # SurveyBuilder's editor knew only predictor and outcome, so it opened with
 # the first variable in both and Save disabled. The builder now carries R's
 # role alias table, inlined by data-raw/inline_role_aliases.R, and an unset
