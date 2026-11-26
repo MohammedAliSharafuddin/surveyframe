@@ -49,7 +49,7 @@ runs on your computer, and you choose where responses are collected and stored.
 | Stage | In SurveyStudio |
 |---|---|
 | **Build** | Write the questions, the analysis plan and the model, then preview the survey |
-| **Collect** | Share the survey and bring the responses back in |
+| **Collect** | Export the survey as 1 web page, collect into your own Google Sheet or any survey tool, then load the responses |
 | **Analyse** | Check quality and reliability, then run the plan |
 | **Report** | Get a results report you can edit in Word |
 | **Record** | Keep the references and every amendment with the study |
@@ -85,7 +85,7 @@ Already have data from Google Forms, Qualtrics or REDCap? Describe the questions
 
 Use surveyframe when:
 
-- the analysis should be decided before collection
+- you want the questionnaire and its analysis plan kept together, planned before collection or added to data you already have
 - you are validating a scale or fitting a measurement model
 - you need an audit trail showing the plan did not change after the results
 
